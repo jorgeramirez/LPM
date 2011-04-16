@@ -1,8 +1,14 @@
-This file is for you to describe the LPM application. Typically
-you would include information such as the information below:
+## Lambda Project Manager
+    A simple project management system.
 
-Installation and Setup
-======================
+## Authors:
+    * Carlos Bellino
+    * Nahuel Hernández
+    * Jorge Ramírez
+
+
+## Installation and Setup
+
 
 Install ``LPM`` using the setup.py script::
 
