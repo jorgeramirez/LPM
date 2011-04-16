@@ -52,7 +52,6 @@ lpm/public/images/star.png
 lpm/public/images/strype2.png
 lpm/public/images/under_the_hood_blue.png
 lpm/public/images/warning.png
-lpm/public/javascript/empty
 lpm/templates/__init__.py
 lpm/templates/about.html
 lpm/templates/authentication.html
