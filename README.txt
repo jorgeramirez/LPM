@@ -33,3 +33,5 @@ Then you are ready to go.
 ## TODO
 
 1. Hacer el mapeo de las tablas del diagrama E/R en clases dentro de la carpeta Model
+(tengo que terminar de leer sobre sendmail)
+
