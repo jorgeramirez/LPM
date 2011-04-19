@@ -28,3 +28,7 @@ While developing you may want the server to reload after changes in package file
     $ paster serve --reload development.ini
 
 Then you are ready to go.
+
+#TODO
+(no voy a escribir en inglés)
+1. Hacer el mapeo de las tablas del diagrama E/R en clases dentro de la carpeta Model
