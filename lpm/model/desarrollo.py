@@ -24,15 +24,16 @@ Iterar sobre los objetos Relacion via RelacionPorItem::
 """
 
 from sqlalchemy import ForeignKey, Column
-from sqlalchemy.types import Integer, String, Boolean, LargeBinary
-from sqlalchemy.orm import relation
+from sqlalchemy.types import Integer, String, Boolean, LargeBinary, Date
+from sqlalchemy.orm import relation, backref
 
 from lpm.model import DeclarativeBase, DBSession
 
 
 __all__ = ['Item', 'PropiedadItem', 'TipoItem', 'AtributosPorTipoItem',
            'RelacionPorItem', 'Relacion', 'AtributosDeItems',
-           'ArchivosExternos', 'ArchivosPorItem']
+           'ArchivosExternos', 'ArchivosPorItem', 'HistorialItems',
+           'AtributosPorItem']
 
 
 class Item(DeclarativeBase):
@@ -72,6 +73,7 @@ class PropiedadItem(DeclarativeBase):
     #{ Relaciones
     relaciones = relation('RelacionPorItem', backref="propiedad_item")
     archivos = relation('ArchivosPorItem', backref="propiedad_item")
+    atributos = relation('AtributosPorItem', backref="propiedad_item")
     #}
 
 
@@ -93,6 +95,7 @@ class TipoItem(DeclarativeBase):
     tipo_hijo = relation('TipoItem', backref=backref('tipo_padre', 
                                                      remote_side=id_tipo_item))
     atributos = relation('AtributosPorTipoItem', backref='tipo_item')
+    items = relation('Item', backref='tipo')
     #}
 
 
@@ -201,9 +204,44 @@ class ArchivosPorItem(DeclarativeBase):
     #} 
 
 
-
-
+class HistorialItems(DeclarativeBase):
+    """
+    Clase que define un historial de modificaciones
+    hechas sobre los ítems.
+    """
+    __tablename__ = 'tbl_historial_item'
     
+    #{ Columnas
+    id_historial_items = Column(Integer, autoincrement=True, primary_key=True)
+    tipo_modificacion = Column(String(45), nullable=False)
+    fecha_modificacion = Column(Date, nullable=False)
+    id_usuario = Column(Integer, ForeignKey('tg_user.user_id'))
+    id_item = Column(Integer, 
+        ForeignKey('tbl_propiedad_item.id_propiedad_item'))
+    
+    #{ Relaciones
+    item = relation("PropiedadItem", backref=backref("historial_item", uselist=False))
+    #}
+
+
+class AtributosPorItem(DeclarativeBase):
+    """
+    Clase que asocia un ítem con sus atributos
+    """
+    __tablename__ = 'tbl_atributos_por_item'
+    
+    #{ Columnas
+    id_atributos_por_item = Column(Integer, autoincrement=True, 
+                                   primary_key=True)
+    id_propiedad_item = Column(Integer,
+        ForeignKey('tbl_propiedad_item.id_propiedad_item'))
+    id_atributos_de_items = Column(Integer,
+        ForeignKey('tbl_atributos_de_items.id_atributos_de_items'))
+    
+    #{ Relaciones
+    atributo = relation("AtributosDeItems", backref="atributos_assocs")
+    #}
+   
 
     
     
