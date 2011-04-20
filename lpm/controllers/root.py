@@ -4,7 +4,8 @@
 from tg import expose, flash, require, url, request, redirect
 from pylons.i18n import ugettext as _, lazy_ugettext as l_
 from tgext.admin.tgadminconfig import TGAdminConfig
-from tgext.admin.controller import AdminController
+#from tgext.admin.controller import AdminController
+from tgext.admin import AdminController
 from repoze.what import predicates
 
 from lpm.lib.base import BaseController

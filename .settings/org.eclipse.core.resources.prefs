@@ -1,0 +1,9 @@
+#Tue Apr 19 19:50:30 PYT 2011
+eclipse.preferences.version=1
+encoding//lpm/__init__.py=utf-8
+encoding//lpm/config/environment.py=utf-8
+encoding//lpm/controllers/__init__.py=utf-8
+encoding//lpm/controllers/root.py=utf-8
+encoding//lpm/controllers/template.py=utf-8
+encoding//lpm/websetup/__init__.py=utf-8
+encoding/setup.py=utf-8
