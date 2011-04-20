@@ -60,3 +60,5 @@ def init_model(engine):
 
 # Import your model modules here.
 from lpm.model.auth import User, Group, Permission
+from lpm.model.desarrollo import *
+from lpm.model.gestconf import *

@@ -113,9 +113,6 @@ class AtributosPorTipoItem(DeclarativeBase):
     tipo = Column(String(32), nullable=False)
     valor_por_defecto = Column(String(32), nullable=True)
     id_tipo_item = Column(Integer, ForeignKey('tbl_tipo_item.id_tipo_item'))
-    
-    #{ Relaciones
-    atributos = relation("AtributosDeItems", backref="tipo_item")
     #}
 
 
@@ -169,6 +166,28 @@ class AtributosDeItems(DeclarativeBase):
     id_atributos_por_tipo_item = Column(Integer, 
         ForeignKey('tbl_atributos_por_tipo_item.id_atributos_por_tipo_item'))
     valor = Column(String(200), nullable=False)
+    
+    #{ Relaciones
+    tipo = relation("AtributosPorTipoItem", backref="")
+    #}
+
+
+class AtributosPorItem(DeclarativeBase):
+    """
+    Clase que asocia un ítem con sus atributos
+    """
+    __tablename__ = 'tbl_atributos_por_item'
+    
+    #{ Columnas
+    id_atributos_por_item = Column(Integer, autoincrement=True, 
+                                   primary_key=True)
+    id_propiedad_item = Column(Integer,
+        ForeignKey('tbl_propiedad_item.id_propiedad_item'))
+    id_atributos_de_items = Column(Integer,
+        ForeignKey('tbl_atributos_de_items.id_atributos_de_items'))
+    
+    #{ Relaciones
+    atributo = relation("AtributosDeItems", backref="attr_item_assocs")
     #}
 
 
@@ -222,28 +241,7 @@ class HistorialItems(DeclarativeBase):
     #{ Relaciones
     item = relation("PropiedadItem", backref=backref("historial_item", uselist=False))
     #}
-
-
-class AtributosPorItem(DeclarativeBase):
-    """
-    Clase que asocia un ítem con sus atributos
-    """
-    __tablename__ = 'tbl_atributos_por_item'
-    
-    #{ Columnas
-    id_atributos_por_item = Column(Integer, autoincrement=True, 
-                                   primary_key=True)
-    id_propiedad_item = Column(Integer,
-        ForeignKey('tbl_propiedad_item.id_propiedad_item'))
-    id_atributos_de_items = Column(Integer,
-        ForeignKey('tbl_atributos_de_items.id_atributos_de_items'))
-    
-    #{ Relaciones
-    atributo = relation("AtributosDeItems", backref="atributos_assocs")
-    #}
    
-
-    
     
     
     
