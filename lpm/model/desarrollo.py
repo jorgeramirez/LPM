@@ -51,9 +51,9 @@ class Item(DeclarativeBase):
     id_fase = Column(Integer, ForeignKey('tbl_fase.id_fase'))
     
     #{ Relaciones
-    propiedad_item = relation('PropiedadItem', backref='item_actual')
+    propiedad_item_versiones = relation('PropiedadItem', backref='item_actual')
     #}
-
+    
 
 class PropiedadItem(DeclarativeBase):
     """
@@ -131,7 +131,7 @@ class RelacionPorItem(DeclarativeBase):
     id_relacion = Column(Integer, ForeignKey('tbl_relacion.id_relacion'))
     
     #{ Relaciones
-    relacion = relation("Relacion", backref="relacion_item")
+    relacion = relation("Relacion", backref="relacion_item_assocs")
     #}
 
 
@@ -147,10 +147,11 @@ class Relacion(DeclarativeBase):
     id_anterior = Column(Integer, ForeignKey('tbl_item.id_item'))
     id_posterior = Column(Integer, ForeignKey('tbl_item.id_item'))
     
-    #{ Relaciones
-    anterior = relation("Item", backref=backref("relacion_anterior", uselist=False))
-    posterior = relation("Item", backref=backref("relacion_posterior", uselist=False))
+    #{ Relaciones  FIXME
+    #anterior = relation("Item", backref=backref("relacion_anterior", uselist=False))
+    #posterior = relation("Item", backref=backref("relacion_posterior", uselist=False))
     #}
+
     
 
 class AtributosDeItems(DeclarativeBase):
@@ -168,7 +169,7 @@ class AtributosDeItems(DeclarativeBase):
     valor = Column(String(200), nullable=False)
     
     #{ Relaciones
-    tipo = relation("AtributosPorTipoItem", backref="")
+    tipo = relation("AtributosPorTipoItem")
     #}
 
 

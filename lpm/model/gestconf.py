@@ -44,7 +44,7 @@ class LB(DeclarativeBase):
     estado = Column(String(20), nullable=True)
     
     #{ Relaciones
-    regs_historial_lb = relationship("HistorialLB", backref="lb")
+    regs_historial_lb = relation("HistorialLB", backref="lb")
     propiedad_items = relation("ItemsPorLB", backref='lb')
     #}
 
