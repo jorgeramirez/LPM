@@ -117,6 +117,10 @@ class User(DeclarativeBase):
 
     created = Column(DateTime, default=datetime.now)
 
+    #{ Relaciones
+    regs_historial_item = relation("HistorialItems", backref="usuario")
+    regs_historial_lb = relation("HistorialLB", backref="usuario")
+    
     #{ Special methods
 
     def __repr__(self):
