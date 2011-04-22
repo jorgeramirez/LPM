@@ -47,7 +47,6 @@ class LB(DeclarativeBase):
     estado = Column(Unicode(20), nullable=True, default="Cerrada")
     
     #{ Relaciones
-    regs_historial_lb = relation("HistorialLB", backref="lb")
     items = relation("ItemsPorLB", backref='lb')
     #}
 
@@ -65,6 +64,10 @@ class HistorialLB(DeclarativeBase):
     fecha_modificacion = Column(DateTime, nullable=False, default=datetime.now)
     id_usuario = Column(Integer, ForeignKey('tg_user.user_id'))
     id_lb = Column(Integer, ForeignKey('tbl_lb.id_lb'))
+    
+    #{ Relaciones
+    usuario = relation("Usuario", backref="regs_historial_lb")
+    lb = relation("LB", backref="regs_historial_lb")
     #}
 
     

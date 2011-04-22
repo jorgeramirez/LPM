@@ -127,12 +127,7 @@ class Usuario(DeclarativeBase):
 
     creado = Column(DateTime, default=datetime.now)
     
-    ''' esto tiene que estar en las otras clases
-    #{ Relaciones
-    regs_historial_item = relation("HistorialItems", backref="usuario")
-    regs_historial_lb = relation("HistorialLB", backref="usuario")
-    '''
-    
+
     #{ Special methods
     def __repr__(self):
         return ('<User: name=%r, email=%r, display=%r>' % (
