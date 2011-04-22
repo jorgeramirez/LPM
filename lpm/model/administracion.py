@@ -14,7 +14,7 @@ al B{Módulo de Administración}
 import os
 from datetime import datetime
 
-from sqlalchemy import ForeignKey, Column
+from sqlalchemy import ForeignKey, Column, and_
 from sqlalchemy.types import Integer, Unicode, DateTime
 from sqlalchemy.orm import relation, backref
 
@@ -42,7 +42,11 @@ class Fase(DeclarativeBase):
     
     #{ Relaciones
     items = relation('Item')
-    lbs = relation('LB')
+    ''' japiro, no se puede...
+    lbs = relation('LB', primaryjoin=LB.id_lb==ItemsPorLB.id_lb,
+                   secundaryjoin=and_(ItemsPorLB.id_item==PropiedadItem.id_propiedad_item,
+                                      PropiedadItem.id_item_actual.id_fase==Fase.id_fase))
+    '''
     #}
 
 

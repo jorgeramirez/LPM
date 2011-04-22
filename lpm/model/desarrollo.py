@@ -54,9 +54,10 @@ class Item(DeclarativeBase):
                           nullable=False)
     id_fase = Column(Integer, ForeignKey('tbl_fase.id_fase', ondelete="CASCADE"),
                      nullable=False)
-    id_propiedad_item = Column(Integer, 
+    id_propiedad_item = Column(Integer)
+    ''', 
                                ForeignKey('tbl_propiedad_item.id_propiedad_item'),
-                               nullable=False,)
+                               nullable=False,)'''
     
 
     #{ Relaciones
@@ -269,7 +270,7 @@ class HistorialItems(DeclarativeBase):
     id_historial_items = Column(Integer, autoincrement=True, primary_key=True)
     tipo_modificacion = Column(Unicode(45), nullable=False)
     fecha_modificacion = Column(DateTime, nullable=False, default=datetime.now)
-    id_usuario = Column(Integer, ForeignKey('tg_user.user_id'))
+    id_usuario = Column(Integer, ForeignKey('tg_user.id_usuario'))
     id_item = Column(Integer, 
         ForeignKey('tbl_propiedad_item.id_propiedad_item'))
     

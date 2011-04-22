@@ -34,18 +34,18 @@ __all__ = ['Usuario', 'Rol', 'Permiso']
 # This is the association table for the many-to-many relationship between
 # groups and permissions. This is required by repoze.what.
 group_permission_table = Table('tg_group_permission', metadata,
-    Column('group_id', Integer, ForeignKey('tg_group.group_id',
+    Column('id_rol', Integer, ForeignKey('tg_group.id_rol',
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
-    Column('permission_id', Integer, ForeignKey('tg_permission.permission_id',
+    Column('id_permiso', Integer, ForeignKey('tg_permission.id_permiso',
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
 )
 
 # This is the association table for the many-to-many relationship between
 # groups and members - this is, the memberships. It's required by repoze.what.
 user_group_table = Table('tg_user_group', metadata,
-    Column('user_id', Integer, ForeignKey('tg_user.user_id',
+    Column('id_usuario', Integer, ForeignKey('tg_user.id_usuario',
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
-    Column('group_id', Integer, ForeignKey('tg_group.group_id',
+    Column('id_rol', Integer, ForeignKey('tg_group.id_rol',
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
 )
 
@@ -67,11 +67,8 @@ class Rol(DeclarativeBase):
     #{ Columns
 
     id_rol = Column(Integer, autoincrement=True, primary_key=True)
-
-    nombre_rol = Column(Unicode(16), unique=True, nullable=False)
-
-    descripcion = Column(Unicode(255))
-
+    nombre_rol = Column(Unicode(32), unique=True, nullable=False)
+    descripcion = Column(Unicode(100))
     creado = Column(DateTime, default=datetime.now)
     
     #Para relacionar un rol con un recurso específico
@@ -112,26 +109,24 @@ class Usuario(DeclarativeBase):
     #{ Columns
 
     id_usuario = Column(Integer, autoincrement=True, primary_key=True)
-
     nombre_usuario = Column(Unicode(32), unique=True, nullable=False)
-
     email = Column(Unicode(100), unique=True, nullable=False,
                            info = {'rum': {'field':'Email'}})
-
     nombre = Column(Unicode(50))
-    
     apellido = Column(Unicode(50))
+    telefono = Column(Unicode(15))
+    nro_documento = Column(Integer)
 
     _password = Column('password', Unicode(80),
                        info = {'rum': {'field':'Password'}})
 
     creado = Column(DateTime, default=datetime.now)
     
-    ''' esto tiene que estar en las otras clases
+    
     #{ Relaciones
-    regs_historial_item = relation("HistorialItems", backref="usuario")
-    regs_historial_lb = relation("HistorialLB", backref="usuario")
-    '''
+    historial_item = relation("HistorialItems")
+    historial_lb = relation("HistorialLB")
+    
     
     #{ Special methods
     def __repr__(self):
@@ -219,10 +214,8 @@ class Permiso(DeclarativeBase):
     #{ Columns
 
     id_permiso = Column(Integer, autoincrement=True, primary_key=True)
-
-    nombre_permiso = Column(Unicode(100), unique=True, nullable=False)
-
-    descripcion = Column(Unicode(255))
+    nombre_permiso = Column(Unicode(32), unique=True, nullable=False)
+    descripcion = Column(Unicode(100))
 
     #{ Relations
 
