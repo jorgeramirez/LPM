@@ -65,7 +65,7 @@ class HistorialLB(DeclarativeBase):
     id_lb = Column(Integer, ForeignKey('tbl_lb.id_lb'))
     
     #{ Relaciones
-    usuario = relation("Usuario", backref="regs_historial_lb")
+    usuario = relation("Usuario", backref="historial_lb")
     lb = relation("LB", backref="regs_historial_lb")
     #}
 

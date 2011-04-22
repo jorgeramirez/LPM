@@ -267,7 +267,7 @@ class HistorialItems(DeclarativeBase):
         ForeignKey('tbl_propiedad_item.id_propiedad_item'))
     
     #{ Relaciones
-    usuario = relation("Usuario", backref="regs_historial_items")
+    usuario = relation("Usuario", backref="historial_item")
     #}
    
     
