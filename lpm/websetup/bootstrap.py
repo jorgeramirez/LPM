@@ -18,6 +18,7 @@ def bootstrap(command, conf, vars):
         u.nombre_usuario = u'manager'
         u.nombre = u'Fulano'
         u.apellido = u'Detal'
+
         u.email = u'manager@somedomain.com'
         u.password = u'managepass'
     
@@ -26,7 +27,7 @@ def bootstrap(command, conf, vars):
         g = model.Rol()
         g.nombre_rol = u'managers'
         g.descripcion= u'Managers Group'
-    
+        
         g.usuarios.append(u)
     
         model.DBSession.add(g)

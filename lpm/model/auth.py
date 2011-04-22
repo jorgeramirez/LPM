@@ -46,6 +46,7 @@ user_group_table = Table('tg_user_group', metadata,
     Column('id_usuario', Integer, ForeignKey('tg_user.id_usuario',
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
     Column('id_rol', Integer, ForeignKey('tg_group.id_rol',
+
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
 )
 
@@ -122,11 +123,9 @@ class Usuario(DeclarativeBase):
 
     creado = Column(DateTime, default=datetime.now)
     
-    
     #{ Relaciones
     historial_item = relation("HistorialItems")
     historial_lb = relation("HistorialLB")
-    
     
     #{ Special methods
     def __repr__(self):
