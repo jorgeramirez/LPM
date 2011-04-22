@@ -22,10 +22,12 @@ Iterar sobre los objetos Relacion via RelacionPorItem::
 
 @since: 1.0
 """
+import os
+from datetime import datetime
 
 from sqlalchemy import ForeignKey, Column
-from sqlalchemy.types import Integer, String, Boolean, LargeBinary, Date
-from sqlalchemy.orm import relation, backref
+from sqlalchemy.types import Integer, Unicode, Boolean, LargeBinary, DateTime
+from sqlalchemy.orm import relation, synonym, backref
 
 from lpm.model import DeclarativeBase, DBSession
 
@@ -47,12 +49,23 @@ class Item(DeclarativeBase):
     id_item = Column(Integer, autoincrement=True, primary_key=True)
     numero = Column(Integer, nullable=False)
     numero_por_tipo = Column(Integer, nullable=False)
-    id_tipo_item = Column(Integer, ForeignKey('tbl_tipo_item.id_tipo_item'))
-    id_fase = Column(Integer, ForeignKey('tbl_fase.id_fase'))
+    id_tipo_item = Column(Integer,
+                          ForeignKey('tbl_tipo_item.id_tipo_item'),
+                          nullable=False)
+    id_fase = Column(Integer, ForeignKey('tbl_fase.id_fase', ondelete="CASCADE"),
+                     nullable=False)
+    id_propiedad_item = Column(Integer, 
+                               ForeignKey('tbl_propiedad_item.id_propiedad_item'),
+                               nullable=False,)
     
+
     #{ Relaciones
-    propiedad_item_versiones = relation('PropiedadItem', backref='item_actual')
+    propiedad_item_versiones = relation('PropiedadItem')
+    
     #}
+    
+    def aprobar(self):
+        pass
     
 
 class PropiedadItem(DeclarativeBase):
@@ -67,15 +80,18 @@ class PropiedadItem(DeclarativeBase):
     version = Column(Integer, nullable=False)
     complejidad = Column(Integer, nullable=False)
     prioridad = Column(Integer, nullable=False)
-    estado = Column(String(20), nullable=False)
-    id_item_actual = Column(Integer, ForeignKey('tbl_item.id_item'))
+    estado = Column(Unicode(20), nullable=False)
+    id_item_actual = Column(Integer, ForeignKey('tbl_item.id_item',
+                            ondelete = "CASCADE"))
     
     #{ Relaciones
+    #no me convencen los backrefs pero vamos a dejarles mba'e
     relaciones = relation('RelacionPorItem', backref="propiedad_item")
     archivos = relation('ArchivosPorItem', backref="propiedad_item")
     atributos = relation('AtributosPorItem', backref="propiedad_item")
     #}
-
+    
+    
 
 class TipoItem(DeclarativeBase):
     """
@@ -86,16 +102,17 @@ class TipoItem(DeclarativeBase):
     
     #{ Columnas
     id_tipo_item = Column(Integer, autoincrement=True, primary_key=True)
-    codigo = Column(String(32), nullable=False)
-    descripcion = Column(String(200), nullable=True)
-    id_proyecto = Column(Integer, ForeignKey('tbl_proyecto.id_proyecto'))
+    codigo = Column(Unicode(32), nullable=False)
+    descripcion = Column(Unicode(200), nullable=True)
+    id_proyecto = Column(Integer, ForeignKey('tbl_proyecto.id_proyecto',
+                         ondelete="CASCADE"), nullable=True)
     id_padre = Column(Integer, ForeignKey('tbl_tipo_item.id_tipo_item'))
     
     #{ Relaciones
-    tipo_hijo = relation('TipoItem', backref=backref('tipo_padre', 
-                                                     remote_side=id_tipo_item))
-    atributos = relation('AtributosPorTipoItem', backref='tipo_item')
-    items = relation('Item', backref='tipo')
+    
+    #tipo_hijo = relation('TipoItem', backref=backref('tipo_padre', remote_side=id_tipo_item))
+    atributos = relation('AtributosPorTipoItem')
+    items = relation('Item')
     #}
 
 
@@ -109,9 +126,9 @@ class AtributosPorTipoItem(DeclarativeBase):
     #{ Columnas
     id_atributos_por_tipo_item = Column(Integer, autoincrement=True, 
                                         primary_key=True)
-    nombre = Column(String(32), nullable=False)
-    tipo = Column(String(32), nullable=False)
-    valor_por_defecto = Column(String(32), nullable=True)
+    nombre = Column(Unicode(32), nullable=False)
+    tipo = Column(Unicode(32), nullable=False)
+    valor_por_defecto = Column(Unicode(32), nullable=True)
     id_tipo_item = Column(Integer, ForeignKey('tbl_tipo_item.id_tipo_item'))
     #}
 
@@ -125,13 +142,17 @@ class RelacionPorItem(DeclarativeBase):
     #{Columnas
     id_relacion_por_item = Column(Integer, autoincrement=True, 
                                   primary_key=True)
-    revisar = Column(Boolean, nullable=False)
+    revisar = Column(Boolean, nullable=False, default=False)
     id_propiedad_item = Column(Integer, 
-                            ForeignKey('tbl_propiedad_item.id_propiedad_item'))
-    id_relacion = Column(Integer, ForeignKey('tbl_relacion.id_relacion'))
+                               ForeignKey('tbl_propiedad_item.id_propiedad_item',
+                               ondelete="CASCADE"))
+    id_relacion = Column(Integer, ForeignKey('tbl_relacion.id_relacion',
+                         ondelete="CASCADE"))
     
+   
     #{ Relaciones
-    relacion = relation("Relacion", backref="relacion_item_assocs")
+    relacion = relation("Relacion")
+
     #}
 
 
@@ -143,13 +164,16 @@ class Relacion(DeclarativeBase):
     
     #{ Columnas
     id_relacion = Column(Integer, autoincrement=True, primary_key=True)
-    tipo = Column(String(45), nullable=False)
+    tipo = Column(Unicode(45), nullable=False)
     id_anterior = Column(Integer, ForeignKey('tbl_item.id_item'))
     id_posterior = Column(Integer, ForeignKey('tbl_item.id_item'))
     
-    #{ Relaciones  FIXME
+    '''(creo que esto no va) me parece que va a ser mejor implementar esto con 
+    metodos que hagan consultas.
+    #{ Relaciones  FIXME 
     #anterior = relation("Item", backref=backref("relacion_anterior", uselist=False))
     #posterior = relation("Item", backref=backref("relacion_posterior", uselist=False))
+    '''
     #}
 
     
@@ -164,12 +188,22 @@ class AtributosDeItems(DeclarativeBase):
     #{ Columnas
     id_atributos_de_items = Column(Integer, 
                                    autoincrement=True, primary_key=True)
-    id_atributos_por_tipo_item = Column(Integer, 
-        ForeignKey('tbl_atributos_por_tipo_item.id_atributos_por_tipo_item'))
-    valor = Column(String(200), nullable=False)
+    id_atributos_por_tipo_item = Column(Integer,
+        ForeignKey('tbl_atributos_por_tipo_item.id_atributos_por_tipo_item'),
+        nullable=False,)
+    _valor = Column(Unicode(200), nullable=False)
     
-    #{ Relaciones
-    tipo = relation("AtributosPorTipoItem")
+    def _get_valor(self):
+        """ dependiendo del tipo retorna un valor"""
+        pass
+    
+    def _set_valor(self, valor):
+        """ dependiendo del tipo del valor, verifica que sea válido,
+         si no lanza una excepción (?) """
+        pass
+    
+    valor = synonym('_valor', descriptor=property(_get_valor, _set_valor))
+    
     #}
 
 
@@ -186,9 +220,9 @@ class AtributosPorItem(DeclarativeBase):
         ForeignKey('tbl_propiedad_item.id_propiedad_item'))
     id_atributos_de_items = Column(Integer,
         ForeignKey('tbl_atributos_de_items.id_atributos_de_items'))
-    
+
     #{ Relaciones
-    atributo = relation("AtributosDeItems", backref="attr_item_assocs")
+    atributos = relation("AtributosDeItems")
     #}
 
 
@@ -202,7 +236,7 @@ class ArchivosExternos(DeclarativeBase):
     #{ Columnas
     id_archivo_externo = Column(Integer, autoincrement=True, primary_key=True)
     archivo = Column(LargeBinary(2048), nullable=False)
-    nombre_archivo = Column(String(50), nullable=False)
+    nombre_archivo = Column(Unicode(50), nullable=False)
     #}
 
 
@@ -220,7 +254,7 @@ class ArchivosPorItem(DeclarativeBase):
         ForeignKey('tbl_archivos_externos.id_archivo_externo')) #parte derecha de la relación
     
     #{ Relaciones
-    archivo = relation("ArchivosExternos", backref="archivos_assoc")
+    archivos = relation("ArchivosExternos")
     #} 
 
 
@@ -233,14 +267,16 @@ class HistorialItems(DeclarativeBase):
     
     #{ Columnas
     id_historial_items = Column(Integer, autoincrement=True, primary_key=True)
-    tipo_modificacion = Column(String(45), nullable=False)
-    fecha_modificacion = Column(Date, nullable=False)
+    tipo_modificacion = Column(Unicode(45), nullable=False)
+    fecha_modificacion = Column(DateTime, nullable=False, default=datetime.now)
     id_usuario = Column(Integer, ForeignKey('tg_user.user_id'))
     id_item = Column(Integer, 
         ForeignKey('tbl_propiedad_item.id_propiedad_item'))
     
+    ''' no entendí esto
     #{ Relaciones
     item = relation("PropiedadItem", backref=backref("historial_item", uselist=False))
+    '''
     #}
    
     

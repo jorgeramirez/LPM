@@ -33,5 +33,8 @@ Then you are ready to go.
 ## TODO
 
 1. Hacer el mapeo de las tablas del diagrama E/R en clases dentro de la carpeta Model
-(tengo que terminar de leer sobre sendmail)
+2. Creación de proyectos:
+	-Permitir agregar/eliminar fases mientras el proyecto no esté iniciado.
+	-a la hora de crear fases, suponiendo que proyecto.numero_de_fases = n,
+	 poner fase.posicion = n+1 e incrementar el numero de fases del proyecto.
 

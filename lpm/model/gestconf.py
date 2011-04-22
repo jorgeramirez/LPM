@@ -23,12 +23,15 @@ Iterar sobre los objetos PropiedadItem via ItemsPorLB::
 
 @since: 1.0
 """
+import os
+from datetime import datetime
 
 from sqlalchemy import ForeignKey, Column
-from sqlalchemy.types import Integer, String, Date
+from sqlalchemy.types import Integer, Unicode, DateTime
 from sqlalchemy.orm import relation, backref
 
 from lpm.model import DeclarativeBase, DBSession
+
 
 __all__ = ['LB', 'HistorialLB', 'ItemsPorLB']
 
@@ -41,11 +44,11 @@ class LB(DeclarativeBase):
     #{ Columnas
     id_lb = Column(Integer, autoincrement=True, primary_key=True)
     numero = Column(Integer, nullable=False)
-    estado = Column(String(20), nullable=True)
+    estado = Column(Unicode(20), nullable=True, default="Cerrada")
     
     #{ Relaciones
     regs_historial_lb = relation("HistorialLB", backref="lb")
-    propiedad_items = relation("ItemsPorLB", backref='lb')
+    items = relation("ItemsPorLB", backref='lb')
     #}
 
 
@@ -58,8 +61,8 @@ class HistorialLB(DeclarativeBase):
     
     #{ Columnas
     id_historial_lb = Column(Integer, autoincrement=True, primary_key=True)
-    tipo_operacion = Column(String(45), nullable=False)
-    fecha_modificacion = Column(Date, nullable=False)
+    tipo_operacion = Column(Unicode(45), nullable=False)
+    fecha_modificacion = Column(DateTime, nullable=False, default=datetime.now)
     id_usuario = Column(Integer, ForeignKey('tg_user.user_id'))
     id_lb = Column(Integer, ForeignKey('tbl_lb.id_lb'))
     #}
@@ -75,7 +78,7 @@ class ItemsPorLB(DeclarativeBase):
     #{ Columnas
     id_item_por_lb = Column(Integer, autoincrement=True, primary_key=True)
     id_item = Column(Integer, 
-        ForeignKey('tbl_propiedad_item.id_propiedad_item'))
+                     ForeignKey('tbl_propiedad_item.id_propiedad_item'))
     id_lb = Column(Integer, ForeignKey('tbl_lb.id_lb'))
     
     #{ Relaciones
