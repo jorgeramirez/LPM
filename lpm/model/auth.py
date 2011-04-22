@@ -25,7 +25,7 @@ from sqlalchemy.orm import relation, synonym
 
 from lpm.model import DeclarativeBase, metadata, DBSession
 
-__all__ = ['User', 'Group', 'Permission']
+__all__ = ['Usuario', 'Rol', 'Permiso']
 
 
 #{ Association tables
@@ -53,11 +53,12 @@ user_group_table = Table('tg_user_group', metadata,
 #{ The auth* model itself
 
 
-class Group(DeclarativeBase):
+class Rol(DeclarativeBase):
     """
     Group definition for :mod:`repoze.what`.
 
     Only the ``group_name`` column is required by :mod:`repoze.what`.
+    Pero se usa un 'translation' a "nombre_rol" y "usuarios"
 
     """
 
@@ -65,25 +66,32 @@ class Group(DeclarativeBase):
 
     #{ Columns
 
-    group_id = Column(Integer, autoincrement=True, primary_key=True)
+    id_rol = Column(Integer, autoincrement=True, primary_key=True)
 
-    group_name = Column(Unicode(16), unique=True, nullable=False)
+    nombre_rol = Column(Unicode(16), unique=True, nullable=False)
 
-    display_name = Column(Unicode(255))
+    descripcion = Column(Unicode(255))
 
-    created = Column(DateTime, default=datetime.now)
+    creado = Column(DateTime, default=datetime.now)
+    
+    #Para relacionar un rol con un recurso específico
+    id_proyecto = Column(Integer)
+    
+    id_fase = Column(Integer)
+    
+    id_tipo_item = Column(Integer)
 
     #{ Relations
 
-    users = relation('User', secondary=user_group_table, backref='groups')
+    usuarios = relation('Usuario', secondary=user_group_table, backref='roles')
 
     #{ Special methods
 
     def __repr__(self):
-        return ('<Group: name=%s>' % self.group_name).encode('utf-8')
+        return ('<Rol: name=%s>' % self.nombre_rol).encode('utf-8')
 
     def __unicode__(self):
-        return self.group_name
+        return self.nombre_rol
 
     #}
 
@@ -91,64 +99,67 @@ class Group(DeclarativeBase):
 # The 'info' argument we're passing to the email_address and password columns
 # contain metadata that Rum (http://python-rum.org/) can use generate an
 # admin interface for your models.
-class User(DeclarativeBase):
+class Usuario(DeclarativeBase):
     """
     User definition.
 
     This is the user definition used by :mod:`repoze.who`, which requires at
     least the ``user_name`` column.
-
+    Pero se usa un 'translation' a "nombre_usuario" y "roles"
     """
     __tablename__ = 'tg_user'
 
     #{ Columns
 
-    user_id = Column(Integer, autoincrement=True, primary_key=True)
+    id_usuario = Column(Integer, autoincrement=True, primary_key=True)
 
-    user_name = Column(Unicode(16), unique=True, nullable=False)
+    nombre_usuario = Column(Unicode(32), unique=True, nullable=False)
 
-    email_address = Column(Unicode(255), unique=True, nullable=False,
-                           info={'rum': {'field':'Email'}})
+    email = Column(Unicode(100), unique=True, nullable=False,
+                           info = {'rum': {'field':'Email'}})
 
-    display_name = Column(Unicode(255))
+    nombre = Column(Unicode(50))
+    
+    apellido = Column(Unicode(50))
 
     _password = Column('password', Unicode(80),
-                       info={'rum': {'field':'Password'}})
+                       info = {'rum': {'field':'Password'}})
 
-    created = Column(DateTime, default=datetime.now)
-
+    creado = Column(DateTime, default=datetime.now)
+    
+    ''' esto tiene que estar en las otras clases
     #{ Relaciones
     regs_historial_item = relation("HistorialItems", backref="usuario")
     regs_historial_lb = relation("HistorialLB", backref="usuario")
+    '''
     
     #{ Special methods
-
     def __repr__(self):
         return ('<User: name=%r, email=%r, display=%r>' % (
-                self.user_name, self.email_address, self.display_name)).encode('utf-8')
+                self.nombre_usuario, self.email, self.nombre)).encode('utf-8')
 
     def __unicode__(self):
-        return self.display_name or self.user_name
+        return self.nombre or self.nombre_usuario
 
     #{ Getters and setters
 
     @property
-    def permissions(self):
+    def permisos(self):
         """Return a set with all permissions granted to the user."""
         perms = set()
-        for g in self.groups:
-            perms = perms | set(g.permissions)
+        for g in self.roles:
+            perms = perms | set(g.permisos)
         return perms
 
     @classmethod
-    def by_email_address(cls, email):
+    def by_email_address(cls, mail):
         """Return the user object whose email address is ``email``."""
-        return DBSession.query(cls).filter_by(email_address=email).first()
+        return DBSession.query(cls).filter_by(email = mail).first()
 
     @classmethod
     def by_user_name(cls, username):
         """Return the user object whose user name is ``username``."""
-        return DBSession.query(cls).filter_by(user_name=username).first()
+        return DBSession.query(cls).filter_by(nombre_usuario = username).first()
 
     def _set_password(self, password):
         """Hash ``password`` on the fly and store its hashed version."""
@@ -194,11 +205,12 @@ class User(DeclarativeBase):
         return self.password[40:] == hash.hexdigest()
 
 
-class Permission(DeclarativeBase):
+class Permiso(DeclarativeBase):
     """
     Permission definition for :mod:`repoze.what`.
 
     Only the ``permission_name`` column is required by :mod:`repoze.what`.
+    Pero se usa un 'translation' a "nombre_permiso"
 
     """
 
@@ -206,24 +218,24 @@ class Permission(DeclarativeBase):
 
     #{ Columns
 
-    permission_id = Column(Integer, autoincrement=True, primary_key=True)
+    id_permiso = Column(Integer, autoincrement=True, primary_key=True)
 
-    permission_name = Column(Unicode(63), unique=True, nullable=False)
+    nombre_permiso = Column(Unicode(100), unique=True, nullable=False)
 
-    description = Column(Unicode(255))
+    descripcion = Column(Unicode(255))
 
     #{ Relations
 
-    groups = relation(Group, secondary=group_permission_table,
-                      backref='permissions')
+    roles = relation(Rol, secondary=group_permission_table,
+                      backref='permisos')
 
     #{ Special methods
 
     def __repr__(self):
-        return ('<Permission: name=%r>' % self.permission_name).encode('utf-8')
+        return ('<Permission: name=%r>' % self.nombre_permiso).encode('utf-8')
 
     def __unicode__(self):
-        return self.permission_name
+        return self.nombre_permiso
 
     #}
 
