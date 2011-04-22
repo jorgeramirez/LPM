@@ -85,10 +85,9 @@ class PropiedadItem(DeclarativeBase):
                             ondelete = "CASCADE"))
     
     #{ Relaciones
-    #no me convencen los backrefs pero vamos a dejarles mba'e
-    relaciones = relation('RelacionPorItem', backref="propiedad_item")
-    archivos = relation('ArchivosPorItem', backref="propiedad_item")
-    atributos = relation('AtributosPorItem', backref="propiedad_item")
+    relaciones = relation('RelacionPorItem')
+    archivos = relation('ArchivosPorItem')
+    atributos = relation('AtributosPorItem')
     #}
     
     
@@ -167,13 +166,6 @@ class Relacion(DeclarativeBase):
     tipo = Column(Unicode(45), nullable=False)
     id_anterior = Column(Integer, ForeignKey('tbl_item.id_item'))
     id_posterior = Column(Integer, ForeignKey('tbl_item.id_item'))
-    
-    '''(creo que esto no va) me parece que va a ser mejor implementar esto con 
-    metodos que hagan consultas.
-    #{ Relaciones  FIXME 
-    #anterior = relation("Item", backref=backref("relacion_anterior", uselist=False))
-    #posterior = relation("Item", backref=backref("relacion_posterior", uselist=False))
-    '''
     #}
 
     
@@ -272,11 +264,6 @@ class HistorialItems(DeclarativeBase):
     id_usuario = Column(Integer, ForeignKey('tg_user.user_id'))
     id_item = Column(Integer, 
         ForeignKey('tbl_propiedad_item.id_propiedad_item'))
-    
-    ''' no entendí esto
-    #{ Relaciones
-    item = relation("PropiedadItem", backref=backref("historial_item", uselist=False))
-    '''
     #}
    
     

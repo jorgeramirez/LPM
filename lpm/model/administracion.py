@@ -67,6 +67,7 @@ class Proyecto(DeclarativeBase):
     
     def iniciar_proyecto(self):
         pass
+        
     """creo que esto debería estar acá, no sé"""   
     def crear_fase(self):
         pass
