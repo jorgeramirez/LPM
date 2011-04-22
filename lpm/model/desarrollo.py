@@ -261,7 +261,7 @@ class HistorialItems(DeclarativeBase):
     id_historial_items = Column(Integer, autoincrement=True, primary_key=True)
     tipo_modificacion = Column(Unicode(45), nullable=False)
     fecha_modificacion = Column(DateTime, nullable=False, default=datetime.now)
-    id_usuario = Column(Integer, ForeignKey('tg_user.user_id'))
+    id_usuario = Column(Integer, ForeignKey('tg_user.id_usuario'))
     id_item = Column(Integer, 
         ForeignKey('tbl_propiedad_item.id_propiedad_item'))
     

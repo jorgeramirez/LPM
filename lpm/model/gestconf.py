@@ -62,7 +62,7 @@ class HistorialLB(DeclarativeBase):
     id_historial_lb = Column(Integer, autoincrement=True, primary_key=True)
     tipo_operacion = Column(Unicode(45), nullable=False)
     fecha_modificacion = Column(DateTime, nullable=False, default=datetime.now)
-    id_usuario = Column(Integer, ForeignKey('tg_user.user_id'))
+    id_usuario = Column(Integer, ForeignKey('tg_user.id_usuario'))
     id_lb = Column(Integer, ForeignKey('tbl_lb.id_lb'))
     
     #{ Relaciones

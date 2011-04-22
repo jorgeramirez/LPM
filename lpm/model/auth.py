@@ -34,18 +34,18 @@ __all__ = ['Usuario', 'Rol', 'Permiso']
 # This is the association table for the many-to-many relationship between
 # groups and permissions. This is required by repoze.what.
 group_permission_table = Table('tg_group_permission', metadata,
-    Column('group_id', Integer, ForeignKey('tg_group.group_id',
+    Column('group_id', Integer, ForeignKey('tg_group.id_rol',
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
-    Column('permission_id', Integer, ForeignKey('tg_permission.permission_id',
+    Column('permission_id', Integer, ForeignKey('tg_permission.id_permiso',
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
 )
 
 # This is the association table for the many-to-many relationship between
 # groups and members - this is, the memberships. It's required by repoze.what.
 user_group_table = Table('tg_user_group', metadata,
-    Column('user_id', Integer, ForeignKey('tg_user.user_id',
+    Column('user_id', Integer, ForeignKey('tg_user.id_usuario',
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
-    Column('group_id', Integer, ForeignKey('tg_group.group_id',
+    Column('group_id', Integer, ForeignKey('tg_group.id_rol',
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
 )
 
