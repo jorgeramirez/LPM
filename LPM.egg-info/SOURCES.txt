@@ -25,7 +25,10 @@ lpm/lib/app_globals.py
 lpm/lib/base.py
 lpm/lib/helpers.py
 lpm/model/__init__.py
+lpm/model/administracion.py
 lpm/model/auth.py
+lpm/model/desarrollo.py
+lpm/model/gestconf.py
 lpm/public/favicon.ico
 lpm/public/css/admin.css
 lpm/public/css/style.css
@@ -53,6 +56,7 @@ lpm/public/images/strype2.png
 lpm/public/images/under_the_hood_blue.png
 lpm/public/images/warning.png
 lpm/templates/__init__.py
+lpm/templates/__init__.pyc
 lpm/templates/about.html
 lpm/templates/authentication.html
 lpm/templates/data.html
@@ -70,7 +74,10 @@ lpm/tests/functional/__init__.py
 lpm/tests/functional/test_authentication.py
 lpm/tests/functional/test_root.py
 lpm/tests/models/__init__.py
+lpm/tests/models/test_administracion.py
 lpm/tests/models/test_auth.py
+lpm/tests/models/test_desarrollo.py
+lpm/tests/models/test_gestconf.py
 lpm/websetup/__init__.py
 lpm/websetup/bootstrap.py
 lpm/websetup/schema.py

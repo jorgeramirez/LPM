@@ -5,47 +5,47 @@ from nose.tools import eq_
 from lpm import model
 from lpm.tests.models import ModelTest
 
-class TestGroup(ModelTest):
-    """Unit test case for the ``Group`` model."""
-    klass = model.Group
+class TestRol(ModelTest):
+    """Unit test case for the ``Rol`` model."""
+    klass = model.Rol
     attrs = dict(
-        group_name = u"test_group",
-        display_name = u"Test Group"
+        nombre_rol = u"test_group",
+        descripcion = u"Test Group"
         )
 
 
 class TestUser(ModelTest):
-    """Unit test case for the ``User`` model."""
+    """Unit test case for the ``Usuario`` model."""
     
-    klass = model.User
+    klass = model.Usuario
     attrs = dict(
-        user_name = u"ignucius",
-        email_address = u"ignucius@example.org"
+        nombre_usuario = u"ignucius",
+        email = u"ignucius@example.org"
         )
 
     def test_obj_creation_username(self):
         """The obj constructor must set the user name right"""
-        eq_(self.obj.user_name, u"ignucius")
+        eq_(self.obj.nombre_usuario, u"ignucius")
 
     def test_obj_creation_email(self):
         """The obj constructor must set the email right"""
-        eq_(self.obj.email_address, u"ignucius@example.org")
+        eq_(self.obj.email, u"ignucius@example.org")
 
     def test_no_permissions_by_default(self):
         """User objects should have no permission by default."""
-        eq_(len(self.obj.permissions), 0)
+        eq_(len(self.obj.permisos), 0)
 
     def test_getting_by_email(self):
         """Users should be fetcheable by their email addresses"""
-        him = model.User.by_email_address(u"ignucius@example.org")
+        him = model.Usuario.by_email_address(u"ignucius@example.org")
         eq_(him, self.obj)
 
 
-class TestPermission(ModelTest):
-    """Unit test case for the ``Permission`` model."""
+class TestPermiso(ModelTest):
+    """Unit test case for the ``Permiso`` model."""
     
-    klass = model.Permission
+    klass = model.Permiso
     attrs = dict(
-        permission_name = u"test_permission",
-        description = u"This is a test Description"
+        nombre_permiso = u"test_permission",
+        descripcion = u"This is a test Description"
         )
