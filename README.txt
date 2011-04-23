@@ -37,4 +37,4 @@ Then you are ready to go.
 	-Permitir agregar/eliminar fases mientras el proyecto no esté iniciado.
 	-a la hora de crear fases, suponiendo que proyecto.numero_de_fases = n,
 	 poner fase.posicion = n+1 e incrementar el numero de fases del proyecto.
-
+  
