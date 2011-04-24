@@ -64,7 +64,7 @@ class Item(DeclarativeBase):
     
     #}
     
-    def aprobar(self):
+    def aprobar(self): #jorge
         pass
     
     def desaprobar(self):
@@ -80,7 +80,7 @@ class Item(DeclarativeBase):
         """id_origen es el id de un Item desde el que se produjo el cambio """
         pass
     
-    def eliminar(self):
+    def eliminar(self): #jorge
         pass
     
     def revivir(self):

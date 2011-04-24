@@ -138,7 +138,7 @@ class Proyecto(DeclarativeBase):
         DBSession.delete(self)
         
     #creo que esto va acá
-    def definir_tipo_item(self, id_papa, id_importado=None, mezclar=False):
+    def definir_tipo_item(self, id_papa, id_importado=None, mezclar=False): #jorge
         """ id_papa dice de quien hereda la estructura
             importado si se especifica es id del tipo de item proveniente de
             otro proyecto.
@@ -169,7 +169,7 @@ class TipoItem(DeclarativeBase):
     items = relation('Item')
     #}
     
-    def agregar_atributo(self):
+    def agregar_atributo(self): #jorge
         pass
     
     def modificar_atributo(self, id_atributo, dict):
