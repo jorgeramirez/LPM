@@ -63,3 +63,4 @@ from lpm.model.auth import Usuario, Rol, Permiso
 from lpm.model.desarrollo import *
 from lpm.model.gestconf import *
 from lpm.model.administracion import *
+

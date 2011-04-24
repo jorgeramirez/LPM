@@ -11,7 +11,12 @@ Módulo de prueba para lpm.model.administracion
 """
 from nose.tools import eq_, raises
 
-from lpm.model import Proyecto, DBSession, Fase
+from lpm.model import DBSession
+from lpm.model.desarrollo import *
+from lpm.model.administracion import *
+from lpm.model.gestconf import *
+from lpm.model.excepciones import *
+
 from lpm.tests.models import ModelTest
 from sqlalchemy.orm.exc import NoResultFound
 

@@ -19,10 +19,9 @@ from sqlalchemy.types import Integer, Unicode, DateTime
 from sqlalchemy.orm import relation, backref
 from sqlalchemy.exc import IntegrityError
 
-from lpm.model import DeclarativeBase, DBSession, desarrollo, gestconf
-from lpm.model.desarrollo import *
-from lpm.model.gestconf import *
+from lpm.model import *
 from lpm.model.excepciones import *
+
 
 
 #import transaction
@@ -95,16 +94,28 @@ class Fase(DeclarativeBase):
             DBSession.add(a_por_item)
             
             
-        item.propiedad_item_versiones.append(p_item_atributos)
+        item.propiedad_item_versiones.append(p_item)
         DBSession.flush()
         
         item.id_propiedad_item = p_item.id_propiedad_item
         self.items.append(item)
-        DBSession.add()
+        DBSession.add(self)
         
     
     def crear_lb(self):
         pass
+    
+    @classmethod
+    def por_id(clase, id):
+        """
+        Método de clase que realiza las búsquedas por identificador.
+        
+        @param id: identificador del elemento a recuperar
+        @type id: C{Integer}
+        @return: el elemento recuperado
+        @rtype: L{Fase}
+        """
+        return DBSession.query(clase).filter_by(id_fase=id).one()    
      
 
 class Proyecto(DeclarativeBase):
@@ -221,8 +232,9 @@ class TipoItem(DeclarativeBase):
     def modificar_atributo(self, id_atributo, dict):
         pass
     
-    def por_id(self, id):
-        return DBSession.query(TipoItem).filter_by(id_tipo_item=id).one()
+    @classmethod
+    def por_id(clase, id):
+        return DBSession.query(clase).filter_by(id_tipo_item=id).one()
 
 
 class AtributosPorTipoItem(DeclarativeBase):

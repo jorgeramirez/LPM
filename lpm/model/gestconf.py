@@ -30,9 +30,7 @@ from sqlalchemy import ForeignKey, Column
 from sqlalchemy.types import Integer, Unicode, DateTime
 from sqlalchemy.orm import relation, backref
 
-from lpm.model import DeclarativeBase, DBSession
-from lpm.model.desarrollo import *
-from lpm.model.administracion import *
+from lpm.model import *
 from lpm.model.excepciones import *
 
 __all__ = ['LB', 'HistorialLB', 'ItemsPorLB']
@@ -46,7 +44,7 @@ class LB(DeclarativeBase):
     #{ Columnas
     id_lb = Column(Integer, autoincrement=True, primary_key=True)
     numero = Column(Integer, nullable=False)
-    estado = Column(Unicode(20), nullable=True, default="Cerrada")
+    estado = Column(Unicode(20), nullable=True, default=u"Cerrada")
     
     #{ Relaciones
     items = relation("ItemsPorLB", backref='lb')
@@ -93,10 +91,15 @@ class ItemsPorLB(DeclarativeBase):
     propiedad_item = relation('PropiedadItem', backref='item_lb_assocs')
     #}
     
-
-
-
-    
-
-
-
+    @classmethod
+    def filter_by_id_item(clase, id):
+        """
+        Método de clase que realiza las búsquedas por identificador
+        de ítem.
+        
+        @param id: identificador del ítem
+        @type id: C{Integer}
+        @return: el elemento recuperado
+        @rtype: L{ItemsPorLB}
+        """
+        return DBSession.query(clase).filter_by(id_item=id).one()

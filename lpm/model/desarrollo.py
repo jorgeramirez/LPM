@@ -25,14 +25,14 @@ Iterar sobre los objetos Relacion via RelacionPorItem::
 import os
 from datetime import datetime
 
-from sqlalchemy import ForeignKey, Column
+from sqlalchemy import ForeignKey, Column, and_
 from sqlalchemy.types import Integer, Unicode, Boolean, LargeBinary, DateTime
 from sqlalchemy.orm import relation, synonym, backref
 
-from lpm.model import DeclarativeBase, DBSession
-from lpm.model.administracion import *
-from lpm.model.gestconf import *
+from lpm.model import *
 from lpm.model.excepciones import *
+
+
 
 __all__ = ['Item', 'PropiedadItem', 'RelacionPorItem',
            'Relacion', 'AtributosDeItems', 'ArchivosExternos',
@@ -64,9 +64,47 @@ class Item(DeclarativeBase):
     
     #}
     
-    def aprobar(self): #jorge
-        pass
-    
+    def aprobar(self): #jorge (falta probar)
+        """
+        Aprueba un ítem.
+        
+        Las transiciones de estado pueden ser:
+            - Revisión-Desbloq al de Aprobado
+            - Desaprobado al de Aprobado
+        
+        @raises CondicionAprobarError: No cumple las condiciones de 
+            aprobación del ítem
+        """
+        p_item = PropiedadItem.por_id(self.id_propiedad_item)
+        fase = Fase.por_id(self.id_fase)
+        anteriores_count = DBSession.query(Relacion).filter_by( \
+            id_posterior=self.id_item).count()
+        
+        if fase.posicion > 1 and anteriores_count == 0:
+            raise CondicionAprobarError( \
+                u"El ítem debe tener al menos un antecesor o padre")
+                        
+        for rel in p_item.relaciones:
+            if rel.id_anterior == self.id_item: 
+                continue
+            item_ant = Item.por_id(rel.id_anterior)
+            p_item_ant = PropiedadItem.por_id(item_ant.id_propiedad_item)
+            iplb = ItemsPorLB.filter_by_id_item(p_item_ant.id_propiedad_item)
+            if iplb.lb.estado != u"Cerrada":
+                raise CondicionAprobarError( \
+                    "Todos los antecesores y padres " + 
+                    "deben estar en una LB cerrada")
+        
+        if p_item.estado == u"Desaprobado":
+            for rel in p_item.relaciones:
+                if rel.id_anterior == self.id_item: 
+                    continue
+                item_ant = Item.por_id(rel.id_anterior)
+                item_ant.revisar(self.id_item)
+        
+        p_item.estado = u"Aprobado"
+        DBSession.add(p_item)
+
     def desaprobar(self): 
         pass
     
@@ -101,7 +139,19 @@ class Item(DeclarativeBase):
     def calcular_impacto(self):
         pass
     
-    i = Item()
+    #i = Item()
+    
+    @classmethod
+    def por_id(clase, id):
+        """
+        Método de clase que realiza las búsquedas por identificador.
+        
+        @param id: identificador del elemento a recuperar
+        @type id: C{Integer}
+        @return: el elemento recuperado
+        @rtype: L{Item}
+        """
+        return DBSession.query(clase).filter_by(id_item=id).one()    
 
 class PropiedadItem(DeclarativeBase):
     """
@@ -134,6 +184,18 @@ class PropiedadItem(DeclarativeBase):
     def eliminar_relacion(self):#nahuel
         pass
     
+    @classmethod
+    def por_id(clase, id):
+        """
+        Método de clase que realiza las búsquedas por identificador.
+        
+        @param id: identificador del elemento a recuperar
+        @type id: C{Integer}
+        @return: el elemento recuperado
+        @rtype: L{PropiedadItem}
+        """
+        return DBSession.query(clase).filter_by(id_propiedad_item=id).one()
+    
 
         
 class RelacionPorItem(DeclarativeBase):
@@ -154,7 +216,6 @@ class RelacionPorItem(DeclarativeBase):
    
     #{ Relaciones
     relacion = relation("Relacion")
-
     #}
 
 
@@ -170,6 +231,35 @@ class Relacion(DeclarativeBase):
 
     id_anterior = Column(Integer, ForeignKey('tbl_item.id_item'))
     id_posterior = Column(Integer, ForeignKey('tbl_item.id_item'))
+    
+    #{ Métodos de clase
+    @classmethod
+    def relaciones_como_posterior(clase, id_item):
+        """
+        Recupera las relaciones en las que el ítem esta como
+        hijo o sucesor, dependiendo del tipo de relación
+        de ítem dado.
+        
+        @param id: el identificador del ítem hijo o sucesor
+        @type id: C{Integer}
+        @return: las relaciones
+        @rtype: L{Relacion}
+        """
+        return DBSession.query(clase).filter_by(id_posterior=id_item).all()
+
+    @classmethod
+    def relaciones_como_anterior(clase, id_item):
+        """
+        Recupera las relaciones en las que el ítem esta como
+        padre o antecesor, dependiendo del tipo de relación
+        de ítem dado.
+        
+        @param id: el identificador del ítem padre o antecesor
+        @type id: C{Integer}
+        @return: las relaciones
+        @rtype: L{Relacion}
+        """
+        DBSession.query(clase).filter_by(id_anterior=id_item).all()
     #}
 
     
