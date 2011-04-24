@@ -97,11 +97,13 @@ class Item(DeclarativeBase):
         
         if p_item.estado == u"Desaprobado":
             for rel in p_item.relaciones:
-                if rel.id_anterior == self.id_item: 
-                    continue
-                item_ant = Item.por_id(rel.id_anterior)
-                item_ant.revisar(self.id_item)
-        
+                if rel.id_anterior != self.id_item:
+                    id = rel.id_anterior
+                else:
+                    id = rel.id_posterior
+                item_rel = Item.por_id(id)
+                item_rel.revisar(self.id_item)
+                    
         p_item.estado = u"Aprobado"
         DBSession.add(p_item)
 
@@ -142,7 +144,7 @@ class Item(DeclarativeBase):
     #i = Item()
     
     @classmethod
-    def por_id(clase, id):
+    def por_id(cls, id):
         """
         Método de clase que realiza las búsquedas por identificador.
         
@@ -151,7 +153,7 @@ class Item(DeclarativeBase):
         @return: el elemento recuperado
         @rtype: L{Item}
         """
-        return DBSession.query(clase).filter_by(id_item=id).one()    
+        return DBSession.query(cls).filter_by(id_item=id).one()    
 
 class PropiedadItem(DeclarativeBase):
     """
@@ -185,7 +187,7 @@ class PropiedadItem(DeclarativeBase):
         pass
     
     @classmethod
-    def por_id(clase, id):
+    def por_id(cls, id):
         """
         Método de clase que realiza las búsquedas por identificador.
         
@@ -194,7 +196,7 @@ class PropiedadItem(DeclarativeBase):
         @return: el elemento recuperado
         @rtype: L{PropiedadItem}
         """
-        return DBSession.query(clase).filter_by(id_propiedad_item=id).one()
+        return DBSession.query(cls).filter_by(id_propiedad_item=id).one()
     
 
         
@@ -234,7 +236,7 @@ class Relacion(DeclarativeBase):
     
     #{ Métodos de clase
     @classmethod
-    def relaciones_como_posterior(clase, id_item):
+    def relaciones_como_posterior(cls, id_item):
         """
         Recupera las relaciones en las que el ítem esta como
         hijo o sucesor, dependiendo del tipo de relación
@@ -245,10 +247,10 @@ class Relacion(DeclarativeBase):
         @return: las relaciones
         @rtype: L{Relacion}
         """
-        return DBSession.query(clase).filter_by(id_posterior=id_item).all()
+        return DBSession.query(cls).filter_by(id_posterior=id_item).all()
 
     @classmethod
-    def relaciones_como_anterior(clase, id_item):
+    def relaciones_como_anterior(cls, id_item):
         """
         Recupera las relaciones en las que el ítem esta como
         padre o antecesor, dependiendo del tipo de relación
@@ -259,7 +261,7 @@ class Relacion(DeclarativeBase):
         @return: las relaciones
         @rtype: L{Relacion}
         """
-        DBSession.query(clase).filter_by(id_anterior=id_item).all()
+        DBSession.query(cls).filter_by(id_anterior=id_item).all()
     #}
 
     

@@ -106,7 +106,7 @@ class Fase(DeclarativeBase):
         pass
     
     @classmethod
-    def por_id(clase, id):
+    def por_id(cls, id):
         """
         Método de clase que realiza las búsquedas por identificador.
         
@@ -115,7 +115,7 @@ class Fase(DeclarativeBase):
         @return: el elemento recuperado
         @rtype: L{Fase}
         """
-        return DBSession.query(clase).filter_by(id_fase=id).one()    
+        return DBSession.query(cls).filter_by(id_fase=id).one()    
      
 
 class Proyecto(DeclarativeBase):
@@ -233,8 +233,16 @@ class TipoItem(DeclarativeBase):
         pass
     
     @classmethod
-    def por_id(clase, id):
-        return DBSession.query(clase).filter_by(id_tipo_item=id).one()
+    def por_id(cls, id):
+        """
+        Método de clase que realiza las búsquedas por identificador.
+        
+        @param id: identificador del elemento a recuperar
+        @type id: C{Integer}
+        @return: el elemento recuperado
+        @rtype: L{TipoItem}
+        """        
+        return DBSession.query(cls).filter_by(id_tipo_item=id).one()
 
 
 class AtributosPorTipoItem(DeclarativeBase):
