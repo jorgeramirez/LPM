@@ -11,10 +11,7 @@ Módulo de prueba para lpm.model.desarrollo
 """
 from nose.tools import eq_
 
-from lpm.model import DBSession
-from lpm.model.desarrollo import *
-from lpm.model.administracion import *
-from lpm.model.gestconf import *
+from lpm.model import *
 from lpm.model.excepciones import *
 
 from lpm.tests.models import ModelTest
@@ -42,10 +39,3 @@ class TestItem(ModelTest):
         dep["numero_por_tipo"] = 0
         dep["id_tipo_item"] = tipo_item.id_tipo_item
         return dep
-    
-    def test_crear_item(self):
-        """``crear_item`` funciona"""
-        fase = Fase.por_id(self.obj.id_fase)
-        item = fase.crear_item(self.obj.id_tipo_item)
-        
-        

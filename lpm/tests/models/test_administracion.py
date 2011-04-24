@@ -11,10 +11,7 @@ Módulo de prueba para lpm.model.administracion
 """
 from nose.tools import eq_, raises
 
-from lpm.model import DBSession
-from lpm.model.desarrollo import *
-from lpm.model.administracion import *
-from lpm.model.gestconf import *
+from lpm.model import *
 from lpm.model.excepciones import *
 
 from lpm.tests.models import ModelTest
@@ -61,3 +58,31 @@ class TestProyecto(ModelTest):
         """
         self.obj.iniciar_proyecto()
         eq_(self.obj.estado, u"Iniciado")
+    
+
+class TestFase(ModelTest):
+    """Unidad de prueba para el modelo ``Proyecto``"""
+    klass = Fase
+    
+    #sobreescribimos el método en ModelTest
+    def do_get_dependencies(self):
+        dep = {}
+        p = Proyecto(nombre=u"proyecto1", descripcion=u"Proyecto Uno")
+        DBSession.add(p)
+        DBSession.flush()
+        dep["id_proyecto"] = p.id_proyecto
+        dep["nombre"] = u"fase1"
+        dep["descripcion"] = u"fase uno"
+        dep["posicion"] = 1
+        return dep
+    
+    def test_crear_item(self):
+        """``crear_item`` funciona"""
+        tipo_item = TipoItem()
+        tipo_item.codigo = u"cu"
+        tipo_item.id_proyecto = self.obj.id_proyecto
+        DBSession.add(tipo_item)
+        DBSession.flush()        
+        self.obj.crear_item(tipo_item.id_tipo_item)
+    
+    
