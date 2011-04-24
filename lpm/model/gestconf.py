@@ -48,6 +48,9 @@ class LB(DeclarativeBase):
     #{ Relaciones
     items = relation("ItemsPorLB", backref='lb')
     #}
+    
+    def agregar_item(self, item):
+        pass
 
 
 class HistorialLB(DeclarativeBase):

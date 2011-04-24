@@ -32,10 +32,9 @@ from sqlalchemy.orm import relation, synonym, backref
 from lpm.model import DeclarativeBase, DBSession
 
 
-__all__ = ['Item', 'PropiedadItem', 'TipoItem', 'AtributosPorTipoItem',
-           'RelacionPorItem', 'Relacion', 'AtributosDeItems',
-           'ArchivosExternos', 'ArchivosPorItem', 'HistorialItems',
-           'AtributosPorItem']
+__all__ = ['Item', 'PropiedadItem', 'RelacionPorItem',
+           'Relacion', 'AtributosDeItems', 'ArchivosExternos',
+            'ArchivosPorItem', 'HistorialItems', 'AtributosPorItem']
 
 
 class Item(DeclarativeBase):
@@ -68,6 +67,40 @@ class Item(DeclarativeBase):
     def aprobar(self):
         pass
     
+    def desaprobar(self):
+        pass
+    
+    def bloquear(self):
+        pass
+    
+    def desbloquear(self):
+        pass
+    
+    def revisar(self, id_origen):#nahuel
+        """id_origen es el id de un Item desde el que se produjo el cambio """
+        pass
+    
+    def eliminar(self):
+        pass
+    
+    def revivir(self):
+        pass
+    
+    def modificar(self, dict):
+        """ se le pasa un diccionario y con los nuevos valores y se compara con los actuales
+        para ver que cambió para colocar en el historial """
+        pass
+    
+    def _crear_propiedad_item(self):
+        """ ayuda a modificar() """
+        pass
+    
+    def revertir(self, version):
+        pass
+    
+    def calcular_impacto(self):
+        pass
+    
 
 class PropiedadItem(DeclarativeBase):
     """
@@ -91,48 +124,17 @@ class PropiedadItem(DeclarativeBase):
     atributos = relation('AtributosPorItem')
     #}
     
+    def modificar_atributo(self):
+        pass
+    
+    def agregar_relacion(self):#nahuel
+        pass
+    
+    def eliminar_relacion(self):#nahuel
+        pass
     
 
-class TipoItem(DeclarativeBase):
-    """
-    Clase que define las características
-    de un tipo de ítem.
-    """
-    __tablename__ = 'tbl_tipo_item'
-    
-    #{ Columnas
-    id_tipo_item = Column(Integer, autoincrement=True, primary_key=True)
-    codigo = Column(Unicode(32), nullable=False)
-    descripcion = Column(Unicode(200), nullable=True)
-    id_proyecto = Column(Integer, ForeignKey('tbl_proyecto.id_proyecto',
-                         ondelete="CASCADE"), nullable=True)
-    id_padre = Column(Integer, ForeignKey('tbl_tipo_item.id_tipo_item'))
-    
-    #{ Relaciones
-    
-    #tipo_hijo = relation('TipoItem', backref=backref('tipo_padre', remote_side=id_tipo_item))
-    atributos = relation('AtributosPorTipoItem')
-    items = relation('Item')
-    #}
-
-
-class AtributosPorTipoItem(DeclarativeBase):
-    """
-    Clase que define que atributos posee un determinado
-    tipo de ítem.
-    """
-    __tablename__ = 'tbl_atributos_por_tipo_item'
-    
-    #{ Columnas
-    id_atributos_por_tipo_item = Column(Integer, autoincrement=True, 
-                                        primary_key=True)
-    nombre = Column(Unicode(32), nullable=False)
-    tipo = Column(Unicode(32), nullable=False)
-    valor_por_defecto = Column(Unicode(32), nullable=True)
-    id_tipo_item = Column(Integer, ForeignKey('tbl_tipo_item.id_tipo_item'))
-    #}
-
-
+        
 class RelacionPorItem(DeclarativeBase):
     """
     Clase que asocia los ítems con sus relaciones
@@ -142,13 +144,12 @@ class RelacionPorItem(DeclarativeBase):
     #{Columnas
     id_relacion_por_item = Column(Integer, autoincrement=True, 
                                   primary_key=True)
-    revisar = Column(Boolean, nullable=False, default=False)
     id_propiedad_item = Column(Integer, 
                                ForeignKey('tbl_propiedad_item.id_propiedad_item',
                                ondelete="CASCADE"))
     id_relacion = Column(Integer, ForeignKey('tbl_relacion.id_relacion',
                          ondelete="CASCADE"))
-    
+    revisar = Column(Boolean, nullable=False, default=False)
    
     #{ Relaciones
     relacion = relation("Relacion")
@@ -165,12 +166,12 @@ class Relacion(DeclarativeBase):
     #{ Columnas
     id_relacion = Column(Integer, autoincrement=True, primary_key=True)
     tipo = Column(Unicode(45), nullable=False)
+
     id_anterior = Column(Integer, ForeignKey('tbl_item.id_item'))
     id_posterior = Column(Integer, ForeignKey('tbl_item.id_item'))
     #}
 
     
-
 class AtributosDeItems(DeclarativeBase):
     """
     Clase que define el valor para un atributo del item. Dicho atributo
@@ -217,6 +218,9 @@ class AtributosPorItem(DeclarativeBase):
     #{ Relaciones
     atributos = relation("AtributosDeItems")
     #}
+    
+    def modificar_atributo(self, id, valor):
+        pass
 
 
 class ArchivosExternos(DeclarativeBase):
@@ -249,6 +253,9 @@ class ArchivosPorItem(DeclarativeBase):
     #{ Relaciones
     archivos = relation("ArchivosExternos")
     #} 
+    
+    def agregar_archivo(self):
+        pass
 
 
 class HistorialItems(DeclarativeBase):
