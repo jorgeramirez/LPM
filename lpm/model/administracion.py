@@ -99,7 +99,7 @@ class Fase(DeclarativeBase):
         
         item.id_propiedad_item = p_item.id_propiedad_item
         self.items.append(item)
-        DBSession.add(self)
+        DBSession.add(item)
         
     
     def crear_lb(self):
