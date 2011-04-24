@@ -31,6 +31,9 @@ from sqlalchemy.types import Integer, Unicode, DateTime
 from sqlalchemy.orm import relation, backref
 
 from lpm.model import DeclarativeBase, DBSession
+from lpm.model.desarrollo import *
+from lpm.model.administracion import *
+from lpm.model.excepciones import *
 
 __all__ = ['LB', 'HistorialLB', 'ItemsPorLB']
 

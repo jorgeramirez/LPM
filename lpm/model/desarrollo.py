@@ -30,7 +30,9 @@ from sqlalchemy.types import Integer, Unicode, Boolean, LargeBinary, DateTime
 from sqlalchemy.orm import relation, synonym, backref
 
 from lpm.model import DeclarativeBase, DBSession
-
+from lpm.model.administracion import *
+from lpm.model.gestconf import *
+from lpm.model.excepciones import *
 
 __all__ = ['Item', 'PropiedadItem', 'RelacionPorItem',
            'Relacion', 'AtributosDeItems', 'ArchivosExternos',
@@ -54,9 +56,7 @@ class Item(DeclarativeBase):
     id_fase = Column(Integer, ForeignKey('tbl_fase.id_fase', ondelete="CASCADE"),
                      nullable=False)
     id_propiedad_item = Column(Integer)
-    ''', 
-                               ForeignKey('tbl_propiedad_item.id_propiedad_item'),
-                               nullable=False,)'''
+
     
 
     #{ Relaciones
@@ -101,6 +101,7 @@ class Item(DeclarativeBase):
     def calcular_impacto(self):
         pass
     
+    i = Item()
 
 class PropiedadItem(DeclarativeBase):
     """

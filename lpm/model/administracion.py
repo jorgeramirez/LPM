@@ -22,6 +22,8 @@ from sqlalchemy.exc import IntegrityError
 from lpm.model import DeclarativeBase, DBSession, desarrollo, gestconf
 from lpm.model.desarrollo import *
 from lpm.model.gestconf import *
+from lpm.model.excepciones import *
+
 
 #import transaction
 """ para probar este módulo, pueden usar
@@ -65,8 +67,41 @@ class Fase(DeclarativeBase):
          “Completa” y “Comprometida” """
         pass
     
-    def crear_item(self):
-        pass
+    def crear_item(self, id_tipo):#todavía no probe
+        """ Crear un itema en la esta fase
+        dict contiene los datos para inicializarlo"""
+        #crear el item
+        item = Item()
+        item.id_tipo_item = id_tipo
+        #su propiedad
+        p_item = PropiedadItem()
+        p_item.version = 1
+        p_item.complejidad = 5
+        p_item.prioriedad = 5
+        p_item.estado = "Desaprobado"
+        #los atributos de su tipo
+        tipo = TipoItem.por_id(id_tipo)
+        
+        for atr in tipo.atributos:
+            a_item = AtributosDeItems()
+            a_item.valor = atr.valor_por_defecto
+            a_item.id_atributos_por_tipo_de_item = atr.\
+            id_atributos_por_tipo_item
+            
+            a_por_item = AtributosPorItem()
+            a_por_item.atributos.append(a_item)
+            p_item.atributos.append(a_por_item)
+            DBSession.add(a_item)
+            DBSession.add(a_por_item)
+            
+            
+        item.propiedad_item_versiones.append(p_item_atributos)
+        DBSession.flush()
+        
+        item.id_propiedad_item = p_item.id_propiedad_item
+        self.items.append(item)
+        DBSession.add()
+        
     
     def crear_lb(self):
         pass
@@ -138,7 +173,7 @@ class Proyecto(DeclarativeBase):
         DBSession.delete(self)
         
     #creo que esto va acá
-    def definir_tipo_item(self, id_papa, id_importado=None, mezclar=False):
+    def definir_tipo_item(self, id_papa, id_importado=None, mezclar=False):#nahuel
         """ id_papa dice de quien hereda la estructura
             importado si se especifica es id del tipo de item proveniente de
             otro proyecto.
@@ -169,11 +204,24 @@ class TipoItem(DeclarativeBase):
     items = relation('Item')
     #}
     
-    def agregar_atributo(self):
-        pass
+    def agregar_atributo(self, dict):#todavía no probé
+        """ se espera un valor ya verificado
+        se lanza una exepcion si se repite en nombre del atributo"""
+        a = AtributosPorTipoItem()
+        
+        for atr in self.atributos:
+            if (atr.nombre == dict["nombre"]):
+                raise NombreAtributoError()
+            
+        a.nombre = dict["nombre"]
+        a.tipo = dict["tipo"]
+        a.valor_por_defecto = dict["valor"]
     
     def modificar_atributo(self, id_atributo, dict):
         pass
+    
+    def por_id(self, id):
+        return DBSession.query(TipoItem).filter_by(id_tipo_item=id).one()
 
 
 class AtributosPorTipoItem(DeclarativeBase):
@@ -191,4 +239,5 @@ class AtributosPorTipoItem(DeclarativeBase):
     valor_por_defecto = Column(Unicode(32), nullable=True)
     id_tipo_item = Column(Integer, ForeignKey('tbl_tipo_item.id_tipo_item'))
     #}
+    _tipos_permitidos = [u"Numérico", u"Texto", u"Fecha"]
 
