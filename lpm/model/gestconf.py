@@ -92,7 +92,7 @@ class ItemsPorLB(DeclarativeBase):
     #}
     
     @classmethod
-    def filter_by_id_item(clase, id):
+    def filter_by_id_item(cls, id):
         """
         Método de clase que realiza las búsquedas por identificador
         de ítem.
@@ -102,4 +102,4 @@ class ItemsPorLB(DeclarativeBase):
         @return: el elemento recuperado
         @rtype: L{ItemsPorLB}
         """
-        return DBSession.query(clase).filter_by(id_item=id).one()
+        return DBSession.query(cls).filter_by(id_item=id).one()
