@@ -372,4 +372,3 @@ class HistorialItems(DeclarativeBase):
    
     
     
-    

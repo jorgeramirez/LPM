@@ -19,12 +19,22 @@ class ModelError(Exception):
     """ Excepcion Base para todas las del modulo """
     pass
 
+class NombreFaseError(ModelError):
+    def __str__(self):
+        return u"El nombre de fase ya existe"
     
 class NombreDeAtributoError(ModelError):
     def __str__(self):
         return u"El nombre de atributo ya existe"
 
+class CodigoTipoItemError(ModelError):
+    def __str__(self):
+        return u"El código para el tipo de item es repetido"
 
+class TipoAtributoError(ModelError):
+    def __str__(self):
+        return u"No se puede cambiar el tipo de un atributo de tipo instanciado"
+    
 class CondicionAprobarError(ModelError):
     """
     Excepcion que indica que algunas de las condiciones
@@ -33,7 +43,7 @@ class CondicionAprobarError(ModelError):
     
     def __init__(self, msg=u"Algunas condiciones no se cumplen"):
         """
-        Constructur para la clase
+        Constructor para la clase
         
         @param msg: el mensaje a desplegar
         @type msg: C{unicode} o C{str}
@@ -43,4 +53,4 @@ class CondicionAprobarError(ModelError):
         self.msg = msg
     
     def __str__(self):
-        return "Error: %s" % msg
+        return "Error: %s" % self.msg

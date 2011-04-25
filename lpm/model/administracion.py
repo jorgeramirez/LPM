@@ -66,7 +66,7 @@ class Fase(DeclarativeBase):
          “Completa” y “Comprometida” """
         pass
     
-    def crear_item(self, id_tipo):#todavía no probe
+    def crear_item(self, id_tipo):#todavía no probé
         """ Crear un itema en la esta fase
         dict contiene los datos para inicializarlo"""
         #crear el item
@@ -92,9 +92,9 @@ class Fase(DeclarativeBase):
             p_item.atributos.append(a_por_item)
             DBSession.add(a_item)
             DBSession.add(a_por_item)
-            
-            
+                      
         item.propiedad_item_versiones.append(p_item)
+        DBSession.add(p_item)
         DBSession.flush()
         
         item.id_propiedad_item = p_item.id_propiedad_item
@@ -165,6 +165,30 @@ class Proyecto(DeclarativeBase):
             self.fases.append(fase)
             DBSession.add(fase)
 
+    def modificar_fase(self, id, dict):#todavía no probé
+        fase = Fase.por_id(id)
+        
+        #comprueba si se cambió algo
+        if (fase.nombre != dict["nombre"]):
+            #comprobar si el nuevo nombre no está repetido
+            for f in self.fases:
+                if (f.nombre == dict["nombre"]):
+                    raise NombreFaseError()
+            fase.nombre = dict["nombre"]
+            
+        if (fase.descripcion != dict["descripcion"]):
+            fase.descripcion = dict["descripcion"]
+            
+        #inserta la fase en esa posicion
+        if (fase.posicion != dict["posicion"]):
+            for f in self.fases:
+                if (fase.posicion < dict["posicion"]):
+                    if (f.posicion >= fase.posicion and f.posicion < dict["posicion"]):
+                        f.posicion -= 1
+                else:
+                    if (f.posicion <= fase.posicion and f.posicion > dict["posicion"]):
+                        f.posicion += 1
+        
     def eliminar_fase(self, id):
         """elimina la fase de id en un proyecto "No Iniciado" """
         """ guarda al probar, está pensado para usarse en un controlador """
@@ -183,16 +207,62 @@ class Proyecto(DeclarativeBase):
         """ Elimina el proyecto con todo lo asociado, fases, tipos de items """
         DBSession.delete(self)
         
-    #creo que esto va acá
-    def definir_tipo_item(self, id_papa, id_importado=None, mezclar=False):#nahuel
+    def definir_tipo_item(self, id_papa, dict, id_importado=None, mezclar=False):#todavía no probé
         """ id_papa dice de quien hereda la estructura
+            dict diccionario que contiene los datos para el nuevo tipo
             importado si se especifica es id del tipo de item proveniente de
             otro proyecto.
-            mezclar indica, en caso de que id_importado tenga un valor, si las estructuras del
-            padre y del importado se deben mezclar """
-        pass
+            mezclar cuando se repite un nombre en los atributos del tipo de item
+            si es True entonces se coloca "import." como prefijo al nombre del
+            atributo importado, si es False el atributo en el tipo importado no se
+            agrega (sólo queda el del padre) """
+        
+        papa = TipoItem.por_id(id_papa)
+        
+        for hijo in papa.hijos:
+            if (hijo.codigo == dict["codigo"]):
+                raise CodigoTipoItemError()
+            
+        tipo = TipoItem()  
+        tipo.codigo = dict["codigo"]
+        tipo.descripcion = dict["descripcion"]
+        papa.hijos.append(tipo)
+        
+        if (id_importado):
+            importado = TipoItem.por_id(id_importado)
+                
+            for atr in importado.atributos:
+                nuevo_atr = AtributosPorTipoItem()
+                nuevo_atr.nombre = atr.nombre
+                
+                for n in papa.atributos:
+                    #si se repite el nombre de atribito se agreaga import. al nombre
+                    if (n.nombre == atr.nombre):
+                        if (mezclar):
+                            nuevo_atr.nombre = "import." + atr.nombre
+                            continuar = True
+                            break
+                        else:
+                            continuar = False
+                            break
 
-
+                if (not continuar):#no se agreaga este atributo
+                    break   
+                        
+                nuevo_atr.tipo = atr.tipo
+                nuevo_atr.valor_por_defecto = atr.valor_por_defecto
+                tipo.atributos.append(nuevo_atr)
+                DBSession.add(nuevo_atr)
+        
+        self.tipos_de_item.append(tipo)
+        DBSession.add(tipo)
+    
+    def eliminar_tipo_item(self, id):
+        """ elimina un tipo de item si no hay items de ese tipo creados"""
+        tipo = TipoItem.por_id(id)
+        if (tipo.items == []):
+            DBSession.delete(tipo)
+        
 class TipoItem(DeclarativeBase):
     """
     Clase que define las características
@@ -210,7 +280,7 @@ class TipoItem(DeclarativeBase):
     
     #{ Relaciones
     
-    #tipo_hijo = relation('TipoItem', backref=backref('tipo_padre', remote_side=id_tipo_item))
+    hijos = relation('TipoItem')#, backref=backref('tipo_padre', remote_side=id_tipo_item))
     atributos = relation('AtributosPorTipoItem')
     items = relation('Item')
     #}
@@ -227,11 +297,45 @@ class TipoItem(DeclarativeBase):
         a.nombre = dict["nombre"]
         a.tipo = dict["tipo"]
         a.valor_por_defecto = dict["valor"]
+        
+        DBSession.add(a)
+        DBSession.flush()
+        
+        #agregar este atributo a los ítems ya creados, no sé si es necesario
+        for i in self.items:
+            a_item = AtributosDeItems()
+            a_item.valor = a.valor_por_defecto
+            a_item.id_atributos_por_tipo_de_item = a.\
+            id_atributos_por_tipo_item
+            
+            a_por_item = AtributosPorItem()
+            a_por_item.atributos.append(a_item)
+            p_item = PropiedadItem.por_id(i.id_propiedad_item)
+            p_item.atributos.append(a_por_item)
+            DBSession.add(a_item)
+            DBSession.add(a_por_item)      
+ 
+    def modificar_atributo(self, id_atributo, dict):#todavía no probé
+        atributo = AtributosPorTipoItem.por_id(id_atributo)
+        
+        #comprueba si se cambió algo
+        if (atributo.nombre != dict["nombre"]):
+            #comprobar si el nuevo nombre no está repetido
+            for atr in self.atributos:
+                if (atr.nombre == dict["nombre"]):
+                    raise NombreAtributoError()
+            atributo.nombre = dict["nombre"]
+            
+        if (atributo.tipo != dict["tipo"]):
+            #comprobar que no hayan items de ese tipo creados
+            if (self.items != []):
+                raise TipoAtributoError()
+            
+            atributo.tipo = dict["tipo"]
+            
+        if (atributo.valor_por_defecto != dict["valor"]):
+            atributo.valor_por_defecto = dict["valor"]
 
-    
-    def modificar_atributo(self, id_atributo, dict):
-        pass
-    
     @classmethod
     def por_id(cls, id):
         """
@@ -261,4 +365,16 @@ class AtributosPorTipoItem(DeclarativeBase):
     id_tipo_item = Column(Integer, ForeignKey('tbl_tipo_item.id_tipo_item'))
     #}
     _tipos_permitidos = [u"Numérico", u"Texto", u"Fecha"]
+    
+    @classmethod
+    def por_id(cls, id):
+        """
+        Método de clase que realiza las búsquedas por identificador.
+        
+        @param id: identificador del elemento a recuperar
+        @type id: C{Integer}
+        @return: el elemento recuperado
+        @rtype: L{AtributoPorTipoItem}
+        """        
+        return DBSession.query(cls).filter_by(id_atributo_por_tipo_item=id).one()
 
