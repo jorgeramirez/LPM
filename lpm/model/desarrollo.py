@@ -132,7 +132,12 @@ class Item(DeclarativeBase):
         pass
     
     def eliminar(self): #jorge
-        pass
+        """
+        Elimina un ítem
+        """
+        p_item = PropiedadItem.por_id(self.id_propiedad_item)
+        p_item.estado = u"Eliminado"
+        DBSession.add(p_item)
     
     def revivir(self):
         pass

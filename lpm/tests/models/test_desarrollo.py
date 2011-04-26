@@ -32,12 +32,20 @@ class TestItem(ModelTest):
         tipo_item = TipoItem()
         tipo_item.codigo = u"cu"
         tipo_item.id_proyecto = p.id_proyecto
+        p_item = PropiedadItem()
+        p_item.version = 1
+        p_item.complejidad = 5
+        p_item.prioridad = 5
+        p_item.estado = u"Aprobado"
+        DBSession.add(p_item)
         DBSession.add(tipo_item)
         DBSession.flush()
         dep["id_fase"] = p.fases[0].id_fase
         dep["numero"] = 0
         dep["numero_por_tipo"] = 0
         dep["id_tipo_item"] = tipo_item.id_tipo_item
+        dep["id_propiedad_item"] = p_item.id_propiedad_item
+        dep["propiedad_item_versiones"] = [p_item]
         return dep
     
     def test_aprobar_item(self):
@@ -46,14 +54,10 @@ class TestItem(ModelTest):
     
     def test_bloquear_item(self):
         """Bloquear Item funciona correctamente"""
-        p_item = PropiedadItem()
-        p_item.version = 1
-        p_item.complejidad = 5
-        p_item.prioridad = 5
-        p_item.estado = u"Aprobado"
-        self.obj.propiedad_item_versiones.append(p_item)
-        DBSession.add(p_item)
-        DBSession.flush()
-        self.obj.id_propiedad_item = p_item.id_propiedad_item
         self.obj.bloquear()
         eq_(self.obj.propiedad_item_versiones[0].estado, u"Bloqueado")
+    
+    def test_eliminar_item(self):
+        """Eliminar ítem funciona correctamente"""
+        self.obj.eliminar()
+        eq_(self.obj.propiedad_item_versiones[0].estado, u"Eliminado")
