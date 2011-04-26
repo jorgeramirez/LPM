@@ -111,8 +111,19 @@ class Item(DeclarativeBase):
         pass
     
     def bloquear(self): #jorge
-        pass
-    
+        """
+        Bloquea un ítem, lo que implica que el mismo no puede
+        ser modificado.
+        
+        @raises BloquearItemError: el estado del L{Item} es distinto al 
+            de aprobado
+        """
+        p_item = PropiedadItem.por_id(self.id_propiedad_item)
+        if p_item.estado != u"Aprobado":
+            raise BloquearItemError()
+        p_item.estado = u"Bloqueado"
+        DBSession.add(p_item)
+            
     def desbloquear(self):
         pass
     
@@ -140,8 +151,6 @@ class Item(DeclarativeBase):
     
     def calcular_impacto(self):
         pass
-    
-    #i = Item()
     
     @classmethod
     def por_id(cls, id):

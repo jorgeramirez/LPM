@@ -76,8 +76,8 @@ class Fase(DeclarativeBase):
         p_item = PropiedadItem()
         p_item.version = 1
         p_item.complejidad = 5
-        p_item.prioriedad = 5
-        p_item.estado = "Desaprobado"
+        p_item.prioridad = 5
+        p_item.estado = u"Desaprobado"
         #los atributos de su tipo
         tipo = TipoItem.por_id(id_tipo)
         

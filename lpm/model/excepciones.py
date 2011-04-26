@@ -12,28 +12,37 @@ el modelo
 @since: 1.0
 """
 
-__all__ = ['ModelError', 'NombreDeAtributoError']
+__all__ = [
+    'ModelError', 'NombreDeAtributoError', 'NombreFaseError',
+    'CodigoTipoItemError', 'TipoAtributoError', 'CondicionAprobarError',
+    'BloquearItemError'
+]
 
 
 class ModelError(Exception):
     """ Excepcion Base para todas las del modulo """
     pass
 
+
 class NombreFaseError(ModelError):
     def __str__(self):
         return u"El nombre de fase ya existe"
+
     
 class NombreDeAtributoError(ModelError):
     def __str__(self):
         return u"El nombre de atributo ya existe"
 
+
 class CodigoTipoItemError(ModelError):
     def __str__(self):
         return u"El código para el tipo de item es repetido"
 
+
 class TipoAtributoError(ModelError):
     def __str__(self):
         return u"No se puede cambiar el tipo de un atributo de tipo instanciado"
+
     
 class CondicionAprobarError(ModelError):
     """
@@ -54,3 +63,12 @@ class CondicionAprobarError(ModelError):
     
     def __str__(self):
         return "Error: %s" % self.msg
+
+
+class BloquearItemError(ModelError):
+    """
+    Excepcion lanzada cuando se intenta bloquear un L{Item}
+    con estado distinto al de "Aprobado"
+    """
+    def __str__(self):
+        return u"Error: Para bloquear un ítem, el mismo de estar Aprobado"

@@ -39,3 +39,21 @@ class TestItem(ModelTest):
         dep["numero_por_tipo"] = 0
         dep["id_tipo_item"] = tipo_item.id_tipo_item
         return dep
+    
+    def test_aprobar_item(self):
+        """Aprobar ítem funciona correctamente"""
+        pass
+    
+    def test_bloquear_item(self):
+        """Bloquear Item funciona correctamente"""
+        p_item = PropiedadItem()
+        p_item.version = 1
+        p_item.complejidad = 5
+        p_item.prioridad = 5
+        p_item.estado = u"Aprobado"
+        self.obj.propiedad_item_versiones.append(p_item)
+        DBSession.add(p_item)
+        DBSession.flush()
+        self.obj.id_propiedad_item = p_item.id_propiedad_item
+        self.obj.bloquear()
+        eq_(self.obj.propiedad_item_versiones[0].estado, u"Bloqueado")
