@@ -85,4 +85,6 @@ class TestFase(ModelTest):
         DBSession.flush()        
         self.obj.crear_item(tipo_item.id_tipo_item)
     
-    
+    def test_cambiar_estado_fase(self):
+        """cambiar_estado de la fase funciona correctamente"""
+        self.obj.cambiar_estado()

@@ -61,11 +61,47 @@ class Fase(DeclarativeBase):
                                         Item.id_fase==self.id_fase)).all()
     #}
     
-    def cambiar_estado(self): #jorge
-        """ La fase puede tener los estados “Inicial”, “Desarrollo”,
-         “Completa” y “Comprometida” """
-        pass
-    
+    def cambiar_estado(self): #jorge (falta probar)
+        """
+        Cambia el estado de la fase. La fase puede estar en uno de 
+        los siguientes estados:
+            - Inicial
+            - Desarrollo
+            - Completa
+            - Comprometida
+        """
+        if self.numero_lb == 0:
+            self.estado = u"Inicial"
+        else:
+            items_lb_cerrada = 0
+            salir = False
+            for lb in self.lineas_bases():
+                if lb.estado == u"Cerrada":
+                    items_lb_cerrada += len(lb.items)
+                elif lb.estado == u"Para-Revisar" and  \
+                     self.estado == u"Completa":
+                    self.estado = u"Comprometida"
+                    salir = True
+                    break
+                else:
+                    self.estado = u"Desarrollo"
+                    salir = True
+                    break
+
+            if not salir:
+                if items_lb_cerrada == len(self.items):
+                    proyecto = Proyecto.por_id(self.id_proyecto)
+                    ok_completa = True
+                    if self.posicion < proyecto.numero_fases:
+                        for item in self.items:
+                            if len(Relacion.relaciones_como_anterior(item.id_item)) == 0:
+                                ok_completa = False
+                                break
+                    if ok_completa:
+                        self.estado = u"Completa"
+                else:
+                    self.estado = u"Desarrollo"
+
     def crear_item(self, id_tipo):#todavía no probé
         """ Crear un itema en la esta fase
         dict contiene los datos para inicializarlo"""
@@ -262,7 +298,20 @@ class Proyecto(DeclarativeBase):
         tipo = TipoItem.por_id(id)
         if (tipo.items == []):
             DBSession.delete(tipo)
+    
+    @classmethod
+    def por_id(cls, id):
+        """
+        Método de clase que realiza las búsquedas por identificador.
         
+        @param id: identificador del elemento a recuperar
+        @type id: C{Integer}
+        @return: el elemento recuperado
+        @rtype: L{Proyecto}
+        """
+        return DBSession.query(cls).filter_by(id_proyecto=id).one()      
+
+
 class TipoItem(DeclarativeBase):
     """
     Clase que define las características
