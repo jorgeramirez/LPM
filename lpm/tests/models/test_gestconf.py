@@ -15,3 +15,16 @@ from lpm.model import *
 from lpm.model.excepciones import *
 
 from lpm.tests.models import ModelTest
+
+class TestLb(ModelTest):
+    """Unidad de prueba para el modelo ``LB``"""
+    klass = LB
+    attrs = {"numero" : 1}
+    
+    def do_get_dependencies(self):
+        return {}
+        
+    def test_agregar_item(self):
+        """agregar_item funciona correctamente"""
+        pass 
+    

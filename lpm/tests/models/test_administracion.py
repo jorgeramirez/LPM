@@ -52,9 +52,8 @@ class TestProyecto(ModelTest):
         query.one()
     
     def test_iniciar_proyecto(self):
-        """
-            ``iniciar_proyecto`` debe setear correctamente 
-            el estadodel proyecto
+        """ 
+        ``iniciar_proyecto`` debe setear correctamente el estado del proyecto
         """
         self.obj.iniciar_proyecto()
         eq_(self.obj.estado, u"Iniciado")
@@ -88,3 +87,10 @@ class TestFase(ModelTest):
     def test_cambiar_estado_fase(self):
         """cambiar_estado de la fase funciona correctamente"""
         self.obj.cambiar_estado()
+    
+    def test_crear_lb(self):
+        """crear_lb funciona correctamente"""
+        num_lb = self.obj.numero_lb
+        self.obj.crear_lb()
+        DBSession.flush()
+        assert num_lb < self.obj.numero_lb

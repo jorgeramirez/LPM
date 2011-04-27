@@ -51,7 +51,18 @@ class LB(DeclarativeBase):
     #}
     
     def agregar_item(self, item): #jorge
-        pass
+        """
+        Agrega un ítem al conjunto de ítems de la Línea Base
+        
+        @param item: El ítem a insertar
+        @type item: L{Item}
+        @raises BloquearItemError: si no se ejecuta con exito L{bloquear}
+        """
+        item.bloquear()
+        iplb = ItemsPorLB()
+        iplb.propiedad_item = PropiedadItem.por_id(item.id_propiedad_item)
+        self.items.append(iplb)
+
 
 
 class HistorialLB(DeclarativeBase):

@@ -137,11 +137,13 @@ class Fase(DeclarativeBase):
         item.id_propiedad_item = p_item.id_propiedad_item
         self.items.append(item)
         DBSession.add(item)
-        
-    
+
     def crear_lb(self): #jorge
-        pass
-    
+        """Crea una nueva Línea Base en esta fase"""
+        lb_new = LB(numero=self.numero_lb)
+        self.numero_lb += 1
+        DBSession.add(lb_new)
+
     @classmethod
     def por_id(cls, id):
         """
