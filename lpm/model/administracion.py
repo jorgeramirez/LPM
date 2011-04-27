@@ -96,6 +96,7 @@ class Fase(DeclarativeBase):
                         for item in self.items:
                             if len(Relacion.relaciones_como_anterior(item.id_item)) == 0:
                                 ok_completa = False
+                                self.estado = u"Desarrollo"
                                 break
                     if ok_completa:
                         self.estado = u"Completa"
@@ -138,7 +139,7 @@ class Fase(DeclarativeBase):
         DBSession.add(item)
         
     
-    def crear_lb(self):
+    def crear_lb(self): #jorge
         pass
     
     @classmethod

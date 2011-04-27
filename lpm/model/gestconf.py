@@ -50,7 +50,7 @@ class LB(DeclarativeBase):
     items = relation("ItemsPorLB", backref='lb')
     #}
     
-    def agregar_item(self, item):
+    def agregar_item(self, item): #jorge
         pass
 
 
