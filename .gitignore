@@ -2,3 +2,5 @@
 lpm/*.pyc
 lpm/**/*.pyc
 ez_setup/*.pyc
+build/
+dist/
