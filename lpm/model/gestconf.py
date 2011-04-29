@@ -32,6 +32,7 @@ from sqlalchemy.orm import relation, backref
 
 from lpm.model import *
 from lpm.model.excepciones import *
+from lpm.model.desarrollo import *
 
 __all__ = ['LB', 'HistorialLB', 'ItemsPorLB']
 

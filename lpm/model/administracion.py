@@ -21,6 +21,8 @@ from sqlalchemy.exc import IntegrityError
 
 from lpm.model import *
 from lpm.model.excepciones import *
+from lpm.model.gestconf import *
+from lpm.model.desarrollo import *
 
 
 
@@ -344,7 +346,7 @@ class TipoItem(DeclarativeBase):
         
         for atr in self.atributos:
             if (atr.nombre == dict["nombre"]):
-                raise NombreAtributoError()
+                raise NombreDeAtributoError()
             
         a.nombre = dict["nombre"]
         a.tipo = dict["tipo"]
@@ -375,7 +377,7 @@ class TipoItem(DeclarativeBase):
             #comprobar si el nuevo nombre no está repetido
             for atr in self.atributos:
                 if (atr.nombre == dict["nombre"]):
-                    raise NombreAtributoError()
+                    raise NombreDeAtributoError()
             atributo.nombre = dict["nombre"]
             
         if (atributo.tipo != dict["tipo"]):

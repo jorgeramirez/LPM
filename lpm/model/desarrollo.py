@@ -31,6 +31,8 @@ from sqlalchemy.orm import relation, synonym, backref
 
 from lpm.model import *
 from lpm.model.excepciones import *
+from lpm.model.gestconf import ItemsPorLB
+from lpm.model.administracion import Fase
 
 
 
