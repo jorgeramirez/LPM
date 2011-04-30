@@ -16,6 +16,7 @@ from lpm.model.excepciones import *
 
 from lpm.tests.models import ModelTest
 
+
 class TestLb(ModelTest):
     """Unidad de prueba para el modelo ``LB``"""
     klass = LB

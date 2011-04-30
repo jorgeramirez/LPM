@@ -31,9 +31,6 @@ from sqlalchemy.orm import relation, synonym, backref
 
 from lpm.model import *
 from lpm.model.excepciones import *
-from lpm.model.gestconf import ItemsPorLB
-from lpm.model.administracion import Fase
-
 
 
 __all__ = ['Item', 'PropiedadItem', 'RelacionPorItem',
@@ -92,7 +89,8 @@ class Item(DeclarativeBase):
             item_ant = Item.por_id(rel.id_anterior)
             p_item_ant = PropiedadItem.por_id(item_ant.id_propiedad_item)
             iplb = ItemsPorLB.filter_by_id_item(p_item_ant.id_propiedad_item)
-            if iplb.lb.estado != u"Cerrada":
+            lb = LB.por_id(iplb.id_lb)
+            if lb.estado != u"Cerrada":
                 raise CondicionAprobarError( \
                     "Todos los antecesores y padres " + 
                     "deben estar en una LB cerrada")
@@ -109,8 +107,26 @@ class Item(DeclarativeBase):
         p_item.estado = u"Aprobado"
         DBSession.add(p_item)
 
-    def desaprobar(self): 
-        pass
+    def desaprobar(self): #carlos
+		"""
+        Desaprueba un ítem, implica que cambia su estado de "Aprobado", 
+            o de "Revisión-Desbloq” al de “Desaprobado".
+        
+        @raises DesAprobarItemError: el estado del L{Item} es distinto al 
+            de "Aprobado" o "Revision-Desbloq"
+        """
+        p_item = PropiedadItem.por_id(self.id_propiedad_item)
+        if p_item.estado == u"Aprobado" :
+            p_item.estado = u"Desaprobado"
+        elif p_item.estado == u"Revision-Desbloq":
+            p_item.estado = u"Desaprobado"
+
+            iplb = ItemsPorLB.filter_by_id_item(p_item.id_propiedad_item)
+            lb = Lb.por_id(iplb.id_lb)
+            lb.romper()
+        else:
+            raise DesAprobarItemError()
+        DBSession.add(p_item)
     
     def bloquear(self): #jorge
         """
@@ -126,10 +142,24 @@ class Item(DeclarativeBase):
         p_item.estado = u"Bloqueado"
         DBSession.add(p_item)
             
-    def desbloquear(self):
-        pass
+    def desbloquear(self): #carlos
+        """
+        Desbloquea un ítem, implica que el mismo puede ser
+        modificado.
+        
+        @raises DesBloquearItemError: el estado del L{Item} es distinto al 
+            de "Bloqueado" o "Revision-Desbloq"
+        """
+        p_item = PropiedadItem.por_id(self.id_propiedad_item)
+        if p_item.estado == u"Bloqueado":
+            p_item.estado = u"Aprobado"
+        elif p_item.estado == u"Revision-Bloq":
+            p_item.estado = u"Revision-Desbloq"
+        else:
+            raise DesBloquearItemError()
+        DBSession.add(p_item)
     
-    def revisar(self, id_origen):#nahuel
+    def revisar(self, id_origen):#nahuelop
         """id_origen es el id de un Item desde el que se produjo el cambio """
         pass
     
@@ -309,7 +339,6 @@ class AtributosDeItems(DeclarativeBase):
     
     #}
 
-
 class AtributosPorItem(DeclarativeBase):
     """
     Clase que asocia un ítem con sus atributos
@@ -386,5 +415,4 @@ class HistorialItems(DeclarativeBase):
     usuario = relation("Usuario", backref="historial_item")
     #}
    
-    
     

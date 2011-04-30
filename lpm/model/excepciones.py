@@ -15,7 +15,7 @@ el modelo
 __all__ = [
     'ModelError', 'NombreDeAtributoError', 'NombreFaseError',
     'CodigoTipoItemError', 'TipoAtributoError', 'CondicionAprobarError',
-    'BloquearItemError'
+    'BloquearItemError', 'DesBloquearItemError', 'DesAprobarItemError'
 ]
 
 
@@ -72,3 +72,19 @@ class BloquearItemError(ModelError):
     """
     def __str__(self):
         return u"Error: Para bloquear un ítem, el mismo de estar Aprobado"
+
+class DesBloquearItemError(ModelError):
+    """
+    Excepcion lanzada cuando se intenta desbloquear un L{Item}
+    con estado distinto al de "Bloqueado"
+    """
+    def __str__(self):
+        return u"Error: Para desbloquear un ítem, el mismo de estar Bloqueado o Revision-Bloq"
+
+class DesAprobarItemError(ModelError):
+    """
+    Excepcion lanzada cuando se intenta desaprobar un L{Item}
+    con estado distinto al de "Aprobado" o “Revisión-Desbloq”
+    """
+    def __str__(self):
+        return u"Error: Para desaprobar un ítem, el mismo de estar Aprobabo o Revision-Desbloq"

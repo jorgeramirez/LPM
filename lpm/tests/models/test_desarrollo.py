@@ -50,12 +50,25 @@ class TestItem(ModelTest):
     
     def test_aprobar_item(self):
         """Aprobar ítem funciona correctamente"""
+        
+        pass
+    
+    def test_desaprobar_item(self):
+        """Desaprobar ítem funciona correctamente"""
+        
         pass
     
     def test_bloquear_item(self):
         """Bloquear Item funciona correctamente"""
         self.obj.bloquear()
         eq_(self.obj.propiedad_item_versiones[0].estado, u"Bloqueado")
+    
+    def test_desbloquear_item(self):
+        """Desbloquear Item funciona correctamente"""
+        self.obj.propiedad_item_versiones[0].estado = u"Bloqueado"
+        self.obj.desbloquear()
+        assert self.obj.propiedad_item_versiones[0].estado == u"Aprobado" or \
+            self.obj.propiedad_item_versiones[0].estado == u"Revision-Desbloq"
     
     def test_eliminar_item(self):
         """Eliminar ítem funciona correctamente"""

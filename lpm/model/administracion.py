@@ -21,8 +21,6 @@ from sqlalchemy.exc import IntegrityError
 
 from lpm.model import *
 from lpm.model.excepciones import *
-from lpm.model.gestconf import *
-from lpm.model.desarrollo import *
 
 
 

@@ -31,8 +31,6 @@ from sqlalchemy.types import Integer, Unicode, DateTime
 from sqlalchemy.orm import relation, backref
 
 from lpm.model import *
-from lpm.model.excepciones import *
-from lpm.model.desarrollo import *
 
 __all__ = ['LB', 'HistorialLB', 'ItemsPorLB']
 
@@ -63,6 +61,27 @@ class LB(DeclarativeBase):
         iplb = ItemsPorLB()
         iplb.propiedad_item = PropiedadItem.por_id(item.id_propiedad_item)
         self.items.append(iplb)
+    
+    def romper(self):
+		"""
+		Rompe una linea base
+		"""
+        
+        pass
+    
+    @classmethod
+    def por_id(cls, id):
+        """
+        Método de clase que realiza las búsquedas por identificador
+        de ítem.
+        
+        @param id: identificador del ítem
+        @type id: C{Integer}
+        @return: el elemento recuperado
+        @rtype: L{ItemsPorLB}
+        """
+        return DBSession.query(cls).filter_by(id_lb=id).one()
+
 
 
 
@@ -84,7 +103,7 @@ class HistorialLB(DeclarativeBase):
     usuario = relation("Usuario", backref="historial_lb")
     lb = relation("LB", backref="regs_historial_lb")
     #}
-
+    
     
 class ItemsPorLB(DeclarativeBase):
     """
