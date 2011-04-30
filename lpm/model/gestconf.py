@@ -63,10 +63,9 @@ class LB(DeclarativeBase):
         self.items.append(iplb)
     
     def romper(self):
-		"""
-		Rompe una linea base
-		"""
-        
+        """
+        Rompe una linea base
+        """
         pass
     
     @classmethod

@@ -115,18 +115,18 @@ class Item(DeclarativeBase):
         @raises DesAprobarItemError: el estado del L{Item} es distinto al 
             de "Aprobado" o "Revision-Desbloq"
         """
-        p_item = PropiedadItem.por_id(self.id_propiedad_item)
-        if p_item.estado == u"Aprobado" :
-            p_item.estado = u"Desaprobado"
-        elif p_item.estado == u"Revision-Desbloq":
-            p_item.estado = u"Desaprobado"
+		p_item = PropiedadItem.por_id(self.id_propiedad_item)
+		if p_item.estado == u"Aprobado" :
+			p_item.estado = u"Desaprobado"
+		elif p_item.estado == u"Revision-Desbloq":
+			p_item.estado = u"Desaprobado"
 
-            iplb = ItemsPorLB.filter_by_id_item(p_item.id_propiedad_item)
-            lb = Lb.por_id(iplb.id_lb)
-            lb.romper()
-        else:
-            raise DesAprobarItemError()
-        DBSession.add(p_item)
+			iplb = ItemsPorLB.filter_by_id_item(p_item.id_propiedad_item)
+			lb = Lb.por_id(iplb.id_lb)
+			lb.romper()
+		else:
+			raise DesAprobarItemError()
+		DBSession.add(p_item)
     
     def bloquear(self): #jorge
         """
