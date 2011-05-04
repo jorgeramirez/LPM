@@ -174,12 +174,12 @@ class Item(DeclarativeBase):
     def revivir(self):
         pass
     
-    def modificar(self, dict):
+    def modificar(self, dict): #jorge
         """ se le pasa un diccionario y con los nuevos valores y se compara con los actuales
         para ver que cambió para colocar en el historial """
         pass
     
-    def _crear_propiedad_item(self):
+    def _crear_propiedad_item(self): #jorge
         """ ayuda a modificar() """
         pass
     
