@@ -151,6 +151,18 @@ class Usuario(DeclarativeBase):
         """Return the user object whose user name is ``username``."""
         return DBSession.query(cls).filter_by(nombre_usuario = username).first()
 
+    @classmethod
+    def por_id(cls, id):
+        """
+        Método de clase que realiza las búsquedas por identificador.
+        
+        @param id: identificador del elemento a recuperar
+        @type id: C{Integer}
+        @return: el elemento recuperado
+        @rtype: L{Usuario}
+        """        
+        return DBSession.query(cls).filter_by(id_usuario=id).one()
+    
     def _set_password(self, password):
         """Hash ``password`` on the fly and store its hashed version."""
         # Make sure password is a str because we cannot hash unicode objects

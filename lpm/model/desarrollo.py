@@ -174,11 +174,39 @@ class Item(DeclarativeBase):
     def revivir(self):
         pass
     
-    def modificar(self, dict): #jorge
-        """ se le pasa un diccionario y con los nuevos valores y se compara con los actuales
-        para ver que cambió para colocar en el historial """
-        pass
-    
+    def modificar(self, id_usuario, dict): #jorge
+        """ 
+        Modifica los valores de la propiedad del ítem.
+        
+        Se le pasa un diccionario y con los nuevos valores y 
+        se compara con los actuales para ver qué cambió, para 
+        registrar dicho cambio en el historial.
+        
+        @param id_usuario: Identificador del usuario que realizo el cambio
+        @type id_usuario: C{Integer}
+        @param dict: Diccionario con los nuevos valores
+        @type dict: C{dict}
+        """
+        p_item = PropiedadItem.por_id(self.id_propiedad_item)
+        if p_item.estado in [u"Bloqueado", u"Eliminado", u"Revisión-Bloq"]:
+            raise ModificarItemError()
+        p_item_mod = PropiedadItem()
+        for attr_nombre, nuevo_valor in dict.items():
+            viejo_valor = getattr(p_item, attr_nombre)
+            if nuevo_valor != viejo_valor:
+                hist_items = HistorialItems()
+                hist_items.tipo_modificacion = u"Modificado " + attr_nombre
+                hist_items.usuario = Usuario.por_id(id_usuario)
+                DBSession.add(hist_items)
+            setattr(p_item_mod, attr_nombre, nuevo_valor)
+        p_item_mod.relaciones = list(p_item.relaciones)
+        p_item_mod.archivos = list(p_item.archivos)
+        p_item_mod.atributos = list(p_item.atributos)
+        p_item_mod.version = p_item.version + 1
+        self.propiedad_item_versiones.append(p_item_mod)
+        DBSession.flush()
+        self.id_propiedad_item = p_item_mod.id_propiedad_item
+
     def _crear_propiedad_item(self): #jorge
         """ ayuda a modificar() """
         pass

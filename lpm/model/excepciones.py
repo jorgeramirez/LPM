@@ -15,7 +15,8 @@ el modelo
 __all__ = [
     'ModelError', 'NombreDeAtributoError', 'NombreFaseError',
     'CodigoTipoItemError', 'TipoAtributoError', 'CondicionAprobarError',
-    'BloquearItemError', 'DesBloquearItemError', 'DesAprobarItemError'
+    'BloquearItemError', 'DesBloquearItemError', 'DesAprobarItemError',
+    'ModificarItemError'
 ]
 
 
@@ -88,3 +89,13 @@ class DesAprobarItemError(ModelError):
     """
     def __str__(self):
         return u"Error: Para desaprobar un ítem, el mismo de estar Aprobabo o Revision-Desbloq"
+
+
+class ModificarItemError(ModelError):
+    """
+    Excepcion lanzada cuando se intenta modificar un L{Item}
+    con estado igual a "Bloqueado", "Revision-Bloq" o "Eliminado"
+    """
+    def __str__(self):
+        return u"Error: No puede modificar un ítem en estado " + \
+            "Bloqueado, Revision-Bloq o Eliminado"
