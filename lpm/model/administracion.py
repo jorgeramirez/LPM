@@ -349,8 +349,8 @@ class TipoItem(DeclarativeBase):
         a.nombre = dict["nombre"]
         a.tipo = dict["tipo"]
         a.valor_por_defecto = dict["valor"]
-        
-        DBSession.add(a)
+        self.atributos.append(a)
+        #DBSession.add(a)
         DBSession.flush()
         
         #agregar este atributo a los ítems ya creados, no sé si es necesario
