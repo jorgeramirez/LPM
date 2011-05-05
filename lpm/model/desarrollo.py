@@ -172,7 +172,26 @@ class Item(DeclarativeBase):
         DBSession.add(p_item)
     
     def revivir(self):
-        pass
+        """
+        Revive un ítem, implica que el mismo reviva con el estado desbloqueado.
+        
+        @raises RevivirItemError: el estado del L{Item} es distinto al 
+            de "Eliminado"
+        """
+        p_item = PropiedadItem.por_id(self.id_propiedad_item)
+        if p_item.estado != u"Eliminado":
+            raise RevivirItemError()
+        p_item_revivido = PropiedadItem()
+        p_item_revivido.version = p_item.version + 1
+        p_item_revivido.complejidad = p_item.complejidad
+        p_item_revivido.prioridad = p_item.prioridad
+        p_item_revivido.atributos = list(p_item.atributos)
+        p_item_revivido.archivos = list(p_item.archivos)
+        p_item_revivido.estado = u"Desaprobado"
+        self.propiedad_item_versiones.append(p_item_revivido)
+        DBSession.add(p_item_revivido)
+        DBSession.flush()
+        self.id_propiedad_item = p_item_revivido.id_propiedad_item
     
     def modificar(self, id_usuario, dict): #jorge
         """ 

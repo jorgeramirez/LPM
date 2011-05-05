@@ -89,3 +89,11 @@ class TestItem(ModelTest):
         self.obj.modificar(u.id_usuario, mods)
         p_item = PropiedadItem.por_id(self.obj.id_propiedad_item)
         eq_(p_item.complejidad, 8)
+
+    def test_revivir_item(self):
+        """Revivir item funciona correctamente"""
+        p_item = self.obj.propiedad_item_versiones[0]
+        DBSession.add(p_item)
+        DBSession.flush()
+        self.obj.eliminar()
+        eq_(self.obj.propiedad_item_versiones[0].estado, u"Eliminado")

@@ -99,3 +99,11 @@ class ModificarItemError(ModelError):
     def __str__(self):
         return u"Error: No puede modificar un ítem en estado " + \
             "Bloqueado, Revision-Bloq o Eliminado"
+
+class RevivirItemError(ModelError):
+    """
+    Excepcion lanzada cuando se intenta revivir un L{Item}
+    con estado distinto al de "Eliminado"
+    """
+    def __str__(self):
+        return u"Error: Para revivir un ítem, el mismo debio haber sido eliminado"
