@@ -361,7 +361,7 @@ class TipoItem(DeclarativeBase):
             id_atributos_por_tipo_item
             
             a_por_item = AtributosPorItem()
-            a_por_item.atributos.append(a_item)
+            a_por_item.atributo = a_item
             p_item = PropiedadItem.por_id(i.id_propiedad_item)
             p_item.atributos.append(a_por_item)
             DBSession.add(a_item)

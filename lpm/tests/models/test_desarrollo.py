@@ -77,7 +77,7 @@ class TestItem(ModelTest):
     
     def test_modificar_item(self):
         """Modificar Item funciona correctamente"""
-        mods = dict(complejidad=8, prioridad=10, estado=u"Aprobado")
+        mods = dict(complejidad=8, prioridad=10)
         u = Usuario()
         u.nombre_usuario = u'admin'
         u.nombre = u'Administrador'
@@ -97,3 +97,7 @@ class TestItem(ModelTest):
         DBSession.flush()
         self.obj.eliminar()
         eq_(self.obj.propiedad_item_versiones[0].estado, u"Eliminado")
+    
+    def test_revertir_item(self):
+        """Revertir Item funciona correctamente"""
+        pass

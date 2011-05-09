@@ -100,7 +100,7 @@ class HistorialLB(DeclarativeBase):
     
     #{ Relaciones
     usuario = relation("Usuario", backref="historial_lb")
-    lb = relation("LB", backref="regs_historial_lb")
+    lb = relation("LB", backref="historial_lb")
     #}
     
     
