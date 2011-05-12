@@ -91,8 +91,8 @@ class ProyectoController(CrudRestController):
 	
 	#{ Métodos
 	@with_trailing_slash
-	@paginate('lista_proyectos', items_per_page=10)
-	@expose('lpm.templates.proyectos.get_all')
+	@paginate('lista_elementos', items_per_page=10)
+	@expose('lpm.templates.get_all')
 	@expose('json')
 	def get_all(self, *args, **kw):
 		""" 
@@ -106,11 +106,13 @@ class ProyectoController(CrudRestController):
 		else:
 			proyectos = []
 		tmpl_context.widget = self.table
-		return dict(modelo=self.model.__name__, lista_proyectos=proyectos)
+		return dict(modelo=self.model.__name__, 
+                    lista_elementos=proyectos,
+                    action='/proyectos/buscar')
 	
 	@with_trailing_slash
-	@paginate('lista_proyectos', items_per_page=10)
-	@expose('lpm.templates.proyectos.get_all')
+	@paginate('lista_elementos', items_per_page=10)
+	@expose('lpm.templates.get_all')
 	@expose('json')
 	def buscar(self, *args, **kw):
 		buscar_table_filler = ProyectoBuscarTableFiller(DBSession)
@@ -118,7 +120,9 @@ class ProyectoController(CrudRestController):
 			buscar_table_filler.filtro = kw['filtro']
 		proyectos = buscar_table_filler.get_value()
 		tmpl_context.widget = self.table
-		return dict(modelo=self.model.__name__, lista_proyectos=proyectos)
+		return dict(modelo=self.model.__name__, 
+                    lista_elementos=proyectos,
+                    action='/proyectos/buscar')
 	#}
 	
 	
