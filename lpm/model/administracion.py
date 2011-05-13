@@ -125,7 +125,7 @@ class Fase(DeclarativeBase):
             id_atributos_por_tipo_item
             
             a_por_item = AtributosPorItem()
-            a_por_item.atributos.append(a_item)
+            a_por_item.atributos = a_item
             p_item.atributos.append(a_por_item)
             DBSession.add(a_item)
             DBSession.add(a_por_item)
