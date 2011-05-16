@@ -4,7 +4,7 @@
 import logging
 from tg import config
 from lpm import model
-
+from lpm.lib.authorization import Permisos
 import transaction
 
 
@@ -31,16 +31,23 @@ def bootstrap(command, conf, vars):
     
         model.DBSession.add(g)
         
-        ''' Aquí se deberían especificar todos los permisos que tendrá el sistema '''
         p = model.Permiso()
         p.nombre_permiso = u'manage'
         p.descripcion = u'This permission give an administrative right to the bearer'
         p.roles.append(g)
-    
         model.DBSession.add(p)
-    
+        
+        #permisos del sistema
+        print "Creando los permisos del sistema..."
+        for perm, desc in Permisos.items():
+            p = model.Permiso()
+            p.nombre_permiso = perm
+            p.descripcion = desc
+            model.DBSession.add(p) 
+
         model.DBSession.flush()
         transaction.commit()
+        print "Se han creado correctamente las tablas"
     except IntegrityError:
         print 'Warning, there was a problem adding your auth data, it may have already been added:'
         import traceback
