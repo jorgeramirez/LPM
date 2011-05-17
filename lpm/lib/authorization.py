@@ -93,7 +93,7 @@ class PoseePermiso(Predicate):
             self.unmet()
         nombre_usuario = credentials['repoze.what.userid']
         usuario = DBSession.query(Usuario).filter_by( \
-                                           nombre_usuario=nombre_usuario)
+                                           nombre_usuario=nombre_usuario).one()
         met = False
         for rol in usuario.roles:
             valor = getattr(rol, self.contexto)
