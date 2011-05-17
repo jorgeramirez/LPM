@@ -60,7 +60,6 @@ class Rol(DeclarativeBase):
 
     Only the ``group_name`` column is required by :mod:`repoze.what`.
     Pero se usa un 'translation' a "nombre_rol" y "usuarios"
-
     """
 
     __tablename__ = 'tg_group'

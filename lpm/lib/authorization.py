@@ -10,8 +10,11 @@ con los módulos de autorización y autenticación
 
 @since: 1.0
 """
+from repoze.what.predicates import Predicate, not_anonymous
 
-__all__ = ['Permisos']
+
+__all__ = ['Permisos', 'PoseePermiso']
+
 
 # Diccionario que define los permisos del sistema
 # clave: nombre del permiso
@@ -57,3 +60,47 @@ Permisos = {
     u"modificar usuario": u"Permite modificar valores de atributos de usuarios",
     u"consultar usuario": u"Permite consultar valores de atributos de usuarios"
 }
+
+
+class PoseePermiso(Predicate):
+    """
+    Clase que evalua si el usuario actual posee
+    el permiso especificado
+    """
+    template = "El usuario debe poseer el permiso: %s"
+    
+    def __init__(self, nombre_permiso, **kwargs):
+        """
+        Método inicializador.
+        
+        @param nombre_permiso: el nombre del permiso a evaluar
+        @type nombre_permiso: C{unicode}
+        """
+        self.nombre_permiso = nombre_permiso
+        if kwargs.has_key('id_proyecto'):
+            self.valor_contexto = kwargs['id_proyecto']
+            self.contexto = 'id_proyecto'
+        elif kwargs.has_key('id_fase'):
+            self.valor_contexto = kwargs['id_fase']
+            self.contexto = 'id_fase'
+        elif kwargs.has_key('id_tipo_item'):
+            self.valor_contexto = kwargs['id_tipo_item']
+            self.contexto = 'id_tipo_item'
+        super(PoseePermiso, self).__init__(**kwargs)
+    
+    def evaluate(self, environ, credentials):
+        if is_anonymous().is_met(environ):
+            self.unmet()
+        nombre_usuario = credentials['repoze.what.userid']
+        usuario = DBSession.query(Usuario).filter_by( \
+                                           nombre_usuario=nombre_usuario)
+        met = False
+        for rol in usuario.roles:
+            valor = getattr(rol, self.contexto)
+            if valor and self.valor_contexto == valor:
+                for perm in rol.permisos:
+                    if perm.nombre_permiso == self.nombre_permiso:
+                        met = True
+                        break
+        if not met:
+            self.unmet(template % self.nombre_permiso)
