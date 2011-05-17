@@ -10,7 +10,7 @@ con los módulos de autorización y autenticación
 
 @since: 1.0
 """
-from repoze.what.predicates import Predicate, not_anonymous
+from repoze.what.predicates import Predicate, is_anonymous
 
 
 __all__ = ['Permisos', 'PoseePermiso']
