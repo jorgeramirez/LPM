@@ -23,18 +23,21 @@ def bootstrap(command, conf, vars):
     
         model.DBSession.add(u)
     
-        g = model.Rol()
-        g.nombre_rol = u'Administrador del Sistema'
-        g.descripcion= u'Rol por defecto que tiene todos los permisos del sistema'
-        
-        g.usuarios.append(u)
+        r = model.Rol()
+        r.nombre_rol = u'Administrador del Sistema'
+        r.descripcion= u'Rol por defecto que tiene todos los permisos del sistema'
+        # Rol de sistema posee ceros en cada identificador de contexto.
+        r.id_proyecto = 0
+        r.id_fase = 0
+        r.id_tipo_item = 0
+        r.usuarios.append(u)
     
-        model.DBSession.add(g)
+        model.DBSession.add(r)
         
         p = model.Permiso()
         p.nombre_permiso = u'manage'
         p.descripcion = u'This permission give an administrative right to the bearer'
-        p.roles.append(g)
+        p.roles.append(r)
         model.DBSession.add(p)
         
         #permisos del sistema
@@ -43,7 +46,8 @@ def bootstrap(command, conf, vars):
             p = model.Permiso()
             p.nombre_permiso = perm
             p.descripcion = desc
-            model.DBSession.add(p) 
+            p.roles.append(r) # Administrador del sistema.
+            model.DBSession.add(r) 
 
         model.DBSession.flush()
         transaction.commit()

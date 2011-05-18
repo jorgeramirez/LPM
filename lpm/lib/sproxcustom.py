@@ -39,11 +39,11 @@ class BuscarTableFiller(TableFiller):
         ## TODO falta verificar y que funcione para distintos
         ## tipos de datos a la hora de buscar
         filtrados = []
-        base_query = DBSession.query(self.__model__)
+        base_query = DBSession.query(self.__entity__)
         if not self.__filtro:
             filtrados = base_query.all()
         else:
-            mapper = self.__model__.__mapper__
+            mapper = self.__entity__.__mapper__
             for key in mapper.columns.keys():
                 column = mapper.columns.get(key)
                 if column.type.__visit_name__ != 'unicode':
