@@ -22,6 +22,8 @@ from sprox.fillerbase import TableFiller, EditFormFiller
 from sprox.fillerbase import EditFormFiller
 from sprox.formbase import AddRecordForm, EditableForm
 
+from repoze.what.predicates import not_anonymous
+
 import pylons
 from pylons import tmpl_context
 
@@ -67,40 +69,41 @@ proyecto_table_filler = ProyectoTableFiller(DBSession)
 
 
 class ProyectoAddForm(AddRecordForm):
-        __model__ = Proyecto
-        __omit_fields__ = ['id_proyecto', 'fecha_creacion', 'complejidad_total',
-                                           'estado', 'numero_fases']
+    __model__ = Proyecto
+    __omit_fields__ = ['id_proyecto', 'fecha_creacion', 'complejidad_total',
+                                       'estado', 'numero_fases']
                                            
 proyecto_add_form = ProyectoAddForm(DBSession)
 
 
 class ProyectoEditForm(EditableForm):
-        __model__ = Proyecto
-        __omit_fields__ = ['id_proyecto', 'fecha_creacion', 'complejidad_total',
-                                           'estado', 'numero_fases']
+    __model__ = Proyecto
+    __omit_fields__ = ['id_proyecto', 'fecha_creacion', 'complejidad_total',
+                                       'estado', 'numero_fases']
                                            
 proyecto_edit_form = ProyectoEditForm(DBSession)        
 
 
 class ProyectoEditFiller(EditFormFiller):
-        __model__ = Proyecto
-        
+    __model__ = Proyecto
+
 proyecto_edit_filler = ProyectoEditFiller(DBSession)
 
 
 class ProyectoBuscarTableFiller(BuscarTableFiller):
-        """
-        Clase que se utiliza para completar L{ProyectoTable}
-        con el resultado de la búsqueda
-        """
-        __model__ = Proyecto
+    """
+    Clase que se utiliza para completar L{ProyectoTable}
+    con el resultado de la búsqueda
+    """
+    __model__ = Proyecto
 
 
 class ProyectoController(CrudRestController):
     """Controlador de Proyectos"""
     #{ Variables
     title = u"Administración de Proyectos"
-
+    # No permitir usuarios anonimos (?)
+    allow_only = not_anonymous(u"El usuario debe haber iniciado sesión")
     #{ Modificadores
     model = Proyecto
     table = proyecto_table
@@ -128,7 +131,8 @@ class ProyectoController(CrudRestController):
         tmpl_context.widget = self.table
         return dict(modelo=self.model.__name__, 
             lista_elementos=proyectos,
-            action='/proyectos/buscar')
+            action='/proyectos/buscar',
+            page=u'Administrar Proyectos')
         
     @with_trailing_slash
     @paginate('lista_elementos', items_per_page=10)
@@ -142,5 +146,6 @@ class ProyectoController(CrudRestController):
             tmpl_context.widget = self.table
             return dict(modelo=self.model.__name__, 
                     lista_elementos=proyectos,
-                    action='/proyectos/buscar')
+                    action='/proyectos/buscar',
+                    page=u'Administrar Proyectos')
     #}

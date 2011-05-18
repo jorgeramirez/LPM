@@ -103,7 +103,7 @@ class RootController(BaseController):
         """
         Redirect the user to the initially requested page on logout and say
         goodbye as well.
-
         """
         flash(_('We hope to see you soon!'))
-        redirect(came_from)
+        #redirect(came_from)
+        redirect(url('/'))
