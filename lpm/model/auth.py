@@ -90,6 +90,13 @@ class Rol(DeclarativeBase):
     def __unicode__(self):
         return self.nombre_rol
 
+    def es_rol_sistema(self):
+        """
+        Indica si el rol es un rol a nivel de sistema.
+        @return: True en caso de ser un rol de sistema, sino False
+        @rtype: C{bool}
+        """
+        return (self.id_proyecto + self.id_fase + self.id_tipo_item) == 0
     #}
 
 
@@ -236,6 +243,29 @@ class Permiso(DeclarativeBase):
     def __unicode__(self):
         return self.nombre_permiso
 
+    @classmethod
+    def por_nombre_permiso(cls, np):
+        """
+        Método de clase que realiza las búsquedas por nombre de permiso.
+        
+        @param np: nombre del permiso
+        @type np: C{unicode}
+        @return: el elemento recuperado
+        @rtype: L{Permiso}
+        """
+        return DBSession.query(Permiso).filter_by(nombre_permiso=np).one()
+        
+    @classmethod
+    def por_id(cls, id):
+        """
+        Método de clase que realiza las búsquedas por identificador.
+        
+        @param id: identificador del elemento a recuperar
+        @type id: C{Integer}
+        @return: el elemento recuperado
+        @rtype: L{Permiso}
+        """        
+        return DBSession.query(cls).filter_by(id_permiso=id).one()
     #}
 
 

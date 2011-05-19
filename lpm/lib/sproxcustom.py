@@ -14,12 +14,12 @@ relacion con el módulo sprox
 from sprox.fillerbase import TableFiller
 from lpm.model import DBSession
 
-__all__ = ['BuscarTableFiller']
+__all__ = ['CustomTableFiller']
 
-class BuscarTableFiller(TableFiller):
+class CustomTableFiller(TableFiller):
     """
-    Clase Base que se utiliza para completar
-    la tabla con el resultado de la búsqueda
+    Clase base utilizada para rellenar una tabla.
+    Añade la capacidad de filtrado de elementos.
     """
     __filtro = None
 
@@ -36,7 +36,7 @@ class BuscarTableFiller(TableFiller):
         Este método define como la consulta a la base de
         datos se debe realizar.
         """
-        ## TODO falta verificar y que funcione para distintos
+        ## TODO que funcione para distintos
         ## tipos de datos a la hora de buscar
         filtrados = []
         base_query = DBSession.query(self.__entity__)

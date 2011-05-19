@@ -11,7 +11,7 @@ con los módulos de autorización y autenticación
 @since: 1.0
 """
 from repoze.what.predicates import Predicate, is_anonymous
-from lpm.model import DBSession, Usuario
+from lpm.model import Usuario
 
 __all__ = ['Permisos', 'PoseePermiso']
 
@@ -76,42 +76,41 @@ class PoseePermiso(Predicate):
         @param nombre_permiso: el nombre del permiso a evaluar
         @type nombre_permiso: C{unicode}
         """
+        
         self.nombre_permiso = unicode(nombre_permiso)
+        self.valor_contexto = None
+        self.contexto = ""
         if kwargs.has_key('id_proyecto'):
             self.valor_contexto = kwargs['id_proyecto']
             self.contexto = 'id_proyecto'
-            del kwargs['id_proyecto']
+            del kwargs[self.contexto]
         elif kwargs.has_key('id_fase'):
             self.valor_contexto = kwargs['id_fase']
             self.contexto = 'id_fase'
-            del kwargs['id_proyecto']
+            del kwargs[self.contexto]
         elif kwargs.has_key('id_tipo_item'):
             self.valor_contexto = kwargs['id_tipo_item']
             self.contexto = 'id_tipo_item'
-            del kwargs['id_proyecto']
+            del kwargs[self.contexto]
         super(PoseePermiso, self).__init__(**kwargs)
-    
+        
     def evaluate(self, environ, credentials):
         if is_anonymous().is_met(environ):
             self.unmet()
         nombre_usuario = credentials['repoze.what.userid']
-        usuario = DBSession.query(Usuario).filter_by( \
-                                           nombre_usuario=nombre_usuario).one()
-        met = False
+        usuario = Usuario.by_user_name(nombre_usuario)
         for rol in usuario.roles:
             #ver si es rol de sistema.
             buscar = False
-            if (rol.id_proyecto + rol.id_fase + rol.id_tipo_item) == 0:
+            if rol.es_rol_sistema():
                 buscar = True
             else:
                 #rol con contexto distinto a sistema.
-                valor = getattr(rol, self.contexto)
+                valor = getattr(rol, self.contexto, None)
                 if valor and self.valor_contexto == valor:
                     buscar = True
             if buscar:
                 for perm in rol.permisos:
                     if perm.nombre_permiso == self.nombre_permiso:
-                        met = True
-                        break
-        if not met:
-            self.unmet(self.message % self.nombre_permiso)
+                        return
+        self.unmet(self.message % self.nombre_permiso)

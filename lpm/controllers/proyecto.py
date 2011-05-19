@@ -11,10 +11,10 @@ Módulo que define el controlador de proyectos.
 """
 from tgext.crud import CrudRestController
 from tg.decorators import paginate, expose, with_trailing_slash
-from tg import redirect, request
+from tg import redirect, request, require, flash
 
-from lpm.model import DBSession, Proyecto
-from lpm.lib.sproxcustom import BuscarTableFiller
+from lpm.model import DBSession, Proyecto, Usuario
+from lpm.lib.sproxcustom import CustomTableFiller
 from lpm.lib.authorization import PoseePermiso
 
 from sprox.tablebase import TableBase
@@ -43,20 +43,20 @@ class ProyectoTable(TableBase):
 proyecto_table = ProyectoTable(DBSession)
 
 
-class ProyectoTableFiller(TableFiller):
+class ProyectoTableFiller(CustomTableFiller):
     __model__ = Proyecto
 
     def __actions__(self, obj):
         """Links de acciones para un registro dado"""
         value = '<div>'
         if PoseePermiso('modificar proyecto', 
-           id_proyecto=obj.id_proyecto).is_met(request.environ):
+                        id_proyecto=obj.id_proyecto).is_met(request.environ):
             value += '<div>' + \
                         '<a class="edit_link" href="'+ str(obj.id_proyecto) +'/edit" ' + \
-                        'style="text-decoration:none">editar</a>' + \
+                        'style="text-decoration:none">Modificar Proyecto</a>' + \
                      '</div>'
         if PoseePermiso('eliminar proyecto',
-           id_proyecto=obj.id_proyecto).is_met(request.environ):
+                        id_proyecto=obj.id_proyecto).is_met(request.environ):
             value += '<div><form method="POST" action="' + str(obj.id_proyecto) + '" class="button-to">'\
                      '<input type="hidden" name="_method" value="DELETE" />' \
                      '<input class="delete-button" onclick="return confirm(\'Está seguro?\');" value="delete" type="submit" '\
@@ -64,7 +64,39 @@ class ProyectoTableFiller(TableFiller):
                      '</form></div>'
         value += '</div>'
         return value
-        
+    
+    def _do_get_provider_count_and_objs(self, **kw):
+        """
+        Sobreescribimos este método para poder listar
+        solamente los proyectos para los cuales tenemos
+        algun permiso.
+        """
+        count, filtrados = super(ProyectoTableFiller, self). \
+                                 _do_get_provider_count_and_objs(**kw)
+        if count == 0:
+            return count, filtrados
+        pks = []
+        filtrar = True
+        nombre_usuario = request.credentials['repoze.what.userid']
+        usuario = Usuario.by_user_name(nombre_usuario)
+        for r in usuario.roles:
+            if r.es_rol_sistema():
+                for p in r.permisos:
+                    if p.nombre_permiso.find("proyecto") > 0 and \
+                       p.nombre_permiso != u"consultar proyecto":
+                        return count, filtrados
+            elif r.id_proyecto != 0 and r.id_proyecto not in pks:
+                pks.append(r.id_proyecto)
+        c = 0
+        while True:
+            if filtrados[c].id_proyecto not in pks:
+                filtrados.pop(c)
+            else:
+                c += 1
+            if c == len(filtrados):
+                break
+        return len(filtrados), filtrados
+
 proyecto_table_filler = ProyectoTableFiller(DBSession)
 
 
@@ -79,7 +111,8 @@ proyecto_add_form = ProyectoAddForm(DBSession)
 class ProyectoEditForm(EditableForm):
     __model__ = Proyecto
     __omit_fields__ = ['id_proyecto', 'fecha_creacion', 'complejidad_total',
-                                       'estado', 'numero_fases']
+                       'estado', 'numero_fases'
+                      ]
                                            
 proyecto_edit_form = ProyectoEditForm(DBSession)        
 
@@ -88,14 +121,6 @@ class ProyectoEditFiller(EditFormFiller):
     __model__ = Proyecto
 
 proyecto_edit_filler = ProyectoEditFiller(DBSession)
-
-
-class ProyectoBuscarTableFiller(BuscarTableFiller):
-    """
-    Clase que se utiliza para completar L{ProyectoTable}
-    con el resultado de la búsqueda
-    """
-    __model__ = Proyecto
 
 
 class ProyectoController(CrudRestController):
@@ -114,7 +139,7 @@ class ProyectoController(CrudRestController):
 
     #{ Métodos
     @with_trailing_slash
-    @paginate('lista_elementos', items_per_page=10)
+    @paginate('lista_elementos', items_per_page=7)
     @expose('lpm.templates.get_all')
     @expose('json')
     def get_all(self, *args, **kw):
@@ -135,11 +160,15 @@ class ProyectoController(CrudRestController):
             page=u'Administrar Proyectos')
         
     @with_trailing_slash
-    @paginate('lista_elementos', items_per_page=10)
+    @paginate('lista_elementos', items_per_page=7)
     @expose('lpm.templates.get_all')
     @expose('json')
     def buscar(self, *args, **kw):
-        buscar_table_filler = ProyectoBuscarTableFiller(DBSession)
+        pp = PoseePermiso('consultar proyecto')
+        if not pp.is_met(request.environ):
+            flash(pp.message % pp.nombre_permiso)
+            redirect("/proyectos")
+        buscar_table_filler = ProyectoTableFiller(DBSession)
         if kw.has_key('filtro'):
             buscar_table_filler.filtro = kw['filtro']
             proyectos = buscar_table_filler.get_value()
@@ -148,4 +177,13 @@ class ProyectoController(CrudRestController):
                     lista_elementos=proyectos,
                     action='/proyectos/buscar',
                     page=u'Administrar Proyectos')
+    
+    @expose('lpm.templates.edit')
+    def edit(self, *args, **kw):
+        """Despliega una pagina para modificar proyecto"""
+        pp = PoseePermiso('modificar proyecto', id_proyecto=args[0])
+        if not pp.is_met(request.environ):
+            flash(pp.message % pp.nombre_permiso)
+            redirect("/proyectos")
+        return super(ProyectoController, self).edit(*args, **kw)
     #}
