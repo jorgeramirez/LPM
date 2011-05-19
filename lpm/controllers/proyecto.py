@@ -38,6 +38,7 @@ class ProyectoTable(TableBase):
     __default_column_width__ = '15em'
     __column_widths__ = {'complejidad_total': "35em",
                          'numero_fases': "35em",
+                         '__actions__' : "50em"
                         }
     
 proyecto_table = ProyectoTable(DBSession)
@@ -52,16 +53,22 @@ class ProyectoTableFiller(CustomTableFiller):
         if PoseePermiso('modificar proyecto', 
                         id_proyecto=obj.id_proyecto).is_met(request.environ):
             value += '<div>' + \
-                        '<a class="edit_link" href="'+ str(obj.id_proyecto) +'/edit" ' + \
-                        'style="text-decoration:none">Modificar Proyecto</a>' + \
+                        '<a href="'+ str(obj.id_proyecto) +'/edit" ' + \
+                        'style="text-decoration:none">Modificar</a>' + \
                      '</div>'
         if PoseePermiso('eliminar proyecto',
                         id_proyecto=obj.id_proyecto).is_met(request.environ):
             value += '<div><form method="POST" action="' + str(obj.id_proyecto) + '" class="button-to">'\
                      '<input type="hidden" name="_method" value="DELETE" />' \
-                     '<input class="delete-button" onclick="return confirm(\'Está seguro?\');" value="delete" type="submit" '\
-                     'style="background-color: transparent; float:left; border:0; color: #286571; display: inline; margin: 0; padding: 0;"/>'\
+                     '<input onclick="return confirm(\'Está seguro?\');" value="Delete" type="submit" '\
+                     'style="background-color: transparent; float:left; border:0; color: #286571; display: inline; margin: 0; padding: 0; margin-left: 5;"/>'\
                      '</form></div>'
+        if PoseePermiso('administrar proyecto',
+                        id_proyecto=obj.id_proyecto).is_met(request.environ):
+            value += '<div>' + \
+                        '<a href="administrar/' + str(obj.id_proyecto) + \
+                        '" style="text-decoration:none">Administrar</a>' + \
+                     '</div>'
         value += '</div>'
         return value
     
@@ -76,7 +83,6 @@ class ProyectoTableFiller(CustomTableFiller):
         if count == 0:
             return count, filtrados
         pks = []
-        filtrar = True
         nombre_usuario = request.credentials['repoze.what.userid']
         usuario = Usuario.by_user_name(nombre_usuario)
         for r in usuario.roles:
@@ -137,6 +143,11 @@ class ProyectoController(CrudRestController):
     edit_form = proyecto_edit_form
     edit_filler = proyecto_edit_filler
 
+    @with_trailing_slash
+    @expose()
+    def administrar(self, *args, **kw):
+        redirect("/")
+        
     #{ Métodos
     @with_trailing_slash
     @paginate('lista_elementos', items_per_page=7)
@@ -166,7 +177,7 @@ class ProyectoController(CrudRestController):
     def buscar(self, *args, **kw):
         pp = PoseePermiso('consultar proyecto')
         if not pp.is_met(request.environ):
-            flash(pp.message % pp.nombre_permiso)
+            flash(pp.message % pp.nombre_permiso, 'warning')
             redirect("/proyectos")
         buscar_table_filler = ProyectoTableFiller(DBSession)
         if kw.has_key('filtro'):
@@ -183,7 +194,7 @@ class ProyectoController(CrudRestController):
         """Despliega una pagina para modificar proyecto"""
         pp = PoseePermiso('modificar proyecto', id_proyecto=args[0])
         if not pp.is_met(request.environ):
-            flash(pp.message % pp.nombre_permiso)
+            flash(pp.message % pp.nombre_permiso, 'warning')
             redirect("/proyectos")
         return super(ProyectoController, self).edit(*args, **kw)
     #}
