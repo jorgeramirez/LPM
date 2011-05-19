@@ -14,6 +14,7 @@ from lpm import model
 from lpm.controllers.secure import SecureController
 from lpm.controllers.error import ErrorController
 from lpm.controllers.proyecto import ProyectoController
+from lpm.controllers.fase import FaseController
 
 __all__ = ['RootController']
 
@@ -35,6 +36,7 @@ class RootController(BaseController):
     secc = SecureController()
     #admin = AdminController(model, DBSession, config_type=TGAdminConfig)
     proyectos = ProyectoController(DBSession)
+    fases = FaseController(DBSession)
     error = ErrorController()
 
     @expose('lpm.templates.index')

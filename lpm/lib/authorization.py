@@ -58,7 +58,11 @@ Permisos = {
     u"crear usuario": u"Permite crear usuarios",
     u"eliminar usuario": u"Permite eliminar usuarios",
     u"modificar usuario": u"Permite modificar valores de atributos de usuarios",
-    u"consultar usuario": u"Permite consultar valores de atributos de usuarios"
+    u"consultar usuario": u"Permite consultar valores de atributos de usuarios",
+    u"crear fase": u"Permite crear fases",
+    u"modificar fase": u"Permite modificar valores de atributos de una fase",
+    u"eliminar fase": u"Permite eliminar una fase",
+    u"consultar fase": u"Permite consultar valores de atributos de fase"
 }
 
 

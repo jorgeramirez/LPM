@@ -3,7 +3,7 @@
       xmlns:xi="http://www.w3.org/2001/XInclude">
   <xi:include href="master.html" />
 <head>
-<title>${tmpl_context.title} - Listado de ${modelo}s</title>
+<title>${titulo}</title>
 <style>
 #menu_items {
   padding:0px 12px 0px 2px;
@@ -19,18 +19,18 @@
             <li py:for="lower, item in sorted(tmpl_context.menu_items.iteritems())"><a href="../${lower}s">$item.__name__</a></li>
         </ul>
     </div>
-	<form action="$action" method="post">
-		<input type="text" id="filtro" name="filtro"/>
-		<!-- <input type="image" style="width:30px; heigth: 40px;" value="Buscar" src="../images/search.png"/> -->
-		<input type="submit" value="Buscar"/>
-	</form>
+    <form action="$action" method="post">
+        <input type="text" id="filtro" name="filtro"/>
+        <!-- <input type="image" style="width:30px; heigth: 40px;" value="Buscar" src="../images/search.png"/> -->
+        <input type="submit" value="Buscar"/>
+    </form>
     <div style="float:left; width:80%">
-      <h1 style="margin-top:1px;">Listado de ${modelo}s</h1>
+      <h1 style="margin-top:1px;">$titulo</h1>
       <div style="margin:1ex 0; width:90%">
         <a href='new/' class="add_link">Nuevo $modelo</a>
         <span py:if="lista_elementos" style="margin-left:2em" py:content="tmpl_context.paginators.lista_elementos.pager(link='../%ss/'%modelo.lower())"/>
       </div>
-      <div class="crud_table" style="height:50%; width:90%">
+      <div class="crud_table" style="height:70%; width:95%">
         ${XML(tmpl_context.widget(value=lista_elementos, action='../'+modelo.lower()+'s.json'))}
       </div>
     </div>

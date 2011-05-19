@@ -10,12 +10,14 @@ Módulo que define el controlador de proyectos.
 @since: 1.0
 """
 from tgext.crud import CrudRestController
-from tg.decorators import paginate, expose, with_trailing_slash
+from tg.decorators import (paginate, expose, with_trailing_slash, 
+                           without_trailing_slash)
 from tg import redirect, request, require, flash
 
 from lpm.model import DBSession, Proyecto, Usuario
 from lpm.lib.sproxcustom import CustomTableFiller
 from lpm.lib.authorization import PoseePermiso
+from lpm.controllers.fase import FaseController
 
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, EditFormFiller
@@ -50,25 +52,28 @@ class ProyectoTableFiller(CustomTableFiller):
     def __actions__(self, obj):
         """Links de acciones para un registro dado"""
         value = '<div>'
+        style = 'text-align:left; margin-top:2px;';
+        style += 'font-family:sans-serif; font-size:12;'        
         if PoseePermiso('modificar proyecto', 
                         id_proyecto=obj.id_proyecto).is_met(request.environ):
             value += '<div>' + \
                         '<a href="'+ str(obj.id_proyecto) +'/edit" ' + \
-                        'style="text-decoration:none">Modificar</a>' + \
-                     '</div>'
+                        'style="' + style + '">Modificar</a>' + \
+                     '</div><br />'
         if PoseePermiso('eliminar proyecto',
                         id_proyecto=obj.id_proyecto).is_met(request.environ):
-            value += '<div><form method="POST" action="' + str(obj.id_proyecto) + '" class="button-to">'\
-                     '<input type="hidden" name="_method" value="DELETE" />' \
-                     '<input onclick="return confirm(\'Está seguro?\');" value="Delete" type="submit" '\
-                     'style="background-color: transparent; float:left; border:0; color: #286571; display: inline; margin: 0; padding: 0; margin-left: 5;"/>'\
-                     '</form></div>'
+            value += '<div><form method="POST" action="' + str(obj.id_proyecto) + '" class="button-to">'+\
+                     '<input type="hidden" name="_method" value="DELETE" />' +\
+                     '<input onclick="return confirm(\'Está seguro?\');" value="Delete" type="submit" '+\
+                     'style="background-color: transparent; float:left; border:0; color: #286571;'+\
+                     'display: inline; margin: 0; padding: 0;' + style + '"/>'+\
+                     '</form></div><br />'
         if PoseePermiso('administrar proyecto',
                         id_proyecto=obj.id_proyecto).is_met(request.environ):
             value += '<div>' + \
-                        '<a href="administrar/' + str(obj.id_proyecto) + \
-                        '" style="text-decoration:none">Administrar</a>' + \
-                     '</div>'
+                        '<a href="' + str(obj.id_proyecto) + '/fases/' +\
+                        '" style="' + style + '">Administrar</a>' + \
+                     '</div><br />'
         value += '</div>'
         return value
     
@@ -117,7 +122,7 @@ proyecto_add_form = ProyectoAddForm(DBSession)
 class ProyectoEditForm(EditableForm):
     __model__ = Proyecto
     __omit_fields__ = ['id_proyecto', 'fecha_creacion', 'complejidad_total',
-                       'estado', 'numero_fases'
+                       'estado', 'numero_fases', 'fases', 'tipos_de_item'
                       ]
                                            
 proyecto_edit_form = ProyectoEditForm(DBSession)        
@@ -132,9 +137,13 @@ proyecto_edit_filler = ProyectoEditFiller(DBSession)
 class ProyectoController(CrudRestController):
     """Controlador de Proyectos"""
     #{ Variables
-    title = u"Administración de Proyectos"
+    title = u"Administrar Proyectos"
+    #{ Plantillas
+    tmp_action = "/proyectos/buscar"
     # No permitir usuarios anonimos (?)
     allow_only = not_anonymous(u"El usuario debe haber iniciado sesión")
+    #{ Sub Controlador     
+    fases = FaseController(DBSession)
     #{ Modificadores
     model = Proyecto
     table = proyecto_table
@@ -143,11 +152,6 @@ class ProyectoController(CrudRestController):
     edit_form = proyecto_edit_form
     edit_filler = proyecto_edit_filler
 
-    @with_trailing_slash
-    @expose()
-    def administrar(self, *args, **kw):
-        redirect("/")
-        
     #{ Métodos
     @with_trailing_slash
     @paginate('lista_elementos', items_per_page=7)
@@ -165,12 +169,18 @@ class ProyectoController(CrudRestController):
         else:
             proyectos = []
         tmpl_context.widget = self.table
-        return dict(modelo=self.model.__name__, 
-            lista_elementos=proyectos,
-            action='/proyectos/buscar',
-            page=u'Administrar Proyectos')
-        
-    @with_trailing_slash
+        retorno = self.retorno_base()
+        retorno["lista_elementos"] = proyectos
+        return retorno
+
+    def retorno_base(self):
+        """Retorno basico para buscar() y get_all()"""
+        return {"action": self.tmp_action, 
+                "page": self.title,
+                "titulo": self.title,
+                "modelo": self.model.__name__}
+                
+    @without_trailing_slash
     @paginate('lista_elementos', items_per_page=7)
     @expose('lpm.templates.get_all')
     @expose('json')
@@ -182,12 +192,11 @@ class ProyectoController(CrudRestController):
         buscar_table_filler = ProyectoTableFiller(DBSession)
         if kw.has_key('filtro'):
             buscar_table_filler.filtro = kw['filtro']
-            proyectos = buscar_table_filler.get_value()
-            tmpl_context.widget = self.table
-            return dict(modelo=self.model.__name__, 
-                    lista_elementos=proyectos,
-                    action='/proyectos/buscar',
-                    page=u'Administrar Proyectos')
+        proyectos = buscar_table_filler.get_value()
+        tmpl_context.widget = self.table
+        retorno = self.retorno_base()
+        retorno["lista_elementos"] = proyectos
+        return retorno
     
     @expose('lpm.templates.edit')
     def edit(self, *args, **kw):
