@@ -44,7 +44,8 @@ class Fase(DeclarativeBase):
     #{ Columnas
     id_fase = Column(Integer, autoincrement=True, primary_key=True)
     id_proyecto = Column(Integer, ForeignKey('tbl_proyecto.id_proyecto',
-                                              ondelete="CASCADE"))
+                                             ondelete="CASCADE",
+                                             onupdate="CASCADE"))
     posicion = Column(Integer, nullable=False)
     nombre = Column(Unicode(32), nullable=False)
     descripcion = Column(Unicode(200), nullable=True)

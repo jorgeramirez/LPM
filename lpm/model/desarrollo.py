@@ -50,9 +50,11 @@ class Item(DeclarativeBase):
     numero = Column(Integer, nullable=False)
     numero_por_tipo = Column(Integer, nullable=False)
     id_tipo_item = Column(Integer,
-                          ForeignKey('tbl_tipo_item.id_tipo_item'),
+                          ForeignKey('tbl_tipo_item.id_tipo_item',
+                                      onupdate='CASCADE', ondelete='CASCADE'),
                           nullable=False)
-    id_fase = Column(Integer, ForeignKey('tbl_fase.id_fase', ondelete="CASCADE"),
+    id_fase = Column(Integer, ForeignKey('tbl_fase.id_fase', 
+                                         onupdate='CASCADE', ondelete='CASCADE'),
                      nullable=False)
     id_propiedad_item = Column(Integer)
 
@@ -104,25 +106,25 @@ class Item(DeclarativeBase):
         DBSession.add(p_item)
 
     def desaprobar(self): #carlos
-		"""
+        """
         Desaprueba un ítem, implica que cambia su estado de "Aprobado", 
             o de "Revisión-Desbloq” al de “Desaprobado".
         
         @raises DesAprobarItemError: el estado del L{Item} es distinto al 
             de "Aprobado" o "Revision-Desbloq"
         """
-		p_item = PropiedadItem.por_id(self.id_propiedad_item)
-		if p_item.estado == u"Aprobado" :
-			p_item.estado = u"Desaprobado"
-		elif p_item.estado == u"Revision-Desbloq":
-			p_item.estado = u"Desaprobado"
+        p_item = PropiedadItem.por_id(self.id_propiedad_item)
+        if p_item.estado == u"Aprobado" :
+            p_item.estado = u"Desaprobado"
+        elif p_item.estado == u"Revision-Desbloq":
+            p_item.estado = u"Desaprobado"
 
-			iplb = ItemsPorLB.filter_by_id_item(p_item.id_propiedad_item)
-			lb = Lb.por_id(iplb.id_lb)
-			lb.romper()
-		else:
-			raise DesAprobarItemError()
-		DBSession.add(p_item)
+            iplb = ItemsPorLB.filter_by_id_item(p_item.id_propiedad_item)
+            lb = Lb.por_id(iplb.id_lb)
+            lb.romper()
+        else:
+            raise DesAprobarItemError()
+        DBSession.add(p_item)
     
     def bloquear(self): #jorge
         """
@@ -313,7 +315,8 @@ class PropiedadItem(DeclarativeBase):
     prioridad = Column(Integer, nullable=False)
     estado = Column(Unicode(20), nullable=False)
     id_item_actual = Column(Integer, ForeignKey('tbl_item.id_item',
-                            ondelete = "CASCADE"))
+                                                onupdate='CASCADE', 
+                                                ondelete='CASCADE'))
     
     #{ Relaciones
     relaciones = relation('RelacionPorItem')
@@ -436,9 +439,9 @@ class RelacionPorItem(DeclarativeBase):
                                   primary_key=True)
     id_propiedad_item = Column(Integer, 
                                ForeignKey('tbl_propiedad_item.id_propiedad_item',
-                               ondelete="CASCADE"))
+                                          onupdate='CASCADE', ondelete='CASCADE'))
     id_relacion = Column(Integer, ForeignKey('tbl_relacion.id_relacion',
-                         ondelete="CASCADE"))
+                                             onupdate='CASCADE', ondelete='CASCADE'))
     revisar = Column(Boolean, nullable=False, default=False)
    
     #{ Relaciones
@@ -456,8 +459,12 @@ class Relacion(DeclarativeBase):
     id_relacion = Column(Integer, autoincrement=True, primary_key=True)
     tipo = Column(Unicode(45), nullable=False)
 
-    id_anterior = Column(Integer, ForeignKey('tbl_item.id_item'))
-    id_posterior = Column(Integer, ForeignKey('tbl_item.id_item'))
+    id_anterior = Column(Integer, ForeignKey('tbl_item.id_item',
+                                              onupdate='CASCADE', 
+                                              ondelete='CASCADE'))
+    id_posterior = Column(Integer, ForeignKey('tbl_item.id_item',
+                                              onupdate='CASCADE', 
+                                              ondelete='CASCADE'))
     
     #{ Métodos de clase
     @classmethod
@@ -518,8 +525,9 @@ class AtributosDeItems(DeclarativeBase):
     id_atributos_de_items = Column(Integer, 
                                    autoincrement=True, primary_key=True)
     id_atributos_por_tipo_item = Column(Integer,
-        ForeignKey('tbl_atributos_por_tipo_item.id_atributos_por_tipo_item'),
-        nullable=False,)
+        ForeignKey('tbl_atributos_por_tipo_item.id_atributos_por_tipo_item',
+                   onupdate='CASCADE', ondelete='CASCADE'),
+        nullable=False)
     _valor = Column(Unicode(200), nullable=False)
     
     def _get_valor(self):
@@ -545,9 +553,11 @@ class AtributosPorItem(DeclarativeBase):
     id_atributos_por_item = Column(Integer, autoincrement=True, 
                                    primary_key=True)
     id_propiedad_item = Column(Integer,
-        ForeignKey('tbl_propiedad_item.id_propiedad_item'))
+        ForeignKey('tbl_propiedad_item.id_propiedad_item',
+                   onupdate='CASCADE', ondelete='CASCADE'))
     id_atributos_de_items = Column(Integer,
-        ForeignKey('tbl_atributos_de_items.id_atributos_de_items'))
+        ForeignKey('tbl_atributos_de_items.id_atributos_de_items',
+                    onupdate='CASCADE', ondelete='CASCADE'))
 
     #{ Relaciones
     atributo = relation("AtributosDeItems")
@@ -580,9 +590,11 @@ class ArchivosPorItem(DeclarativeBase):
     #{ Columnas
     id_archivos_por_item = Column(Integer, autoincrement=True, primary_key=True)
     id_propiedad_item = Column(Integer, 
-        ForeignKey('tbl_propiedad_item.id_propiedad_item'))  #parte izquierda de la relación
+        ForeignKey('tbl_propiedad_item.id_propiedad_item',
+                   onupdate='CASCADE', ondelete='CASCADE'))  #parte izquierda de la relación
     id_archivo_externo = Column(Integer,
-        ForeignKey('tbl_archivos_externos.id_archivo_externo')) #parte derecha de la relación
+        ForeignKey('tbl_archivos_externos.id_archivo_externo',
+                   onupdate='CASCADE', ondelete='CASCADE')) #parte derecha de la relación
     
     #{ Relaciones
     archivo = relation("ArchivosExternos")
@@ -603,9 +615,12 @@ class HistorialItems(DeclarativeBase):
     id_historial_items = Column(Integer, autoincrement=True, primary_key=True)
     tipo_modificacion = Column(Unicode(45), nullable=False)
     fecha_modificacion = Column(DateTime, nullable=False, default=datetime.now)
-    id_usuario = Column(Integer, ForeignKey('tg_user.id_usuario'))
+    id_usuario = Column(Integer, ForeignKey('tg_user.id_usuario',
+                                            onupdate='CASCADE', 
+                                            ondelete='CASCADE'))
     id_item = Column(Integer, 
-        ForeignKey('tbl_propiedad_item.id_propiedad_item'))
+        ForeignKey('tbl_propiedad_item.id_propiedad_item',
+                    onupdate='CASCADE', ondelete='CASCADE'))
     
     #{ Relaciones
     usuario = relation("Usuario", backref="historial_item")

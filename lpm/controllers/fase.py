@@ -150,7 +150,8 @@ class FaseController(CrudRestController):
         if "proyectos" in partes:
             #filtramos por el identificador de proyecto.
             id_proyecto = int(partes[-3])
-            self.__reducir(fases, id_proyecto)
+            if fases:
+                self.__reducir(fases, id_proyecto)
             proy = Proyecto.por_id(id_proyecto)
             self.__cambiar_retorno(retorno, proy)
         if pylons.request.response_type == 'application/json':
