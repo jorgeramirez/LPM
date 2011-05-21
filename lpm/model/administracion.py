@@ -313,7 +313,18 @@ class Proyecto(DeclarativeBase):
         @return: el elemento recuperado
         @rtype: L{Proyecto}
         """
-        return DBSession.query(cls).filter_by(id_proyecto=id).one()      
+        return DBSession.query(cls).filter_by(id_proyecto=id).one()
+    
+    def obtener_lider(self):
+        """
+        Retorna el lider de este proyecto.
+        """
+        rol = DBSession.query(Rol).filter(and_( \
+                                   Rol.nombre_rol == "Lider de Proyecto", 
+                                   Rol.id_proyecto == self.id_proyecto)).first()
+        if rol:
+            return rol.usuarios[0]
+        return None
 
 
 class TipoItem(DeclarativeBase):

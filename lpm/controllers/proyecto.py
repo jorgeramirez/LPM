@@ -14,7 +14,7 @@ from tg.decorators import (paginate, expose, with_trailing_slash,
                            without_trailing_slash)
 from tg import redirect, request, require, flash, validate
 
-from lpm.model import DBSession, Proyecto, Usuario
+from lpm.model import DBSession, Proyecto, Usuario, Rol
 from lpm.lib.sproxcustom import CustomTableFiller
 from lpm.lib.authorization import PoseePermiso
 from lpm.controllers.fase import FaseController
@@ -38,6 +38,7 @@ class ProyectoTable(TableBase):
     __headers__ = {'id_proyecto': u'ID', 'fecha_creacion': u'Creación',
                    'complejidad_total': u'Complejidad Total', 'estado': u'Estado',
                    'numero_fases': u'Nro. de Fases', 'descripcion': u'Descripción',
+                   'project_leader': 'Lider de Proyecto'
                   }
     __omit_fields__ = ['fases', 'tipos_de_item']
     __default_column_width__ = '15em'
@@ -45,13 +46,21 @@ class ProyectoTable(TableBase):
                          'numero_fases': "35em",
                          '__actions__' : "50em"
                         }
+    __add_fields__ = {'project_leader':None}
     
 proyecto_table = ProyectoTable(DBSession)
 
 
 class ProyectoTableFiller(CustomTableFiller):
     __model__ = Proyecto
-
+    __add_fields__ = {'project_leader': None}
+    
+    def project_leader(self, obj):
+        lider = obj.obtener_lider()
+        if lider:
+            return lider.nombre + " " + lider.apellido + ", " + lider.nombre_usuario
+        return None
+    
     def __actions__(self, obj):
         """Links de acciones para un registro dado"""
         value = '<div>'
@@ -114,23 +123,23 @@ class ProyectoTableFiller(CustomTableFiller):
 proyecto_table_filler = ProyectoTableFiller(DBSession)
 
 
-class ProyectLeaderField(PropertySingleSelectField):
+class ProjectLeaderField(PropertySingleSelectField):
+
     def _my_update_params(self, d, nullable=False):
         usuarios = DBSession.query(Usuario).all()
-        options = [(usuario.id_usuario, '%s (%s)'%(usuario.nombre, usuario.apellido))
-                            for usuario in usuarios]
-        d['options']= options
+        options = [(u.id_usuario, '%s (%s)'%(u.nombre_usuario, u.nombre))
+                            for u in usuarios]
+        d['options'] = options
         return d
-
 
 class ProyectoAddForm(AddRecordForm):
     __model__ = Proyecto
     __omit_fields__ = ['id_proyecto', 'fecha_creacion', 'complejidad_total',
                        'estado', 'numero_fases', 'fases', 'tipos_de_item']
-    __field_order__ = ['nombre', 'descripcion', 'proyect_leader']
-    __dropdown_field_names__ = {'proyect_leader':'nombre'}    
-    proyect_leader = ProyectLeaderField
-    
+    __field_order__ = ['nombre', 'descripcion', 'project_leader']
+    project_leader = ProjectLeaderField('id_lider')
+
+
                                            
 proyecto_add_form = ProyectoAddForm(DBSession)
 
@@ -140,7 +149,8 @@ class ProyectoEditForm(EditableForm):
     __omit_fields__ = ['id_proyecto', 'fecha_creacion', 'complejidad_total',
                        'estado', 'numero_fases', 'fases', 'tipos_de_item'
                       ]
-                                           
+    project_leader = ProjectLeaderField('id_lider')
+
 proyecto_edit_form = ProyectoEditForm(DBSession)        
 
 
@@ -235,12 +245,12 @@ class ProyectoController(CrudRestController):
     def post(self, *args, **kw):
         if "sprox_id" in kw:
             del kw["sprox_id"]
-        id_proy_lider = int(kw["id_usuario"])
-        del kw["id_usuario"]
+        id_proy_lider = int(kw["id_lider"])
+        del kw["id_lider"]
         transaction.begin()
         proy = Proyecto(**kw)
         lider = Usuario.por_id(id_proy_lider)
-        rol_template = Rol.obtener_template("Lider de Proyecto")
+        rol_template = Rol.obtener_template(nombre_rol=u"Lider de Proyecto")
         rol_nuevo = Rol()
         rol_nuevo.nombre_rol = rol_template.nombre_rol + " " + proy.nombre
         rol_nuevo.descripcion = rol_template.descripcion
@@ -248,10 +258,11 @@ class ProyectoController(CrudRestController):
         rol_nuevo.id_tipo_item = 0
         rol_nuevo.usuarios.append(lider)
         for perm in rol_template.permisos:
-            perm.append(rol_nuevo)
-        DBSession.add(rol_nuevo)
+            perm.roles.append(rol_nuevo)
+        DBSession.add(proy)
         DBSession.flush()
         rol_nuevo.id_proyecto = proy.id_proyecto
+        DBSession.add(rol_nuevo)
         transaction.commit()
         redirect("./")
     #}
