@@ -226,9 +226,62 @@ class PropiedadItem(DeclarativeBase):
     def modificar_atributo(self):
         pass
     
-    def agregar_relacion(self):#nahuel
-        pass
-    
+    def agregar_relacion(self, id_antecesor, tipo):#nahuel
+        """
+        Relaciona dos items
+        @param id_antecesor: identificador del ítem con el que se quiere relacionar.
+        @param tipo: tipo de relación.
+        
+        @raise RelacionError: Si se quiere relacionar con un ítem que no está en una LB
+        """
+        antecesor = Item.por_id(id_antecesor)
+        p_item_ant = PropiedadItem.por_id(antecesor.id_propiedad_item)
+        
+        if (self.estado != u"Bloqueado"):
+            raise RelacionError(u"El item con el que se relaciona debe estar en una LB")
+        
+        relacion = Relacion()
+        relacion.id_anterior = antecesor.id_item
+        relacion.id_posterior = self.id_item_actual
+        
+        
+        relacion.tipo = tipo
+        rel_por_item = RelacionPorItem()
+        rel_por_item.relaciones.append(relacion)
+        DBSession.add(relacion)
+          
+            
+    def _detectar_bucle(self):   
+        """ 
+        funciona con el método dfs()
+         retorna una lista con id_item_actual de los que forman el ciclo
+         None si no se encontró ciclo
+        """
+        index = 0
+        visitado = {}
+        
+        return PropiedadItem._dfs(self, visitado)
+        
+    @classmethod
+    def _dfs(cls, nodo, visitado):
+        """ realiza la búsqueda en profundidad para encontrar bucles """
+        if (nodo.item_actual in visitado):
+            if (self.item_actual == nodo.item_actual):
+                return [nodo.item_actual]
+        
+        visitado.setdefault(nodo.item_actual, [True])
+        
+        for arco in Relacion.relaciones_como_anterior(nodo.id_propiedad_item):
+            if (arco.tipo == Relacion.tipo_relaciones['p-h']):
+                adyacente = ProiedadItem.por_id(Item.por_id(arco.id_anterior).id_item_actual)
+                ciclo = PropiedadItem._dfs(adyacente, visitado)
+                if (ciclo):
+                    ciclo.append(adyacente.id_item_actual)
+                
+        visitado[nodo.item_actual] = [False]
+        
+        return None
+
     def eliminar_relacion(self):#nahuel
         pass
     
@@ -263,7 +316,7 @@ class RelacionPorItem(DeclarativeBase):
     revisar = Column(Boolean, nullable=False, default=False)
    
     #{ Relaciones
-    relacion = relation("Relacion")
+    relaciones = relation("Relacion")
     #}
 
 
@@ -279,6 +332,8 @@ class Relacion(DeclarativeBase):
 
     id_anterior = Column(Integer, ForeignKey('tbl_item.id_item'))
     id_posterior = Column(Integer, ForeignKey('tbl_item.id_item'))
+    
+    tipo_relaciones = {'a-s': u"Antecesor-Sucesor", 'p-h' : u"Padre-Hijo"}
     
     #{ Métodos de clase
     @classmethod
