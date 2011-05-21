@@ -74,3 +74,30 @@ class TestItem(ModelTest):
         """Eliminar ítem funciona correctamente"""
         self.obj.eliminar()
         eq_(self.obj.propiedad_item_versiones[0].estado, u"Eliminado")
+    
+    def test_modificar_item(self):
+        """Modificar Item funciona correctamente"""
+        mods = dict(complejidad=8, prioridad=10)
+        u = Usuario()
+        u.nombre_usuario = u'admin'
+        u.nombre = u'Administrador'
+        u.apellido = u'Del Sistema'
+        u.email = u'manager@somedomain.com'
+        u.password = u'administrador'
+        DBSession.add(u)
+        DBSession.flush()
+        self.obj.modificar(u.id_usuario, mods)
+        p_item = PropiedadItem.por_id(self.obj.id_propiedad_item)
+        eq_(p_item.complejidad, 8)
+
+    def test_revivir_item(self):
+        """Revivir item funciona correctamente"""
+        p_item = self.obj.propiedad_item_versiones[0]
+        DBSession.add(p_item)
+        DBSession.flush()
+        self.obj.eliminar()
+        eq_(self.obj.propiedad_item_versiones[0].estado, u"Eliminado")
+    
+    def test_revertir_item(self):
+        """Revertir Item funciona correctamente"""
+        pass

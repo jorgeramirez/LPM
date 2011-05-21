@@ -27,5 +27,7 @@ class BaseController(TGController):
         # available in environ['pylons.routes_dict']
 
         request.identity = request.environ.get('repoze.who.identity')
+        # para acceder mas rapido a este componente
+        request.credentials = request.environ.get('repoze.what.credentials')
         tmpl_context.identity = request.identity
         return TGController.__call__(self, environ, start_response)

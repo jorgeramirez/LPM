@@ -44,7 +44,8 @@ class Fase(DeclarativeBase):
     #{ Columnas
     id_fase = Column(Integer, autoincrement=True, primary_key=True)
     id_proyecto = Column(Integer, ForeignKey('tbl_proyecto.id_proyecto',
-                                              ondelete="CASCADE"))
+                                             ondelete="CASCADE",
+                                             onupdate="CASCADE"))
     posicion = Column(Integer, nullable=False)
     nombre = Column(Unicode(32), nullable=False)
     descripcion = Column(Unicode(200), nullable=True)
@@ -125,7 +126,7 @@ class Fase(DeclarativeBase):
             id_atributos_por_tipo_item
             
             a_por_item = AtributosPorItem()
-            a_por_item.atributos.append(a_item)
+            a_por_item.atributos = a_item
             p_item.atributos.append(a_por_item)
             DBSession.add(a_item)
             DBSession.add(a_por_item)
@@ -349,8 +350,8 @@ class TipoItem(DeclarativeBase):
         a.nombre = dict["nombre"]
         a.tipo = dict["tipo"]
         a.valor_por_defecto = dict["valor"]
-        
-        DBSession.add(a)
+        self.atributos.append(a)
+        #DBSession.add(a)
         DBSession.flush()
         
         #agregar este atributo a los ítems ya creados, no sé si es necesario
@@ -361,7 +362,7 @@ class TipoItem(DeclarativeBase):
             id_atributos_por_tipo_item
             
             a_por_item = AtributosPorItem()
-            a_por_item.atributos.append(a_item)
+            a_por_item.atributo = a_item
             p_item = PropiedadItem.por_id(i.id_propiedad_item)
             p_item.atributos.append(a_por_item)
             DBSession.add(a_item)

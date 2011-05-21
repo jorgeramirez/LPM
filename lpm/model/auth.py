@@ -60,7 +60,6 @@ class Rol(DeclarativeBase):
 
     Only the ``group_name`` column is required by :mod:`repoze.what`.
     Pero se usa un 'translation' a "nombre_rol" y "usuarios"
-
     """
 
     __tablename__ = 'tg_group'
@@ -91,6 +90,13 @@ class Rol(DeclarativeBase):
     def __unicode__(self):
         return self.nombre_rol
 
+    def es_rol_sistema(self):
+        """
+        Indica si el rol es un rol a nivel de sistema.
+        @return: True en caso de ser un rol de sistema, sino False
+        @rtype: C{bool}
+        """
+        return (self.id_proyecto + self.id_fase + self.id_tipo_item) == 0
     #}
 
 
@@ -151,6 +157,18 @@ class Usuario(DeclarativeBase):
         """Return the user object whose user name is ``username``."""
         return DBSession.query(cls).filter_by(nombre_usuario = username).first()
 
+    @classmethod
+    def por_id(cls, id):
+        """
+        Método de clase que realiza las búsquedas por identificador.
+        
+        @param id: identificador del elemento a recuperar
+        @type id: C{Integer}
+        @return: el elemento recuperado
+        @rtype: L{Usuario}
+        """        
+        return DBSession.query(cls).filter_by(id_usuario=id).one()
+    
     def _set_password(self, password):
         """Hash ``password`` on the fly and store its hashed version."""
         # Make sure password is a str because we cannot hash unicode objects
@@ -225,6 +243,29 @@ class Permiso(DeclarativeBase):
     def __unicode__(self):
         return self.nombre_permiso
 
+    @classmethod
+    def por_nombre_permiso(cls, np):
+        """
+        Método de clase que realiza las búsquedas por nombre de permiso.
+        
+        @param np: nombre del permiso
+        @type np: C{unicode}
+        @return: el elemento recuperado
+        @rtype: L{Permiso}
+        """
+        return DBSession.query(Permiso).filter_by(nombre_permiso=np).one()
+        
+    @classmethod
+    def por_id(cls, id):
+        """
+        Método de clase que realiza las búsquedas por identificador.
+        
+        @param id: identificador del elemento a recuperar
+        @type id: C{Integer}
+        @return: el elemento recuperado
+        @rtype: L{Permiso}
+        """        
+        return DBSession.query(cls).filter_by(id_permiso=id).one()
     #}
 
 

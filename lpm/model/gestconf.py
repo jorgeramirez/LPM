@@ -95,12 +95,14 @@ class HistorialLB(DeclarativeBase):
     id_historial_lb = Column(Integer, autoincrement=True, primary_key=True)
     tipo_operacion = Column(Unicode(45), nullable=False)
     fecha_modificacion = Column(DateTime, nullable=False, default=datetime.now)
-    id_usuario = Column(Integer, ForeignKey('tg_user.id_usuario'))
+    id_usuario = Column(Integer, ForeignKey('tg_user.id_usuario',
+                                            onupdate="CASCADE", 
+                                            ondelete="CASCADE"))
     id_lb = Column(Integer, ForeignKey('tbl_lb.id_lb'))
     
     #{ Relaciones
     usuario = relation("Usuario", backref="historial_lb")
-    lb = relation("LB", backref="regs_historial_lb")
+    lb = relation("LB", backref="historial_lb")
     #}
     
     
@@ -114,8 +116,10 @@ class ItemsPorLB(DeclarativeBase):
     #{ Columnas
     id_item_por_lb = Column(Integer, autoincrement=True, primary_key=True)
     id_item = Column(Integer, 
-                     ForeignKey('tbl_propiedad_item.id_propiedad_item'))
-    id_lb = Column(Integer, ForeignKey('tbl_lb.id_lb'))
+                     ForeignKey('tbl_propiedad_item.id_propiedad_item',
+                                onupdate="CASCADE", ondelete="CASCADE"))
+    id_lb = Column(Integer, ForeignKey('tbl_lb.id_lb',
+                                        onupdate="CASCADE", ondelete="CASCADE"))
     
     #{ Relaciones
     propiedad_item = relation('PropiedadItem', backref='item_lb_assocs')
