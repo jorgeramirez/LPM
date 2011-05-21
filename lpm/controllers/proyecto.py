@@ -74,6 +74,11 @@ class ProyectoTableFiller(CustomTableFiller):
                         '<a href="' + str(obj.id_proyecto) + '/fases/' +\
                         '" style="' + style + '">Administrar</a>' + \
                      '</div><br />'
+            if (obj.estado == "No Iniciado"):
+                value += '<div>' + \
+                            '<a href="' + str(obj.id_proyecto) + '/iniciar/' +\
+                            '" style="' + style + '">Iniciar</a>' + \
+                         '</div><br />'
         value += '</div>'
         return value
     
