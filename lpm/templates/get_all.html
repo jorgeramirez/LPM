@@ -19,13 +19,14 @@
             <li py:for="lower, item in sorted(tmpl_context.menu_items.iteritems())"><a href="../${lower}s">$item.__name__</a></li>
         </ul>
     </div>
-    <form action="$action" method="post">
-        <input type="text" id="filtro" name="filtro"/>
-        <!-- <input type="image" style="width:30px; heigth: 40px;" value="Buscar" src="../images/search.png"/> -->
-        <input type="submit" value="Buscar"/>
-    </form>
+
     <div style="float:left; width:80%">
       <h1 style="margin-top:1px;">$titulo</h1>
+       <form action="$action" method="post">
+	        <input type="text" id="filtro" name="filtro"/>
+	        <!-- <input type="image" style="width:30px; heigth: 40px;" value="Buscar" src="../images/search.png"/> -->
+	        <input type="submit" value="Buscar"/>
+       </form>
       <div style="margin:1ex 0; width:90%">
         <a href='new/' class="add_link">Nuevo $modelo</a>
         <span py:if="lista_elementos" style="margin-left:2em" py:content="tmpl_context.paginators.lista_elementos.pager(link='../%ss/'%modelo.lower())"/>

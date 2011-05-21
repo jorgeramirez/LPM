@@ -34,6 +34,20 @@ class NombreDeAtributoError(ModelError):
     def __str__(self):
         return u"El nombre de atributo ya existe"
 
+class RelacionError(ModelError):
+    def __init__(self, msg):
+        """
+        Constructor para la clase
+        
+        @param msg: el mensaje a desplegar
+        @type msg: C{unicode} o C{str}
+        """
+        if isinstance(msg, str):
+            msg = unicode(msg)
+        self.msg = msg
+    
+    def __str__(self):
+        return "Error: %s" % self.msg
 
 class CodigoTipoItemError(ModelError):
     def __str__(self):
