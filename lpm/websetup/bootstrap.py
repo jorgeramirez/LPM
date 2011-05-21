@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """Setup the LPM application"""
-
-import logging
 from tg import config
+
 from lpm import model
 from lpm.lib.authorization import Permisos
-import transaction
 
+import transaction
+import logging
 
 def bootstrap(command, conf, vars):
     """Place any commands to setup lpm here"""
@@ -31,7 +31,16 @@ def bootstrap(command, conf, vars):
         r.id_fase = 0
         r.id_tipo_item = 0
         r.usuarios.append(u)
-    
+        
+        #Rol Lider de Proyecto
+        rlp = model.Rol()
+        rlp.nombre_rol = u"Lider de Proyecto"
+        rlp.descripcion = u"Rol Lider de Proyecto, administra componentes" +\
+                           "de un proyecto"
+        rlp.id_proyecto = -1
+        rlp.id_fase = 0
+        rlp.id_tipo_item = 0
+        
         model.DBSession.add(r)
         
         p = model.Permiso()
@@ -50,6 +59,9 @@ def bootstrap(command, conf, vars):
             model.DBSession.add(r) 
 
         model.DBSession.flush()
+        perm = model.DBSession.query(model.Permiso).filter_by(
+                               nombre_permiso=u"administrar proyecto").one()
+        perm.roles.append(rlp)
         transaction.commit()
         print "Se han creado correctamente las tablas"
     except IntegrityError:

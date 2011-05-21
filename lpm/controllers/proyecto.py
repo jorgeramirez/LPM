@@ -12,7 +12,7 @@ Módulo que define el controlador de proyectos.
 from tgext.crud import CrudRestController
 from tg.decorators import (paginate, expose, with_trailing_slash, 
                            without_trailing_slash)
-from tg import redirect, request, require, flash
+from tg import redirect, request, require, flash, validate
 
 from lpm.model import DBSession, Proyecto, Usuario
 from lpm.lib.sproxcustom import CustomTableFiller
@@ -28,6 +28,8 @@ from repoze.what.predicates import not_anonymous
 
 import pylons
 from pylons import tmpl_context
+
+import transaction
 
 
 class ProyectoTable(TableBase):
@@ -206,4 +208,36 @@ class ProyectoController(CrudRestController):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect("/proyectos")
         return super(ProyectoController, self).edit(*args, **kw)
+        
+    @without_trailing_slash
+    @expose('lpm.templates.new')
+    def new(self, *args, **kw):
+        """Display a page to show a new record."""
+        tmpl_context.widget = self.new_form
+        return dict(value=kw, modelo=self.model.__name__)    
+    
+    @validate(proyecto_add_form, error_handler=new)
+    @expose()
+    def post(self, *args, **kw):
+        if "sprox_id" in kw:
+            del kw["sprox_id"]
+        id_proy_lider = int(kw["id_usuario"])
+        del kw["id_usuario"]
+        transaction.begin()
+        proy = Proyecto(**kw)
+        lider = Usuario.por_id(id_proy_lider)
+        rol_template = Rol.obtener_template("Lider de Proyecto")
+        rol_nuevo = Rol()
+        rol_nuevo.nombre_rol = rol_template.nombre_rol + " " + proy.nombre
+        rol_nuevo.descripcion = rol_template.descripcion
+        rol_nuevo.id_fase = 0
+        rol_nuevo.id_tipo_item = 0
+        rol_nuevo.usuarios.append(lider)
+        for perm in rol_template.permisos:
+            perm.append(rol_nuevo)
+        DBSession.add(rol_nuevo)
+        DBSession.flush()
+        rol_nuevo.id_proyecto = proy.id_proyecto
+        transaction.commit()
+        redirect("./")
     #}

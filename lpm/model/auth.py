@@ -19,7 +19,7 @@ except ImportError:
              'If you are on python2.4 this library is not part of python. '
              'Please install it. Example: easy_install hashlib')
 
-from sqlalchemy import Table, ForeignKey, Column
+from sqlalchemy import Table, ForeignKey, Column, and_
 from sqlalchemy.types import Unicode, Integer, DateTime
 from sqlalchemy.orm import relation, synonym
 
@@ -97,6 +97,23 @@ class Rol(DeclarativeBase):
         @rtype: C{bool}
         """
         return (self.id_proyecto + self.id_fase + self.id_tipo_item) == 0
+    
+    @classmethod
+    def obtener_template(cls, **kw):
+        """
+        Obtiene un rol utilizado como template, para la creación de 
+        otros roles
+        
+        @param kw: posee el identificador o el nombre del rol.
+        """
+        base_query = DBSession.query(Rol)
+        if "id" in kw:
+            rol = base_query.filter(and_(Rol.id_rol == int(kw["id"]),
+                                         Rol.id_proyecto == -1)).one()
+        elif "nombre_rol" in kw:
+            rol = base_query.filter(and_(Rol.id_rol == unicode(kw["nombre_rol"]),
+                                         Rol.id_proyecto == -1)).one()
+        return rol
     #}
 
 
