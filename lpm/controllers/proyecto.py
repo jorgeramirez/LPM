@@ -23,6 +23,7 @@ from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, EditFormFiller
 from sprox.fillerbase import EditFormFiller
 from sprox.formbase import AddRecordForm, EditableForm
+from sprox.widgets import PropertySingleSelectField
 
 from repoze.what.predicates import not_anonymous
 
@@ -111,10 +112,23 @@ class ProyectoTableFiller(CustomTableFiller):
 proyecto_table_filler = ProyectoTableFiller(DBSession)
 
 
+class ProyectLeaderField(PropertySingleSelectField):
+    def _my_update_params(self, d, nullable=False):
+        usuarios = DBSession.query(Usuario).all()
+        options = [(usuario.id_usuario, '%s (%s)'%(usuario.nombre, usuario.apellido))
+                            for usuario in usuarios]
+        d['options']= options
+        return d
+
+
 class ProyectoAddForm(AddRecordForm):
     __model__ = Proyecto
     __omit_fields__ = ['id_proyecto', 'fecha_creacion', 'complejidad_total',
-                                       'estado', 'numero_fases']
+                       'estado', 'numero_fases', 'fases', 'tipos_de_item']
+    __field_order__ = ['nombre', 'descripcion', 'proyect_leader']
+    __dropdown_field_names__ = {'proyect_leader':'nombre'}    
+    proyect_leader = ProyectLeaderField
+    
                                            
 proyecto_add_form = ProyectoAddForm(DBSession)
 
