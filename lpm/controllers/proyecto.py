@@ -38,13 +38,14 @@ class ProyectoTable(TableBase):
     __headers__ = {'id_proyecto': u'ID', 'fecha_creacion': u'Creación',
                    'complejidad_total': u'Complejidad Total', 'estado': u'Estado',
                    'numero_fases': u'Nro. de Fases', 'descripcion': u'Descripción',
-                   'project_leader': 'Lider de Proyecto'
+                   'project_leader': 'Lider de Proyecto', 'codigo': u"Código"
                   }
-    __omit_fields__ = ['fases', 'tipos_de_item']
+    __omit_fields__ = ['fases', 'tipos_de_item', 'id_proyecto']
     __default_column_width__ = '15em'
     __column_widths__ = {'complejidad_total': "35em",
                          'numero_fases': "35em",
-                         '__actions__' : "50em"
+                         '__actions__' : "50em",
+                         'codigo': "30em"
                         }
     __add_fields__ = {'project_leader':None}
     
@@ -140,7 +141,8 @@ class ProjectLeaderField(PropertySingleSelectField):
 class ProyectoAddForm(AddRecordForm):
     __model__ = Proyecto
     __omit_fields__ = ['id_proyecto', 'fecha_creacion', 'complejidad_total',
-                       'estado', 'numero_fases', 'fases', 'tipos_de_item']
+                       'estado', 'numero_fases', 'fases', 'tipos_de_item',
+                       'codigo']
     __field_order__ = ['nombre', 'descripcion', 'project_leader']
     project_leader = ProjectLeaderField('id_lider')
 
@@ -152,8 +154,8 @@ proyecto_add_form = ProyectoAddForm(DBSession)
 class ProyectoEditForm(EditableForm):
     __model__ = Proyecto
     __omit_fields__ = ['id_proyecto', 'fecha_creacion', 'complejidad_total',
-                       'estado', 'numero_fases', 'fases', 'tipos_de_item'
-                      ]
+                       'estado', 'numero_fases', 'fases', 'tipos_de_item',
+                       'codigo']
     project_leader = ProjectLeaderField('id_lider')
 
 proyecto_edit_form = ProyectoEditForm(DBSession)        
@@ -255,19 +257,19 @@ class ProyectoController(CrudRestController):
         transaction.begin()
         proy = Proyecto(**kw)
         lider = Usuario.por_id(id_proy_lider)
-        rol_template = Rol.obtener_template(nombre_rol=u"Lider de Proyecto")
+        rol_template = Rol.obtener_rol_plantilla(nombre_rol=u"Lider de Proyecto")
         rol_nuevo = Rol()
-        rol_nuevo.nombre_rol = rol_template.nombre_rol + " " + proy.nombre
+        rol_nuevo.nombre_rol = rol_template.nombre_rol
         rol_nuevo.descripcion = rol_template.descripcion
-        rol_nuevo.id_fase = 0
-        rol_nuevo.id_tipo_item = 0
+        rol_nuevo.tipo = u"proyecto"
         rol_nuevo.usuarios.append(lider)
         for perm in rol_template.permisos:
             perm.roles.append(rol_nuevo)
-        DBSession.add(proy)
+        DBSession.add_all([proy, rol_nuevo])
         DBSession.flush()
         rol_nuevo.id_proyecto = proy.id_proyecto
-        DBSession.add(rol_nuevo)
+        rol_nuevo.codigo = Rol.generar_codigo(rol_nuevo)
+        proy.codigo = Proyecto.generar_codigo(proy)
         transaction.commit()
         redirect("./")
     #}

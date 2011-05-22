@@ -57,7 +57,7 @@ base_config.sa_auth.permission_class = model.Permiso
 base_config.sa_auth.translations.users = 'usuarios'
 base_config.sa_auth.translations.groups = 'roles'
 base_config.sa_auth.translations.user_name = 'nombre_usuario'
-base_config.sa_auth.translations.group_name = 'nombre_rol'
+base_config.sa_auth.translations.group_name = 'codigo'
 base_config.sa_auth.translations.permission_name = 'nombre_permiso'
 base_config.sa_auth.translations.permissions = 'permisos'
 

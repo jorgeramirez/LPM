@@ -81,14 +81,21 @@ class Rol(DeclarativeBase):
     #{ variables
     #template para el codigo (usar metodo format)
     tmpl_codigo = "ROL-{id_rol}-{tipo}"
-    __tipos_posibles = [u"sistema", u"proyecto", u"fase", u"tipo_item"]
+    __tipos_posibles = [u"sistema", u"proyecto", u"fase", u"tipo_item",
+                        u"plantilla"]
 
     #{ Relations
 
     usuarios = relation('Usuario', secondary=user_group_table, backref='roles')
 
     #{ Special methods
-
+    @classmethod
+    def generar_codigo(cls, rol):
+        """
+        Genera el codigo para el rol dado como parametro
+        """
+        return cls.tmpl_codigo.format(id_rol=rol.id_rol, tipo=rol.tipo)
+        
     def __repr__(self):
         return ('<Rol: name=%s>' % self.nombre_rol).encode('utf-8')
 
@@ -101,21 +108,24 @@ class Rol(DeclarativeBase):
         @return: True en caso de ser un rol de sistema, sino False
         @rtype: C{bool}
         """
-        return (self.id_proyecto + self.id_fase + self.id_tipo_item) == 0
+        return self.tipo == u"sistema"
     
     @classmethod
-    def obtener_template(cls, **kw):
+    def obtener_rol_plantilla(cls, **kw):
         """
-        Obtiene un rol utilizado como template, para la creación de 
+        Obtiene un rol utilizado como plantilla, para la creación de 
         otros roles
         
         @param kw: posee el identificador o el nombre del rol.
         """
         base_query = DBSession.query(Rol)
         if "id" in kw:
-            rol = base_query.filter_by(id_rol=int(kw["id"])).one()
+            rol = base_query.filter(and_(Rol.id_rol == int(kw["id"]),
+                                        Rol.tipo == u"plantilla")).one()
         elif "nombre_rol" in kw:
-            rol = base_query.filter_by(nombre_rol=unicode(kw["nombre_rol"])).one()
+            rol = base_query.filter(and_(
+                                    Rol.nombre_rol == kw["nombre_rol"],
+                                    Rol.tipo == u"plantilla")).one()
         return rol
     #}
 

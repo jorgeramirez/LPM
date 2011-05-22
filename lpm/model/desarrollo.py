@@ -66,6 +66,14 @@ class Item(DeclarativeBase):
     propiedad_item_versiones = relation('PropiedadItem')
     
     #}
+
+    @classmethod
+    def generar_codigo(cls, item):
+        """
+        Genera el codigo para el elemento pasado como parametro
+        """
+        return cls.tmpl_codigo.format(id_item=item.id_item,
+                                      id_tipo_item=item.id_tipo_item)
     
     def aprobar(self): #jorge (falta probar)
         """
@@ -524,7 +532,18 @@ class Relacion(DeclarativeBase):
     tipo_relaciones = {'a-s': u"Antecesor-Sucesor", 'p-h' : u"Padre-Hijo"}
     #template para codificacion
     tmpl_codigo = u"REL-{id_relacion}-{tipo}-{id_anterior}-{id_posterior}"
+    
     #{ Métodos de clase
+    @classmethod
+    def generar_codigo(cls, rel):
+        """
+        Genera el codigo para el elemento pasado como parametro
+        """
+        return cls.tmpl_codigo.format(id_relacion=rel.id_relacion,
+                                      tipo=rel.tipo,
+                                      id_anterior=rel.id_anterior,
+                                      id_posterior=rel.id_posterior)
+
     @classmethod
     def relaciones_como_posterior(cls, id_item):
         """

@@ -26,10 +26,7 @@ def bootstrap(command, conf, vars):
         r = model.Rol()
         r.nombre_rol = u'Administrador del Sistema'
         r.descripcion= u'Rol por defecto que tiene todos los permisos del sistema'
-        # Rol de sistema posee ceros en cada identificador de contexto.
-        r.id_proyecto = 0
-        r.id_fase = 0
-        r.id_tipo_item = 0
+        r.tipo = u"sistema"
         r.usuarios.append(u)
         
         #Rol Lider de Proyecto
@@ -37,11 +34,11 @@ def bootstrap(command, conf, vars):
         rlp.nombre_rol = u"Lider de Proyecto"
         rlp.descripcion = u"Rol Lider de Proyecto, administra componentes" +\
                            "de un proyecto"
-        rlp.id_proyecto = -1
-        rlp.id_fase = 0
-        rlp.id_tipo_item = 0
-        
-        model.DBSession.add(r)
+        rlp.tipo = u"plantilla"
+        model.DBSession.add_all([r, rlp])
+        model.DBSession.flush()
+        rlp.codigo = model.Rol.generar_codigo(rlp)
+        r.codigo = model.Rol.generar_codigo(r)
         
         p = model.Permiso()
         p.nombre_permiso = u'manage'

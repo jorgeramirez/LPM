@@ -51,7 +51,14 @@ class LB(DeclarativeBase):
     #{ Relaciones
     items = relation("ItemsPorLB", backref='lb')
     #}
-    
+
+    @classmethod
+    def generar_codigo(cls, lb):
+        """
+        Genera el codigo para el elemento pasado como parametro
+        """
+        return cls.tmpl_codigo.format(id_lb=lb.id_lb)
+
     def agregar_item(self, item): #jorge
         """
         Agrega un ítem al conjunto de ítems de la Línea Base

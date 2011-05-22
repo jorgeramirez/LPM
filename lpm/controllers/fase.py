@@ -37,9 +37,10 @@ class FaseTable(TableBase):
                     'numero_items': u'Nro. de Items', 
                     'numero_lb': u'Nro de Lineas Base',
                     'estado':u'Estado',
-                    'descripcion': u'Descripcion'
+                    'descripcion': u'Descripcion',
+                    'codigo': u'Código'
                   }
-    __omit_fields__ = ['items', 'id_proyecto']
+    __omit_fields__ = ['items', 'id_proyecto', 'id_fase']
     __default_column_width__ = '15em'
     __column_widths__ = { 'descripcion': "35em", '__actions__': "50em"}
     
@@ -96,7 +97,7 @@ fase_table_filler = FaseTableFiller(DBSession)
 class FaseAddForm(AddRecordForm):
     __model__ = Fase
     __omit_fields__ = ['id_fase', 'numero_items', 'numero_lb',
-                       'estado', 'id_proyecto']
+                       'estado', 'id_proyecto', 'codigo']
 
 fase_add_form = FaseAddForm(DBSession)
 
@@ -104,7 +105,7 @@ fase_add_form = FaseAddForm(DBSession)
 class FaseEditForm(EditableForm):
     __model__ = Fase
     __omit_fields__ = ['id_fase', 'numero_items', 'numero_lb',
-                       'estado']
+                       'estado', 'codigo', 'id_proyecto']
 
 fase_edit_form = FaseEditForm(DBSession)
 

@@ -158,7 +158,15 @@ class Fase(DeclarativeBase):
         @return: el elemento recuperado
         @rtype: L{Fase}
         """
-        return DBSession.query(cls).filter_by(id_fase=id).one()    
+        return DBSession.query(cls).filter_by(id_fase=id).one()
+
+    @classmethod
+    def generar_codigo(cls, fase):
+        """
+        Genera el codigo para la fase dada como parametro
+        """
+        return cls.tmpl_codigo.format(id_fase=fase.id_fase,
+                                      id_proyecto=fase.id_proyecto)
      
 
 class Proyecto(DeclarativeBase):
@@ -183,6 +191,13 @@ class Proyecto(DeclarativeBase):
     fases = relation('Fase')
     tipos_de_item = relation ('TipoItem')
     #}
+
+    @classmethod
+    def generar_codigo(cls, proy):
+        """
+        Genera el codigo para el proyecto pasado como parametro
+        """
+        return cls.tmpl_codigo.format(id_proyecto=proy.id_proyecto)
     
     def iniciar_proyecto(self):
         """ inicia un proyecto, cambia su estado a iniciado """
@@ -355,6 +370,14 @@ class TipoItem(DeclarativeBase):
     atributos = relation('AtributosPorTipoItem')
     items = relation('Item')
     #}
+    
+    @classmethod
+    def generar_codigo(cls, ti):
+        """
+        Genera el codigo para el elemento pasado como parametro
+        """
+        return cls.tmpl_codigo.format(id_tipo_item=ti.id_tipo_item,
+                                      id_proyecto=ti.id_proyecto)    
     
     def agregar_atributo(self, dict):#todavía no probé
         """ se espera un valor ya verificado
