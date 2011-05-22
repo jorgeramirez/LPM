@@ -71,14 +71,17 @@ class Rol(DeclarativeBase):
     nombre_rol = Column(Unicode(70), nullable=False)
     descripcion = Column(Unicode(100))
     creado = Column(DateTime, default=datetime.now)
-    #template para el codigo (usar metodo format)
-    tmpl_codigo = "ROL-{id_rol}-{tipo}"
+    tipo = Column(Unicode(50), nullable=False)
+
     #Para relacionar un rol con un recurso específico
     id_proyecto = Column(Integer)
-    
     id_fase = Column(Integer)
-    
     id_tipo_item = Column(Integer)
+
+    #{ variables
+    #template para el codigo (usar metodo format)
+    tmpl_codigo = "ROL-{id_rol}-{tipo}"
+    __tipos_posibles = [u"sistema", u"proyecto", u"fase", u"tipo_item"]
 
     #{ Relations
 
