@@ -189,7 +189,7 @@ class Proyecto(DeclarativeBase):
     tmpl_codigo = u"PROY-{id_proyecto}"
     #{ Relaciones
     fases = relation('Fase')
-    tipos_de_item = relation ('TipoItem')
+    tipos_de_item = relation('TipoItem')
     #}
 
     @classmethod

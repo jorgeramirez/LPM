@@ -40,7 +40,7 @@ class ProyectoTable(TableBase):
                    'numero_fases': u'Nro. de Fases', 'descripcion': u'Descripción',
                    'project_leader': 'Lider de Proyecto', 'codigo': u"Código"
                   }
-    __omit_fields__ = ['fases', 'tipos_de_item', 'id_proyecto']
+    __omit_fields__ = ['fases', 'tipos_de_item', 'id_proyecto', 'descripcion']
     __default_column_width__ = '15em'
     __column_widths__ = {'complejidad_total': "35em",
                          'numero_fases': "35em",
@@ -59,7 +59,7 @@ class ProyectoTableFiller(CustomTableFiller):
     def project_leader(self, obj):
         lider = obj.obtener_lider()
         if lider:
-            return lider.nombre + " " + lider.apellido + ", " + lider.nombre_usuario
+            return lider.nombre_usuario
         return None
     
     def __actions__(self, obj):
@@ -133,14 +133,15 @@ class ProjectLeaderField(PropertySingleSelectField):
 
     def _my_update_params(self, d, nullable=False):
         usuarios = DBSession.query(Usuario).all()
-        options = [(u.id_usuario, '%s (%s)'%(u.nombre_usuario, u.nombre))
-                            for u in usuarios]
+        options = [(u.id_usuario, '%s (%s)'%(u.nombre_usuario, 
+                    u.nombre + " " + u.apellido))
+                   for u in usuarios]
         d['options'] = options
         return d
 
 class ProyectoAddForm(AddRecordForm):
     __model__ = Proyecto
-    __omit_fields__ = ['id_proyecto', 'fecha_creacion', 'complejidad_total',
+    __hide_fields__ = ['id_proyecto', 'fecha_creacion', 'complejidad_total',
                        'estado', 'numero_fases', 'fases', 'tipos_de_item',
                        'codigo']
     __field_order__ = ['nombre', 'descripcion', 'project_leader']
@@ -153,7 +154,7 @@ proyecto_add_form = ProyectoAddForm(DBSession)
 
 class ProyectoEditForm(EditableForm):
     __model__ = Proyecto
-    __omit_fields__ = ['id_proyecto', 'fecha_creacion', 'complejidad_total',
+    __hide_fields__ = ['id_proyecto', 'fecha_creacion', 'complejidad_total',
                        'estado', 'numero_fases', 'fases', 'tipos_de_item',
                        'codigo']
     project_leader = ProjectLeaderField('id_lider')
