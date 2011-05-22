@@ -44,7 +44,10 @@ class LB(DeclarativeBase):
     id_lb = Column(Integer, autoincrement=True, primary_key=True)
     numero = Column(Integer, nullable=False)
     estado = Column(Unicode(20), nullable=True, default=u"Cerrada")
+    codigo = Column(Unicode(50), unique=True)
     
+    # template para codificacion
+    tmpl_codigo = u"LB-{id_lb}"
     #{ Relaciones
     items = relation("ItemsPorLB", backref='lb')
     #}

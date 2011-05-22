@@ -46,13 +46,16 @@ class Fase(DeclarativeBase):
     id_proyecto = Column(Integer, ForeignKey('tbl_proyecto.id_proyecto',
                                              ondelete="CASCADE",
                                              onupdate="CASCADE"))
+    codigo = Column(Unicode(50), unique=True)
     posicion = Column(Integer, nullable=False)
     nombre = Column(Unicode(32), nullable=False)
     descripcion = Column(Unicode(200), nullable=True)
     numero_items = Column(Integer, nullable=False, default=0)
     numero_lb = Column(Integer, nullable=False, default=0)
     estado = Column(Unicode(20), nullable=True, default=u"Inicial")
-    
+
+    # template para codificacion
+    tmpl_codigo = u"FASE-{id_fase}-PROY-{id_proyecto}"
     #{ Relaciones
     items = relation('Item')
     
@@ -166,6 +169,7 @@ class Proyecto(DeclarativeBase):
     
     #{Columnas
     id_proyecto = Column(Integer, autoincrement=True, primary_key=True)
+    codigo = Column(Unicode(50), unique=True)
     nombre = Column(Unicode(32), nullable=False, unique=True)
     descripcion = Column(Unicode(200), nullable=False, default=u"Proyecto LPM")
     fecha_creacion = Column(DateTime, nullable=False, default=datetime.now)
@@ -173,6 +177,8 @@ class Proyecto(DeclarativeBase):
     estado = Column(Unicode(20), nullable=False, default=u"No Iniciado")
     numero_fases = Column(Integer, nullable=False, default=0)
     
+    #template para codificacion
+    tmpl_codigo = u"PROY-{id_proyecto}"
     #{ Relaciones
     fases = relation('Fase')
     tipos_de_item = relation ('TipoItem')
@@ -336,15 +342,16 @@ class TipoItem(DeclarativeBase):
     
     #{ Columnas
     id_tipo_item = Column(Integer, autoincrement=True, primary_key=True)
-    codigo = Column(Unicode(32), nullable=False)
+    codigo = Column(Unicode(50), unique=True)
     descripcion = Column(Unicode(200), nullable=True)
     id_proyecto = Column(Integer, ForeignKey('tbl_proyecto.id_proyecto',
                          ondelete="CASCADE"), nullable=True)
     id_padre = Column(Integer, ForeignKey('tbl_tipo_item.id_tipo_item'))
     
+    # template para codificacion
+    tmpl_codigo = u"TI-{id_tipo_item}-PROY-{id_proyecto}"
     #{ Relaciones
-    
-    hijos = relation('TipoItem')#, backref=backref('tipo_padre', remote_side=id_tipo_item))
+    hijos = relation('TipoItem')
     atributos = relation('AtributosPorTipoItem')
     items = relation('Item')
     #}

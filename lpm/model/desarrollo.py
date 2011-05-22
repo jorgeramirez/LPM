@@ -47,6 +47,7 @@ class Item(DeclarativeBase):
     
     #{ Columnas
     id_item = Column(Integer, autoincrement=True, primary_key=True)
+    codigo = Column(Unicode(50), unique=True)
     numero = Column(Integer, nullable=False)
     numero_por_tipo = Column(Integer, nullable=False)
     id_tipo_item = Column(Integer,
@@ -59,7 +60,8 @@ class Item(DeclarativeBase):
     id_propiedad_item = Column(Integer)
 
     
-
+    #template para codificacion
+    tmpl_codigo = u"IT-{id_item}-TI-{id_tipo_item}"
     #{ Relaciones
     propiedad_item_versiones = relation('PropiedadItem')
     
@@ -511,7 +513,7 @@ class Relacion(DeclarativeBase):
     #{ Columnas
     id_relacion = Column(Integer, autoincrement=True, primary_key=True)
     tipo = Column(Unicode(45), nullable=False)
-
+    codigo = Column(Unicode(50), unique=True)
     id_anterior = Column(Integer, ForeignKey('tbl_item.id_item',
                                               onupdate='CASCADE', 
                                               ondelete='CASCADE'))
@@ -520,7 +522,8 @@ class Relacion(DeclarativeBase):
                                               ondelete='CASCADE'))
     
     tipo_relaciones = {'a-s': u"Antecesor-Sucesor", 'p-h' : u"Padre-Hijo"}
-    
+    #template para codificacion
+    tmpl_codigo = u"REL-{id_relacion}-{tipo}-{id_anterior}-{id_posterior}"
     #{ Métodos de clase
     @classmethod
     def relaciones_como_posterior(cls, id_item):
