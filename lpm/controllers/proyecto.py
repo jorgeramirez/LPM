@@ -15,15 +15,16 @@ from tg.decorators import (paginate, expose, with_trailing_slash,
 from tg import redirect, request, require, flash, validate
 
 from lpm.model import DBSession, Proyecto, Usuario, Rol
-from lpm.lib.sproxcustom import CustomTableFiller
+from lpm.lib.sproxcustom import (CustomTableFiller, 
+                                 CustomPropertySingleSelectField)
 from lpm.lib.authorization import PoseePermiso
+from lpm.lib.util import UrlParser
 from lpm.controllers.fase import FaseController
 
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, EditFormFiller
 from sprox.fillerbase import EditFormFiller
 from sprox.formbase import AddRecordForm, EditableForm
-from sprox.widgets import PropertySingleSelectField
 
 from repoze.what.predicates import not_anonymous
 
@@ -32,6 +33,7 @@ from pylons import tmpl_context
 
 import transaction
 
+from tw.forms import TextField
 
 class ProyectoTable(TableBase):
     __model__ = Proyecto
@@ -129,24 +131,34 @@ class ProyectoTableFiller(CustomTableFiller):
 proyecto_table_filler = ProyectoTableFiller(DBSession)
 
 
-class ProjectLeaderField(PropertySingleSelectField):
-
+class LiderField(CustomPropertySingleSelectField):
+    """Dropdown list para líder de proyecto"""
     def _my_update_params(self, d, nullable=False):
+        options = []
         usuarios = DBSession.query(Usuario).all()
-        options = [(u.id_usuario, '%s (%s)'%(u.nombre_usuario, 
-                    u.nombre + " " + u.apellido))
-                   for u in usuarios]
+        if self.accion == "edit":
+            id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+            if id_proyecto:
+                proy = Proyecto.por_id(id_proyecto)
+                lider = proy.obtener_lider()
+                options.append((lider.id_usuario, '%s (%s)'%(lider.nombre_usuario, 
+                                lider.nombre + " " + lider.apellido)))
+        elif self.accion == "new":
+            options.append((None, "----------"))
+        for u in usuarios:
+            options.append((u.id_usuario, '%s (%s)'%(u.nombre_usuario, 
+                    u.nombre + " " + u.apellido)))
         d['options'] = options
         return d
 
+
 class ProyectoAddForm(AddRecordForm):
     __model__ = Proyecto
-    __hide_fields__ = ['id_proyecto', 'fecha_creacion', 'complejidad_total',
-                       'estado', 'numero_fases', 'fases', 'tipos_de_item',
-                       'codigo']
-    __field_order__ = ['nombre', 'descripcion', 'project_leader']
-    project_leader = ProjectLeaderField('id_lider')
-
+    __omit_fields__ = ['id_proyecto', 'fecha_creacion', 'complejidad_total',
+                       'estado', 'fases', 'tipos_de_item', 'codigo']
+    __field_order__ = ['nombre', 'descripcion', 'lider', 
+                       'numero_fases']
+    lider = LiderField('lider', label_text="Lider de Proyecto", accion="new")
 
                                            
 proyecto_add_form = ProyectoAddForm(DBSession)
@@ -155,16 +167,16 @@ proyecto_add_form = ProyectoAddForm(DBSession)
 class ProyectoEditForm(EditableForm):
     __model__ = Proyecto
     __hide_fields__ = ['id_proyecto', 'fecha_creacion', 'complejidad_total',
-                       'estado', 'numero_fases', 'fases', 'tipos_de_item',
-                       'codigo']
-    project_leader = ProjectLeaderField('id_lider')
+                       'estado', 'numero_fases', 'codigo', 'fases', 
+                       'tipos_de_item']
+    lider = LiderField('lider', label_text="Lider de Proyecto", accion="edit")
 
 proyecto_edit_form = ProyectoEditForm(DBSession)        
 
 
 class ProyectoEditFiller(EditFormFiller):
     __model__ = Proyecto
-
+    
 proyecto_edit_filler = ProyectoEditFiller(DBSession)
 
 
@@ -253,8 +265,8 @@ class ProyectoController(CrudRestController):
     def post(self, *args, **kw):
         if "sprox_id" in kw:
             del kw["sprox_id"]
-        id_proy_lider = int(kw["id_lider"])
-        del kw["id_lider"]
+        id_proy_lider = int(kw["lider"])
+        del kw["lider"]
         transaction.begin()
         proy = Proyecto(**kw)
         lider = Usuario.por_id(id_proy_lider)

@@ -213,18 +213,18 @@ class Proyecto(DeclarativeBase):
                 self.tipos_de_item.append(tipo)
                 DBSession.add(tipo)
         
-    def crear_fase(self, dict):
+    def crear_fase(self, **kw):
         """ Para agregar fases a un proyecto no iniciado
         se le pasa un  diccionario con los atributos para la nueva fase"""
         if (self.estado == u"No Iniciado"):
-            print "creando fase"
-            self.numero_fases += 1
-            fase = Fase()
-            fase.posicion = self.numero_fases
-            fase.nombre = dict["nombre"]
-            fase.descripcion = dict["descripcion"]
-            self.fases.append(fase)
+            print "Creando fase..."
+            fase = Fase(**kw)
+            self.fases.append(fase)            
             DBSession.add(fase)
+            DBSession.flush()
+            fase.codigo = Fase.generar_codigo(fase)
+
+
 
     def modificar_fase(self, id, dict):#todavía no probé
         fase = Fase.por_id(id)

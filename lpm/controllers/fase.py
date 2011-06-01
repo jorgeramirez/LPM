@@ -12,11 +12,13 @@ Módulo que define el controlador de fases.
 from tgext.crud import CrudRestController
 from tg.decorators import (paginate, expose, with_trailing_slash,
                            without_trailing_slash)
-from tg import redirect, request
+from tg import redirect, request, validate
 
 from lpm.model import DBSession, Fase, Proyecto
-from lpm.lib.sproxcustom import CustomTableFiller
+from lpm.lib.sproxcustom import (CustomTableFiller,
+                                 CustomPropertySingleSelectField)
 from lpm.lib.authorization import PoseePermiso
+from lpm.lib.util import UrlParser
 
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, EditFormFiller
@@ -27,6 +29,8 @@ from repoze.what.predicates import not_anonymous
 
 import pylons
 from pylons import tmpl_context
+
+import transaction
 
 
 class FaseTable(TableBase):
@@ -93,10 +97,38 @@ class FaseTableFiller(CustomTableFiller):
 fase_table_filler = FaseTableFiller(DBSession)
 
 
+class PosicionField(CustomPropertySingleSelectField):
+    """
+    Dropdown field para las posiciones disponibles
+    """
+    def _my_update_params(self, d, nullable=False):
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        if not id_proyecto: return d
+        proy = Proyecto.por_id(id_proyecto)
+        pos_usadas, pos_disp, options = [], [], []
+        for fase in proy.fases:
+            pos_usadas.append(fase.posicion)
+        for i in xrange(1, proy.numero_fases + 1):
+            if i not in pos_usadas:
+                pos_disp.append(i)
+        if self.accion == "edit":
+            id_fase = UrlParser.parse_id(request.url, "fases")
+            if id_fase:
+                fase = Fase.por_id(id_fase)
+                options.append((fase.posicion, str(fase.posicion)))
+        elif self.accion == "new":
+            options.append((None, "----------"))
+        for pos in pos_disp:
+            options.append((pos, str(pos)))
+        d['options'] = options
+        return d
+
+
 class FaseAddForm(AddRecordForm):
     __model__ = Fase
-    __hide_fields__ = ['id_fase', 'numero_items', 'numero_lb',
+    __omit_fields__ = ['id_fase', 'numero_items', 'numero_lb',
                        'estado', 'id_proyecto', 'codigo', 'items']
+    posicion = PosicionField("posicion", accion="new")
 
 fase_add_form = FaseAddForm(DBSession)
 
@@ -105,6 +137,7 @@ class FaseEditForm(EditableForm):
     __model__ = Fase
     __hide_fields__ = ['id_fase', 'numero_items', 'numero_lb',
                        'estado', 'codigo', 'id_proyecto', 'items']
+    posicion = PosicionField("posicion", accion="edit")
 
 fase_edit_form = FaseEditForm(DBSession)
 
@@ -141,15 +174,14 @@ class FaseController(CrudRestController):
         Retorna todos los registros
         Retorna una página HTML si no se especifica JSON
         """
-        partes = request.url.split("/")
         retorno = self.retorno_base()
         if not getattr(self.table.__class__, '__retrieves_own_value__', False):
             fases = self.table_filler.get_value(**kw)
         else:
             fases = []
-        if "proyectos" in partes:
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        if id_proyecto:
             #filtramos por el identificador de proyecto.
-            id_proyecto = int(partes[-3])
             if fases:
                 self.__reducir(fases, id_proyecto)
             proy = Proyecto.por_id(id_proyecto)
@@ -192,20 +224,40 @@ class FaseController(CrudRestController):
     @expose('lpm.templates.get_all')
     @expose('json')
     def buscar(self, *args, **kw):
-        partes = request.url.split("/")
         retorno = self.retorno_base()
         buscar_table_filler = FaseTableFiller(DBSession)
         if kw.has_key('filtro'):
             buscar_table_filler.filtro = kw['filtro']
         fases = buscar_table_filler.get_value()
         tmpl_context.widget = self.table
-        if "proyectos" in partes:
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        if id_proyecto:
             #filtramos por el identificador de proyecto.
-            id_proyecto = int(partes[-3])
+            id_proyecto = UrlParser.parse_id(request.url, "proyectos")
             if fases:
                 self.__reducir(fases, id_proyecto)
             proy = Proyecto.por_id(id_proyecto)
             self.__cambiar_retorno(retorno, proy)
         retorno["lista_elementos"] = fases
         return retorno
+
+    @without_trailing_slash
+    @expose('lpm.templates.new')
+    def new(self, *args, **kw):
+        """Display a page to show a new record."""
+        tmpl_context.widget = self.new_form
+        return dict(value=kw, modelo=self.model.__name__)
+    
+    @validate(fase_add_form, error_handler=new)
+    @expose()
+    def post(self, *args, **kw):
+        if "sprox_id" in kw:
+            del kw["sprox_id"]
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        if id_proyecto:
+            transaction.begin()
+            proy = Proyecto.por_id(id_proyecto)
+            proy.crear_fase(**kw)
+            transaction.commit()
+        redirect("./")
     #}
