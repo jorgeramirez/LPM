@@ -17,7 +17,7 @@ from tg import redirect, request, require, flash, validate
 from lpm.model import DBSession, Proyecto, Usuario, Rol
 from lpm.lib.sproxcustom import (CustomTableFiller, 
                                  CustomPropertySingleSelectField)
-from lpm.lib.authorization import PoseePermiso
+from lpm.lib.authorization import PoseePermiso, AlgunPermiso
 from lpm.lib.util import UrlParser
 from lpm.controllers.fase import FaseController
 
@@ -83,11 +83,11 @@ class ProyectoTableFiller(CustomTableFiller):
                      'style="background-color: transparent; float:left; border:0; color: #286571;'+\
                      'display: inline; margin: 0; padding: 0;' + style + '"/>'+\
                      '</form></div><br />'
-        if PoseePermiso('administrar proyecto',
-                        id_proyecto=obj.id_proyecto).is_met(request.environ):
+        if AlgunPermiso(id_proyecto=obj.id_proyecto, 
+                        patron="fase").is_met(request.environ):
             value += '<div>' + \
                         '<a href="' + str(obj.id_proyecto) + '/fases/' +\
-                        '" style="' + style + '">Administrar</a>' + \
+                        '" style="' + style + '">Fases</a>' + \
                      '</div><br />'
             if (obj.estado == "No Iniciado"):
                 value += '<div>' + \

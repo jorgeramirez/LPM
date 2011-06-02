@@ -13,7 +13,7 @@ con los módulos de autorización y autenticación
 from repoze.what.predicates import Predicate, is_anonymous
 from lpm.model import Usuario
 
-__all__ = ['Permisos', 'PoseePermiso']
+__all__ = ['Permisos', 'PoseePermiso', 'AlgunPermiso']
 
 
 # Diccionario que define los permisos del sistema
@@ -73,7 +73,7 @@ class PoseePermiso(Predicate):
     """
     message = "El usuario debe poseer el permiso: %s"
     
-    def __init__(self, nombre_permiso, **kwargs):
+    def __init__(self, nombre_permiso, **kw):
         """
         Método inicializador.
         
@@ -84,19 +84,13 @@ class PoseePermiso(Predicate):
         self.nombre_permiso = unicode(nombre_permiso)
         self.valor_contexto = None
         self.contexto = u""
-        if kwargs.has_key('id_proyecto'):
-            self.valor_contexto = int(kwargs['id_proyecto'])
-            self.contexto = 'id_proyecto'
-            del kwargs[self.contexto]
-        elif kwargs.has_key('id_fase'):
-            self.valor_contexto = int(kwargs['id_fase'])
-            self.contexto = 'id_fase'
-            del kwargs[self.contexto]
-        elif kwargs.has_key('id_tipo_item'):
-            self.valor_contexto = int(kwargs['id_tipo_item'])
-            self.contexto = 'id_tipo_item'
-            del kwargs[self.contexto]
-        super(PoseePermiso, self).__init__(**kwargs)
+        for key in ["id_proyecto", "id_fase", "id_tipo_item"]:
+            if kw.has_key(key):
+                self.valor_contexto = int(kw[key])
+                self.contexto = key
+                del kw[key]
+                break
+        super(PoseePermiso, self).__init__(**kw)
         
     def evaluate(self, environ, credentials):
         if is_anonymous().is_met(environ):
@@ -110,3 +104,47 @@ class PoseePermiso(Predicate):
                     if p.nombre_permiso == self.nombre_permiso:
                         return
         self.unmet(self.message % self.nombre_permiso)
+
+
+class AlgunPermiso(Predicate):
+    """
+    Evalua si el usuario tiene algún permiso para un
+    contexto dado.
+    """
+    message = u"No tiene algun permiso para dicho contexto"
+    def __init__(self, **kw):
+        """
+        Método inicializador
+        
+        @param kw: Parametros para inicializar
+        @keyword patron: El patron para el nombre del permiso.
+        """
+        self.valor_contexto = None
+        self.contexto = u""
+        for key in ["id_proyecto", "id_fase", "id_tipo_item"]:
+            if kw.has_key(key):
+                self.valor_contexto = int(kw[key])
+                self.contexto = key
+                del kw[key]
+                break
+        self.patron = unicode(kw["patron"])
+        del kw["patron"]
+        super(AlgunPermiso, self).__init__(**kw)
+    
+    def evaluate(self, environ, credentials):
+        if is_anonymous().is_met(environ) or not self.valor_contexto: 
+            self.unmet()
+        nombre_usuario = credentials["repoze.what.userid"]
+        usuario = Usuario.by_user_name(nombre_usuario)
+        for r in usuario.roles:
+            valor = getattr(r, self.contexto, None)
+            if r.es_rol_sistema() or (valor and valor == self.valor_contexto):
+                for p in r.permisos:
+                    if self.patron == u"item" and \
+                       p.nombre_permiso.find("tipo item") > 0:
+                        continue
+                    if p.nombre_permiso.find(self.patron) > 0 and \
+                       p.nombre_permiso.find(u"consultar") < 0:
+                        return
+        self.unmet(self.message)
+    
