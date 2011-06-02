@@ -135,7 +135,6 @@ class LiderField(CustomPropertySingleSelectField):
     """Dropdown list para líder de proyecto"""
     def _my_update_params(self, d, nullable=False):
         options = []
-        usuarios = DBSession.query(Usuario).all()
         if self.accion == "edit":
             id_proyecto = UrlParser.parse_id(request.url, "proyectos")
             if id_proyecto:
@@ -145,9 +144,10 @@ class LiderField(CustomPropertySingleSelectField):
                                 lider.nombre + " " + lider.apellido)))
         elif self.accion == "new":
             options.append((None, "----------"))
-        for u in usuarios:
-            options.append((u.id_usuario, '%s (%s)'%(u.nombre_usuario, 
-                    u.nombre + " " + u.apellido)))
+            usuarios = DBSession.query(Usuario).all()
+            for u in usuarios:
+                options.append((u.id_usuario, '%s (%s)'%(u.nombre_usuario, 
+                        u.nombre + " " + u.apellido)))
         d['options'] = options
         return d
 
@@ -246,12 +246,16 @@ class ProyectoController(CrudRestController):
     
     @expose('lpm.templates.edit')
     def edit(self, *args, **kw):
-        """Despliega una pagina para modificar proyecto"""
+        """Despliega una pagina para realizar modificaciones"""
         pp = PoseePermiso('modificar proyecto', id_proyecto=args[0])
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect("/proyectos")
-        return super(ProyectoController, self).edit(*args, **kw)
+        tmpl_context.widget = self.edit_form
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        value = self.edit_filler.get_value(values={'id_proyecto': id_proyecto})
+        value['_method'] = 'PUT'
+        return dict(value=value, modelo=self.model.__name__)
         
     @without_trailing_slash
     @expose('lpm.templates.new')
@@ -285,4 +289,18 @@ class ProyectoController(CrudRestController):
         proy.codigo = Proyecto.generar_codigo(proy)
         transaction.commit()
         redirect("./")
+
+    @validate(proyecto_edit_form, error_handler=edit)
+    @expose()
+    def put(self, *args, **kw):
+        """update"""
+        if "sprox_id" in kw:
+            del kw["sprox_id"]
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        transaction.begin()
+        proy = Proyecto.por_id(id_proyecto)
+        proy.nombre = unicode(kw["nombre"])
+        proy.descripcion = unicode(kw["descripcion"])
+        transaction.commit()
+        redirect("../")
     #}

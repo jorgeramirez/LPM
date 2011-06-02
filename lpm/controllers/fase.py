@@ -104,21 +104,25 @@ class PosicionField(CustomPropertySingleSelectField):
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
         if not id_proyecto: return d
         proy = Proyecto.por_id(id_proyecto)
-        pos_usadas, pos_disp, options = [], [], []
-        for fase in proy.fases:
-            pos_usadas.append(fase.posicion)
-        for i in xrange(1, proy.numero_fases + 1):
-            if i not in pos_usadas:
-                pos_disp.append(i)
+        options = []
         if self.accion == "edit":
             id_fase = UrlParser.parse_id(request.url, "fases")
             if id_fase:
                 fase = Fase.por_id(id_fase)
                 options.append((fase.posicion, str(fase.posicion)))
+                pos = range(1, proy.numero_fases + 1)
+                pos.pop(fase.posicion - 1)
+                options.extend(pos)
         elif self.accion == "new":
             options.append((None, "----------"))
-        for pos in pos_disp:
-            options.append((pos, str(pos)))
+            pos_usadas, pos_disp = [], []
+            for fase in proy.fases:
+                pos_usadas.append(fase.posicion)
+            for i in xrange(1, proy.numero_fases + 1):
+                if i not in pos_usadas:
+                    pos_disp.append(i)
+            for pos in pos_disp:
+                options.append((pos, str(pos)))
         d['options'] = options
         return d
 
@@ -259,4 +263,32 @@ class FaseController(CrudRestController):
             proy.crear_fase(**kw)
             transaction.commit()
         redirect("./")
+    
+    @expose('lpm.templates.edit')
+    def edit(self, *args, **kw):
+        """Despliega una pagina para realizar modificaciones"""
+        pp = PoseePermiso('modificar fase', id_fase=args[0])
+        if not pp.is_met(request.environ):
+            flash(pp.message % pp.nombre_permiso, 'warning')
+            redirect("./")
+        tmpl_context.widget = self.edit_form
+        id_fase = UrlParser.parse_id(request.url, "fases")
+        value = self.edit_filler.get_value(values={'id_fase': id_fase})
+        value['_method'] = 'PUT'
+        return dict(value=value, modelo=self.model.__name__)
+        
+    @validate(fase_edit_form, error_handler=edit)
+    @expose()
+    def put(self, *args, **kw):
+        """update"""
+        if "sprox_id" in kw:
+            del kw["sprox_id"]
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        id_fase = UrlParser.parse_id(request.url, "fases")
+        transaction.begin()
+        if id_proyecto:
+            proy = Proyecto.por_id(id_proyecto)
+            proy.modificar_fase(id_fase, **kw)
+        transaction.commit()
+        redirect("../")
     #}

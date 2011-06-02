@@ -226,29 +226,34 @@ class Proyecto(DeclarativeBase):
 
 
 
-    def modificar_fase(self, id, dict):#todavía no probé
-        fase = Fase.por_id(id)
+    def modificar_fase(self, id_fase, **kw):#todavía no probé
+        """Modifica los atributos de una fase"""
+        fase = Fase.por_id(id_fase)
         
         #comprueba si se cambió algo
-        if (fase.nombre != dict["nombre"]):
+        if (fase.nombre != kw["nombre"]):
             #comprobar si el nuevo nombre no está repetido
             for f in self.fases:
-                if (f.nombre == dict["nombre"]):
+                if (f.nombre == kw["nombre"]):
                     raise NombreFaseError()
-            fase.nombre = dict["nombre"]
+            fase.nombre = kw["nombre"]
             
-        if (fase.descripcion != dict["descripcion"]):
-            fase.descripcion = dict["descripcion"]
+        if (fase.descripcion != kw["descripcion"]):
+            fase.descripcion = kw["descripcion"]
             
         #inserta la fase en esa posicion
-        if (fase.posicion != dict["posicion"]):
-            for f in self.fases:
-                if (fase.posicion < dict["posicion"]):
-                    if (f.posicion >= fase.posicion and f.posicion < dict["posicion"]):
-                        f.posicion -= 1
-                else:
-                    if (f.posicion <= fase.posicion and f.posicion > dict["posicion"]):
+        pos_ini = fase.posicion
+        pos_fin = int(kw["posicion"])
+        if (fase.posicion != pos_fin):
+            if pos_fin < pos_ini:
+                for f in self.fases:
+                    if f.posicion >= pos_fin and f.posicion < pos_ini:
                         f.posicion += 1
+            elif pos_fin > pos_ini:
+                for f in self.fases:
+                    if f.posicion > pos_ini and f.posicion <= pos_fin:
+                        f.posicion -= 1
+            fase.posicion = pos_fin
         
     def eliminar_fase(self, id):
         """elimina la fase de id en un proyecto "No Iniciado" """
