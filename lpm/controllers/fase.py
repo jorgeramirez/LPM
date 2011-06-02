@@ -12,11 +12,13 @@ Módulo que define el controlador de fases.
 from tgext.crud import CrudRestController
 from tg.decorators import (paginate, expose, with_trailing_slash,
                            without_trailing_slash)
-from tg import redirect, request
+from tg import redirect, request, validate
 
 from lpm.model import DBSession, Fase, Proyecto
-from lpm.lib.sproxcustom import CustomTableFiller
-from lpm.lib.authorization import PoseePermiso
+from lpm.lib.sproxcustom import (CustomTableFiller,
+                                 CustomPropertySingleSelectField)
+from lpm.lib.authorization import PoseePermiso, AlgunPermiso
+from lpm.lib.util import UrlParser
 
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, EditFormFiller
@@ -28,6 +30,8 @@ from repoze.what.predicates import not_anonymous
 import pylons
 from pylons import tmpl_context
 
+import transaction
+
 
 class FaseTable(TableBase):
     __model__ = Fase
@@ -35,12 +39,11 @@ class FaseTable(TableBase):
                     'nombre': u'Nombre',
                     'posicion': u'Posicion',
                     'numero_items': u'Nro. de Items', 
-                    'numero_lb': u'Nro de Lineas Base',
                     'estado':u'Estado',
-                    'descripcion': u'Descripcion',
                     'codigo': u'Código'
                   }
-    __omit_fields__ = ['items', 'id_proyecto', 'id_fase']
+    __omit_fields__ = ['items', 'id_proyecto', 'id_fase',
+                       'numero_lb', 'descripcion']
     __default_column_width__ = '15em'
     __column_widths__ = { 'descripcion': "35em", '__actions__': "50em"}
     
@@ -61,20 +64,20 @@ class FaseTableFiller(CustomTableFiller):
                         '<a href="'+ str(obj.id_fase) +'/edit" ' + \
                         'style="' + style + '">Modificar</a>' + \
                      '</div><br />'
-        if PoseePermiso('administrar lb',
-                        id_fase=obj.id_fase).is_met(request.environ) or True:
+        if AlgunPermiso(id_fase=obj.id_fase, 
+                        patron="lb").is_met(request.environ):
             value += '<div>' + \
                         '<a href="'+ str(obj.id_fase) + "/lbs/"\
                         '" style="' + style + '">LBs</a>' + \
                      '</div><br />'
-        if PoseePermiso('administrar tipos de item',
-                        id_fase=obj.id_fase).is_met(request.environ) or True:
+        if AlgunPermiso(id_fase=obj.id_fase, 
+                        patron="tipo item").is_met(request.environ):
             value += '<div>' + \
                         '<a href="'+ str(obj.id_fase) + "/tipo_items/"\
                         '" style="' + style + '">Tipos de Ítems</a>' + \
                      '</div><br />'
-        if PoseePermiso('administrar items',
-                        id_fase=obj.id_fase).is_met(request.environ) or True:
+        if AlgunPermiso(id_fase=obj.id_fase, 
+                        patron="item").is_met(request.environ):
             value += '<div>' + \
                         '<a href="'+ str(obj.id_fase) + "/items/"\
                         '" style="'+ style +'">Ítems</a>' + \
@@ -87,25 +90,57 @@ class FaseTableFiller(CustomTableFiller):
                      'style="background-color: transparent; float:left; border:0; color: #286571; display: inline;'+\
                      'margin: 0; padding: 0;' + style + '"/>'+\
                      '</form></div><br />'
-        #administrar lb es simbolico, FIXME, compound predicate checker(?)
         value += '</div>'
         return value
 
 fase_table_filler = FaseTableFiller(DBSession)
 
 
+class PosicionField(CustomPropertySingleSelectField):
+    """
+    Dropdown field para las posiciones disponibles
+    """
+    def _my_update_params(self, d, nullable=False):
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        if not id_proyecto: return d
+        proy = Proyecto.por_id(id_proyecto)
+        options = []
+        if self.accion == "edit":
+            id_fase = UrlParser.parse_id(request.url, "fases")
+            if id_fase:
+                fase = Fase.por_id(id_fase)
+                options.append((fase.posicion, str(fase.posicion)))
+                pos = range(1, proy.numero_fases + 1)
+                pos.pop(fase.posicion - 1)
+                options.extend(pos)
+        elif self.accion == "new":
+            options.append((None, "----------"))
+            pos_usadas, pos_disp = [], []
+            for fase in proy.fases:
+                pos_usadas.append(fase.posicion)
+            for i in xrange(1, proy.numero_fases + 1):
+                if i not in pos_usadas:
+                    pos_disp.append(i)
+            for pos in pos_disp:
+                options.append((pos, str(pos)))
+        d['options'] = options
+        return d
+
+
 class FaseAddForm(AddRecordForm):
     __model__ = Fase
     __omit_fields__ = ['id_fase', 'numero_items', 'numero_lb',
-                       'estado', 'id_proyecto', 'codigo']
+                       'estado', 'id_proyecto', 'codigo', 'items']
+    posicion = PosicionField("posicion", accion="new")
 
 fase_add_form = FaseAddForm(DBSession)
 
 
 class FaseEditForm(EditableForm):
     __model__ = Fase
-    __omit_fields__ = ['id_fase', 'numero_items', 'numero_lb',
-                       'estado', 'codigo', 'id_proyecto']
+    __hide_fields__ = ['id_fase', 'numero_items', 'numero_lb',
+                       'estado', 'codigo', 'id_proyecto', 'items']
+    posicion = PosicionField("posicion", accion="edit")
 
 fase_edit_form = FaseEditForm(DBSession)
 
@@ -142,15 +177,14 @@ class FaseController(CrudRestController):
         Retorna todos los registros
         Retorna una página HTML si no se especifica JSON
         """
-        partes = request.url.split("/")
         retorno = self.retorno_base()
         if not getattr(self.table.__class__, '__retrieves_own_value__', False):
             fases = self.table_filler.get_value(**kw)
         else:
             fases = []
-        if "proyectos" in partes:
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        if id_proyecto:
             #filtramos por el identificador de proyecto.
-            id_proyecto = int(partes[-3])
             if fases:
                 self.__reducir(fases, id_proyecto)
             proy = Proyecto.por_id(id_proyecto)
@@ -193,20 +227,68 @@ class FaseController(CrudRestController):
     @expose('lpm.templates.get_all')
     @expose('json')
     def buscar(self, *args, **kw):
-        partes = request.url.split("/")
         retorno = self.retorno_base()
         buscar_table_filler = FaseTableFiller(DBSession)
         if kw.has_key('filtro'):
             buscar_table_filler.filtro = kw['filtro']
         fases = buscar_table_filler.get_value()
         tmpl_context.widget = self.table
-        if "proyectos" in partes:
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        if id_proyecto:
             #filtramos por el identificador de proyecto.
-            id_proyecto = int(partes[-3])
+            id_proyecto = UrlParser.parse_id(request.url, "proyectos")
             if fases:
                 self.__reducir(fases, id_proyecto)
             proy = Proyecto.por_id(id_proyecto)
             self.__cambiar_retorno(retorno, proy)
         retorno["lista_elementos"] = fases
         return retorno
+
+    @without_trailing_slash
+    @expose('lpm.templates.new')
+    def new(self, *args, **kw):
+        """Display a page to show a new record."""
+        tmpl_context.widget = self.new_form
+        return dict(value=kw, modelo=self.model.__name__)
+    
+    @validate(fase_add_form, error_handler=new)
+    @expose()
+    def post(self, *args, **kw):
+        if "sprox_id" in kw:
+            del kw["sprox_id"]
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        if id_proyecto:
+            transaction.begin()
+            proy = Proyecto.por_id(id_proyecto)
+            proy.crear_fase(**kw)
+            transaction.commit()
+        redirect("./")
+    
+    @expose('lpm.templates.edit')
+    def edit(self, *args, **kw):
+        """Despliega una pagina para realizar modificaciones"""
+        pp = PoseePermiso('modificar fase', id_fase=args[0])
+        if not pp.is_met(request.environ):
+            flash(pp.message % pp.nombre_permiso, 'warning')
+            redirect("./")
+        tmpl_context.widget = self.edit_form
+        id_fase = UrlParser.parse_id(request.url, "fases")
+        value = self.edit_filler.get_value(values={'id_fase': id_fase})
+        value['_method'] = 'PUT'
+        return dict(value=value, modelo=self.model.__name__)
+        
+    @validate(fase_edit_form, error_handler=edit)
+    @expose()
+    def put(self, *args, **kw):
+        """update"""
+        if "sprox_id" in kw:
+            del kw["sprox_id"]
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        id_fase = UrlParser.parse_id(request.url, "fases")
+        transaction.begin()
+        if id_proyecto:
+            proy = Proyecto.por_id(id_proyecto)
+            proy.modificar_fase(id_fase, **kw)
+        transaction.commit()
+        redirect("../")
     #}

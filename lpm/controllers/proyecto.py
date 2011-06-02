@@ -15,15 +15,16 @@ from tg.decorators import (paginate, expose, with_trailing_slash,
 from tg import redirect, request, require, flash, validate
 
 from lpm.model import DBSession, Proyecto, Usuario, Rol
-from lpm.lib.sproxcustom import CustomTableFiller
-from lpm.lib.authorization import PoseePermiso
+from lpm.lib.sproxcustom import (CustomTableFiller, 
+                                 CustomPropertySingleSelectField)
+from lpm.lib.authorization import PoseePermiso, AlgunPermiso
+from lpm.lib.util import UrlParser
 from lpm.controllers.fase import FaseController
 
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, EditFormFiller
 from sprox.fillerbase import EditFormFiller
 from sprox.formbase import AddRecordForm, EditableForm
-from sprox.widgets import PropertySingleSelectField
 
 from repoze.what.predicates import not_anonymous
 
@@ -32,6 +33,7 @@ from pylons import tmpl_context
 
 import transaction
 
+from tw.forms import TextField
 
 class ProyectoTable(TableBase):
     __model__ = Proyecto
@@ -40,7 +42,7 @@ class ProyectoTable(TableBase):
                    'numero_fases': u'Nro. de Fases', 'descripcion': u'Descripción',
                    'project_leader': 'Lider de Proyecto', 'codigo': u"Código"
                   }
-    __omit_fields__ = ['fases', 'tipos_de_item', 'id_proyecto']
+    __omit_fields__ = ['fases', 'tipos_de_item', 'id_proyecto', 'descripcion']
     __default_column_width__ = '15em'
     __column_widths__ = {'complejidad_total': "35em",
                          'numero_fases': "35em",
@@ -59,7 +61,7 @@ class ProyectoTableFiller(CustomTableFiller):
     def project_leader(self, obj):
         lider = obj.obtener_lider()
         if lider:
-            return lider.nombre + " " + lider.apellido + ", " + lider.nombre_usuario
+            return lider.nombre_usuario
         return None
     
     def __actions__(self, obj):
@@ -81,11 +83,11 @@ class ProyectoTableFiller(CustomTableFiller):
                      'style="background-color: transparent; float:left; border:0; color: #286571;'+\
                      'display: inline; margin: 0; padding: 0;' + style + '"/>'+\
                      '</form></div><br />'
-        if PoseePermiso('administrar proyecto',
-                        id_proyecto=obj.id_proyecto).is_met(request.environ):
+        if AlgunPermiso(id_proyecto=obj.id_proyecto, 
+                        patron="fase").is_met(request.environ):
             value += '<div>' + \
                         '<a href="' + str(obj.id_proyecto) + '/fases/' +\
-                        '" style="' + style + '">Administrar</a>' + \
+                        '" style="' + style + '">Fases</a>' + \
                      '</div><br />'
             if (obj.estado == "No Iniciado"):
                 value += '<div>' + \
@@ -129,23 +131,34 @@ class ProyectoTableFiller(CustomTableFiller):
 proyecto_table_filler = ProyectoTableFiller(DBSession)
 
 
-class ProjectLeaderField(PropertySingleSelectField):
-
+class LiderField(CustomPropertySingleSelectField):
+    """Dropdown list para líder de proyecto"""
     def _my_update_params(self, d, nullable=False):
-        usuarios = DBSession.query(Usuario).all()
-        options = [(u.id_usuario, '%s (%s)'%(u.nombre_usuario, u.nombre))
-                            for u in usuarios]
+        options = []
+        if self.accion == "edit":
+            id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+            if id_proyecto:
+                proy = Proyecto.por_id(id_proyecto)
+                lider = proy.obtener_lider()
+                options.append((lider.id_usuario, '%s (%s)'%(lider.nombre_usuario, 
+                                lider.nombre + " " + lider.apellido)))
+        elif self.accion == "new":
+            options.append((None, "----------"))
+            usuarios = DBSession.query(Usuario).all()
+            for u in usuarios:
+                options.append((u.id_usuario, '%s (%s)'%(u.nombre_usuario, 
+                        u.nombre + " " + u.apellido)))
         d['options'] = options
         return d
+
 
 class ProyectoAddForm(AddRecordForm):
     __model__ = Proyecto
     __omit_fields__ = ['id_proyecto', 'fecha_creacion', 'complejidad_total',
-                       'estado', 'numero_fases', 'fases', 'tipos_de_item',
-                       'codigo']
-    __field_order__ = ['nombre', 'descripcion', 'project_leader']
-    project_leader = ProjectLeaderField('id_lider')
-
+                       'estado', 'fases', 'tipos_de_item', 'codigo']
+    __field_order__ = ['nombre', 'descripcion', 'lider', 
+                       'numero_fases']
+    lider = LiderField('lider', label_text="Lider de Proyecto", accion="new")
 
                                            
 proyecto_add_form = ProyectoAddForm(DBSession)
@@ -153,17 +166,17 @@ proyecto_add_form = ProyectoAddForm(DBSession)
 
 class ProyectoEditForm(EditableForm):
     __model__ = Proyecto
-    __omit_fields__ = ['id_proyecto', 'fecha_creacion', 'complejidad_total',
-                       'estado', 'numero_fases', 'fases', 'tipos_de_item',
-                       'codigo']
-    project_leader = ProjectLeaderField('id_lider')
+    __hide_fields__ = ['id_proyecto', 'fecha_creacion', 'complejidad_total',
+                       'estado', 'numero_fases', 'codigo', 'fases', 
+                       'tipos_de_item']
+    lider = LiderField('lider', label_text="Lider de Proyecto", accion="edit")
 
 proyecto_edit_form = ProyectoEditForm(DBSession)        
 
 
 class ProyectoEditFiller(EditFormFiller):
     __model__ = Proyecto
-
+    
 proyecto_edit_filler = ProyectoEditFiller(DBSession)
 
 
@@ -233,12 +246,16 @@ class ProyectoController(CrudRestController):
     
     @expose('lpm.templates.edit')
     def edit(self, *args, **kw):
-        """Despliega una pagina para modificar proyecto"""
+        """Despliega una pagina para realizar modificaciones"""
         pp = PoseePermiso('modificar proyecto', id_proyecto=args[0])
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect("/proyectos")
-        return super(ProyectoController, self).edit(*args, **kw)
+        tmpl_context.widget = self.edit_form
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        value = self.edit_filler.get_value(values={'id_proyecto': id_proyecto})
+        value['_method'] = 'PUT'
+        return dict(value=value, modelo=self.model.__name__)
         
     @without_trailing_slash
     @expose('lpm.templates.new')
@@ -252,8 +269,8 @@ class ProyectoController(CrudRestController):
     def post(self, *args, **kw):
         if "sprox_id" in kw:
             del kw["sprox_id"]
-        id_proy_lider = int(kw["id_lider"])
-        del kw["id_lider"]
+        id_proy_lider = int(kw["lider"])
+        del kw["lider"]
         transaction.begin()
         proy = Proyecto(**kw)
         lider = Usuario.por_id(id_proy_lider)
@@ -272,4 +289,18 @@ class ProyectoController(CrudRestController):
         proy.codigo = Proyecto.generar_codigo(proy)
         transaction.commit()
         redirect("./")
+
+    @validate(proyecto_edit_form, error_handler=edit)
+    @expose()
+    def put(self, *args, **kw):
+        """update"""
+        if "sprox_id" in kw:
+            del kw["sprox_id"]
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        transaction.begin()
+        proy = Proyecto.por_id(id_proyecto)
+        proy.nombre = unicode(kw["nombre"])
+        proy.descripcion = unicode(kw["descripcion"])
+        transaction.commit()
+        redirect("../")
     #}

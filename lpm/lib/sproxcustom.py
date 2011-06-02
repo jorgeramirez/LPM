@@ -12,6 +12,8 @@ relacion con el módulo sprox
 """
 
 from sprox.fillerbase import TableFiller
+from sprox.widgets import PropertySingleSelectField
+
 from lpm.model import DBSession
 
 __all__ = ['CustomTableFiller']
@@ -59,3 +61,23 @@ class CustomTableFiller(TableFiller):
             if i not in l2:
                 l2.append(i)
         return l2
+
+
+class CustomPropertySingleSelectField(PropertySingleSelectField):
+    """
+    Clase que proporciona un combobox. La misma extiende de 
+    L{PropertySingleSelectField} y agrega el campo accion
+    utilizado para controlar el metodo _my_update_params.
+    """
+    accion = None
+    
+    def __init__(self, id=None, parent=None, children=[], **kw):
+        if "accion" in kw:
+            self.accion = kw["accion"]
+            del kw["accion"]
+        super(CustomPropertySingleSelectField, self).__init__(id, parent, 
+                                                              children, **kw)
+    def _my_update_params(self, d, nullable=False):
+        """Metodo utilizado para cargar el combobox"""
+        #debe sobreescribirse.
+        pass
