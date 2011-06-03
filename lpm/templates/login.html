@@ -4,7 +4,7 @@
     xmlns:py="http://genshi.edgewall.org/"
     xmlns:xi="http://www.w3.org/2001/XInclude">
 
-<xi:include href="master.html" />
+<xi:include href="esquema.html" />
 
 <head>
 <meta content="text/html; charset=UTF-8" http-equiv="content-type" py:replace="''"/>
@@ -14,11 +14,11 @@
 <body>
 <div id="loginform">
 <form action="${tg.url('/login_handler', params=dict(came_from=came_from.encode('utf-8'), __logins=login_counter.encode('utf-8')))}" method="post" accept-charset="UTF-8" class="loginfields">
-    <h2><span>Login</span></h2>
+    <div><span style="font-size:18px; margin: 2px;">Iniciar Sesión</span></div>
     <label for="loginusername">Username:</label><input type="text" id="loginusername" name="login" class="text"></input><br/>
     <label for="loginpassword">Password:</label><input type="password" id="loginpassword" name="password" class="text"></input>
-    <label id="labelremember" for="loginremember">remember me</label><input type="checkbox" id="loginremember" name="remember" value="2252000"/>
-    <input type="submit" id="submit" value="Login" />
+    <label id="labelremember" for="loginremember">No cerrar sesión</label><input type="checkbox" id="loginremember" name="remember" value="2252000"/>
+    <input type="submit" class="ingresar-btn" id="submit" value="Ingresar" />
 </form>
 </div>
 </body>

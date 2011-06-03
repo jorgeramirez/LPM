@@ -26,7 +26,7 @@ from sprox.fillerbase import TableFiller, EditFormFiller
 from sprox.fillerbase import EditFormFiller
 from sprox.formbase import AddRecordForm, EditableForm
 
-from repoze.what.predicates import not_anonymous
+from repoze.what.predicates import not_anonymous, is_anonymous
 
 import pylons
 from pylons import tmpl_context
@@ -68,15 +68,19 @@ class ProyectoTableFiller(CustomTableFiller):
         """Links de acciones para un registro dado"""
         value = '<div>'
         style = 'text-align:left; margin-top:2px;';
-        style += 'font-family:sans-serif; font-size:12;'        
+        style += 'font-family:sans-serif; font-size:12;'
+        ok_administrar = PoseePermiso('administrar proyecto',
+                         id_proyecto=obj.id_proyecto).is_met(request.environ)
         if PoseePermiso('modificar proyecto', 
-                        id_proyecto=obj.id_proyecto).is_met(request.environ):
+                        id_proyecto=obj.id_proyecto).is_met(request.environ) or \
+           ok_administrar:
             value += '<div>' + \
                         '<a href="'+ str(obj.id_proyecto) +'/edit" ' + \
                         'style="' + style + '">Modificar</a>' + \
                      '</div><br />'
         if PoseePermiso('eliminar proyecto',
-                        id_proyecto=obj.id_proyecto).is_met(request.environ):
+                        id_proyecto=obj.id_proyecto).is_met(request.environ) or \
+           ok_administrar:
             value += '<div><form method="POST" action="' + str(obj.id_proyecto) + '" class="button-to">'+\
                      '<input type="hidden" name="_method" value="DELETE" />' +\
                      '<input onclick="return confirm(\'Está seguro?\');" value="Delete" type="submit" '+\
@@ -84,16 +88,20 @@ class ProyectoTableFiller(CustomTableFiller):
                      'display: inline; margin: 0; padding: 0;' + style + '"/>'+\
                      '</form></div><br />'
         if AlgunPermiso(id_proyecto=obj.id_proyecto, 
-                        patron="fase").is_met(request.environ):
+                        patron="fase").is_met(request.environ) or \
+           ok_administrar:            
             value += '<div>' + \
                         '<a href="' + str(obj.id_proyecto) + '/fases/' +\
                         '" style="' + style + '">Fases</a>' + \
                      '</div><br />'
-            if (obj.estado == "No Iniciado"):
-                value += '<div>' + \
-                            '<a href="' + str(obj.id_proyecto) + '/iniciar/' +\
+        if obj.estado == "No Iniciado" and ( \
+           PoseePermiso('iniciar proyecto', 
+                        id_proyecto=obj.id_proyecto).is_met(request.environ) or \
+           ok_administrar):
+            value += '<div>' + \
+                        '<a href="' + str(obj.id_proyecto) + '/iniciar/' +\
                             '" style="' + style + '">Iniciar</a>' + \
-                         '</div><br />'
+                     '</div><br />'
         value += '</div>'
         return value
     
@@ -200,7 +208,7 @@ class ProyectoController(CrudRestController):
 
     #{ Métodos
     @with_trailing_slash
-    @paginate('lista_elementos', items_per_page=7)
+    @paginate('lista_elementos', items_per_page=5)
     @expose('lpm.templates.get_all')
     @expose('json')
     def get_all(self, *args, **kw):
@@ -227,7 +235,7 @@ class ProyectoController(CrudRestController):
                 "modelo": self.model.__name__}
                 
     @without_trailing_slash
-    @paginate('lista_elementos', items_per_page=7)
+    @paginate('lista_elementos', items_per_page=5)
     @expose('lpm.templates.get_all')
     @expose('json')
     def buscar(self, *args, **kw):
@@ -255,14 +263,14 @@ class ProyectoController(CrudRestController):
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
         value = self.edit_filler.get_value(values={'id_proyecto': id_proyecto})
         value['_method'] = 'PUT'
-        return dict(value=value, modelo=self.model.__name__)
+        return dict(value=value, page="Modificar Proyecto")
         
     @without_trailing_slash
     @expose('lpm.templates.new')
     def new(self, *args, **kw):
         """Display a page to show a new record."""
         tmpl_context.widget = self.new_form
-        return dict(value=kw, modelo=self.model.__name__)    
+        return dict(value=kw, page="Nuevo Proyecto")    
     
     @validate(proyecto_add_form, error_handler=new)
     @expose()
@@ -303,4 +311,36 @@ class ProyectoController(CrudRestController):
         proy.descripcion = unicode(kw["descripcion"])
         transaction.commit()
         redirect("../")
+    
+    @without_trailing_slash
+    @paginate('lista_elementos', items_per_page=5)
+    @expose('lpm.templates.get_all')
+    @expose('json')
+    def mis_proyectos(self, *args, **kw):
+        ia = is_anonymous()
+        if ia.is_met(request.environ):
+            flash(ia.message, 'warning')
+            redirect("/")
+        tmpl_context.widget = self.table
+        
+        class mp_filler(ProyectoTableFiller):
+            """
+            TableFiller temporal utilizado para recuperar los proyectos del
+            usuario actual.
+            """
+            def _do_get_provider_count_and_objs(self, **kw):
+                count, proys = super(mp_filler, 
+                                    self)._do_get_provider_count_and_objs(**kw)
+                filtrados = []
+                for p in proys:
+                    if p.obtener_lider().nombre_usuario == \
+                       request.credentials["repoze.what.userid"]:
+                        filtrados.append(p)
+                return len(filtrados), filtrados
+                
+        proyectos = mp_filler().get_value(**kw)
+        retorno = self.retorno_base()
+        retorno["lista_elementos"] = proyectos
+        retorno["page"] =  "Mis Proyectos"
+        return retorno
     #}

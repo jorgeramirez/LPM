@@ -59,7 +59,7 @@ class FaseTableFiller(CustomTableFiller):
         style = 'text-align:left; margin-top:2px;';
         style += 'font-family:sans-serif; font-size:12;'
         if PoseePermiso('modificar fase', 
-                        id_fase=obj.id_fase).is_met(request.environ) or True:
+                        id_fase=obj.id_fase).is_met(request.environ):
             value += '<div>' + \
                         '<a href="'+ str(obj.id_fase) +'/edit" ' + \
                         'style="' + style + '">Modificar</a>' + \
@@ -83,7 +83,7 @@ class FaseTableFiller(CustomTableFiller):
                         '" style="'+ style +'">Ítems</a>' + \
                      '</div><br />'
         if PoseePermiso('eliminar fase',
-                        id_fase=obj.id_fase).is_met(request.environ) or True:
+                        id_fase=obj.id_fase).is_met(request.environ):
             value += '<div><form method="POST" action="' + str(obj.id_fase) + '" class="button-to">'+\
                      '<input type="hidden" name="_method" value="DELETE" />' +\
                      '<input onclick="return confirm(\'Está seguro?\');" value="Eliminar" type="submit" '+\
@@ -219,8 +219,8 @@ class FaseController(CrudRestController):
         tal a que siga teniendo el url desde donde vinimos.
         """
         ret["action"] = self.tmp_from_proyecto_action % proy.id_proyecto
-        ret["titulo"] = self.tmp_from_proyecto_titulo % proy.nombre
-        ret["page"] = "Administrar Proyectos"
+        #ret["titulo"] = self.tmp_from_proyecto_titulo % proy.nombre
+        ret["page"] = self.tmp_from_proyecto_titulo % proy.nombre
     
     @without_trailing_slash
     @paginate('lista_elementos', items_per_page=5)
@@ -249,7 +249,7 @@ class FaseController(CrudRestController):
     def new(self, *args, **kw):
         """Display a page to show a new record."""
         tmpl_context.widget = self.new_form
-        return dict(value=kw, modelo=self.model.__name__)
+        return dict(value=kw, page="Nueva Fase")
     
     @validate(fase_add_form, error_handler=new)
     @expose()
@@ -275,7 +275,7 @@ class FaseController(CrudRestController):
         id_fase = UrlParser.parse_id(request.url, "fases")
         value = self.edit_filler.get_value(values={'id_fase': id_fase})
         value['_method'] = 'PUT'
-        return dict(value=value, modelo=self.model.__name__)
+        return dict(value=value, page="Modificar Fase")
         
     @validate(fase_edit_form, error_handler=edit)
     @expose()

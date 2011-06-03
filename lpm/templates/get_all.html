@@ -1,42 +1,17 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:py="http://genshi.edgewall.org/"
       xmlns:xi="http://www.w3.org/2001/XInclude">
-  <xi:include href="master.html" />
+  <xi:include href="esquema.html" />
 <head>
-<title>${titulo}</title>
-<style>
-#menu_items {
-  padding:0px 12px 0px 2px;
-  list-style-type:None
-  }
-</style>
+<title>$page</title>
 </head>
-<body class="tundra">
-  <div style="height:0px;"> &nbsp; </div>
-  <div id="main_content">
-    <div style="float:left; padding-left:0px;">
-        <ul id="menu_items" py:if="hasattr(tmpl_context, 'menu_items')">
-            <li py:for="lower, item in sorted(tmpl_context.menu_items.iteritems())"><a href="../${lower}s">$item.__name__</a></li>
-        </ul>
-    </div>
-
-    <div style="float:left; width:80%">
-      <h1 style="margin-top:1px;">$titulo</h1>
-       <form action="$action" method="post">
-	        <input type="text" id="filtro" name="filtro"/>
-	        <!-- <input type="image" style="width:30px; heigth: 40px;" value="Buscar" src="../images/search.png"/> -->
-	        <input type="submit" value="Buscar"/>
-       </form>
-      <div style="margin:1ex 0; width:90%">
-        <a href='new/' class="add_link">Nuevo $modelo</a>
-        <span py:if="lista_elementos" style="margin-left:2em" py:content="tmpl_context.paginators.lista_elementos.pager(link='../%ss/'%modelo.lower())"/>
-      </div>
-      <div class="crud_table" style="height:70%; width:95%">
+<body>
+  <div class="cntmid">
+      <h2 style="margin-top:1px; padding-left: 60px;">$page</h2>
+      <span style="padding-left: 95px; font-size: 12;" py:if="lista_elementos" py:content="tmpl_context.paginators.lista_elementos.pager(link=request.url)"/>
+      <div class="crud_table" style="height:65%; width:80%; padding-left: 95px;">
         ${XML(tmpl_context.widget(value=lista_elementos, action='../'+modelo.lower()+'s.json'))}
       </div>
-    </div>
   </div>
-  <div style="clear:both;"/>
-
 </body>
 </html>

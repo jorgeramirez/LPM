@@ -33,8 +33,6 @@ class RootController(BaseController):
     must be wrapped around with :class:`tg.controllers.WSGIAppController`.
 
     """
-    secc = SecureController()
-    #admin = AdminController(model, DBSession, config_type=TGAdminConfig)
     proyectos = ProyectoController(DBSession)
     fases = FaseController(DBSession)
     error = ErrorController()
