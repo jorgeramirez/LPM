@@ -318,6 +318,8 @@ class PropiedadItem(DeclarativeBase):
     """
     __tablename__ = 'tbl_propiedad_item'
     
+
+    
     #{ Columnas
     id_propiedad_item = Column(Integer, autoincrement=True, primary_key=True)
     version = Column(Integer, nullable=False)
@@ -355,12 +357,16 @@ class PropiedadItem(DeclarativeBase):
         relacion.id_anterior = antecesor.id_item
         relacion.id_posterior = self.id_item_actual
         
-        
         relacion.tipo = tipo
+        relacion.set_codigo()
         rel_por_item = RelacionPorItem()
-        rel_por_item.relaciones.append(relacion)
+        rel_por_item.relaciones.append(relacion) 
         DBSession.add(relacion)
-          
+        
+        p_item_ant.relaciones.append(rel_por_item)
+        self.relaciones.append(rel_por_item)
+        DBSession.add(rel_por_item)
+        #no hace falta agregar p_item_ant verdad?  
             
     def _detectar_bucle(self):   
         """ 
@@ -393,8 +399,14 @@ class PropiedadItem(DeclarativeBase):
         
         return None
 
-    def eliminar_relacion(self):#nahuel
+    def eliminar_relacion(self, id_relacion):#nahuel
+        """
+        Elimina una relación existente
+        @param id_relacion: identificador de la relacion
+        
+        """
         pass
+        
     
     @classmethod
     def por_id(cls, id):
@@ -509,6 +521,31 @@ class RelacionPorItem(DeclarativeBase):
    
     #{ Relaciones
     relaciones = relation("Relacion")
+    
+    #Métodos de clase
+    @classmethod
+    def por_id(cls, id):
+        """
+        Método de clase que realiza las búsquedas por identificador.
+        
+        @param id: identificador del elemento a recuperar
+        @type id: C{Integer}
+        @return: el elemento recuperado
+        @rtype: L{PropiedadItem}
+        """
+        return DBSession.query(cls).filter_by(id_relacion_por_item=id).one()
+    
+    @classmethod
+    def por_id_relacion(cls, id):
+        """
+        Método de clase que realiza las búsquedas por identificador.
+        
+        @param id: identificador del elemento a recuperar
+        @type id: C{Integer}
+        @return: el elemento recuperado
+        @rtype: L{PropiedadItem}
+        """
+        return DBSession.query(cls).filter_by(id_relacion=id)
     #}
 
 
@@ -537,10 +574,15 @@ class Relacion(DeclarativeBase):
     @classmethod
     def generar_codigo(cls, rel):
         """
-        Genera el codigo para el elemento pasado como parametro
+        Genera el código para el elemento pasado como parametro
         """
+        if (rel.tipo == tipo_relaciones['a-s']):
+            t = "AS"
+        else:
+            t = "PH"
+            
         return cls.tmpl_codigo.format(id_relacion=rel.id_relacion,
-                                      tipo=rel.tipo,
+                                      tipo=t,
                                       id_anterior=rel.id_anterior,
                                       id_posterior=rel.id_posterior)
 
@@ -588,6 +630,10 @@ class Relacion(DeclarativeBase):
             id_otro = self.id_posterior
         item_otro = Item.por_id(id_otro)
         return item_otro
+    
+    def set_codigo(self):
+        """ Establece el código de la reción """
+        self.codigo = Relacion.generar_codigo(self)
     #}
 
     
