@@ -238,7 +238,7 @@ class ProyectoController(CrudRestController):
     @paginate('lista_elementos', items_per_page=5)
     @expose('lpm.templates.get_all')
     @expose('json')
-    def buscar(self, *args, **kw):
+    def post_buscar(self, *args, **kw):
         pp = PoseePermiso('consultar proyecto')
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
@@ -251,6 +251,14 @@ class ProyectoController(CrudRestController):
         retorno = self.retorno_base()
         retorno["lista_elementos"] = proyectos
         return retorno
+    
+    @with_trailing_slash
+    @expose('lpm.templates.buscar')
+    def buscar(self, *args, **kw):
+        columnas = dict(codigo="texto", nombre="texto", estado="texto",
+                        fecha_creacion="fecha")
+        return dict(page="Buscar Proyectos",
+                    columnas=columnas)
     
     @expose('lpm.templates.edit')
     def edit(self, *args, **kw):
