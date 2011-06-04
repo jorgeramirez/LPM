@@ -9,6 +9,7 @@ from tgext.admin import AdminController
 from repoze.what import predicates
 
 from lpm.lib.base import BaseController
+from lpm.lib.mail import Gmail
 from lpm.model import DBSession, metadata
 from lpm import model
 from lpm.controllers.secure import SecureController
@@ -85,7 +86,24 @@ class RootController(BaseController):
             flash(_('Wrong credentials'), 'warning')
         return dict(page='login', login_counter=str(login_counter),
                     came_from=came_from)
-
+        
+    @expose('lpm.templates.recuperar_pass')
+    def recuperar_pass(self):
+        """Recupera el pass enviado por mail uno nuevo."""
+        return dict(page='recuperar pass')
+    
+    @expose()
+    def enviar_pass(self, mail):
+        """Recupera el pass enviado por mail uno nuevo."""
+        smtp_gmail = Gmail()
+        #cambiar esto
+        mail = u"nahuel.11990@gmail.com"
+        text = u"Tu nueva contraseña es : 234234234342asfsaf3r"
+        smtp_gmail.enviar_mail(mail, text)
+        flash(_('Nueva contraseña enviada a %s') % mail)
+        redirect('/login')
+        return dict(page='recuperar pass')
+    
     @expose()
     def post_login(self, came_from='/'):
         """
