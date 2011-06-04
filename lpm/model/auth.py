@@ -74,9 +74,9 @@ class Rol(DeclarativeBase):
     tipo = Column(Unicode(50), nullable=False)
 
     #Para relacionar un rol con un recurso específico
-    id_proyecto = Column(Integer)
-    id_fase = Column(Integer)
-    id_tipo_item = Column(Integer)
+    id_proyecto = Column(Integer, default=0)
+    id_fase = Column(Integer, default=0)
+    id_tipo_item = Column(Integer, default=0)
 
     #{ variables
     #template para el codigo (usar metodo format)
@@ -108,7 +108,7 @@ class Rol(DeclarativeBase):
         @return: True en caso de ser un rol de sistema, sino False
         @rtype: C{bool}
         """
-        return self.tipo == u"sistema"
+        return (self.id_proyecto + self.id_fase + self.id_tipo_item) == 0
     
     @classmethod
     def obtener_rol_plantilla(cls, **kw):

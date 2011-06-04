@@ -26,7 +26,7 @@ from sprox.fillerbase import TableFiller, EditFormFiller
 from sprox.fillerbase import EditFormFiller
 from sprox.formbase import AddRecordForm, EditableForm
 
-from repoze.what.predicates import not_anonymous, is_anonymous
+from repoze.what.predicates import not_anonymous, is_anonymous, All
 
 import pylons
 from pylons import tmpl_context
@@ -69,43 +69,33 @@ class ProyectoTableFiller(CustomTableFiller):
         value = '<div>'
         style = 'text-align:left; margin-top:2px;';
         style += 'font-family:sans-serif; font-size:12;'
-        ok_administrar = PoseePermiso('administrar proyecto',
-                         id_proyecto=obj.id_proyecto).is_met(request.environ)
+
         if PoseePermiso('modificar proyecto', 
-                        id_proyecto=obj.id_proyecto).is_met(request.environ) or \
-           ok_administrar:
+                        id_proyecto=obj.id_proyecto).is_met(request.environ):
             value += '<div>' + \
                         '<a href="'+ str(obj.id_proyecto) +'/edit" ' + \
                         'style="' + style + '">Modificar</a>' + \
                      '</div><br />'
         if PoseePermiso('eliminar proyecto',
-                        id_proyecto=obj.id_proyecto).is_met(request.environ) or \
-           ok_administrar:
+                        id_proyecto=obj.id_proyecto).is_met(request.environ):
             value += '<div><form method="POST" action="' + str(obj.id_proyecto) + '" class="button-to">'+\
                      '<input type="hidden" name="_method" value="DELETE" />' +\
                      '<input onclick="return confirm(\'Está seguro?\');" value="Delete" type="submit" '+\
                      'style="background-color: transparent; float:left; border:0; color: #286571;'+\
                      'display: inline; margin: 0; padding: 0;' + style + '"/>'+\
                      '</form></div><br />'
-        if AlgunPermiso(id_proyecto=obj.id_proyecto, 
-                        patron="fase").is_met(request.environ) or \
-           ok_administrar:            
-            value += '<div>' + \
-                        '<a href="' + str(obj.id_proyecto) + '/fases/' +\
-                        '" style="' + style + '">Fases</a>' + \
-                     '</div><br />'
-        if obj.estado == "No Iniciado" and ( \
-           PoseePermiso('iniciar proyecto', 
-                        id_proyecto=obj.id_proyecto).is_met(request.environ) or \
-           ok_administrar):
-            value += '<div>' + \
-                        '<a href="' + str(obj.id_proyecto) + '/iniciar/' +\
-                            '" style="' + style + '">Iniciar</a>' + \
-                     '</div><br />'
+
+        if obj.estado == "No Iniciado":
+            if PoseePermiso('iniciar proyecto', 
+                        id_proyecto=obj.id_proyecto).is_met(request.environ):
+                value += '<div>' + \
+                            '<a href="' + str(obj.id_proyecto) + '/iniciar/' +\
+                                '" style="' + style + '">Iniciar</a>' + \
+                         '</div><br />'
         value += '</div>'
         return value
     
-    def _do_get_provider_count_and_objs(self, **kw):
+    '''def _do_get_provider_count_and_objs(self, **kw):
         """
         Sobreescribimos este método para poder listar
         solamente los proyectos para los cuales tenemos
@@ -134,7 +124,7 @@ class ProyectoTableFiller(CustomTableFiller):
                 c += 1
             if c == len(filtrados):
                 break
-        return len(filtrados), filtrados
+        return len(filtrados), filtrados'''
 
 proyecto_table_filler = ProyectoTableFiller(DBSession)
 
@@ -163,12 +153,14 @@ class LiderField(CustomPropertySingleSelectField):
 class ProyectoAddForm(AddRecordForm):
     __model__ = Proyecto
     __omit_fields__ = ['id_proyecto', 'fecha_creacion', 'complejidad_total',
-                       'estado', 'fases', 'tipos_de_item', 'codigo']
-    __field_order__ = ['nombre', 'descripcion', 'lider', 
+                       'estado', 'fases', 'tipos_de_item', 'codigo',
                        'numero_fases']
-    lider = LiderField('lider', label_text="Lider de Proyecto", accion="new")
+    __field_order__ = ['nombre', 'descripcion']
 
-                                           
+    if PoseePermiso('asignar rol').is_met(request.environ):
+        lider = LiderField('lider', label_text="Lider de Proyecto", accion="new")
+        __field_order__.append('lider')
+
 proyecto_add_form = ProyectoAddForm(DBSession)
 
 
@@ -177,7 +169,10 @@ class ProyectoEditForm(EditableForm):
     __hide_fields__ = ['id_proyecto', 'fecha_creacion', 'complejidad_total',
                        'estado', 'numero_fases', 'codigo', 'fases', 
                        'tipos_de_item']
-    lider = LiderField('lider', label_text="Lider de Proyecto", accion="edit")
+    if All(PoseePermiso('asignar rol'), 
+           PoseePermiso('eliminar rol')).is_met(request.environ):
+        lider = LiderField('lider', label_text="Lider de Proyecto", 
+                           accion="edit")
 
 proyecto_edit_form = ProyectoEditForm(DBSession)        
 
@@ -291,7 +286,7 @@ class ProyectoController(CrudRestController):
         proy = Proyecto(**kw)
         lider = Usuario.por_id(id_proy_lider)
         rol_template = Rol.obtener_rol_plantilla(nombre_rol=u"Lider de Proyecto")
-        rol_nuevo = Rol()
+        rol_nuevo = Rol(id_fase=0, id_tipo_item=0)
         rol_nuevo.nombre_rol = rol_template.nombre_rol
         rol_nuevo.descripcion = rol_template.descripcion
         rol_nuevo.tipo = u"proyecto"

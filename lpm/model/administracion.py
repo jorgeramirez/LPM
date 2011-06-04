@@ -218,6 +218,7 @@ class Proyecto(DeclarativeBase):
         se le pasa un  diccionario con los atributos para la nueva fase"""
         if (self.estado == u"No Iniciado"):
             print "Creando fase..."
+            self.numero_fases += 1
             fase = Fase(**kw)
             self.fases.append(fase)            
             DBSession.add(fase)

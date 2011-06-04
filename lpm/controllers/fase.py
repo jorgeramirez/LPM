@@ -52,7 +52,7 @@ fase_table = FaseTable(DBSession)
 
 class FaseTableFiller(CustomTableFiller):
     __model__ = Fase
-
+    
     def __actions__(self, obj):
         """Links de acciones para un registro dado"""
         value = '<div>'
@@ -64,24 +64,6 @@ class FaseTableFiller(CustomTableFiller):
                         '<a href="'+ str(obj.id_fase) +'/edit" ' + \
                         'style="' + style + '">Modificar</a>' + \
                      '</div><br />'
-        if AlgunPermiso(id_fase=obj.id_fase, 
-                        patron="lb").is_met(request.environ):
-            value += '<div>' + \
-                        '<a href="'+ str(obj.id_fase) + "/lbs/"\
-                        '" style="' + style + '">LBs</a>' + \
-                     '</div><br />'
-        if AlgunPermiso(id_fase=obj.id_fase, 
-                        patron="tipo item").is_met(request.environ):
-            value += '<div>' + \
-                        '<a href="'+ str(obj.id_fase) + "/tipo_items/"\
-                        '" style="' + style + '">Tipos de Ítems</a>' + \
-                     '</div><br />'
-        if AlgunPermiso(id_fase=obj.id_fase, 
-                        patron="item").is_met(request.environ):
-            value += '<div>' + \
-                        '<a href="'+ str(obj.id_fase) + "/items/"\
-                        '" style="'+ style +'">Ítems</a>' + \
-                     '</div><br />'
         if PoseePermiso('eliminar fase',
                         id_fase=obj.id_fase).is_met(request.environ):
             value += '<div><form method="POST" action="' + str(obj.id_fase) + '" class="button-to">'+\
@@ -90,6 +72,11 @@ class FaseTableFiller(CustomTableFiller):
                      'style="background-color: transparent; float:left; border:0; color: #286571; display: inline;'+\
                      'margin: 0; padding: 0;' + style + '"/>'+\
                      '</form></div><br />'
+        if not_anonymous().is_met(request.environ):
+            value += '<div>' + \
+                        '<a href="/fases/'+ str(obj.id_fase) +'" ' + \
+                        'style="' + style + '">Ver</a>' + \
+                     '</div><br />'
         value += '</div>'
         return value
 
@@ -114,15 +101,9 @@ class PosicionField(CustomPropertySingleSelectField):
                 pos.pop(fase.posicion - 1)
                 options.extend(pos)
         elif self.accion == "new":
-            options.append((None, "----------"))
-            pos_usadas, pos_disp = [], []
-            for fase in proy.fases:
-                pos_usadas.append(fase.posicion)
-            for i in xrange(1, proy.numero_fases + 1):
-                if i not in pos_usadas:
-                    pos_disp.append(i)
-            for pos in pos_disp:
-                options.append((pos, str(pos)))
+            np = proy.numero_fases + 1
+            options.append((np, str(np)))
+            options.extend(range(1, np))
         d['options'] = options
         return d
 
