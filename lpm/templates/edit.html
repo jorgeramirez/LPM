@@ -2,20 +2,14 @@
       xmlns:py="http://genshi.edgewall.org/"
       xmlns:xi="http://www.w3.org/2001/XInclude">
 
-<xi:include href="master.html" />
-<title>${tmpl_context.title} - Modificar ${modelo}</title>
+<xi:include href="esquema.html" />
 <head>
-<style>
-#menu_items {
-  padding:0px 12px 0px 2px;
-  list-style-type:None
-  }
-</style>
+<title>$page</title>
 </head>
 <body class="tundra">
   <div style="height:0px;"> &nbsp; </div>
-  <div style="float:left;" class="crud_edit">
-    <h2 style="margin-top:1px;">Modificar $modelo</h2>
+  <div style="float:left; padding-left: 95px;" class="crud_edit">
+    <h2 style="margin-top:1px; padding-left: 60px;">$page</h2>
      ${XML(tmpl_context.widget(value=value, action='./'))}
   </div>
   <div style="height:0px; clear:both;"> &nbsp; </div>

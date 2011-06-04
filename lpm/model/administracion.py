@@ -274,11 +274,11 @@ class Proyecto(DeclarativeBase):
         DBSession.delete(self)
         
     def definir_tipo_item(self, id_papa, dict, id_importado=None, mezclar=False):#todavía no probé
-        """ id_papa dice de quien hereda la estructura
-            dict diccionario que contiene los datos para el nuevo tipo
-            importado si se especifica es id del tipo de item proveniente de
+        """ @param id_papa : dice de quien hereda la estructura
+            @param dict diccionario que contiene los datos para el nuevo tipo
+            @param importado si se especifica es id del tipo de item proveniente de
             otro proyecto.
-            mezclar cuando se repite un nombre en los atributos del tipo de item
+            @param mezclar cuando se repite un nombre en los atributos del tipo de item
             si es True entonces se coloca "import." como prefijo al nombre del
             atributo importado, si es False el atributo en el tipo importado no se
             agrega (sólo queda el del padre) """

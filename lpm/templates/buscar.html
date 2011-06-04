@@ -1,0 +1,116 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+  <xi:include href="esquema.html" />
+<head>
+    <style>
+        #templates { 
+            display: none;
+        }
+    </style>
+    <title>$page</title>
+
+<!--    <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+-->
+    <link href="${tg.url('/css/jquery-ui.css')}" rel="stylesheet" type="text/css"/>
+    <script src="${tg.url('/javascript/jquery-1.5.1.min.js')}"></script>
+    <script src="${tg.url('/javascript/jquery-ui-1.8.13.custom.min.js')}"></script>
+
+    <script type="text/javascript">    
+        $(document).ready(function () {
+            $('#form :button[name=add-filter]').live('click', function () {
+                count = $('#form .filters').data('count');
+                $('#form .filters').data('count', count + 1);
+                
+                $('#templates .filter.template').children().clone().appendTo('#form .filters')
+                    .data('count', count)
+                    .find('[name]').trigger('adjust-name');
+            });
+            
+            $('#form :button[name^=remove-filter]').live('click', function () {
+                $(this).parent('.filter').remove();
+            });
+            
+            $('#form select[name^=filter-type]').live('change', function () {
+                template = $(this).find(':selected').attr('data-filter-template-name');
+                if (template) {
+                    destination = $(this).next('span').children().remove().end();
+                    
+                    if(template == "fecha"){
+                        $('#templates .' + template + '.template').children().clone().appendTo(destination)
+                            .find('[name]').andSelf().trigger('adjust-name')
+                            .datepicker();
+                            
+                    }else{
+                        $('#templates .' + template + '.template').children().clone().appendTo(destination)
+                            .find('[name]').andSelf().trigger('adjust-name');
+                    }
+                }
+            });
+            
+            $('#form [name]').live('adjust-name', function (event) {
+                count = $(this).parents('.filter').data('count');
+                $(this).attr('name', $(this).attr('name') + '-' + count);
+            });
+          
+            $('#templates .form.template').children().clone().appendTo('#form');
+            
+            $('#form .filters').data('count', 0);
+        });
+    </script>
+    
+</head> 
+<body>
+    <h2 style="margin-top:1px; padding-left: 60px;">$page</h2>
+    <div id="templates">
+        <div class="form template">
+            <div class="filters">
+            </div>
+            <div>
+                <input style="margin-left:40px;" type="button" name="add-filter" value="Add filter" />
+            </div>
+            <input style="margin-top:10px; margin-left: 250px;" type="submit" value="Buscar"/>    
+        </div>
+        
+        <div class="filter template">
+            <div style="margin-left:40px;" class="filter">
+                <input type="button" name="remove-filter" value="X" />
+                <select name="filter-type">
+                    <option value="" selected="selected">--- Seleccionar un filtro ---</option>
+                    <py:for each="col in columnas">
+                        <option value="$col" data-filter-template-name="${columnas[col]}">${col}</option>
+                    </py:for>
+                    <!--
+                    <option value="name" data-filter-template-name="name">Name</option>
+                    <option value="gender" data-filter-template-name="gender">Gender</option>
+                    -->
+                </select>
+                <span>
+                </span>
+            </div>
+        </div>
+        
+        <div class="name template">
+            <input type="text" name="name" />
+        </div>
+        
+        <div class="gender template">
+            <label><input type="radio" name="gender" /> Male</label>
+            <label><input type="radio" name="gender" /> Female</label>
+        </div>
+        
+        <div class="texto template">
+            <input type="text" name="texto" />
+        </div>
+        
+        <div class="fecha template">
+            <input type="text" id="datepicker" name="fecha" />
+        </div>
+    </div>
+    
+    <form id="form" method="post" action="../post_buscar">
+    </form>
+</body>
+</html>
