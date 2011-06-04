@@ -91,16 +91,16 @@ class RootController(BaseController):
         return dict(page='recuperar pass')
     
     @expose()
-    def enviar_pass(self, mail):
+    def enviar_pass(self, **kw):
         """Recupera el pass enviado por mail uno nuevo."""
         smtp_gmail = Gmail()
         #cambiar esto
         mail = u"nahuel.11990@gmail.com"
         text = u"Tu nueva contraseña es : 234234234342asfsaf3r"
         smtp_gmail.enviar_mail(mail, text)
-        flash(_('Nueva contraseña enviada a %s') % mail)
-        redirect('/login')
-        return dict(page='recuperar pass')
+        smtp_gmail.quit()
+        flash(_(u'Nueva contraseña enviada a %s') % mail)
+        redirect(url('/login'))
     
     @expose()
     def post_login(self, came_from='/'):

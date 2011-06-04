@@ -4,7 +4,7 @@
     xmlns:py="http://genshi.edgewall.org/"
     xmlns:xi="http://www.w3.org/2001/XInclude">
 
-<xi:include href="master.html" />
+<xi:include href="esquema.html" />
 
 <head>
 <meta content="text/html; charset=UTF-8" http-equiv="content-type" py:replace="''"/>
@@ -13,9 +13,9 @@
 
 <body>
 <div id="loginform">
-<form action="${tg.url('enviar_pass')}" method="post" accept-charset="UTF-8" class="loginfields">
-    <h2><span>Login</span></h2>
-    <label for="loginusername">email:</label><input type="text" id="loginusername" name="email" class="text"></input><br/>
+<form action="${tg.url('/enviar_pass')}" method="post" accept-charset="UTF-8" class="loginfields">
+    <h2><span>Ingrese su nombre de usuario</span></h2>
+    <label for="loginusername">username:</label><input type="text" id="loginusername" name="email" class="text"></input><br/>
     <input type="submit" id="submit" value="Enviar" />
     <br/>   
 </form>
