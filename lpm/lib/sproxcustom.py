@@ -14,6 +14,9 @@ relacion con el módulo sprox
 from sprox.fillerbase import TableFiller
 from sprox.widgets import PropertySingleSelectField
 
+from sqlalchemy import and_
+from sqlalchemy.sql import func
+
 from lpm.model import DBSession
 
 __all__ = ['CustomTableFiller']
@@ -23,36 +26,37 @@ class CustomTableFiller(TableFiller):
     Clase base utilizada para rellenar una tabla.
     Añade la capacidad de filtrado de elementos.
     """
-    __filtro = None
+    __filtros = {}
 
-    def get_filtro(self):
-        return self.__filtro
+    def get_filtros(self):
+        return self.__filtros
         
-    def set_filtro(self, filtro):
-        self.__filtro = unicode(filtro)
+    def set_filtros(self, filtros):
+        self.__filtros = filtros
 
-    filtro = property(get_filtro, set_filtro)
-
+    filtros = property(get_filtros, set_filtros)
+    
     def _do_get_provider_count_and_objs(self, **kw): #sobreescribimos el método
         """
         Este método define como la consulta a la base de
         datos se debe realizar.
         """
-        ## TODO que funcione para distintos
-        ## tipos de datos a la hora de buscar
         filtrados = []
-        base_query = DBSession.query(self.__entity__)
-        if not self.__filtro:
-            filtrados = base_query.all()
-        else:
-            mapper = self.__entity__.__mapper__
-            for key in mapper.columns.keys():
-                column = mapper.columns.get(key)
-                if column.type.__visit_name__ != 'unicode':
-                    continue
-                rec = base_query.filter(column.ilike("%" + self.filtro + "%"))
-                filtrados.extend(rec)
-                filtrados = self.__remover_duplicados(filtrados)
+        query = DBSession.query(self.__entity__)
+        if not self.filtros:
+            return query.count, query.all()
+        mapper = self.__entity__.__mapper__
+        for fil_col, fil_val in self.filtros.items():
+            col = mapper.columns.get(fil_col)
+            col_type = col.type.__visit_name__
+            if col_type == 'integer':
+                res = query.filter(col == int(fil_val)).all()
+            elif col_type == 'unicode':
+                res = query.filter(col.ilike("%" + fil_val + "%")).all()
+            elif col_type == 'datetime':
+                res = query.filter(col == fil_val).all() #FIXME
+            filtrados.extend(res)
+            filtrados = self.__remover_duplicados(filtrados)
         return len(filtrados), filtrados
     
     def __remover_duplicados(self, l):
