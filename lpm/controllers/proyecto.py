@@ -249,7 +249,7 @@ class ProyectoController(CrudRestController):
             filtros[kw[col_tmp.format(i=i)]] = kw[val_key]
         buscar_table_filler = ProyectoTableFiller(DBSession)
         buscar_table_filler.filtros = filtros
-        proyectos = buscar_table_filler.get_value(values=filtros)
+        proyectos = buscar_table_filler.get_value()
         tmpl_context.widget = self.table
         retorno = self.retorno_base()
         retorno["lista_elementos"] = proyectos
