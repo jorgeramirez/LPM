@@ -10,12 +10,14 @@ from repoze.what import predicates
 
 from lpm.lib.base import BaseController
 from lpm.lib.mail import Gmail
-from lpm.model import DBSession, metadata
+from lpm.model import DBSession, metadata, Usuario
 from lpm import model
 from lpm.controllers.secure import SecureController
 from lpm.controllers.error import ErrorController
 from lpm.controllers.proyecto import ProyectoController
 from lpm.controllers.fase import FaseController
+
+import hashlib , random
 
 __all__ = ['RootController']
 
@@ -93,13 +95,19 @@ class RootController(BaseController):
     @expose()
     def enviar_pass(self, **kw):
         """Recupera el pass enviado por mail uno nuevo."""
-        smtp_gmail = Gmail()
-        #cambiar esto
-        mail = u"nahuel.11990@gmail.com"
-        text = u"Tu nueva contraseña es : 234234234342asfsaf3r"
-        smtp_gmail.enviar_mail(mail, text)
-        smtp_gmail.quit()
-        flash(_(u'Nueva contraseña enviada a %s') % mail)
+        usernamegiven = kw["loginusernamegiven"]
+        user = Usuario.by_user_name(usernamegiven)
+        if user != None:
+            smtp_gmail = Gmail()
+            mail = user.email # DEBUG: u"carlosbellino@gmail.com" 
+            hash = hashlib.new('ripemd160')
+            hash.update(user.email + unicode(random.random()))
+            text = _(u"Tu nueva contraseña es : %s") % hash.hexdigest()
+            smtp_gmail.enviar_mail(mail, text)
+            smtp_gmail.quit()
+            flash(_(u'Nueva contraseña enviada a %s') % mail)
+        else:
+            flash(_(u'No existe Usuario'))
         redirect(url('/login'))
     
     @expose()
