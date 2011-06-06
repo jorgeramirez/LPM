@@ -83,7 +83,7 @@ class RootController(BaseController):
         """Illustrate how a page exclusive for the editor works."""
         return dict(page='editor stuff')
 
-    @expose('lpm.templates.login')
+    @expose('lpm.templates.login.login')
     def login(self, came_from=url('/')):
         """Start the user login."""
         login_counter = request.environ['repoze.who.logins']
@@ -92,7 +92,7 @@ class RootController(BaseController):
         return dict(page='login', login_counter=str(login_counter),
                     came_from=came_from)
         
-    @expose('lpm.templates.recuperar_pass')
+    @expose('lpm.templates.login.recuperar_pass')
     def recuperar_pass(self):
         """Recupera el pass enviado por mail uno nuevo."""
         return dict(page='recuperar pass')
