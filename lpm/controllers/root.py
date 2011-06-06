@@ -109,9 +109,10 @@ class RootController(BaseController):
             smtp_gmail.enviar_mail(mail, text)
             smtp_gmail.quit()
             flash(_(u'Nueva contraseña enviada a %s') % mail)
+            redirect(url('/login'))
         else:
             flash(_(u'No existe Usuario'))
-        redirect(url('/login'))
+            redirect(url('/recuperar_pass'))
     
     @expose()
     def post_login(self, came_from='/'):
