@@ -1,0 +1,39 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<xi:include href="esquema.html" />
+<head>
+<title>$page</title>
+</head>
+<body class="tundra">
+  <div style="height:0px;"> &nbsp; </div>
+  <div style="float:left; padding-left: 95px;" class="crud_edit">
+    <h2 style="margin-top:1px; padding-left: 60px;">$page</h2>
+
+    <table cellspacing="0" cellpadding="2" border="0">
+	<tbody>
+		<tr>
+			<td>
+				${XML(tmpl_context.widget(value=value))}
+				
+			</td>
+		</tr>
+		<tr>
+			<div style="clear:both;"></div>
+		</tr>
+		<tr>
+			<td>
+
+				<input id="historial" class="button" type="button" value="Historial"/>
+
+				<input id="proyectos" class="button" type="button" value="Proyectos"/>
+			</td>
+		</tr>
+  </tbody>
+  </table>			
+  </div>
+  <div style="height:0px; clear:both;"> &nbsp; </div>
+
+</body>
+</html>

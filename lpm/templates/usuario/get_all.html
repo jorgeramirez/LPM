@@ -1,0 +1,17 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+  <xi:include href="esquema.html" />
+<head>
+<title>$page</title>
+</head>
+<body>
+  <div class="cntmid">
+      <h2 style="margin-top:1px; padding-left: 60px;">$page</h2>
+      <span style="padding-left: 95px; font-size: 12;" py:if="lista_elementos" py:content="tmpl_context.paginators.lista_elementos.pager(link=request.url)"/>
+      <div class="crud_table" style="height:65%; width:80%; padding-left: 95px;">
+        ${tmpl_context.widget(value=lista_elementos)}
+      </div>
+  </div>
+</body>
+</html>

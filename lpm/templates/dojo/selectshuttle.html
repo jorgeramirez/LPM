@@ -1,0 +1,40 @@
+<div xmlns="http://www.w3.org/1999/xhtml" xmlns:py="http://genshi.edgewall.org/" dojoType="$dojoType" id="${name}_SelectShuttle">
+    <table cellspacing="0" cellpadding="5" border="0">
+    <tbody>
+    <tr>
+        <td>
+            <div style="float:left;">
+                Disponibles<br/>
+                <select class="shuttle" id="${name}_src" multiple="true" name="" size="$size">
+                        <option py:for="value, description, attrs in options"
+                                py:content="description"
+                                value="${value}"/>
+                </select>
+            </div>
+        </td>
+        <td>
+            <div style="float:left; padding: 25px 5px 5px 0px;" id="${name}_Buttons">
+                <button class="shuttle" id="${name}_AllRightButton">&gt;&gt;</button><br/>
+                <button class="shuttle" id="${name}_RightButton">&gt;</button><br/>
+                <button class="shuttle" id="${name}_LeftButton">&lt;</button><br/>
+                <button class="shuttle" id="${name}_AllLeftButton">&lt;&lt;</button>
+            </div>
+        </td>
+        <td>
+            <div style="float:left">
+                    Seleccionados<br/>
+
+                    <select class="shuttle" id="${name}" multiple="true" name="${name}" size="$size">
+                        <option py:for="value, description, attrs in selected_options"
+                                py:content="description"
+                                value="${value}"/>
+                    </select>
+            </div>
+        </td>
+    </tr>
+    </tbody>
+    </table>
+    <script type="text/javascript">
+    //create an object of this type here
+    </script>
+</div>
