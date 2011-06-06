@@ -14,6 +14,10 @@ relacion con el módulo sprox
 from sprox.fillerbase import TableFiller
 from sprox.widgets import PropertySingleSelectField
 
+from tw.dojo.selectshuttle import DojoSelectShuttleField
+from sprox.widgets import PropertyMixin
+from sprox.widgetselector import SAWidgetSelector
+
 from sqlalchemy import and_
 from sqlalchemy.sql import func
 
@@ -85,3 +89,14 @@ class CustomPropertySingleSelectField(PropertySingleSelectField):
         """Metodo utilizado para cargar el combobox"""
         #debe sobreescribirse.
         pass
+
+class MultipleSelectDojo(DojoSelectShuttleField, PropertyMixin):
+    template = 'lpm.templates.dojo.selectshuttle'
+    def update_params(self, d):
+        self._my_update_params(d)
+        super(MultipleSelectDojo, self).update_params(d)
+
+class WidgetSelectorDojo(SAWidgetSelector):
+    default_multiple_select_field_widget_type = MultipleSelectDojo
+
+

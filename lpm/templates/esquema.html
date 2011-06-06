@@ -51,7 +51,7 @@
                             <li py:if="request.identity" class="top"><a href="#" class="top_link">
                             <span class="down">Administración</span></a>
                                 <ul class="sub">
-                                    <li><a href="#" class="fly">Usuario</a>
+                                    <li><a href="${tg.url('/usuarios')}" class="fly">Usuario</a>
                                             <ul>
                                                 <li><a href="${tg.url('/usuarios/buscar')}">Búsqueda</a></li>
                                                 <li><a href="${tg.url('/usuarios/perfil')}">Perfil</a></li>
@@ -60,7 +60,7 @@
                                                 </li>
                                             </ul>
                                     </li>
-                                    <li class="mid"><a href="#" class="fly">Rol</a>
+                                    <li class="mid"><a href="${tg.url('/roles')}" class="fly">Rol</a>
                                             <ul>
                                                 <li><a href="${tg.url('/roles/buscar')}">Búsqueda</a></li>
                                                 <li><a href="${tg.url('/roles/mis_roles')}">Mis Roles</a></li>
@@ -70,7 +70,7 @@
                                                 
                                             </ul>
                                     </li>
-                                    <li><a href="#" class="fly">Proyecto</a>
+                                    <li><a href="${tg.url('/proyectos')}" class="fly">Proyecto</a>
                                             <ul>
                                                 <li><a href="${tg.url('/proyectos/buscar')}">Búsqueda</a></li>
                                                 <li><a href="${tg.url('/proyectos/mis_proyectos')}">Mis Proyectos</a></li>
@@ -80,14 +80,14 @@
                                                 <li><a href="${tg.url('/proyectos/')}">Participando</a></li>
                                             </ul>
                                     </li>
-                                   <li><a href="#" class="fly">Fase</a>
+                                   <li><a href="${tg.url('/fases')}" class="fly">Fase</a>
                                             <ul>
                                                 <li><a href="${tg.url('/fases/buscar')}">Búsqueda</a></li>
                                                 <li><a href="${tg.url('/fases/')}">Participando</a></li>
                                                 <!-- <li><a href="#nogo5">Nueva(?)</a></li> -->
                                             </ul>
                                     </li>
-                                    <li><a href="#" class="fly">Tipos de Ítem</a>
+                                    <li><a href="${tg.url('/tipo_items')}" class="fly">Tipos de Ítem</a>
                                             <ul>
                                                 <li><a href="${tg.url('/tipo_items/buscar')}">Búsqueda</a></li>
                                                 <!-- <li><a href="#nogo5">Nuevo(?)</a></li> -->

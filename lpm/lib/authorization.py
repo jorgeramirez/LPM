@@ -192,7 +192,7 @@ class PoseePermiso(Predicate):
         self.id_proyecto = 0
         self.id_fase = 0
         self.id_tipo_item = 0
-        for key in ["id_proyecto", "id_fase", "id_tipo_item"]:
+        for key in ["id_proyecto", "id_fase", "id_tipo_item", "id_usuario"]:
             if kw.has_key(key):
                 setattr(self, key, kw[key])
                 del kw[key]

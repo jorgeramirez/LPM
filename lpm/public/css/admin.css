@@ -56,7 +56,4 @@ a.edit_link{
 .crud_edit label, .crud_add label{
     font-size: 12px;
 }
-.crud_edit input, .crud_add input,
-.crud_edit select, .crud_add select{
-    width: 15em;
-}
+
