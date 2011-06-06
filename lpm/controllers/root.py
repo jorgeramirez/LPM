@@ -16,6 +16,8 @@ from lpm.controllers.secure import SecureController
 from lpm.controllers.error import ErrorController
 from lpm.controllers.proyecto import ProyectoController
 from lpm.controllers.fase import FaseController
+from lpm.controllers.usuario import UsuarioController
+from lpm.controllers.rol import RolController
 
 __all__ = ['RootController']
 
@@ -34,7 +36,10 @@ class RootController(BaseController):
     must be wrapped around with :class:`tg.controllers.WSGIAppController`.
 
     """
+    usuarios = UsuarioController(DBSession)
+    roles = RolController(DBSession)
     proyectos = ProyectoController(DBSession)
+    
     fases = FaseController(DBSession)
     error = ErrorController()
 
