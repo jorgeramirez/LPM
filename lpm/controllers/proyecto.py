@@ -238,9 +238,17 @@ class ProyectoController(CrudRestController):
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect("/proyectos")
+        filtros = {}
+        col_tmp = "filter-type-{i}"
+        val_tmp_txt = "texto-{i}"
+        val_tmp_date = "fecha-{i}"
+        for i in xrange(0, len(kw) / 2):
+            val_key = val_tmp_txt.format(i=i)
+            if not kw.has_key(val_key):
+                val_key = val_tmp_date.format(i=i)
+            filtros[kw[col_tmp.format(i=i)]] = kw[val_key]
         buscar_table_filler = ProyectoTableFiller(DBSession)
-        if kw.has_key('filtro'):
-            buscar_table_filler.filtro = kw['filtro']
+        buscar_table_filler.filtros = filtros
         proyectos = buscar_table_filler.get_value()
         tmpl_context.widget = self.table
         retorno = self.retorno_base()
