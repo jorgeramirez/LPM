@@ -104,16 +104,20 @@ class RootController(BaseController):
         user = Usuario.by_user_name(usernamegiven)
         if user != None:
             smtp_gmail = Gmail()
-            mail = user.email # DEBUG: u"carlosbellino@gmail.com" 
+            mail = user.email #DEBUG: u"carlosbellino@gmail.com"
             hash = hashlib.new('ripemd160')
             hash.update(user.email + unicode(random.random()))
-            text = _(u"Tu nueva contraseña es : %s") % hash.hexdigest()
+            new_pass = hash.hexdigest()
+            user._set_password(new_pass)
+            DBSession.add(user)
+            text = _(u"Tu nueva contraseña es : %s") % new_pass
             smtp_gmail.enviar_mail(mail, text)
             smtp_gmail.quit()
             flash(_(u'Nueva contraseña enviada a %s') % mail)
+            redirect(url('/login'))
         else:
             flash(_(u'No existe Usuario'))
-        redirect(url('/login'))
+            redirect(url('/recuperar_pass'))
     
     @expose()
     def post_login(self, came_from='/'):
