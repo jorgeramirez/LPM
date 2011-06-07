@@ -283,6 +283,17 @@ class UsuarioController(CrudRestController):
             redirect("/usuarios")
         '''
         class mis_roles_tf(RolRolTableFiller):
+            def __actions__(self, obj):
+                """Links de acciones para un registro dado"""
+                value = '<div>'
+                clase = 'actions'   
+                if PoseePermiso('modificar rol').is_met(request.environ):
+                    value += '<div>' + \
+                                '<a href="/roles/'+ str(obj.id_rol) +'/edit" ' + \
+                                'class="' + clase + '">Ver</a>' + \
+                             '</div><br /></div>'
+                    return value
+
             def _do_get_provider_count_and_objs(self, **kw):
                 count, filtrados = super(mis_roles_tf, self). \
                                          _do_get_provider_count_and_objs()
