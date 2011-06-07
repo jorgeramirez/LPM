@@ -81,8 +81,8 @@ class Rol(DeclarativeBase):
     #{ variables
     #template para el codigo (usar metodo format)
     tmpl_codigo = "ROL-{id_rol}-{tipo}"
-    __tipos_posibles = [u"sistema", u"proyecto", u"fase", u"tipo_item",
-                        u"plantilla"]
+    __tipos_posibles = [u'Plantilla', u'Sistema', u'Proyecto',
+                        u'Fase', u'Tipo de Ítem']
 
     #{ Relations
 
@@ -150,6 +150,18 @@ class Rol(DeclarativeBase):
                 desasignados.append(r)
 
         return desasignados
+
+    @classmethod
+    def por_id(cls, id):
+        """
+        Método de clase que realiza las búsquedas por identificador.
+        
+        @param id: identificador del elemento a recuperar
+        @type id: C{Integer}
+        @return: el elemento recuperado
+        @rtype: L{Rol}
+        """        
+        return DBSession.query(cls).filter_by(id_rol=id).one()
     #}
 
 

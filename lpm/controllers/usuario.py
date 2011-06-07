@@ -66,7 +66,7 @@ class UsuarioTableFiller(CustomTableFiller):
     __omit_fields__ = ['password', 'telefono', 'nro_documento', 
                        '_password', 'historial_lb', 'roles',
                        'historial_item']
-'''   
+
     def __actions__(self, obj):
         """Links de acciones para un registro dado"""
         value = '<div>'
@@ -76,7 +76,7 @@ class UsuarioTableFiller(CustomTableFiller):
             value += '<div>' + \
                         '<a href="'+ str(obj.id_usuario) +'/edit" ' + \
                         'class="' + clase + '">Modificar</a>' + \
-                     '</ div><br />'
+                     '</div><br />'
         if PoseePermiso('eliminar usuario',
                         id_usuario=obj.id_usuario).is_met(request.environ):
             value += '<div><form method="POST" action="' + str(obj.id_usuario) + '" class="button-to">'+\
@@ -84,14 +84,16 @@ class UsuarioTableFiller(CustomTableFiller):
                      '<input onclick="return confirm(\'Está seguro?\');" value="Delete" type="submit" '+\
                      'style="background-color: transparent; float:left; border:0; color: #286571;'+\
                      'display: inline; margin: 0; padding: 0;" class="' + clase + '"/>'+\
-                     '</ form></ div><br />'
+                     '</form></div><br />'
 #-------------------------------------------------------------- arreglar!
         if PoseePermiso('asignar rol',
                         id_usuario=obj.id_usuario).is_met(request.environ):
             value += '<div>' + \
-                        '<a href="' + str(obj.id_usuario) + '/roles/" ' +\
+                        '<a href="/usuarios/' + str(obj.id_usuario) + '/roles/" ' +\
                         'class="' + clase + '">Roles</a>' + \
-                     '</ div><br />'
+                     '</div><br />'
+        value += '</div>'
+        return value
 
     def _do_get_provider_count_and_objs(self, **kw):
         """
@@ -102,7 +104,6 @@ class UsuarioTableFiller(CustomTableFiller):
                                  _do_get_provider_count_and_objs(**kw)
         if count == 0:
             return count, filtrados
-        pks = []
         nombre_usuario = request.credentials['repoze.what.userid']
         usuario = Usuario.by_user_name(nombre_usuario)
         for r in usuario.roles:
@@ -112,7 +113,7 @@ class UsuarioTableFiller(CustomTableFiller):
 
         #si no tiene permisos necesarios lo unico que puede ver es su usuario
         return 1, [usuario]
-'''
+
     
 usuario_table_filler = UsuarioTableFiller(DBSession)
 

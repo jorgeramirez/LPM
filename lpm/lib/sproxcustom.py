@@ -93,8 +93,9 @@ class CustomPropertySingleSelectField(PropertySingleSelectField):
 class MultipleSelectDojo(DojoSelectShuttleField, PropertyMixin):
     template = 'lpm.templates.dojo.selectshuttle'
     def update_params(self, d):
-        self._my_update_params(d)
+        #en este orden no se pierden los selected_options
         super(MultipleSelectDojo, self).update_params(d)
+        self._my_update_params(d)
 
 class WidgetSelectorDojo(SAWidgetSelector):
     default_multiple_select_field_widget_type = MultipleSelectDojo
