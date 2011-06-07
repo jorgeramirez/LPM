@@ -302,4 +302,8 @@ class RolController(CrudRestController):
 #            redirect("/rols")
         return dict(super(RolController, self).new(*args, **kw), page='Nuevo Rol')
     #}
+    
+    
+
+        
 
