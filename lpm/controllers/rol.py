@@ -253,10 +253,14 @@ class RolController(CrudRestController):
     edit_form = rol_edit_form
     edit_filler = rol_edit_filler
 
+    #para el form de busqueda
+    columnas = dict(codigo="texto", nombre_rol="texto", tipo="combobox")
+    tipo_opciones = [u'Plantilla', u'Sistema', u'Proyecto',
+                        u'Fase', u'Tipo de Ítem']
  
     #{ Métodos
-    #@with_trailing_slash
-    @paginate('lista_elementos', items_per_page=7)
+    @with_trailing_slash
+    @paginate('lista_elementos', items_per_page=5)
     @expose('lpm.templates.rol.get_all')
     @expose('json')
     def get_all(self, *args, **kw):
@@ -270,10 +274,10 @@ class RolController(CrudRestController):
             roles = self.table_filler.get_value(**kw)
         else:
             roles = []
-            
         tmpl_context.widget = self.table
         return dict(lista_elementos=roles, page=self.title, titulo=self.title, 
-                    modelo=self.model.__name__)
+                    modelo=self.model.__name__, columnas=self.columnas,
+                    tipo_opciones=self.tipo_opciones, url_action="/roles/")
 
     @expose('lpm.templates.rol.edit')
     def edit(self, *args, **kw):
@@ -371,5 +375,18 @@ class RolController(CrudRestController):
                     p.roles.append(rol_mod)
         transaction.commit()
         redirect("/roles/")
+
+    @with_trailing_slash
+    @paginate('lista_elementos', items_per_page=5)
+    @expose('lpm.templates.rol.get_all')
+    @expose('json')
+    def post_buscar(self, *args, **kw):
+        tmpl_context.widget = self.table
+        buscar_table_filler = RolTableFiller(DBSession)
+        buscar_table_filler.filtros = kw
+        roles = buscar_table_filler.get_value()
+        return dict(lista_elementos=roles, page=self.title, titulo=self.title, 
+                    modelo=self.model.__name__, columnas=self.columnas,
+                    tipo_opciones=self.tipo_opciones, url_action="/roles/")
     #}
 

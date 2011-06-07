@@ -232,10 +232,13 @@ class UsuarioController(CrudRestController):
     edit_form = usuario_edit_form
     edit_filler = usuario_edit_filler
 
+    #para el form de busqueda
+    columnas = dict(nombre_usuario="texto", nombre="texto", apellido="texto",
+                    nro_documento="texto")
  
     #{ Métodos
-    #@with_trailing_slash
-    @paginate('lista_elementos', items_per_page=7)
+    @with_trailing_slash
+    @paginate('lista_elementos', items_per_page=5)
     @expose('lpm.templates.usuario.get_all')
     @expose('json')
     def get_all(self, *args, **kw):
@@ -251,28 +254,11 @@ class UsuarioController(CrudRestController):
             usuarios = []
             
         tmpl_context.widget = usuario_table
+    
         return dict(lista_elementos=usuarios, page=self.title, titulo=self.title, 
-                    modelo=self.model.__name__)
+                    modelo=self.model.__name__, columnas=self.columnas,
+                    url_action="/usuarios/")
 
-    '''            
-    @without_trailing_slash
-    @paginate('lista_elementos', items_per_page=7)
-    @expose('lpm.templates.get_all')
-    @expose('json')
-    def buscar(self, *args, **kw):
-        pp = PoseePermiso('consultar usuario')
-        if not pp.is_met(request.environ):
-            flash(pp.message % pp.nombre_permiso, 'warning')
-            redirect("/usuarios")
-        buscar_table_filler = UsuarioTableFiller(DBSession)
-        if kw.has_key('filtro'):
-            buscar_table_filler.filtro = kw['filtro']
-        usuarios = buscar_table_filler.get_value()
-        tmpl_context.widget = self.table
-        retorno = self.retorno_base()
-        retorno["lista_elementos"] = usuarios
-        return retorno
-''' 
     @expose('lpm.templates.usuario.edit')
     def edit(self, *args, **kw):
         """Despliega una pagina para modificar usuario"""
@@ -354,7 +340,6 @@ class UsuarioController(CrudRestController):
         DBSession.add(usuario)
         transaction.commit()
         redirect("./")
-    #}
 
     @expose('lpm.templates.usuario.roles')
     def roles(self, *args, **kw):
@@ -370,3 +355,17 @@ class UsuarioController(CrudRestController):
                                                        asignados=False, **kw)
         return dict(asignados=asignados, desasignados=desasignados,
                     page=page)
+
+    @with_trailing_slash
+    @paginate('lista_elementos', items_per_page=5)
+    @expose('lpm.templates.rol.get_all')
+    @expose('json')
+    def post_buscar(self, *args, **kw):
+        tmpl_context.widget = self.table
+        buscar_table_filler = UsuarioTableFiller(DBSession)
+        buscar_table_filler.filtros = kw
+        usuarios = buscar_table_filler.get_value()
+        return dict(lista_elementos=usuarios, page=self.title, titulo=self.title, 
+                    modelo=self.model.__name__, columnas=self.columnas,
+                    url_action="/usuarios/")
+    #}

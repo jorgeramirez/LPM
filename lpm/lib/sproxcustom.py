@@ -36,8 +36,24 @@ class CustomTableFiller(TableFiller):
         return self.__filtros
         
     def set_filtros(self, filtros):
-        self.__filtros = filtros
-
+        """
+        Setea los filtros enviados por el formulario de busqueda. 
+        Los mismos hay que parsearlos al formato apropiado
+        """
+        self.__filtros = {}
+        #contiene el nombre de la columna
+        col_tmp = "filter-type-{i}" 
+        #contiene el valor para esa columna.
+        val_tmp_txt = "texto-{i}"   
+        val_tmp_date = "fecha-{i}"
+        val_tmp_combo = "combobox-{i}"
+        for i in xrange(0, len(filtros) / 2):
+            for tmp in [val_tmp_txt, val_tmp_date, val_tmp_combo]:
+                val_key = tmp.format(i=i)
+                if filtros.has_key(val_key):
+                    self.__filtros[filtros[col_tmp.format(i=i)]] = filtros[val_key]
+                    break        
+        print self.__filtros
     filtros = property(get_filtros, set_filtros)
     
     def _do_get_provider_count_and_objs(self, **kw): #sobreescribimos el método
