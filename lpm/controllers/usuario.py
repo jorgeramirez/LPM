@@ -295,18 +295,8 @@ class UsuarioController(CrudRestController):
                     return value
 
             def _do_get_provider_count_and_objs(self, **kw):
-                count, filtrados = super(mis_roles_tf, self). \
-                                         _do_get_provider_count_and_objs()
-                if not count:
-                    return count, filtrados
                 user = Usuario.por_id(int(kw["id_usuario"]))
-                c = 0
-                while c < len(filtrados):
-                    if filtrados[c] not in user.roles:
-                        filtrados.pop(c)
-                    else:
-                        c += 1
-                return len(filtrados), filtrados
+                return len(user.roles), user.roles
 
         usuarios = self.table_filler.get_value(**kw)
         roles = mis_roles_tf(DBSession).get_value(id_usuario=args[0])
