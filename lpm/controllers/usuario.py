@@ -37,10 +37,6 @@ from formencode.validators import String, Email, NotEmpty
 
 import transaction
 
-'''
-import pylons
-from pylons import tmpl_context
-'''
 from tg import tmpl_context, request
 
 class UsuarioTable(TableBase):
@@ -74,7 +70,7 @@ class UsuarioTableFiller(CustomTableFiller):
         if PoseePermiso('modificar usuario', 
                         id_usuario=obj.id_usuario).is_met(request.environ):
             value += '<div>' + \
-                        '<a href="'+ str(obj.id_usuario) +'/edit" ' + \
+                        '<a href="/usuarios/'+ str(obj.id_usuario) +'/edit" ' + \
                         'class="' + clase + '">Modificar</a>' + \
                      '</div><br />'
         if PoseePermiso('eliminar usuario',
@@ -89,7 +85,7 @@ class UsuarioTableFiller(CustomTableFiller):
         if PoseePermiso('asignar rol',
                         id_usuario=obj.id_usuario).is_met(request.environ):
             value += '<div>' + \
-                        '<a href="/usuarios/' + str(obj.id_usuario) + '/roles/" ' +\
+                        '<a href="/usuarios/roles/' + str(obj.id_usuario) + '" ' +\
                         'class="' + clase + '">Roles</a>' + \
                      '</div><br />'
         value += '</div>'
@@ -285,11 +281,11 @@ class UsuarioController(CrudRestController):
             redirect("/usuarios")
         '''   
         usuarios = self.table_filler.get_value(**kw)
-        tmpl_context.tabla_roles = usuario_table
+        tmpl_context.tabla_usuarios = usuario_table
         user = Usuario.por_id(args[0])
         page = "Usuario {nombre}".format(nombre=user.nombre_usuario)
         return dict(super(UsuarioController, self).edit(*args, **kw), 
-                    page=page, roles=usuarios, id=args[0])
+                    page=page, usuarios=usuarios, id=args[0])
         
     @expose('lpm.templates.usuario.perfil')
     def perfil(self, *args, **kw):
