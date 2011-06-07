@@ -18,6 +18,8 @@ from tg import redirect, request, require, flash, url, validate
 from lpm.model import DBSession, Usuario, Rol
 from lpm.lib.sproxcustom import CustomTableFiller
 from lpm.lib.authorization import PoseePermiso
+from lpm.controllers.rol import (RolTable as RolRolTable,
+                                     RolTableFiller as RolRolTableFiller)
 
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller
@@ -279,13 +281,29 @@ class UsuarioController(CrudRestController):
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect("/usuarios")
-        '''   
+        '''
+        class mis_roles_tf(RolRolTableFiller):
+            def _do_get_provider_count_and_objs(self, **kw):
+                count, filtrados = super(mis_roles_tf, self). \
+                                         _do_get_provider_count_and_objs()
+                if not count:
+                    return count, filtrados
+                user = Usuario.por_id(int(kw["id_usuario"]))
+                c = 0
+                while c < len(filtrados):
+                    if filtrados[c] not in user.roles:
+                        filtrados.pop(c)
+                    else:
+                        c += 1
+                return len(filtrados), filtrados
+
         usuarios = self.table_filler.get_value(**kw)
-        tmpl_context.tabla_usuarios = usuario_table
+        roles = mis_roles_tf(DBSession).get_value(id_usuario=args[0])
+        tmpl_context.tabla_roles = RolRolTable(DBSession)
         user = Usuario.por_id(args[0])
         page = "Usuario {nombre}".format(nombre=user.nombre_usuario)
         return dict(super(UsuarioController, self).edit(*args, **kw), 
-                    page=page, usuarios=usuarios, id=args[0])
+                    page=page, roles=roles, id=args[0])
         
     @expose('lpm.templates.usuario.perfil')
     def perfil(self, *args, **kw):
