@@ -15,7 +15,7 @@ from tg.decorators import (paginate, expose, with_trailing_slash,
                            without_trailing_slash)
 from tg import redirect, request, require, flash, url
 
-from lpm.model import DBSession, Usuario
+from lpm.model import DBSession, Usuario, Rol
 from lpm.lib.sproxcustom import CustomTableFiller
 from lpm.lib.authorization import PoseePermiso
 
@@ -165,6 +165,49 @@ class UsuarioEditFiller(EditFormFiller):
 usuario_edit_filler = UsuarioEditFiller(DBSession)
 
 
+#tablas para la asignación/desasignación de roles
+class RolTable(TableBase):
+    __model__ = Rol
+    __headers__ = {'nombre_rol' : u'Nombre de Rol',
+                   'codigo' : u"Código", 'tipo' : u'Tipo',
+                   'check' : u'Check'
+                  }
+    __omit_fields__ = ['id_rol', 'permisos', 'usuarios',
+                       'id_proyecto', 'id_fase', 'id_tipo_item',
+                       'descripcion']
+    __default_column_width__ = '15em'
+    
+    __add_fields__ = {'check' : None}
+    __xml_fields__ = ['Check']
+    __column_widths__ = {'nombre_rol': "35em",
+                         'codigo': "35em",
+                         '__actions__' : "50em"
+                        }
+
+    
+rol_user_table = RolTable(DBSession)
+
+class RolTableFiller(TableFiller):
+    __model__ = Rol
+    __add_fields__ = {'check' : None}
+
+    def check(self, obj, **kw):
+        #id o name???
+        checkbox = '<input type="checkbox" class="checkbox_tabla" id="' + str(obj.id_rol) + '"/>'
+        return checkbox
+    
+    def _do_get_provider_count_and_objs(self,
+                                         usuario=None, asignados=True, **kw):
+        if (not asignados):
+            roles = Rol.roles_desasignados(usuario.id_usuario)
+        elif (asignados):
+            roles = usuario.roles
+            
+        return len(roles), roles
+
+roles_usuario_filler = RolTableFiller(DBSession)
+
+
 class UsuarioController(CrudRestController):
     """Controlador de usuarios"""
     #{ Variables
@@ -237,7 +280,7 @@ class UsuarioController(CrudRestController):
         user = Usuario.por_id(args[0])
         page = "Usuario {nombre}".format(nombre=user.nombre_usuario)
         return dict(super(UsuarioController, self).edit(*args, **kw), 
-                    page=page, roles=usuarios)
+                    page=page, roles=usuarios, id=args[0])
         
     @expose('lpm.templates.usuario.perfil')
     def perfil(self):
@@ -265,3 +308,17 @@ class UsuarioController(CrudRestController):
         return dict(super(UsuarioController, self).new(*args, **kw), page='Nuevo Usuario')
     #}
 
+    @expose('lpm.templates.usuario.roles')
+    def roles(self, *args, **kw):
+        """ Asignar y desasignar Roles """
+
+        tmpl_context.tabla_asignados = rol_user_table
+        tmpl_context.tabla_desasignados = rol_user_table
+        user = Usuario.por_id(args[0])
+        page = "Roles de Usuario {nombre}".format(nombre=user.nombre_usuario)
+        asignados = roles_usuario_filler.get_value(usuario=user,
+                                                          asignados=True, **kw)
+        desasignados = roles_usuario_filler.get_value(usuario=user,
+                                                       asignados=False, **kw)
+        return dict(asignados=asignados, desasignados=desasignados,
+                    page=page)

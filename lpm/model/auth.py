@@ -127,6 +127,29 @@ class Rol(DeclarativeBase):
                                     Rol.nombre_rol == kw["nombre_rol"],
                                     Rol.tipo == u"plantilla")).one()
         return rol
+    
+    @classmethod
+    def roles_desasignados(cls, usuario):
+        """
+        Obtiene los roles que no están asignados al usuario
+        
+        @param usuario: identificador del usuario para ver cuales roles no 
+                        tiene asignado.
+        """
+        roles = DBSession.query(cls).all()
+        id_u = int(usuario)
+        desasignados = []
+        #falta discrimininar el tipo
+        for r in roles:
+            esta = False
+            for u in r.usuarios:
+                if (u.id_usuario == id_u):
+                    esta = True
+                    break
+            if (not esta):
+                desasignados.append(r)
+
+        return desasignados
     #}
 
 
