@@ -13,7 +13,7 @@ from tgext.crud import CrudRestController
 from tg.controllers import RestController
 from tg.decorators import (paginate, expose, with_trailing_slash, 
                            without_trailing_slash)
-from tg import redirect, request, require, flash, url
+from tg import redirect, request, require, flash, url, validate 
 
 from lpm.model import DBSession, Usuario
 from lpm.lib.sproxcustom import CustomTableFiller
@@ -32,6 +32,10 @@ from sprox.widgets import PropertySingleSelectField
 from tw.forms.fields import PasswordField, TextField, InputField, SubmitButton
 
 from repoze.what.predicates import not_anonymous
+
+from formencode.validators import String, Email, NotEmpty
+
+import transaction
 
 '''
 import pylons
@@ -130,6 +134,10 @@ class UsuarioAddForm(AddRecordForm):
 #                                  }
                        }
     __add_fields__ = {'password2' : PasswordField('repita_password')}
+    
+    nombre_usuario = String(min=4)
+    password = String(min=6, max=80)
+    email = Email()
 
 #    from sprox.formbase import Field
 #    roles_boton = Field(SubmitButton('roles'))
@@ -240,7 +248,7 @@ class UsuarioController(CrudRestController):
                     page=page, roles=usuarios)
         
     @expose('lpm.templates.usuario.perfil')
-    def perfil(self):
+    def perfil(self, *args, **kw):
         """ Despliega una pagina para modificar el perfil del usuario que 
         inició sesión """
         '''
@@ -251,10 +259,10 @@ class UsuarioController(CrudRestController):
         '''
         user = request.identity['repoze.who.userid']
         id = Usuario.by_user_name(user)
+        ret = self.edit(id.id_usuario,*args, **kw)
+        ret["page"] = "Mi perfil"
+        return ret    
 
-        return dict(super(UsuarioController, self).edit(id.id_usuario), 
-                    page="Mi perfil")
- 
     @expose('lpm.templates.usuario.new')
     def new(self, *args, **kw):
         """Despliega una pagina para crear un usuario"""
@@ -263,5 +271,29 @@ class UsuarioController(CrudRestController):
 #            flash(pp.message % pp.nombre_permiso, 'warning')
 #            redirect("/usuarios")
         return dict(super(UsuarioController, self).new(*args, **kw), page='Nuevo Usuario')
+ 
+    #@validate(proyecto_edit_form, error_handler=edit)
+    @expose()
+    def put(self, *args, **kw):
+        """update"""
+        if "sprox_id" in kw:
+            del kw["sprox_id"]
+        print kw
+        #redirect("../") 
+    
+    @validate(usuario_add_form, error_handler=new)
+    @expose()
+    def post(self, *args, **kw):
+        if "sprox_id" in kw:
+            del kw["sprox_id"]
+        if "repita_password" in kw:
+            del kw["repita_password"]
+        transaction.begin()
+        if kw["nro_documento"]:
+            kw["nro_documento"] = int(kw["nro_documento"])
+        usuario = Usuario(**kw)
+        DBSession.add(usuario)
+        transaction.commit()
+        redirect("./")
     #}
 

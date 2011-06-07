@@ -104,7 +104,7 @@ class RootController(BaseController):
         user = Usuario.by_user_name(usernamegiven)
         if user != None:
             smtp_gmail = Gmail()
-            mail = user.email #DEBUG: u"carlosbellino@gmail.com"
+            mail = user.email #DEBUG:  u"carlosbellino@gmail.com"
             hash = hashlib.new('ripemd160')
             hash.update(user.email + unicode(random.random()))
             new_pass = hash.hexdigest()
