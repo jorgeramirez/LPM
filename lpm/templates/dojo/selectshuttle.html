@@ -6,7 +6,7 @@
             <div style="float:left;">
                 Disponibles<br/>
                 <select class="shuttle" id="${name}_src" multiple="true" name="" size="$size">
-                        <option py:for="value, description, attrs in options"
+                        <option py:for="value, description in options"
                                 py:content="description"
                                 value="${value}"/>
                 </select>
@@ -25,7 +25,7 @@
                     Seleccionados<br/>
 
                     <select class="shuttle" id="${name}" multiple="true" name="${name}" size="$size">
-                        <option py:for="value, description, attrs in selected_options"
+                        <option py:for="value, description in selected_options"
                                 py:content="description"
                                 value="${value}"/>
                     </select>

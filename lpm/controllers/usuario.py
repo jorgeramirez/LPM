@@ -18,6 +18,8 @@ from tg import redirect, request, require, flash, url, validate
 from lpm.model import DBSession, Usuario, Rol
 from lpm.lib.sproxcustom import CustomTableFiller
 from lpm.lib.authorization import PoseePermiso
+from lpm.controllers.rol import (RolTable as RolRolTable,
+                                     RolTableFiller as RolRolTableFiller)
 
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller
@@ -37,10 +39,6 @@ from formencode.validators import String, Email, NotEmpty
 
 import transaction
 
-'''
-import pylons
-from pylons import tmpl_context
-'''
 from tg import tmpl_context, request
 
 class UsuarioTable(TableBase):
@@ -66,7 +64,7 @@ class UsuarioTableFiller(CustomTableFiller):
     __omit_fields__ = ['password', 'telefono', 'nro_documento', 
                        '_password', 'historial_lb', 'roles',
                        'historial_item']
-'''   
+
     def __actions__(self, obj):
         """Links de acciones para un registro dado"""
         value = '<div>'
@@ -74,9 +72,9 @@ class UsuarioTableFiller(CustomTableFiller):
         if PoseePermiso('modificar usuario', 
                         id_usuario=obj.id_usuario).is_met(request.environ):
             value += '<div>' + \
-                        '<a href="'+ str(obj.id_usuario) +'/edit" ' + \
+                        '<a href="/usuarios/'+ str(obj.id_usuario) +'/edit" ' + \
                         'class="' + clase + '">Modificar</a>' + \
-                     '</ div><br />'
+                     '</div><br />'
         if PoseePermiso('eliminar usuario',
                         id_usuario=obj.id_usuario).is_met(request.environ):
             value += '<div><form method="POST" action="' + str(obj.id_usuario) + '" class="button-to">'+\
@@ -84,14 +82,16 @@ class UsuarioTableFiller(CustomTableFiller):
                      '<input onclick="return confirm(\'Está seguro?\');" value="Delete" type="submit" '+\
                      'style="background-color: transparent; float:left; border:0; color: #286571;'+\
                      'display: inline; margin: 0; padding: 0;" class="' + clase + '"/>'+\
-                     '</ form></ div><br />'
+                     '</form></div><br />'
 #-------------------------------------------------------------- arreglar!
         if PoseePermiso('asignar rol',
                         id_usuario=obj.id_usuario).is_met(request.environ):
             value += '<div>' + \
-                        '<a href="' + str(obj.id_usuario) + '/roles/" ' +\
+                        '<a href="/usuarios/roles/' + str(obj.id_usuario) + '" ' +\
                         'class="' + clase + '">Roles</a>' + \
-                     '</ div><br />'
+                     '</div><br />'
+        value += '</div>'
+        return value
 
     def _do_get_provider_count_and_objs(self, **kw):
         """
@@ -102,7 +102,6 @@ class UsuarioTableFiller(CustomTableFiller):
                                  _do_get_provider_count_and_objs(**kw)
         if count == 0:
             return count, filtrados
-        pks = []
         nombre_usuario = request.credentials['repoze.what.userid']
         usuario = Usuario.by_user_name(nombre_usuario)
         for r in usuario.roles:
@@ -112,7 +111,7 @@ class UsuarioTableFiller(CustomTableFiller):
 
         #si no tiene permisos necesarios lo unico que puede ver es su usuario
         return 1, [usuario]
-'''
+
     
 usuario_table_filler = UsuarioTableFiller(DBSession)
 
@@ -233,10 +232,13 @@ class UsuarioController(CrudRestController):
     edit_form = usuario_edit_form
     edit_filler = usuario_edit_filler
 
+    #para el form de busqueda
+    columnas = dict(nombre_usuario="texto", nombre="texto", apellido="texto",
+                    nro_documento="texto")
  
     #{ Métodos
-    #@with_trailing_slash
-    @paginate('lista_elementos', items_per_page=7)
+    @with_trailing_slash
+    @paginate('lista_elementos', items_per_page=5)
     @expose('lpm.templates.usuario.get_all')
     @expose('json')
     def get_all(self, *args, **kw):
@@ -252,28 +254,11 @@ class UsuarioController(CrudRestController):
             usuarios = []
             
         tmpl_context.widget = usuario_table
+    
         return dict(lista_elementos=usuarios, page=self.title, titulo=self.title, 
-                    modelo=self.model.__name__)
+                    modelo=self.model.__name__, columnas=self.columnas,
+                    url_action="/usuarios/")
 
-    '''            
-    @without_trailing_slash
-    @paginate('lista_elementos', items_per_page=7)
-    @expose('lpm.templates.get_all')
-    @expose('json')
-    def buscar(self, *args, **kw):
-        pp = PoseePermiso('consultar usuario')
-        if not pp.is_met(request.environ):
-            flash(pp.message % pp.nombre_permiso, 'warning')
-            redirect("/usuarios")
-        buscar_table_filler = UsuarioTableFiller(DBSession)
-        if kw.has_key('filtro'):
-            buscar_table_filler.filtro = kw['filtro']
-        usuarios = buscar_table_filler.get_value()
-        tmpl_context.widget = self.table
-        retorno = self.retorno_base()
-        retorno["lista_elementos"] = usuarios
-        return retorno
-''' 
     @expose('lpm.templates.usuario.edit')
     def edit(self, *args, **kw):
         """Despliega una pagina para modificar usuario"""
@@ -282,13 +267,30 @@ class UsuarioController(CrudRestController):
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect("/usuarios")
-        '''   
+        '''
+        class mis_roles_tf(RolRolTableFiller):
+            def __actions__(self, obj):
+                """Links de acciones para un registro dado"""
+                value = '<div>'
+                clase = 'actions'   
+                if PoseePermiso('modificar rol').is_met(request.environ):
+                    value += '<div>' + \
+                                '<a href="/roles/'+ str(obj.id_rol) +'/edit" ' + \
+                                'class="' + clase + '">Ver</a>' + \
+                             '</div><br /></div>'
+                    return value
+
+            def _do_get_provider_count_and_objs(self, **kw):
+                user = Usuario.por_id(int(kw["id_usuario"]))
+                return len(user.roles), user.roles
+
         usuarios = self.table_filler.get_value(**kw)
-        tmpl_context.tabla_roles = usuario_table
+        roles = mis_roles_tf(DBSession).get_value(id_usuario=args[0])
+        tmpl_context.tabla_roles = RolRolTable(DBSession)
         user = Usuario.por_id(args[0])
         page = "Usuario {nombre}".format(nombre=user.nombre_usuario)
         return dict(super(UsuarioController, self).edit(*args, **kw), 
-                    page=page, roles=usuarios, id=args[0])
+                    page=page, roles=roles, id=args[0])
         
     @expose('lpm.templates.usuario.perfil')
     def perfil(self, *args, **kw):
@@ -338,7 +340,6 @@ class UsuarioController(CrudRestController):
         DBSession.add(usuario)
         transaction.commit()
         redirect("./")
-    #}
 
     @expose('lpm.templates.usuario.roles')
     def roles(self, *args, **kw):
@@ -354,3 +355,17 @@ class UsuarioController(CrudRestController):
                                                        asignados=False, **kw)
         return dict(asignados=asignados, desasignados=desasignados,
                     page=page)
+
+    @with_trailing_slash
+    @paginate('lista_elementos', items_per_page=5)
+    @expose('lpm.templates.rol.get_all')
+    @expose('json')
+    def post_buscar(self, *args, **kw):
+        tmpl_context.widget = self.table
+        buscar_table_filler = UsuarioTableFiller(DBSession)
+        buscar_table_filler.filtros = kw
+        usuarios = buscar_table_filler.get_value()
+        return dict(lista_elementos=usuarios, page=self.title, titulo=self.title, 
+                    modelo=self.model.__name__, columnas=self.columnas,
+                    url_action="/usuarios/")
+    #}

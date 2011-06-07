@@ -2,16 +2,38 @@
       xmlns:py="http://genshi.edgewall.org/"
       xmlns:xi="http://www.w3.org/2001/XInclude">
   <xi:include href="esquema.html" />
+  <xi:include href="buscar.html" />
 <head>
 <title>$page</title>
 </head>
 <body>
   <div class="cntmid">
       <h2 style="margin-top:1px; padding-left: 60px;">$page</h2>
-      <span style="padding-left: 95px; font-size: 12;" py:if="lista_elementos" py:content="tmpl_context.paginators.lista_elementos.pager(link=request.url)"/>
-      <div class="crud_table" style="height:65%; width:80%; padding-left: 95px;">
-        ${tmpl_context.widget(value=lista_elementos)}
-      </div>
+    <div style="padding-left: 95px;">
+    <table cellspacing="0" cellpadding="2" border="0">
+    <tbody>
+        <tr>
+            <td>
+                <a class="link_boton" href="${tg.url('/roles/new')}">
+                <input id="nuevo_rol" class="boton" type="button" value="Nuevo"/>
+                </a>
+            </td>
+        </tr>
+        <tr>${buscar()}</tr>
+        <tr>
+            <td>
+                <span style="font-size: 12;" py:if="lista_elementos" py:content="tmpl_context.paginators.lista_elementos.pager(link='./')"/>
+                <div class="crud_table" style="height:65%; width:700px; margin-top: 5px;">
+                    ${tmpl_context.widget(value=lista_elementos)}
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <div style="clear:both;"></div>
+        </tr>
+    </tbody>
+    </table>  
+    </div>
   </div>
 </body>
 </html>
