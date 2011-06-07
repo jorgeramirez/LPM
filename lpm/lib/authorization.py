@@ -29,6 +29,7 @@ Permisos = {
 #roles
     u"crear rol": u"Permite realizar la operación de crear un rol",
     u"eliminar rol": u"Permite realizar la operación de eliminar un rol",
+    u"modificar rol": u"Permite modificar un rol",
     u"asignar rol": u"Permite realizar la operación de asignar un rol",
     u"consultar rol": u"Permite consultar atributos de un rol",
 
@@ -192,6 +193,7 @@ class PoseePermiso(Predicate):
         self.id_proyecto = 0
         self.id_fase = 0
         self.id_tipo_item = 0
+        self.id_usuario = 0
         for key in ["id_proyecto", "id_fase", "id_tipo_item", "id_usuario"]:
             if kw.has_key(key):
                 setattr(self, key, kw[key])

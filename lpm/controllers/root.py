@@ -41,8 +41,8 @@ class RootController(BaseController):
     usuarios = UsuarioController(DBSession)
     roles = RolController(DBSession)
     proyectos = ProyectoController(DBSession)
-    
     fases = FaseController(DBSession)
+
     error = ErrorController()
 
     @expose('lpm.templates.index')
