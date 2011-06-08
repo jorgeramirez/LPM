@@ -17,7 +17,7 @@ from tg import redirect, request, require, flash, url, validate
 
 from lpm.model import DBSession, Usuario, Rol
 from lpm.lib.sproxcustom import CustomTableFiller
-from lpm.lib.authorization import PoseePermiso
+from lpm.lib.authorization import PoseePermiso, AlgunPermiso
 from lpm.controllers.rol import (RolTable as RolRolTable,
                                      RolTableFiller as RolRolTableFiller)
 
@@ -69,23 +69,20 @@ class UsuarioTableFiller(CustomTableFiller):
         """Links de acciones para un registro dado"""
         value = '<div>'
         clase = 'actions'   
-        if PoseePermiso('modificar usuario', 
-                        id_usuario=obj.id_usuario).is_met(request.environ):
+        if PoseePermiso('modificar usuario').is_met(request.environ):
             value += '<div>' + \
                         '<a href="/usuarios/'+ str(obj.id_usuario) +'/edit" ' + \
                         'class="' + clase + '">Modificar</a>' + \
                      '</div><br />'
-        if PoseePermiso('eliminar usuario',
-                        id_usuario=obj.id_usuario).is_met(request.environ):
+        if PoseePermiso('eliminar usuario').is_met(request.environ):
             value += '<div><form method="POST" action="' + str(obj.id_usuario) + '" class="button-to">'+\
                      '<input type="hidden" name="_method" value="DELETE" />' +\
                      '<input onclick="return confirm(\'Está seguro?\');" value="Delete" type="submit" '+\
                      'style="background-color: transparent; float:left; border:0; color: #286571;'+\
                      'display: inline; margin: 0; padding: 0;" class="' + clase + '"/>'+\
                      '</form></div><br />'
-#-------------------------------------------------------------- arreglar!
-        if PoseePermiso('asignar rol',
-                        id_usuario=obj.id_usuario).is_met(request.environ):
+
+        if PoseePermiso('asignar rol').is_met(request.environ):
             value += '<div>' + \
                         '<a href="/usuarios/roles/' + str(obj.id_usuario) + '" ' +\
                         'class="' + clase + '">Roles</a>' + \
@@ -96,21 +93,34 @@ class UsuarioTableFiller(CustomTableFiller):
     def _do_get_provider_count_and_objs(self, **kw):
         """
         Se muestra la lista de usuario si se tiene un permiso 
-        necesario
+        necesario. Caso contrario se muestra solo su usuario
         """
-        count, filtrados = super(UsuarioTableFiller, self). \
-                                 _do_get_provider_count_and_objs(**kw)
-        if count == 0:
-            return count, filtrados
-        nombre_usuario = request.credentials['repoze.what.userid']
-        usuario = Usuario.by_user_name(nombre_usuario)
-        for r in usuario.roles:
-            for p in r.permisos:
-                if p.nombre_permiso.find("usuario") > 0:
-                    return count, filtrados
+        if AlgunPermiso(patron="usuario").is_met(request.environ):
+            return super(UsuarioTableFiller,
+                         self)._do_get_provider_count_and_objs(**kw)
+        username = request.credentials['repoze.what.userid']
+        user = Usuario.by_user_name(username)
+        return 1, [user]
 
-        #si no tiene permisos necesarios lo unico que puede ver es su usuario
-        return 1, [usuario]
+
+#    def _do_get_provider_count_and_objs(self, **kw):
+#        """
+#        Se muestra la lista de usuario si se tiene un permiso 
+#        necesario
+#        """
+#        count, filtrados = super(UsuarioTableFiller, self). \
+#                                 _do_get_provider_count_and_objs(**kw)
+#        if count == 0:
+#            return count, filtrados
+#        nombre_usuario = request.credentials['repoze.what.userid']
+#        usuario = Usuario.by_user_name(nombre_usuario)
+#        for r in usuario.roles:
+#            for p in r.permisos:
+#                if p.nombre_permiso.find("usuario") > 0:
+#                    return count, filtrados
+#
+#        #si no tiene permisos necesarios lo unico que puede ver es su usuario
+#        return 1, [usuario]
 
     
 usuario_table_filler = UsuarioTableFiller(DBSession)
@@ -199,7 +209,7 @@ class RolTableFiller(TableFiller):
     __add_fields__ = {'check' : None}
 
     def check(self, obj, **kw):
-        #id o name???
+        #id
         checkbox = '<input type="checkbox" class="checkbox_tabla" id="' + str(obj.id_rol) + '"/>'
         return checkbox
     
@@ -211,6 +221,26 @@ class RolTableFiller(TableFiller):
             roles = usuario.roles
             
         return len(roles), roles
+
+    def __actions__(self, obj):
+        """Links de acciones para un registro dado"""
+        value = '<div>'
+        clase = 'actions'   
+        if PoseePermiso('modificar rol').is_met(request.environ):
+            value += '<div>' + \
+                        '<a href="/roles/'+ str(obj.id_rol) +'/edit" ' + \
+                        'class="' + clase + '">Modificar</a>' + \
+                     '</div><br />'
+        if PoseePermiso('eliminar rol').is_met(request.environ):
+            value += '<div><form method="POST" action="/roles/' + str(obj.id_rol) + '" class="button-to">'+\
+                     '<input type="hidden" name="_method" value="DELETE" />' +\
+                     '<input onclick="return confirm(\'Está seguro?\');" value="Delete" type="submit" '+\
+                     'style="background-color: transparent; float:left; border:0; color: #286571;'+\
+                     'display: inline; margin: 0; padding: 0;" class="' + clase + '"/>'+\
+                     '</form></div><br />'
+        value += '</div>'
+        return value
+
 
 roles_usuario_filler = RolTableFiller(DBSession)
 
@@ -246,6 +276,7 @@ class UsuarioController(CrudRestController):
         Retorna todos los registros
         Retorna una página HTML si no se especifica JSON
         """
+        puede_crear = PoseePermiso("crear usuario").is_met(request.environ)
         if request.response_type == 'application/json':
             return self.table_filler.get_value(**kw)
         if not getattr(self.table.__class__, '__retrieves_own_value__', False):
@@ -257,7 +288,7 @@ class UsuarioController(CrudRestController):
     
         return dict(lista_elementos=usuarios, page=self.title, titulo=self.title, 
                     modelo=self.model.__name__, columnas=self.columnas,
-                    url_action="/usuarios/")
+                    url_action="/usuarios/", puede_crear=puede_crear)
 
     @expose('lpm.templates.usuario.edit')
     def edit(self, *args, **kw):
@@ -281,6 +312,7 @@ class UsuarioController(CrudRestController):
                     return value
 
             def _do_get_provider_count_and_objs(self, **kw):
+                print kw
                 user = Usuario.por_id(int(kw["id_usuario"]))
                 return len(user.roles), user.roles
 
@@ -358,16 +390,17 @@ class UsuarioController(CrudRestController):
 
     @with_trailing_slash
     @paginate('lista_elementos', items_per_page=5)
-    @expose('lpm.templates.rol.get_all')
+    @expose('lpm.templates.usuario.get_all')
     @expose('json')
     def post_buscar(self, *args, **kw):
+        puede_crear = PoseePermiso("crear usuario").is_met(request.environ)
         tmpl_context.widget = self.table
         buscar_table_filler = UsuarioTableFiller(DBSession)
         buscar_table_filler.filtros = kw
         usuarios = buscar_table_filler.get_value()
         return dict(lista_elementos=usuarios, page=self.title, titulo=self.title, 
                     modelo=self.model.__name__, columnas=self.columnas,
-                    url_action="/usuarios/")
+                    url_action="/usuarios/", puede_crear=puede_crear)
     
     @expose('lpm.templates.usuario.roles')
     def desasignar_roles(self, *args, **kw):

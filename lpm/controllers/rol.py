@@ -19,7 +19,7 @@ from lpm.model import (DBSession, Usuario, Rol, Permiso, Proyecto,
                        Fase, TipoItem)
 from lpm.lib.sproxcustom import CustomTableFiller
 from lpm.lib.sproxcustom import WidgetSelectorDojo, MultipleSelectDojo
-from lpm.lib.authorization import PoseePermiso
+from lpm.lib.authorization import PoseePermiso, AlgunPermiso
 
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller
@@ -82,6 +82,18 @@ class RolTableFiller(CustomTableFiller):
                      '</form></div><br />'
         value += '</div>'
         return value
+    
+    def _do_get_provider_count_and_objs(self, **kw):
+        """
+        Se muestra la lista de rol si se tiene un permiso 
+        necesario. Caso contrario le muestra sus roles.
+        """
+        if AlgunPermiso(patron="rol").is_met(request.environ):
+            return super(RolTableFiller,
+                         self)._do_get_provider_count_and_objs(**kw)
+        username = request.credentials['repoze.what.userid']
+        user = Usuario.by_user_name(username)
+        return len(user.roles), user.roles 
 
     #def _do_get_provider_count_and_objs(self, **kw):
     #    """
@@ -146,6 +158,12 @@ class TiposRolesField(PropertySingleSelectField):
     def _my_update_params(self, d, nullable=False):
         options = [u'Plantilla', u'Sistema', u'Proyecto',
                    u'Fase', u'Tipo de Ítem']
+        if d['value']:
+            for i, op in enumerate(options):
+                if op.lower() == d['value']:
+                    o = options.pop(i)
+                    options.insert(0, o)
+                    break
         d['options'] = options
         return d
     
@@ -268,6 +286,7 @@ class RolController(CrudRestController):
         Retorna todos los registros
         Retorna una página HTML si no se especifica JSON
         """
+        puede_crear = PoseePermiso("crear rol").is_met(request.environ)
         if request.response_type == 'application/json':
             return self.table_filler.get_value(**kw)
         if not getattr(self.table.__class__, '__retrieves_own_value__', False):
@@ -277,7 +296,8 @@ class RolController(CrudRestController):
         tmpl_context.widget = self.table
         return dict(lista_elementos=roles, page=self.title, titulo=self.title, 
                     modelo=self.model.__name__, columnas=self.columnas,
-                    tipo_opciones=self.tipo_opciones, url_action="/roles/")
+                    tipo_opciones=self.tipo_opciones, url_action="/roles/",
+                    puede_crear=puede_crear)
 
     @expose('lpm.templates.rol.edit')
     def edit(self, *args, **kw):
@@ -381,13 +401,15 @@ class RolController(CrudRestController):
     @expose('lpm.templates.rol.get_all')
     @expose('json')
     def post_buscar(self, *args, **kw):
+        puede_crear = PoseePermiso("crear rol").is_met(request.environ)
         tmpl_context.widget = self.table
         buscar_table_filler = RolTableFiller(DBSession)
         buscar_table_filler.filtros = kw
         roles = buscar_table_filler.get_value()
         return dict(lista_elementos=roles, page=self.title, titulo=self.title, 
                     modelo=self.model.__name__, columnas=self.columnas,
-                    tipo_opciones=self.tipo_opciones, url_action="/roles/")
+                    tipo_opciones=self.tipo_opciones, url_action="/roles/",
+                    puede_crear=puede_crear)
     #}
     
     
