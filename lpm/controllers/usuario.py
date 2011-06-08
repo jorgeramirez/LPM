@@ -354,7 +354,7 @@ class UsuarioController(CrudRestController):
         desasignados = roles_usuario_filler.get_value(usuario=user,
                                                        asignados=False, **kw)
         return dict(asignados=asignados, desasignados=desasignados,
-                    page=page)
+                    page=page, id=args[0])
 
     @with_trailing_slash
     @paginate('lista_elementos', items_per_page=5)
@@ -368,4 +368,37 @@ class UsuarioController(CrudRestController):
         return dict(lista_elementos=usuarios, page=self.title, titulo=self.title, 
                     modelo=self.model.__name__, columnas=self.columnas,
                     url_action="/usuarios/")
+    
+    @expose('lpm.templates.usuario.roles')
+    def desasignar_roles(self, *args, **kw):
+        """ Desasigna los roles seleccionados a un usuario """
+        if kw:
+            pks = []
+            for k, pk in kw.items():
+                pks.append(int(pk))
+            transaction.begin()
+            user = Usuario.por_id(int(args[0]))
+            c = 0
+            while c < len(user.roles):
+                if user.roles[c].id_rol in pks:
+                    del user.roles[c]
+                else:
+                    c += 1
+            transaction.commit()
+        return self.roles(*args)
+
+    @expose('lpm.templates.usuario.roles')
+    def asignar_roles(self, *args, **kw):
+        """ Asigna los roles seleccionados a un usuario """
+        if kw:
+            pks = []
+            for k, pk in kw.items():
+                pks.append(int(pk))
+            transaction.begin()
+            user = Usuario.por_id(int(args[0]))
+            roles = DBSession.query(Rol).filter(Rol.id_rol.in_(pks)).all()
+            for r in roles:
+                r.usuarios.append(user)
+            transaction.commit()
+        return self.roles(*args)
     #}
