@@ -4,6 +4,8 @@
  **/
 $(function(){
 
+    var rscript = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
+    
     $("#form_desasignar").submit(function(){
         var desa_pks = $("#tabla_asignados :checkbox").filter(":checked");
         var desa_kw = new Object();
@@ -11,16 +13,23 @@ $(function(){
             desa_kw[n] = $(this).attr("id");
         });
 
+        
+        
         $.ajax({
             type: "POST",
             dataType: "html",
             url: $(this).attr("action"),
-            cache: true,
+            cache: false,
             data: desa_kw,
-            success: function(html){
-                var tbl_html = jQuery("<div>").append(html).find("#tabla_asignados");
+            complete: function(jqXHR, textStatus){
+                var responseText = jqXHR.responseText;
+                var tbl_html = jQuery("<div>")
+                               .append(responseText.replace(rscript, ""))
+                               .find("#tabla_asignados");
                 $("#tabla_asignados").html(tbl_html);
-                var tbl_html = jQuery("<div>").append(html).find("#tabla_desasignados");
+                var tbl_html = jQuery("<div>")
+                               .append(responseText.replace(rscript, ""))
+                               .find("#tabla_desasignados");
                 $("#tabla_desasignados").html(tbl_html);
             }
         });
@@ -34,17 +43,22 @@ $(function(){
         $(asig_pks).each(function(n){
             asig_kw[n] = $(this).attr("id");
         });
-
+        
         $.ajax({
             type: "POST",
             dataType: "html",
             url: $(this).attr("action"),
-            cache: true,
+            cache: false,
             data: asig_kw,
-            success: function(html){
-                var tbl_html = jQuery("<div>").append(html).find("#tabla_desasignados");
+            complete: function(jqXHR, textStatus){
+                var responseText = jqXHR.responseText;
+                var tbl_html = jQuery("<div>")
+                               .append(responseText.replace(rscript, ""))
+                               .find("#tabla_desasignados");
                 $("#tabla_desasignados").html(tbl_html);
-                var tbl_html = jQuery("<div>").append(html).find("#tabla_asignados");
+                var tbl_html = jQuery("<div>")
+                               .append(responseText.replace(rscript, ""))
+                               .find("#tabla_asignados");
                 $("#tabla_asignados").html(tbl_html);
             }
         });
