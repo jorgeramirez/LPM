@@ -132,49 +132,6 @@ Permisos = {
 #    u"consultar fase": u"Permite consultar valores de atributos de fase"
 }
 
-class AlgunPermiso(Predicate):
-    """
-    Evalua si el usuario tiene algún permiso para un
-    contexto dado.
-    """
-    message = u"No tiene algun permiso para dicho contexto"
-    def __init__(self, **kw):
-        """
-        Método inicializador
-        
-        @param kw: Parametros para inicializar
-        @keyword patron: El patron para el nombre del permiso.
-        """
-        self.valor_contexto = None
-        self.contexto = u""
-        for key in ["id_proyecto", "id_fase", "id_tipo_item"]:
-            if kw.has_key(key):
-                self.valor_contexto = int(kw[key])
-                self.contexto = key
-                del kw[key]
-                break
-        self.patron = unicode(kw["patron"])
-        del kw["patron"]
-        super(AlgunPermiso, self).__init__(**kw)
-    
-    def evaluate(self, environ, credentials):
-        if is_anonymous().is_met(environ) or not self.valor_contexto: 
-            self.unmet()
-        nombre_usuario = credentials["repoze.what.userid"]
-        usuario = Usuario.by_user_name(nombre_usuario)
-        for r in usuario.roles:
-            valor = getattr(r, self.contexto, None)
-            if r.es_rol_sistema() or (valor and valor == self.valor_contexto):
-                for p in r.permisos:
-                    if self.patron == u"item" and \
-                       p.nombre_permiso.find("tipo item") > 0:
-                        continue
-                    if p.nombre_permiso.find(self.patron) > 0 and \
-                       p.nombre_permiso.find(u"consultar") < 0:
-                        return
-        self.unmet(self.message)
-    
-
 class PoseePermiso(Predicate):
     """
     Clase que evalua si el usuario actual posee
@@ -193,8 +150,7 @@ class PoseePermiso(Predicate):
         self.id_proyecto = 0
         self.id_fase = 0
         self.id_tipo_item = 0
-        self.id_usuario = 0
-        for key in ["id_proyecto", "id_fase", "id_tipo_item", "id_usuario"]:
+        for key in ["id_proyecto", "id_fase", "id_tipo_item"]:
             if kw.has_key(key):
                 setattr(self, key, kw[key])
                 del kw[key]
@@ -224,3 +180,55 @@ class PoseePermiso(Predicate):
                 if self.id_tipo_item == r.id_tipo_item:
                     return
         self.unmet(self.message % self.nombre_permiso)
+        
+class AlgunPermiso(Predicate):
+    """
+    Evalua si el usuario tiene algún permiso para un
+    contexto dado.
+    """
+    message = u"No tiene algun permiso para dicho contexto"
+    def __init__(self, **kw):
+        """
+        Método inicializador
+        
+        @param kw: Parametros para inicializar
+        @keyword patron: El patron para el nombre del permiso.
+        """
+        self.id_proyecto = 0
+        self.id_fase = 0
+        self.id_tipo_item = 0
+        self.patron = unicode(kw["patron"])
+        del kw["patron"]
+        for key in ["id_proyecto", "id_fase", "id_tipo_item"]:
+            if kw.has_key(key):
+                setattr(self, key, int(kw[key]))
+                del kw[key]
+                break
+        super(AlgunPermiso, self).__init__(**kw)
+    
+    def evaluate(self, environ, credentials):
+        if is_anonymous().is_met(environ): 
+            self.unmet()
+        nombre_usuario = credentials["repoze.what.userid"]
+        usuario = Usuario.by_user_name(nombre_usuario)
+        for r in usuario.roles:
+            algun = False
+            for p in r.permisos:
+                if p.nombre_permiso.find(u"consultar") < 0 and \
+                   p.nombre_permiso.find(self.patron) > 0:
+                    algun = True
+                    break
+            if not algun:
+                continue
+            if r.es_rol_sistema():
+                return
+            if self.id_proyecto == r.id_proyecto:
+                if r.id_fase == 0 and r.id_tipo_item == 0:
+                    return
+            if self.id_fase == r.id_fase:
+                if r.id_tipo_item == 0:
+                    return
+            if self.id_tipo_item == r.id_tipo_item:
+                return
+        self.unmet(self.message)
+

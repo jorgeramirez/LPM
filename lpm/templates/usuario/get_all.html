@@ -13,8 +13,8 @@
     <tbody>
         <tr>
             <td>
-                <a class="link_boton" href="${tg.url('/usuarios/new')}">
-                <input id="nuevo_usuario" class="boton" type="button" value="Nuevo"/>
+                <a py:if="puede_crear" class="link_boton" href="${tg.url('/usuarios/new')}">
+                    <input id="nuevo_usuario" class="boton" type="button" value="Nuevo"/>
                 </a>
             </td>
         </tr>

@@ -59,7 +59,7 @@ def bootstrap(command, conf, vars):
             p.nombre_permiso = perm
             p.descripcion = desc
             p.roles.append(r) # Administrador del sistema.
-            if perm.find('usuario') < 0:
+            if perm.find('usuario') < 0 and perm.find('rol') < 0:
                 p.roles.append(rlp) #Líder de Proyecto.
 
         model.DBSession.flush()
