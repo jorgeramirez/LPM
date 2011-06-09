@@ -171,48 +171,38 @@ class CodTipoItemField(PropertySingleSelectField):
         d['options'] = options
         return d
 
+#para mejorar el multiple selector hecho en dojo
+class PermisosMultipleSelect(MultipleSelectDojo):
+    def _my_update_params(self, d, nullable=False):
+        options, selected = [], []
+        permisos = self.get_permisos()
+        for p in permisos:
+            if d['value'] and p.id_permiso in d['value']: #seleccionados
+                selected.append((p.id_permiso, '%s' % p.nombre_permiso))
+            else:
+                options.append((p.id_permiso, '%s' % p.nombre_permiso))
+        d['options'] = options
+        d['selected_options'] = selected
+        return d
+    
+    def get_permisos(self):
+        pass
+
 
 #para mejorar el multiple selector hecho en dojo
-class PermisosSistemaMultipleSelect(MultipleSelectDojo):
-    def _my_update_params(self, d, nullable=False):
-        options, selected = [], []
-        permisos = Permiso.permisos_de_sistema()
-        for p in permisos:
-            if d['value'] and p.id_permiso in d['value']: #seleccionados
-                selected.append((p.id_permiso, '%s' % p.nombre_permiso))
-            else:
-                options.append((p.id_permiso, '%s' % p.nombre_permiso))
-        d['options'] = options
-        d['selected_options'] = selected
-        return d
+class PermisosSistemaMultipleSelect(PermisosMultipleSelect):
+    def get_permisos(self):
+        return Permiso.permisos_de_sistema()
 
 
-class PermisosPlantillaMultipleSelect(MultipleSelectDojo):
-    def _my_update_params(self, d, nullable=False):
-        options, selected = [], []
-        permisos = DBSession.query(Permiso).all()
-        for p in permisos:
-            if d['value'] and p.id_permiso in d['value']: #seleccionados
-                selected.append((p.id_permiso, '%s' % p.nombre_permiso))
-            else:
-                options.append((p.id_permiso, '%s' % p.nombre_permiso))
-        d['options'] = options
-        d['selected_options'] = selected
-        return d
+class PermisosPlantillaMultipleSelect(PermisosMultipleSelect):
+    def get_permisos(self):
+        return DBSession.query(Permiso).all()
 
 
-class PermisosContextoMultipleSelect(MultipleSelectDojo):
-    def _my_update_params(self, d, nullable=False):
-        options, selected = [], []
-        permisos = Permiso.permisos_con_contexto()
-        for p in permisos:
-            if d['value'] and p.id_permiso in d['value']: #seleccionados
-                selected.append((p.id_permiso, '%s' % p.nombre_permiso))
-            else:
-                options.append((p.id_permiso, '%s' % p.nombre_permiso))
-        d['options'] = options
-        d['selected_options'] = selected
-        return d
+class PermisosContextoMultipleSelect(PermisosMultipleSelect):
+    def get_permisos(self):
+        return Permiso.permisos_con_contexto()
 
 
 class SelectorPermisosSistema(WidgetSelectorDojo):
