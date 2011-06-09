@@ -2,6 +2,7 @@ from lpm.model import Usuario
 from formencode.validators import String, Email, NotEmpty, FieldsMatch, NotEmpty
 from formencode import FancyValidator, Schema, All, Invalid
 
+__all__ = ["UsuarioAddFormValidator"]
 
 class UniqueUsername(FancyValidator):
     def _to_python(self, value, state):

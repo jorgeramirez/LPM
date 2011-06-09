@@ -15,7 +15,7 @@ from tg.decorators import (paginate, expose, with_trailing_slash,
                            without_trailing_slash)
 from tg import redirect, request, require, flash, url, validate 
 
-from lpm.controllers.validaciones.usuarioFormValidator import UsuarioAddFormValidator
+from lpm.controllers.validaciones import UsuarioAddFormValidator
 from lpm.model import DBSession, Usuario, Rol
 from lpm.lib.sproxcustom import CustomTableFiller
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
