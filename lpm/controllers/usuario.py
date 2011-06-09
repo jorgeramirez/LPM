@@ -15,6 +15,7 @@ from tg.decorators import (paginate, expose, with_trailing_slash,
                            without_trailing_slash)
 from tg import redirect, request, require, flash, url, validate 
 
+from lpm.controllers.validaciones.usuarioFormValidator import UsuarioAddFormValidator
 from lpm.model import DBSession, Usuario, Rol
 from lpm.lib.sproxcustom import CustomTableFiller
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
@@ -132,21 +133,11 @@ class UsuarioAddForm(AddRecordForm):
                        'historial_item']
     __require_fields__ = ['nombre_usuario', 'nombre', 'apellido', 'password',
                           'repita_password', 'email']
-    __check_if_unique__ = True
+    __base_validator__ = UsuarioAddFormValidator
     __field_order__ = ['nombre_usuario', 'nombre', 'apellido', 'password',
-                       'password2', 'email', 'nro_documento', 'telefono']
-    __field_attrs__ = {
-                       'nombre_usuario': { 'maxlength' : '32'},
-#                       'roles' : {'label_text':'Roles',
-#                                  'named_button' : True,
-#                                  'attrs' : {'value' : 'Roles'}
-#                                  }
-                       }
-    __add_fields__ = {'password2' : PasswordField('repita_password')}
-    
-    nombre_usuario = String(min=4)
-    password = String(min=6, max=80)
-    email = Email()
+                       'repita_password', 'email', 'nro_documento', 'telefono']
+    __field_attrs__ = {}
+    repita_password = PasswordField('repita_password')
 
 #    from sprox.formbase import Field
 #    roles_boton = Field(SubmitButton('roles'))
