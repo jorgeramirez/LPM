@@ -16,7 +16,7 @@ from tg.decorators import (paginate, expose, with_trailing_slash,
 from tg import redirect, request, require, flash, url, validate 
 
 from lpm.controllers.validaciones import UsuarioAddFormValidator
-from lpm.model import DBSession, Usuario, Rol
+from lpm.model import DBSession, Usuario, Rol, TipoItem, Proyecto, Fase
 from lpm.lib.sproxcustom import CustomTableFiller
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
 from lpm.controllers.rol import (RolTable as RolRolTable,
@@ -178,31 +178,57 @@ class RolTable(TableBase):
     __model__ = Rol
     __headers__ = {'nombre_rol' : u'Nombre de Rol',
                    'codigo' : u"Código", 'tipo' : u'Tipo',
-                   'check' : u'Check'
+                   'proyecto': u'Proyecto', 'fase': u"Fase", 
+                   'tipo_item': u"Tipo de Ítem", 'check' : u'Check',
                   }
     __omit_fields__ = ['id_rol', 'permisos', 'usuarios',
                        'id_proyecto', 'id_fase', 'id_tipo_item',
-                       'descripcion']
+                       'descripcion', 'creado']
     __default_column_width__ = '15em'
     
-    __add_fields__ = {'check' : None}
+    __add_fields__ = {'proyecto':None, 'fase': None,
+                      'tipo_item': None, 'check' : None}
     __xml_fields__ = ['Check']
     __column_widths__ = {'nombre_rol': "35em",
                          'codigo': "35em",
                          '__actions__' : "50em"
                         }
+    __field_order__ = ["nombre_rol", "codigo", "tipo", "proyecto", "fase",
+                       "tipo_item", "check"]
 
     
 rol_user_table = RolTable(DBSession)
 
 class RolTableFiller(TableFiller):
     __model__ = Rol
-    __add_fields__ = {'check' : None}
+    __add_fields__ = {'proyecto':None, 'fase': None,
+                      'tipo_item': None, 'check' : None}
 
     def check(self, obj, **kw):
         #id
         checkbox = '<input type="checkbox" class="checkbox_tabla" id="' + str(obj.id_rol) + '"/>'
         return checkbox
+    
+    def proyecto(self, obj, **kw):
+        if obj.id_proyecto != 0:
+            proy = Proyecto.por_id(obj.id_proyecto)
+            return proy.nombre
+        else:
+            return u"---------"
+
+    def fase(self, obj, **kw):
+        if obj.id_fase != 0:
+            fase = Fase.por_id(obj.id_fase)
+            return fase.nombre
+        else:
+            return u"---------"
+            
+    def tipo_item(self, obj, **kw):
+        if obj.id_tipo_item != 0:
+            tipo_item = TipoItem.por_id(obj.id_tipo_item)
+            return tipo_item.codigo
+        else:
+            return u"---------"
     
     def _do_get_provider_count_and_objs(self,
                                          usuario=None, asignados=True, **kw):
