@@ -67,7 +67,14 @@
                                                 <li py:if='request.credentials and "crear rol" in request.credentials["permissions"]'>
                                                     <a href="${tg.url('/roles/new')}">Nuevo</a>
                                                 </li>
-                                                
+                                                <li class="mid"><a href="${tg.url('/rolesplantilla/')}" class="fly">Plantilla</a>
+                                                        <ul>
+                                                            <li><a href="${tg.url('/rolesplantilla/buscar')}">Búsqueda</a></li>
+                                                            <li py:if='request.credentials and "crear rol" in request.credentials["permissions"]'>
+                                                                <a href="${tg.url('/rolesplantilla/new')}">Nuevo</a>
+                                                            </li>
+                                                        </ul>
+                                                </li>                                                
                                             </ul>
                                     </li>
                                     <li><a href="${tg.url('/proyectos')}" class="fly">Proyecto</a>
