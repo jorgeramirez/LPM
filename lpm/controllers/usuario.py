@@ -137,7 +137,8 @@ class UsuarioAddForm(AddRecordForm):
     __field_order__ = ['nombre_usuario', 'nombre', 'apellido', 'password',
                        'repita_password', 'email', 'nro_documento', 'telefono']
     __field_attrs__ = {}
-    repita_password = PasswordField('repita_password')
+    
+repita_password = PasswordField('repita_password')
 
 #    from sprox.formbase import Field
 #    roles_boton = Field(SubmitButton('roles'))
