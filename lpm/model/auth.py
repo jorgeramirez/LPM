@@ -121,11 +121,11 @@ class Rol(DeclarativeBase):
         base_query = DBSession.query(Rol)
         if "id" in kw:
             rol = base_query.filter(and_(Rol.id_rol == int(kw["id"]),
-                                        Rol.tipo == u"plantilla")).one()
+                                        Rol.tipo == u"Plantilla")).one()
         elif "nombre_rol" in kw:
             rol = base_query.filter(and_(
                                     Rol.nombre_rol == kw["nombre_rol"],
-                                    Rol.tipo == u"plantilla")).one()
+                                    Rol.tipo == u"Plantilla")).one()
         return rol
     
     @classmethod
