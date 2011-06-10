@@ -359,7 +359,8 @@ class RolController(CrudRestController):
         value = self.edit_filler.get_value(values={'id_rol': int(args[0])})
         value['_method'] = 'PUT'
         page = "Rol {nombre}".format(nombre=value["nombre_rol"])
-        return dict(value=value, page=page)
+        nav = dict(atras=self.action, adelante=self.action)
+        return dict(value=value, page=page, nav=nav)
 
     @without_trailing_slash
     @expose('lpm.templates.rol.new')
@@ -370,7 +371,8 @@ class RolController(CrudRestController):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect(self.action)
         tmpl_context.widget = self.new_form
-        return dict(value=kw, page="Nuevo Rol", action=self.action)
+        nav = dict(atras=self.action, adelante=self.action)
+        return dict(value=kw, page="Nuevo Rol", action=self.action, nav=nav)
     
     @validate(rol_add_form, error_handler=new)
     @expose()
