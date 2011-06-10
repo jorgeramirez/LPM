@@ -273,7 +273,8 @@ class ProyectoController(CrudRestController):
         
         return dict(lista_elementos=proyectos, page=self.title, titulo=self.title, 
                     modelo=self.model.__name__, columnas=self.columnas,
-                    url_action="/proyectos/", puede_crear=puede_crear)
+                    url_action="/proyectos/", puede_crear=puede_crear,
+                    tipo_opciones=self.tipo_opciones)
     
     
     @expose('lpm.templates.edit')
