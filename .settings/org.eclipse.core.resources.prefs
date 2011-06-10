@@ -1,8 +1,10 @@
-#Sun Jun 05 17:01:17 PYT 2011
+#Wed Jun 08 22:00:34 PYT 2011
 eclipse.preferences.version=1
 encoding//lpm/__init__.py=utf-8
+encoding//lpm/config/__init__.py=utf-8
 encoding//lpm/config/app_cfg.py=utf-8
 encoding//lpm/config/environment.py=utf-8
+encoding//lpm/config/middleware.py=utf-8
 encoding//lpm/controllers/__init__.py=utf-8
 encoding//lpm/controllers/error.py=utf-8
 encoding//lpm/controllers/fase.py=utf-8
@@ -14,8 +16,10 @@ encoding//lpm/controllers/template.py=utf-8
 encoding//lpm/controllers/usuario.py=utf-8
 encoding//lpm/lib/app_globals.py=utf-8
 encoding//lpm/lib/authorization.py=utf-8
+encoding//lpm/lib/base.py=utf-8
 encoding//lpm/lib/mail.py=utf-8
 encoding//lpm/lib/sproxcustom.py=utf-8
+encoding//lpm/lib/util.py=utf-8
 encoding//lpm/model/__init__.py=utf-8
 encoding//lpm/model/administracion.py=utf-8
 encoding//lpm/model/auth.py=utf-8

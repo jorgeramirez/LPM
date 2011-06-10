@@ -17,7 +17,8 @@ from lpm.controllers.error import ErrorController
 from lpm.controllers.proyecto import ProyectoController
 from lpm.controllers.fase import FaseController
 from lpm.controllers.usuario import UsuarioController
-from lpm.controllers.rol import RolController
+from lpm.controllers.rol import (RolController, RolPlantillaController,
+                                 RolContextoController)
 
 import hashlib , random
 
@@ -40,6 +41,8 @@ class RootController(BaseController):
     """
     usuarios = UsuarioController(DBSession)
     roles = RolController(DBSession)
+    rolesplantilla = RolPlantillaController(DBSession)
+    rolescontexto = RolContextoController(DBSession)
     proyectos = ProyectoController(DBSession)
     fases = FaseController(DBSession)
 
@@ -50,38 +53,17 @@ class RootController(BaseController):
         """Handle the front-page."""
         return dict(page='index')
 
-    @expose('lpm.templates.about')
-    def about(self):
-        """Handle the 'about' page."""
-        return dict(page='about')
-
-    @expose('lpm.templates.environ')
-    def environ(self):
-        """This method showcases TG's access to the wsgi environment."""
-        return dict(environment=request.environ)
-
     @expose('lpm.templates.data')
     @expose('json')
     def data(self, **kw):
         """This method showcases how you can use the same controller for a data page and a display page"""
         return dict(params=kw)
 
-    @expose('lpm.templates.authentication')
-    def auth(self):
-        """Display some information about auth* on this application."""
-        return dict(page='auth')
-
     @expose('lpm.templates.index')
     @require(predicates.has_permission('manage', msg=l_('Only for managers')))
     def manage_permission_only(self, **kw):
         """Illustrate how a page for managers only works."""
         return dict(page='managers stuff')
-
-    @expose('lpm.templates.index')
-    @require(predicates.is_user('editor', msg=l_('Only for the editor')))
-    def editor_user_only(self, **kw):
-        """Illustrate how a page exclusive for the editor works."""
-        return dict(page='editor stuff')
 
     @expose('lpm.templates.login.login')
     def login(self, came_from=url('/')):

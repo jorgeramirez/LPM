@@ -107,6 +107,12 @@ class CustomPropertySingleSelectField(PropertySingleSelectField):
         pass
 
 class MultipleSelectDojo(DojoSelectShuttleField, PropertyMixin):
+    """
+    Clase que proporciona un widget para selección multiple. 
+    La misma extiende de 
+    L{DojoSelectShuttleField} y L{PropertyMixin} y cambia el template
+    utilizado por defecto que no está muy trabajado.
+    """
     template = 'lpm.templates.dojo.selectshuttle'
     def update_params(self, d):
         #en este orden no se pierden los selected_options

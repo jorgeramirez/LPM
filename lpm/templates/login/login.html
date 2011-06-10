@@ -14,13 +14,48 @@
 <body>
 <div id="loginform">
 <form action="${tg.url('/login_handler', params=dict(came_from=came_from.encode('utf-8'), __logins=login_counter.encode('utf-8')))}" method="post" accept-charset="UTF-8" class="loginfields">
-    <div><span style="font-size:18px; margin: 2px;">Iniciar Sesión</span></div>
-    <label for="loginusername">Username:</label><input type="text" id="loginusername" name="login" class="text"></input><br/>
-    <label for="loginpassword">Password:</label><input type="password" id="loginpassword" name="password" class="text"></input><br/>
-    <a style="margin-top:3px;" href="${tg.url('/recuperar_pass')}">Recuperar Contrase&ntilde;a</a><br/>
-    <label id="labelremember" for="loginremember">No cerrar sesión</label><input type="checkbox" id="loginremember" name="remember" value="2252000"/>
-    <br/>
-    <input type="submit" class="ingresar-btn" id="submit" value="Ingresar" />
+    <table>
+    <tbody>
+	    <tr>
+	    	<td  colspan="2">
+	    		<div><span style="font-size:18px; margin: 2px;">Iniciar Sesión</span></div>
+	    	</td>
+	    </tr>
+	    <tr>
+	    	<td>
+		    	<label for="loginusername">Username</label>
+	    	</td>
+	    	<td>
+		    	<input type="text" id="loginusername" name="login" class="text"></input>
+		    	<br/>
+	    	</td>
+	    </tr>
+	    <tr>
+	    	<td>
+	    		<label for="loginpassword">Password</label>
+	    	</td>
+	    	<td>
+	    		<input type="password" id="loginpassword" name="password" class="text"></input>
+	    		<br/>
+	    	</td>
+	    </tr>
+	    <tr>
+	    	<td  colspan="2">
+		    	<a style="margin-top:3px;" href="${tg.url('/recuperar_pass')}">Recuperar Contrase&ntilde;a</a>
+		    	<br/>
+	    	</td>
+	    </tr>
+	    <tr>
+	    	<td>
+		    	<label id="labelremember" for="loginremember">No cerrar sesión</label>
+		    	<input type="checkbox" id="loginremember" name="remember" value="2252000"/>
+		    </td>
+	    	<td>
+	    		<input type="submit" class="ingresar-btn" id="submit" value="Ingresar" />
+	    	</td>
+	    </tr>
+    </tbody>
+    </table>
 </form>
 
 

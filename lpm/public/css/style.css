@@ -35,7 +35,7 @@ a:hover{text-decoration:none;}
 h1 { font-size:2.91em; color:#303030; font-weight:normal; line-height:.9em; margin-bottom:14px;}
 h1 span { color:#65696d; font-size:.69em; display:block; padding-top:4px;}
 h1 span em { font-style:normal; color:#01a5e4;}
-h2 {font-size:2.91em; color:#303030; font-weight:normal; line-height:.9em; margin-bottom:14px;}
+h2 {/*font-size:2.91em;*/ color:#303030; font-weight:normal; line-height:.9em; margin-bottom:14px;}
 h3 { font-size:1.27em; color:#3f4449; font-weight:normal;}
 h3 a {color:#3f4449; }
 h4 { font-size:1.27em; color:#3f4449; font-weight:normal; margin-bottom:17px;}
@@ -130,6 +130,7 @@ height: 500px;
 margin: 0;
 padding: 0;
 line-height: normal;
+position:relative;
 }
 #content .cntbot { background-image: url(../images/glass_bot.png);
 background-repeat: no-repeat;
@@ -171,34 +172,39 @@ background-repeat: repeat-x;
 background:#FFFFFF none repeat scroll 0 0;
 border:1px solid #E5E5E5;
 font-weight:normal;
-margin-left:230px;
-margin-top:40px;
+margin:auto;
+
 padding:16px 16px 40px;
-width:320px;
+width:280px;
 height:107px;
+position:absolute;
+left:35%;
+top:15%;
 }
 
-.ingresar-btn{
--moz-border-radius-bottomleft:11px;
--moz-border-radius-bottomright:11px;
--moz-border-radius-topleft:11px;
--moz-border-radius-topright:11px;
+.ingresar-btn, .submitbutton {
+-moz-border-radius-bottomleft:10px;
+-moz-border-radius-bottomright:10px;
+-moz-border-radius-topleft:10px;
+-moz-border-radius-topright:10px;
 cursor:pointer;
-font-family:"Lucida Grande",Verdana,Arial,"Bitstream Vera Sans",sans-serif;
-font-size:12px;
-margin-top: 13px;
+font-family:arial, verdana, sans-serif;
+/*font-family:"Lucida Grande",Verdana,Arial,"Bitstream Vera Sans",sans-serif;*/
+font-size:10px;
+margin-top: 5px;
 padding:3px 10px;
 text-decoration:none;
 -moz-background-clip:border;
 -moz-background-inline-policy:continuous;
 -moz-background-origin:padding;
-background: #3381B7 url(images/boton.png) repeat-x scroll left top;
+background: #3381B7 url(../images/blank.gif) repeat-x scroll left top;
 width:90px; 
 border-color:#3381B7;
 border-style: groove;
-color:#FFFFFF;
+color:#DDDDDD;
 font-weight:bold;
 text-shadow:0 -1px 0 rgba(0, 0, 0, 0.3);
+float:right;
 }
 
 #loginremember
@@ -206,7 +212,7 @@ text-shadow:0 -1px 0 rgba(0, 0, 0, 0.3);
     float:right;
     vertical-align: middle;
     height: 26px;
-    margin-top: 20px;
+    /*margin-top: 20px;*/
 }
 
 #labelremember 
@@ -216,7 +222,7 @@ text-shadow:0 -1px 0 rgba(0, 0, 0, 0.3);
     margin:0;
     margin-right: 15px;
     vertical-align: middle;
-    margin-top: 20px;
+    /*margin-top: 20px;*/
     margin-left: 2px;
 }
 
@@ -233,6 +239,10 @@ font-size:127%;
 span.code {
 background:#EEEEEE none repeat scroll 0% 0%;
 font-weight:bold;
+}
+#flash {
+float:right;
+padding-left: 95px;
 }
 #flash, .notice {
 font-size:120%;
@@ -272,3 +282,56 @@ clear:both;
 text-align:left; margin-top:2px;
 font-family:sans-serif; font-size:12;
 }
+
+/*columna donde van los elementos de navegación */
+.panel_nav {
+width:150;
+float:right;
+}
+
+/*columna del contenido */
+.columna_contenido {
+min-width:90%;
+}
+
+/*botones*/
+.boton {
+-moz-border-radius-bottomleft:10px;
+-moz-border-radius-bottomright:10px;
+-moz-border-radius-topleft:10px;
+-moz-border-radius-topright:10px;
+cursor:pointer;
+font-family:arial, verdana, sans-serif;
+/*font-family:"Lucida Grande",Verdana,Arial,"Bitstream Vera Sans",sans-serif;*/
+font-size:10px;
+margin-top: 6px;
+margin-right: 10px;
+padding:3px 10px;
+text-decoration:none;
+-moz-background-clip:border;
+-moz-background-inline-policy:continuous;
+-moz-background-origin:padding;
+background: #3381B7 url(../images/blank.gif) repeat-x scroll left top;
+width:90px; 
+border-color:#3381B7;
+border-style: groove;
+color:#DDDDDD;
+font-weight:bold;
+text-shadow:0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+
+
+
+.link_boton {
+text-decoration: none;
+}
+
+
+
+
+/* labels de los forms de sprox */
+.labelcol {
+padding-left:2px;
+padding-right:10px;
+}
+

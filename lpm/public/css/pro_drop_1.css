@@ -30,7 +30,7 @@ width: 951px;
 margin: 0 auto 0 auto;
 white-space: nowrap;}
 #nav li.top {display:block; float:left;}
-#nav li a.top_link {display:block; float:left; height:36px; line-height:27px; color:#ccc; text-decoration:none; font-size:11px; font-weight:bold; padding:0 0 0 12px; cursor:pointer;
+#nav li a.top_link {display:block; float:left; height:36px; line-height:27px; color:#ddd; text-decoration:none; font-size:11px; font-weight:bold; padding:0 0 0 12px; cursor:pointer;
 background: url(../images/menu/blank.gif);
 }
 #nav li a.top_link span {float:left; display:block; padding:0 24px 0 12px; height:36px;

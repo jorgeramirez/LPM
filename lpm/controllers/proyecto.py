@@ -44,7 +44,7 @@ class ProyectoTable(TableBase):
                   }
     __omit_fields__ = ['fases', 'tipos_de_item', 'id_proyecto', 'descripcion']
     __default_column_width__ = '15em'
-    __column_widths__ = {'complejidad_total': "35em",
+    __column_widths__ = {'complejidad_total': "25em",
                          'numero_fases': "35em",
                          '__actions__' : "50em",
                          'codigo': "30em"
@@ -67,35 +67,35 @@ class ProyectoTableFiller(CustomTableFiller):
     def __actions__(self, obj):
         """Links de acciones para un registro dado"""
         value = '<div>'
-        style = 'text-align:left; margin-top:2px;';
-        style += 'font-family:sans-serif; font-size:12;'
+        clase = 'actions'
 
-        if PoseePermiso('modificar proyecto', 
+        if PoseePermiso('modificar proyecto',
                         id_proyecto=obj.id_proyecto).is_met(request.environ):
             value += '<div>' + \
-                        '<a href="'+ str(obj.id_proyecto) +'/edit" ' + \
-                        'style="' + style + '">Modificar</a>' + \
+                        '<a href="/proyectos/'+ str(obj.id_proyecto) + '/edit" ' + \
+                        'class="' + clase + '">Modificar</a>' + \
                      '</div><br />'
+
         if PoseePermiso('eliminar proyecto',
                         id_proyecto=obj.id_proyecto).is_met(request.environ):
             value += '<div><form method="POST" action="' + str(obj.id_proyecto) + '" class="button-to">'+\
                      '<input type="hidden" name="_method" value="DELETE" />' +\
                      '<input onclick="return confirm(\'Está seguro?\');" value="Delete" type="submit" '+\
                      'style="background-color: transparent; float:left; border:0; color: #286571;'+\
-                     'display: inline; margin: 0; padding: 0;' + style + '"/>'+\
+                     'display: inline; margin: 0; padding: 0;" class="' + clase + '"/>'+\
                      '</form></div><br />'
 
-        if obj.estado == "No Iniciado":
+        if obj.estado == u"No Iniciado":
             if PoseePermiso('iniciar proyecto', 
                         id_proyecto=obj.id_proyecto).is_met(request.environ):
                 value += '<div>' + \
-                            '<a href="' + str(obj.id_proyecto) + '/iniciar/' +\
-                                '" style="' + style + '">Iniciar</a>' + \
+                            '<a href="/proyectos/' + str(obj.id_proyecto) + '/iniciar/" ' +\
+                            'class="' + clase + '">Iniciar</a>' + \
                          '</div><br />'
         value += '</div>'
         return value
     
-    '''def _do_get_provider_count_and_objs(self, **kw):
+    def _do_get_provider_count_and_objs(self, **kw):
         """
         Sobreescribimos este método para poder listar
         solamente los proyectos para los cuales tenemos
@@ -124,13 +124,14 @@ class ProyectoTableFiller(CustomTableFiller):
                 c += 1
             if c == len(filtrados):
                 break
-        return len(filtrados), filtrados'''
+        return len(filtrados), filtrados
 
 proyecto_table_filler = ProyectoTableFiller(DBSession)
 
 
 class LiderField(CustomPropertySingleSelectField):
-    """Dropdown list para líder de proyecto"""
+    """Dropdown list para líder de proyecto
+    al crear por defecto se selecciona el usuario actual"""
     def _my_update_params(self, d, nullable=False):
         options = []
         if self.accion == "edit":
@@ -140,12 +141,23 @@ class LiderField(CustomPropertySingleSelectField):
                 lider = proy.obtener_lider()
                 options.append((lider.id_usuario, '%s (%s)'%(lider.nombre_usuario, 
                                 lider.nombre + " " + lider.apellido)))
+                if (PoseePermiso('asignar rol').is_met(request.environ)):
+                    usuarios = DBSession.query(Usuario).\
+                        filter(Usuario.id_usuario!=lider.id_usuario).all()
+                    for u in usuarios:
+                        options.append((u.id_usuario, '%s (%s)'%(u.nombre_usuario, 
+                        u.nombre + " " + u.apellido)))
+                        
         elif self.accion == "new":
-            options.append((None, "----------"))
-            usuarios = DBSession.query(Usuario).all()
+            user = Usuario.by_user_name(request.identity['repoze.who.userid'])
+            options.append((user.id_usuario, '%s (%s)'%(user.nombre_usuario, 
+                        user.nombre + " " + user.apellido)))
+            usuarios = DBSession.query(Usuario).\
+                filter(Usuario.id_usuario != user.id_usuario).all()
             for u in usuarios:
                 options.append((u.id_usuario, '%s (%s)'%(u.nombre_usuario, 
-                        u.nombre + " " + u.apellido)))
+                    u.nombre + " " + u.apellido)))
+                    
         d['options'] = options
         return d
 
@@ -158,7 +170,7 @@ class ProyectoAddForm(AddRecordForm):
     __field_order__ = ['nombre', 'descripcion']
 
     if PoseePermiso('asignar rol').is_met(request.environ):
-        lider = LiderField('lider', label_text="Lider de Proyecto", accion="new")
+        lider = LiderField('lider', label_text="Lider", accion="new")
         __field_order__.append('lider')
 
 proyecto_add_form = ProyectoAddForm(DBSession)
@@ -170,12 +182,11 @@ class ProyectoEditForm(EditableForm):
                        'estado', 'numero_fases', 'codigo', 'fases', 
                        'tipos_de_item']
     if All(PoseePermiso('asignar rol'), 
-           PoseePermiso('eliminar rol')).is_met(request.environ):
-        lider = LiderField('lider', label_text="Lider de Proyecto", 
+           PoseePermiso('eliminar rol')).is_met(request.environ):#para qué el permiso de eliminar?
+        lider = LiderField('lider', label_text="Lider", 
                            accion="edit")
 
 proyecto_edit_form = ProyectoEditForm(DBSession)        
-
 
 class ProyectoEditFiller(EditFormFiller):
     __model__ = Proyecto
@@ -200,40 +211,47 @@ class ProyectoController(CrudRestController):
     new_form = proyecto_add_form
     edit_form = proyecto_edit_form
     edit_filler = proyecto_edit_filler
-
+    
+    #para el form de busqueda
+    columnas = dict(nombre_proyecto="texto", codigo="texto",#lider="text",
+                    estado="combobox")
+    
+    tipo_opciones = [u'Iniciado', u'No iniciado']
+    
     #{ Métodos
     @with_trailing_slash
     @paginate('lista_elementos', items_per_page=5)
-    @expose('lpm.templates.get_all')
+    @expose('lpm.templates.proyecto.get_all')
     @expose('json')
     def get_all(self, *args, **kw):
         """ 
         Retorna todos los registros
         Retorna una página HTML si no se especifica JSON
         """
+        puede_crear = PoseePermiso("crear proyecto").is_met(request.environ)
         if pylons.request.response_type == 'application/json':
             return self.table_filler.get_value(**kw)
         if not getattr(self.table.__class__, '__retrieves_own_value__', False):
             proyectos = self.table_filler.get_value(**kw)
         else:
             proyectos = []
+            
         tmpl_context.widget = self.table
-        retorno = self.retorno_base()
-        retorno["lista_elementos"] = proyectos
-        return retorno
+            
+        return dict(lista_elementos=proyectos, page=self.title, titulo=self.title, 
+                    modelo=self.model.__name__, columnas=self.columnas,
+                    url_action="/proyectos/", puede_crear=puede_crear,
+                    tipo_opciones=self.tipo_opciones)
 
-    def retorno_base(self):
-        """Retorno basico para buscar() y get_all()"""
-        return {"action": self.tmp_action, 
-                "page": self.title,
-                "titulo": self.title,
-                "modelo": self.model.__name__}
                 
     @without_trailing_slash
     @paginate('lista_elementos', items_per_page=5)
-    @expose('lpm.templates.get_all')
+    @expose('lpm.templates.proyecto.get_all')
     @expose('json')
     def post_buscar(self, *args, **kw):
+        puede_crear = PoseePermiso("crear proyecto").is_met(request.environ)
+
+        '''
         pp = PoseePermiso('consultar proyecto')
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
@@ -247,29 +265,26 @@ class ProyectoController(CrudRestController):
             if not kw.has_key(val_key):
                 val_key = val_tmp_date.format(i=i)
             filtros[kw[col_tmp.format(i=i)]] = kw[val_key]
-        buscar_table_filler = ProyectoTableFiller(DBSession)
-        buscar_table_filler.filtros = filtros
-        proyectos = buscar_table_filler.get_value()
+        '''
         tmpl_context.widget = self.table
-        retorno = self.retorno_base()
-        retorno["lista_elementos"] = proyectos
-        return retorno
+        buscar_table_filler = ProyectoTableFiller(DBSession)
+        buscar_table_filler.filtros = kw
+        proyectos = buscar_table_filler.get_value()
+        
+        return dict(lista_elementos=proyectos, page=self.title, titulo=self.title, 
+                    modelo=self.model.__name__, columnas=self.columnas,
+                    url_action="/proyectos/", puede_crear=puede_crear)
     
-    @with_trailing_slash
-    @expose('lpm.templates.buscar')
-    def buscar(self, *args, **kw):
-        columnas = dict(codigo="texto", nombre="texto", estado="texto",
-                        fecha_creacion="fecha")
-        return dict(page="Buscar Proyectos",
-                    columnas=columnas)
     
     @expose('lpm.templates.edit')
     def edit(self, *args, **kw):
         """Despliega una pagina para realizar modificaciones"""
+        '''
         pp = PoseePermiso('modificar proyecto', id_proyecto=args[0])
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect("/proyectos")
+        '''
         tmpl_context.widget = self.edit_form
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
         value = self.edit_filler.get_value(values={'id_proyecto': id_proyecto})

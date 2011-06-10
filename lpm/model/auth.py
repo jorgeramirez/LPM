@@ -19,7 +19,7 @@ except ImportError:
              'If you are on python2.4 this library is not part of python. '
              'Please install it. Example: easy_install hashlib')
 
-from sqlalchemy import Table, ForeignKey, Column, and_
+from sqlalchemy import Table, ForeignKey, Column, and_, or_, not_
 from sqlalchemy.types import Unicode, Integer, DateTime
 from sqlalchemy.orm import relation, synonym
 
@@ -141,6 +141,8 @@ class Rol(DeclarativeBase):
         desasignados = []
         #falta discrimininar el tipo
         for r in roles:
+            if r.tipo == u"Plantilla":
+                continue
             esta = False
             for u in r.usuarios:
                 if (u.id_usuario == id_u):
@@ -162,6 +164,87 @@ class Rol(DeclarativeBase):
         @rtype: L{Rol}
         """        
         return DBSession.query(cls).filter_by(id_rol=id).one()
+
+    @classmethod
+    def crear_rol(cls, **kw):
+        """ Crea un nuevo rol """
+        if "sprox_id" in kw:
+            del kw["sprox_id"]
+        pks = kw["permisos"]
+        del kw["permisos"]
+        for k in ["id_proyecto", "id_fase", "id_tipo_item"]:
+            if kw.has_key(k):
+                kw[k] = int(kw[k])
+        rol_new = Rol(**kw)
+        for i, pk in enumerate(pks):
+            pks[i] = int(pk)
+        permisos = DBSession.query(Permiso).filter( \
+                                            Permiso.id_permiso.in_(pks)).all()
+        for p in permisos:
+            p.roles.append(rol_new)
+            
+        #seteamos el tipo
+        if kw["tipo"] == "deducir":
+            #calculamos el tipo para el rol con contexto
+            rol_new.tipo = u"Tipo de Ítem"
+            for p in permisos:
+                np = p.nombre_permiso
+                if (np.find("item") > 0 and np.find("tipo item") < 0) or \
+                      np.find("lb") > 0 or np.find("impacto") > 0:
+                    rol_new.tipo = u"Fase"
+                elif np.find("proyecto") > 0 or np.find("fase") > 0:
+                    rol_new.tipo = u"Proyecto"
+                    break
+        DBSession.flush()
+        rol_new.codigo = Rol.generar_codigo(rol_new)
+        DBSession.add(rol_new)
+        return rol_new
+
+    @classmethod
+    def actualizar_rol(cls, id_rol, **kw):
+        """Actualiza un rol"""
+        if "sprox_id" in kw:
+            del kw["sprox_id"]
+        pks = kw["permisos"]
+        for i, pk in enumerate(pks):
+            pks[i] = int(pk)
+        del kw["permisos"]
+        for k in ["id_proyecto", "id_fase", "id_tipo_item"]:
+            if kw.has_key(k):
+                kw[k] = int(kw[k])
+        rol_mod = Rol.por_id(id_rol)
+        for k in ["id_proyecto", "id_fase", "id_tipo_item", "nombre_rol",
+                  "descripcion"]:
+            setattr(rol_mod, k, kw[k])
+        c = 0
+        while c < len(rol_mod.permisos):
+            p = rol_mod.permisos[c]
+            if p.id_permiso not in pks:
+                del rol_mod.permisos[c]
+            else:
+                c += 1
+        if pks:
+            permisos = DBSession.query(Permiso).filter( \
+                                            Permiso.id_permiso.in_(pks)).all()
+            for p in permisos:
+                if p not in rol_mod.permisos:
+                    p.roles.append(rol_mod)
+        
+        #seteamos el tipo
+        if rol_mod.tipo not in ["Sistema", "Plantilla"]:
+            tipo = ""
+            for p in permisos:
+                np = p.nombre_permiso
+                if np.find("tipo de item") > 0:
+                    tipo = u"Tipo de Ítem"
+                if (np.find("item") > 0 and np.find("tipo item") < 0) or \
+                      np.find("lb") > 0 or np.find("impacto") > 0:
+                    tipo = u"Fase"
+                elif np.find("proyecto") > 0 or np.find("fase") > 0:
+                    tipo = u"Proyecto"
+                    break
+            rol_mod.tipo = tipo
+        return rol_mod
     #}
 
 
@@ -331,6 +414,24 @@ class Permiso(DeclarativeBase):
         @rtype: L{Permiso}
         """        
         return DBSession.query(cls).filter_by(id_permiso=id).one()
+
+    @classmethod
+    def permisos_de_sistema(cls):
+        """
+        Método de clase que retorna los permisos de nivel de sistema.
+        """
+        return DBSession.query(Permiso).filter( \
+                   or_(Permiso.nombre_permiso.ilike("%rol%"), 
+                       Permiso.nombre_permiso.ilike("%usuario%"))).all()
+
+    @classmethod
+    def permisos_con_contexto(cls):
+        """
+        Método de clase que retorna los permisos que poseen un contexto.
+        """
+        return DBSession.query(Permiso).filter(not_( \
+                   or_(Permiso.nombre_permiso.ilike("%rol%"), 
+                       Permiso.nombre_permiso.ilike("%usuario%")))).all()
     #}
 
 

@@ -15,8 +15,8 @@ from tg.decorators import (paginate, expose, with_trailing_slash,
                            without_trailing_slash)
 from tg import redirect, request, require, flash, url, validate 
 
-from lpm.controllers.validaciones.usuarioFormValidator import UsuarioAddFormValidator
-from lpm.model import DBSession, Usuario, Rol
+from lpm.controllers.validaciones import UsuarioAddFormValidator
+from lpm.model import DBSession, Usuario, Rol, TipoItem, Proyecto, Fase
 from lpm.lib.sproxcustom import CustomTableFiller
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
 from lpm.controllers.rol import (RolTable as RolRolTable,
@@ -138,7 +138,7 @@ class UsuarioAddForm(AddRecordForm):
                        'repita_password', 'email', 'nro_documento', 'telefono']
     __field_attrs__ = {}
     
-repita_password = PasswordField('repita_password')
+    repita_password = PasswordField('repita_password')
 
 #    from sprox.formbase import Field
 #    roles_boton = Field(SubmitButton('roles'))
@@ -179,31 +179,57 @@ class RolTable(TableBase):
     __model__ = Rol
     __headers__ = {'nombre_rol' : u'Nombre de Rol',
                    'codigo' : u"Código", 'tipo' : u'Tipo',
-                   'check' : u'Check'
+                   'proyecto': u'Proyecto', 'fase': u"Fase", 
+                   'tipo_item': u"Tipo de Ítem", 'check' : u'Check',
                   }
     __omit_fields__ = ['id_rol', 'permisos', 'usuarios',
                        'id_proyecto', 'id_fase', 'id_tipo_item',
-                       'descripcion']
+                       'descripcion', 'creado']
     __default_column_width__ = '15em'
     
-    __add_fields__ = {'check' : None}
+    __add_fields__ = {'proyecto':None, 'fase': None,
+                      'tipo_item': None, 'check' : None}
     __xml_fields__ = ['Check']
     __column_widths__ = {'nombre_rol': "35em",
                          'codigo': "35em",
                          '__actions__' : "50em"
                         }
+    __field_order__ = ["nombre_rol", "codigo", "tipo", "proyecto", "fase",
+                       "tipo_item", "check"]
 
     
 rol_user_table = RolTable(DBSession)
 
 class RolTableFiller(TableFiller):
     __model__ = Rol
-    __add_fields__ = {'check' : None}
+    __add_fields__ = {'proyecto':None, 'fase': None,
+                      'tipo_item': None, 'check' : None}
 
     def check(self, obj, **kw):
         #id
         checkbox = '<input type="checkbox" class="checkbox_tabla" id="' + str(obj.id_rol) + '"/>'
         return checkbox
+    
+    def proyecto(self, obj, **kw):
+        if obj.id_proyecto != 0:
+            proy = Proyecto.por_id(obj.id_proyecto)
+            return proy.nombre
+        else:
+            return u"---------"
+
+    def fase(self, obj, **kw):
+        if obj.id_fase != 0:
+            fase = Fase.por_id(obj.id_fase)
+            return fase.nombre
+        else:
+            return u"---------"
+            
+    def tipo_item(self, obj, **kw):
+        if obj.id_tipo_item != 0:
+            tipo_item = TipoItem.por_id(obj.id_tipo_item)
+            return tipo_item.codigo
+        else:
+            return u"---------"
     
     def _do_get_provider_count_and_objs(self,
                                          usuario=None, asignados=True, **kw):
@@ -256,7 +282,7 @@ class UsuarioController(CrudRestController):
 
     #para el form de busqueda
     columnas = dict(nombre_usuario="texto", nombre="texto", apellido="texto",
-                    nro_documento="texto")
+                    email="texto", nro_documento="texto")
  
     #{ Métodos
     @with_trailing_slash
@@ -298,16 +324,18 @@ class UsuarioController(CrudRestController):
                 clase = 'actions'   
                 if PoseePermiso('modificar rol').is_met(request.environ):
                     value += '<div>' + \
-                                '<a href="/roles/'+ str(obj.id_rol) +'/edit" ' + \
+                                '<a href="/roles/'+ str(obj.id_rol) + '/edit/" ' + \
                                 'class="' + clase + '">Ver</a>' + \
-                             '</div><br /></div>'
-                    return value
+                             '</div><br />'
+                value += '</div>'           
+                return value
 
             def _do_get_provider_count_and_objs(self, **kw):
                 print kw
                 user = Usuario.por_id(int(kw["id_usuario"]))
                 return len(user.roles), user.roles
 
+        tmpl_context.widget = self.edit_form
         usuarios = self.table_filler.get_value(**kw)
         roles = mis_roles_tf(DBSession).get_value(id_usuario=args[0])
         tmpl_context.tabla_roles = RolRolTable(DBSession)
@@ -339,7 +367,9 @@ class UsuarioController(CrudRestController):
 #        if not pp.is_met(request.environ):
 #            flash(pp.message % pp.nombre_permiso, 'warning')
 #            redirect("/usuarios")
-        return dict(super(UsuarioController, self).new(*args, **kw), page='Nuevo Usuario')
+        nav = dict(atras="/", adelante="/proyectos")
+        return dict(super(UsuarioController, self).new(*args, **kw),
+                     page='Nuevo Usuario', nav=nav)
  
     #@validate(proyecto_edit_form, error_handler=edit)
     @expose()
