@@ -45,15 +45,17 @@ class CustomTableFiller(TableFiller):
         col_tmp = "filter-type-{i}" 
         #contiene el valor para esa columna.
         val_tmp_txt = "texto-{i}"   
-        val_tmp_date = "fecha-{i}"
         val_tmp_combo = "combobox-{i}"
         for i in xrange(0, len(filtros) / 2):
-            for tmp in [val_tmp_txt, val_tmp_date, val_tmp_combo]:
-                val_key = tmp.format(i=i)
+            for tmp in [val_tmp_txt, val_tmp_combo]:
+                val_key = tmp.format(i=i) #valor del filtro
+                _fk = filtros[col_tmp.format(i=i)] #key para self.__filtros
                 if filtros.has_key(val_key):
-                    self.__filtros[filtros[col_tmp.format(i=i)]] = filtros[val_key]
-                    break        
-        print self.__filtros
+                    if self.__filtros.has_key(_fk):
+                        self.__filtros[_fk].append(filtros[val_key])
+                    else:
+                        self.__filtros[_fk] = [filtros[val_key]]
+                    break
     filtros = property(get_filtros, set_filtros)
     
     def _do_get_provider_count_and_objs(self, **kw): #sobreescribimos el método
@@ -66,19 +68,21 @@ class CustomTableFiller(TableFiller):
         if not self.filtros:
             return query.count, query.all()
         mapper = self.__entity__.__mapper__
-        for fil_col, fil_val in self.filtros.items():
+        for fil_col, fil_val_list in self.filtros.items(): #filtrado OR
             col = mapper.columns.get(fil_col)
             col_type = col.type.__visit_name__
+            res = []
             if col_type == 'integer':
-                res = query.filter(col == int(fil_val)).all()
+                for i, fvl in enumerate(fil_val_list):
+                    fil_val_list[i] = int(fvl)
+                res = query.filter(col.in_(fil_val_list)).all()
             elif col_type == 'unicode':
-                res = query.filter(col.ilike("%" + fil_val + "%")).all()
-            elif col_type == 'datetime':
-                res = query.filter(col == fil_val).all() #FIXME
+                for fvl in fil_val_list:
+                    res.extend(query.filter(col.ilike(fvl)).all())
             filtrados.extend(res)
-            filtrados = self.__remover_duplicados(filtrados)
+        filtrados = self.__remover_duplicados(filtrados)
         return len(filtrados), filtrados
-    
+
     def __remover_duplicados(self, l):
         l2 = []
         for i in l:
