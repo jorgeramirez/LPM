@@ -15,7 +15,7 @@ from tg.decorators import (paginate, expose, with_trailing_slash,
                            without_trailing_slash)
 from tg import redirect, request, require, flash, url, validate 
 
-from lpm.controllers.validaciones import UsuarioAddFormValidator
+from lpm.controllers.validaciones import UsuarioAddFormValidator, UsuarioEditFormValidator
 from lpm.model import DBSession, Usuario, Rol, TipoItem, Proyecto, Fase
 from lpm.lib.sproxcustom import CustomTableFiller
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
@@ -152,19 +152,19 @@ class UsuarioEditForm(EditableForm):
     __hide_fields__ = ['id_usuario']
     __omit_fields__ = ['nombre_usuario', 'creado', '_password', 'password',
                         'historial_lb', 'roles', 'historial_item']
-    __require_fields__ = ['nombre', 'apellido', 'password',
+    __require_fields__ = ['nombre', 'apellido', 'nuevo_password',
                           'repita_password', 'email']
-    __check_if_unique__ = True
-    __field_order__ = ['nombre_usuario', 'nombre', 'apellido', 'password1',
-                       'password2', 'email', 'nro_documento', 'telefono']
+    __base_validator__ = UsuarioEditFormValidator
+    __field_order__ = ['nombre_usuario', 'nombre', 'apellido', 'nuevo_password',
+                       'repita_password', 'email', 'nro_documento', 'telefono']
     __field_attrs__ = {
                        'nombre_usuario': { 'maxlength' : '32'},
                        'roles' : {'label_text' :'Roles'}
                        }
-    __add_fields__ = {'password1' : PasswordField('nuevo_password'),
-                      'password2' : PasswordField('repita_nuevo_password'),
-                      }
 
+    nuevo_password = PasswordField('nuevo_password')
+    repita_password = PasswordField('repita_nuevo_password')
+    
 usuario_edit_form = UsuarioEditForm(DBSession)        
 
 
@@ -331,7 +331,6 @@ class UsuarioController(CrudRestController):
                 return value
 
             def _do_get_provider_count_and_objs(self, **kw):
-                print kw
                 user = Usuario.por_id(int(kw["id_usuario"]))
                 return len(user.roles), user.roles
 
@@ -371,14 +370,29 @@ class UsuarioController(CrudRestController):
         return dict(super(UsuarioController, self).new(*args, **kw),
                      page='Nuevo Usuario', nav=nav)
  
-    #@validate(proyecto_edit_form, error_handler=edit)
+    @validate(usuario_edit_form, error_handler=edit)
     @expose()
     def put(self, *args, **kw):
-        """update"""
         if "sprox_id" in kw:
             del kw["sprox_id"]
-        print kw
-        #redirect("../") 
+        if "repita_nuevo_password" in kw:
+            del kw["repita_nuevo_password"]
+        if kw["nro_documento"]:
+            kw["nro_documento"] = int(kw["nro_documento"])
+        pp = PoseePermiso('modificar usuario')
+        if not pp.is_met(request.environ):
+            flash(pp.message % pp.nombre_permiso, 'warning')
+            redirect(self.action)
+        transaction.begin()
+        usuario = Usuario.por_id(args[0])
+        usuario.nombre = kw["nombre"]
+        usuario.apellido = kw["apellido"]
+        usuario.email = kw["email"]
+        usuario.telefono = kw["telefono"]
+        usuario.nro_documento = kw["nro_documento"]
+        usuario.password = kw["nuevo_password"]
+        transaction.commit()      
+        redirect("../") 
     
     @validate(usuario_add_form, error_handler=new)
     @expose()
@@ -387,9 +401,9 @@ class UsuarioController(CrudRestController):
             del kw["sprox_id"]
         if "repita_password" in kw:
             del kw["repita_password"]
-        transaction.begin()
         if kw["nro_documento"]:
             kw["nro_documento"] = int(kw["nro_documento"])
+        transaction.begin()
         usuario = Usuario(**kw)
         DBSession.add(usuario)
         transaction.commit()

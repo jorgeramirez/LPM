@@ -317,6 +317,11 @@ class Usuario(DeclarativeBase):
         """        
         return DBSession.query(cls).filter_by(id_usuario=id).one()
     
+    @classmethod
+    def by_nro_documento(cls, nro_doc):
+        """Return the user object whose nro_doc address is ``nro_documento``."""
+        return DBSession.query(cls).filter_by(nro_documento=int(nro_doc)).first()
+    
     def _set_password(self, password):
         """Hash ``password`` on the fly and store its hashed version."""
         # Make sure password is a str because we cannot hash unicode objects
