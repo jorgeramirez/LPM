@@ -1,15 +1,34 @@
+from tg import request
+
+from lpm.lib.util import UrlParser
 from lpm.model import Usuario
+
 from formencode.validators import String, Email, NotEmpty, FieldsMatch, NotEmpty
 from formencode import FancyValidator, Schema, All, Invalid
 
-__all__ = ["UsuarioAddFormValidator"]
+__all__ = ['UsuarioAddFormValidator','UsuarioEditFormValidator']
 
 class UniqueUsername(FancyValidator):
     def _to_python(self, value, state):
         usernames = Usuario.by_user_name(value)
-        print usernames
         if usernames != None:
-            raise Invalid('El usuario ya existe',
+            raise Invalid('El usuario ya existe en sistema',
+                                        value, state)
+        return value
+
+class UniqueNewEmail(FancyValidator):
+    def _to_python(self, value, state):
+        emails = Usuario.by_email_address(value)
+        if emails != None:
+            raise Invalid('Email ya existe en sistema',
+                                        value, state)
+        return value
+
+class UniqueNewNroDocumento(FancyValidator):
+    def _to_python(self, value, state):
+        nro_doc = Usuario.by_nro_documento(value)
+        if nro_doc != None:
+            raise Invalid('Nro de Documento ya existe en sistema',
                                         value, state)
         return value
 
@@ -33,20 +52,74 @@ class UsuarioAddFormValidator(Schema):
     repita_password = All(String(min=6,messages={'tooShort':
             'Password incorrecto, minimo 6 caracteres'}), 
             NotEmpty(messages={'empty':'Ingrese password'}))
-    email = Email(not_empty=True,messages = {
+    email = All(Email(not_empty=True,messages = {
         'empty': 'Ingrese una direccion de email',
         'noAt': 'Un email debe contener un @',
         'badUsername': 'Ingrese un usuario de email correcto',
         'badDomain': 'Ingrese un dominio de email correcto',
-        })
+        }),UniqueNewEmail())
     chained_validators=(FieldsMatch('password','repita_password',
                                                messages={'invalidNoMatch':
                                                'Passwords no coinciden'}),)
     nro_documento = All(String(min=5,max=50,messages = {
             'tooLong': "Nro de Documendo invalido, debe tener 5 digitos como minimo",
             'tooShort': "Nro de Documendo invalido",}),
-             NotEmpty(messages={'empty':'Ingrese numero de documento'}))
+             NotEmpty(messages={'empty':'Ingrese numero de documento'}), UniqueNewNroDocumento())
     telefono = All(String(min=6,max=15,messages = {
-            'tooLong': "Nro de Telefono invalido, debe tener 6 digitos como minimo",
-            'tooShort': "Nro de Telefono invalido",}),
+            'tooShort': "Nro de Telefono invalido, debe tener 6 digitos como minimo",
+            'tooLong': "Nro de Telefono invalido",}),
              NotEmpty(messages={'empty':'Ingrese numero de telefono'}))
+             
+
+class UniqueEditEmail(FancyValidator):
+    def _to_python(self, value, state):
+        emails = Usuario.by_email_address(value)
+        id_usuario = UrlParser.parse_id(request.url, "usuarios")
+        if emails != None and id_usuario != emails.id_usuario:
+            raise Invalid('Email ya existe en sistema',
+                                        value, state)
+        return value
+
+class UniqueEditNroDocumento(FancyValidator):
+    def _to_python(self, value, state):
+        nro_doc = Usuario.by_nro_documento(value)
+        id_usuario = UrlParser.parse_id(request.url, "usuarios")
+        if nro_doc != None and id_usuario != nro_doc.id_usuario:
+            raise Invalid('Nro de Documento ya existe en sistema',
+                                        value, state)
+        return value
+
+class UsuarioEditFormValidator(Schema):
+    nombre = All(String(min=2,max=50, messages={'tooShort':
+            'Nombre incorrecto, minimo 4 caracteres','tooLong':
+            'Nombre incorrecto, maximo 50 caracteres'}),
+            NotEmpty(messages={'empty':'Ingrese un nombre'}))
+    apellido = All(String(min=2,max=50, messages={'tooShort':
+            'Apellido incorrecto, minimo 4 caracteres','tooLong':
+            'Apellido incorrecto, maximo 50 caracteres'}),
+            NotEmpty(messages={'empty':'Ingrese un apellido'}))
+    nuevo_password = All(String(min=6,messages={'tooShort':
+            'Password incorrecto, minimo 6 caracteres'}), 
+            NotEmpty(messages={'empty':'Ingrese password'}))
+    repita_nuevo_password = All(String(min=6,messages={'tooShort':
+            'Password incorrecto, minimo 6 caracteres'}), 
+            NotEmpty(messages={'empty':'Ingrese password'}))
+    email = All(Email(not_empty=True,messages = {
+        'empty': 'Ingrese una direccion de email',
+        'noAt': 'Un email debe contener un @',
+        'badUsername': 'Ingrese un usuario de email correcto',
+        'badDomain': 'Ingrese un dominio de email correcto',
+        }),UniqueEditEmail())
+    chained_validators=(FieldsMatch('nuevo_password','repita_nuevo_password',
+                                               messages={'invalidNoMatch':
+                                               'Passwords no coinciden'}),)
+    nro_documento = All(String(min=5,max=50,messages = {
+            'tooShort': "Nro de Documendo invalido, debe tener 5 digitos como minimo",
+            'tooLong': "Nro de Documendo invalido",}),
+             NotEmpty(messages={'empty':'Ingrese numero de documento'}), UniqueEditNroDocumento())
+
+    telefono = All(String(min=6,max=15,messages = {
+            'tooShort': "Nro de Telefono invalido, debe tener 6 digitos como minimo",
+            'tooLong': "Nro de Telefono invalido",}),
+             NotEmpty(messages={'empty':'Ingrese numero de telefono'}))
+
