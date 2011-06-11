@@ -5,3 +5,4 @@ ez_setup/*.pyc
 build/
 dist/
 .settings/
+data/**
