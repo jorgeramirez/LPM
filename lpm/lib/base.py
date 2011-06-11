@@ -4,7 +4,7 @@
 
 from tg import TGController, tmpl_context
 from tg.render import render
-from tg import request
+from tg import request, session
 from pylons.i18n import _, ungettext, N_
 import lpm.model as model
 
@@ -30,4 +30,8 @@ class BaseController(TGController):
         # para acceder mas rapido a este componente
         request.credentials = request.environ.get('repoze.what.credentials')
         tmpl_context.identity = request.identity
+#        session['atras'] = session['actual']
+#        session['actual'] = session['adelante']
+        
+        session.save()
         return TGController.__call__(self, environ, start_response)

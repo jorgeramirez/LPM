@@ -19,6 +19,7 @@
 $(document).ready(function () {
 
     $('#form :button[name=add-filter]').live('click', function () {
+    	$('#form :input[name=cualquiera]').attr('disabled', true);
         count = $('#form .filters').data('count');
         $('#form .filters').data('count', count + 1);
         
@@ -29,6 +30,12 @@ $(document).ready(function () {
     
     $('#form :button[name^=remove-filter]').live('click', function () {
         $(this).parent('.filter').remove();
+        count = $('#form .filters').data('count');
+        $('#form .filters').data('count', count - 1);
+        if(count - 1 == 0) {
+        	$('#form :input[name=cualquiera]').attr('disabled', false);
+        }
+        	
     });
     
     $('#form select[name^=filter-type]').live('change', function () {
@@ -53,33 +60,38 @@ $(document).ready(function () {
         $(this).attr('name', $(this).attr('name') + '-' + count);
     });
   
+    $('#templates .header_filtro').children().clone().appendTo('#form');
     $('#templates .form.template').children().clone().appendTo('#form');
-    
     $('#form .filters').data('count', 0);
 });
+
 </script>
 <div>
-    <div>
-        <span style="margin-top:5px; margin-left:40px; font-size:15;">Buscar $modelo</span>
-    </div>
-    <div id="templates">
+	<div class="buscar">
+	<div id="templates">
+   		<div class="header_filtro">
+	        <!--<span style="margin-top:5px; margin-left:40px; font-size:15;">En ${modelo}s</span>-->
+	        <input id="buscar_cualquiera" type="text" name="cualquiera" />
+	        <input id="buscar_boton" class="boton" type="submit" value="Buscar"/>    
+    	</div>
+    
         <div class="form template">
             <div class="filters">
             </div>
-            <div style="margin-left:40px;">
-                <input  type="button" name="add-filter" value="Agregar Filtro" />
-                <input  type="submit" value="Buscar"/>    
+            <div class="footer_filtro">
+                <input  id="filtro_boton" type="button" name="add-filter" value="Agregar Filtro" />  
             </div>
         </div>
         <div class="filter template">
-            <div style="margin-left:40px;" class="filter">
-                <input type="button" name="remove-filter" value="X" />
+            <div class="filter">
+                <input id="x_boton" type="button" name="remove-filter" value="x"/>
                 <select name="filter-type">
                     <option value="" selected="selected">--- Seleccionar un filtro ---</option>
                     <py:for each="col in columnas">
                         <option value="$col" data-filter-template-name="${columnas[col]}">${col}</option>
                     </py:for>
                 </select>
+                
                 <span>
                 </span>
             </div>
@@ -90,15 +102,15 @@ $(document).ready(function () {
         </div>
         
         <div class="texto template">
-            <input type="text" name="texto" />
+            <input type="text" name="texto" style="width:47%;" />
         </div>
         
         <div class="fecha template">
-            <input type="text" id="datepicker" name="fecha" />
+            <input type="text" id="datepicker" name="fecha" style="width:47%;"/>
         </div>
 
         <div py:if="defined('tipo_opciones')" class="combobox template">
-            <select name="combobox">
+            <select name="combobox" style="width:47%;">
                 <option value="" selected="selected">--- Seleccionar Tipo ---</option>
                 <py:for each="opt in tipo_opciones">
                     <option value="$opt">${opt}</option>
@@ -109,6 +121,7 @@ $(document).ready(function () {
     
     <form id="form" method="post" action="${url_action}post_buscar/">
     </form>
+    </div>
 </div>
 </py:def>
 </html>

@@ -10,6 +10,7 @@ relacion con el módulo sprox
 
 @since: 1.0
 """
+from tg import session
 
 from sprox.fillerbase import TableFiller
 from sprox.widgets import PropertySingleSelectField
@@ -31,7 +32,8 @@ class CustomTableFiller(TableFiller):
     Añade la capacidad de filtrado de elementos.
     """
     __filtros = {}
-
+    cualquiera = ""
+    
     def get_filtros(self):
         return self.__filtros
         
@@ -41,6 +43,11 @@ class CustomTableFiller(TableFiller):
         Los mismos hay que parsearlos al formato apropiado
         """
         self.__filtros = {}
+        
+        #contaminado código
+        if (filtros.has_key('cualquiera')):
+            self.cualquiera = filtros['cualquiera']
+        
         #contiene el nombre de la columna
         col_tmp = "filter-type-{i}" 
         #contiene el valor para esa columna.
@@ -65,13 +72,39 @@ class CustomTableFiller(TableFiller):
         """
         filtrados = []
         query = DBSession.query(self.__entity__)
-        if not self.filtros:
-            return query.count, query.all()
         mapper = self.__entity__.__mapper__
+        res = []
+        
+#        p = " " 
+
+        if not self.filtros:
+            if (self.cualquiera == ""):
+                return query.count, query.all()
+            
+            #contaminando código
+            for key in mapper.columns.keys():
+                column = mapper.columns.get(key)
+                 
+
+                if column.type.__visit_name__ == 'unicode':
+#                    p = p + "/" + str(column)
+                    res.extend(query.filter(column.ilike(self.cualquiera+"%")).all())
+#                elif column.type.__visit_name__ == 'integer':
+#                    try:
+#                        entero = int(self.cualquiera)
+#                        res.extend(query.filter(column.in_([entero])).all())
+#                    except:
+#                        pass     
+                    
+                filtrados.extend(res)
+#            session["print"] = p
+#            session.save()
+            filtrados = self.__remover_duplicados(filtrados)
+            return len(filtrados), filtrados
+        
         for fil_col, fil_val_list in self.filtros.items(): #filtrado OR
             col = mapper.columns.get(fil_col)
             col_type = col.type.__visit_name__
-            res = []
             if col_type == 'integer':
                 for i, fvl in enumerate(fil_val_list):
                     fil_val_list[i] = int(fvl)

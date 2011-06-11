@@ -12,7 +12,7 @@ Módulo que define el controlador de proyectos.
 from tgext.crud import CrudRestController
 from tg.decorators import (paginate, expose, with_trailing_slash, 
                            without_trailing_slash)
-from tg import redirect, request, require, flash, validate
+from tg import redirect, request, require, flash, validate, session
 
 from lpm.model import DBSession, Proyecto, Usuario, Rol
 from lpm.lib.sproxcustom import (CustomTableFiller, 
@@ -213,7 +213,7 @@ class ProyectoController(CrudRestController):
     edit_filler = proyecto_edit_filler
     
     #para el form de busqueda
-    columnas = dict(nombre_proyecto="texto", codigo="texto",#lider="text",
+    columnas = dict(nombre="texto", codigo="texto",#lider="text",
                     estado="combobox")
     
     tipo_opciones = [u'Iniciado', u'No iniciado']
@@ -238,8 +238,11 @@ class ProyectoController(CrudRestController):
             
         tmpl_context.widget = self.table
             
-        return dict(lista_elementos=proyectos, page=self.title, titulo=self.title, 
-                    modelo=self.model.__name__, columnas=self.columnas,
+        return dict(lista_elementos=proyectos, 
+                    page=self.title,#session['print'] 
+                    titulo=self.title, 
+                    modelo=self.model.__name__, 
+                    columnas=self.columnas,
                     url_action="/proyectos/", puede_crear=puede_crear,
                     tipo_opciones=self.tipo_opciones)
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Main Controller"""
 
-from tg import expose, flash, require, url, request, redirect
+from tg import expose, flash, require, url, request, redirect, session
 from pylons.i18n import ugettext as _, lazy_ugettext as l_
 from tgext.admin.tgadminconfig import TGAdminConfig
 #from tgext.admin.controller import AdminController
@@ -60,10 +60,10 @@ class RootController(BaseController):
         return dict(params=kw)
 
     @expose('lpm.templates.index')
-    @require(predicates.has_permission('manage', msg=l_('Only for managers')))
-    def manage_permission_only(self, **kw):
+   # @require(predicates.has_permission('manage', msg=l_('Only for managers')))
+    def m(self, **kw):
         """Illustrate how a page for managers only works."""
-        return dict(page='managers stuff')
+        return dict(page=session['a'])
 
     @expose('lpm.templates.login.login')
     def login(self, came_from=url('/')):

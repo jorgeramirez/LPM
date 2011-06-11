@@ -327,11 +327,81 @@ text-decoration: none;
 }
 
 
-
-
 /* labels de los forms de sprox */
 .labelcol {
 padding-left:2px;
 padding-right:10px;
+}
+
+/*filtros*/
+.buscar {
+width:55%;
+}
+
+#buscar_boton {
+float:right;
+margin-right: 0;
+}
+
+.filters {
+padding-top:3px;
+margin-left:40px;
+}
+
+.footer_filtro {
+margin-left:40px;
+}
+
+.header_filtro {
+margin-left:40px;
+
+}
+
+#buscar_cualquiera {
+margin-top: 6px;
+margin-left: 40px;
+padding: 3px 10px;
+width:66%;
+}
+
+#x_boton {
+-moz-border-radius-bottomleft:10px;
+-moz-border-radius-bottomright:10px;
+-moz-border-radius-topleft:10px;
+-moz-border-radius-topright:10px;
+cursor:pointer;
+font-family:arial, verdana, sans-serif;
+/*font-family:"Lucida Grande",Verdana,Arial,"Bitstream Vera Sans",sans-serif;*/
+font-size:10px;
+padding:0px 10px;
+text-decoration:none;
+background-color: #CCCCCC;
+width:7px; 
+border-color:#BBBBBB;
+/*border-style: groove;*/
+color:#FFFFFF;
+font-weight:bold;
+text-shadow:0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+
+#filtro_boton {
+margin-top: 3px;
+width:105px; 
+-moz-border-radius-bottomleft:10px;
+-moz-border-radius-bottomright:10px;
+-moz-border-radius-topleft:10px;
+-moz-border-radius-topright:10px;
+cursor:pointer;
+font-family:arial, verdana, sans-serif;
+/*font-family:"Lucida Grande",Verdana,Arial,"Bitstream Vera Sans",sans-serif;*/
+font-size:10px;
+padding:0px 10px;
+text-decoration:none;
+background-color: #CCCCCC;
+border-color:#BBBBBB;
+/*border-style: groove;*/
+color:#FFFFFF;
+font-weight:bold;
+text-shadow:0 -1px 0 rgba(0, 0, 0, 0.3);
 }
 
