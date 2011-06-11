@@ -138,12 +138,9 @@
 				                    <div py:replace="select('*|text()')"/>
 				                 </td>
 				                 <td class="panel_nav" aling="right">
-				                 	<py:if test="defined('nav')">
-					                 	<a class="link_boton" href="${tg.url(nav['atras'])}">               
+				                 	<py:if test="defined('atras')">
+					                 	<a class="link_boton" href="${tg.url(atras)}">               
 						                	<input id="proyectos" class="boton" type="button" value="Atrás"/>
-						                </a>
-						                <a class="link_boton" href="${tg.url(nav['adelante'])}">               
-						                	<input id="proyectos" class="boton" type="button" value="Adelante"/>
 						                </a>
 				                 	</py:if>
 				                 </td>

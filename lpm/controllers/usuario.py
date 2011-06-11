@@ -366,9 +366,10 @@ class UsuarioController(CrudRestController):
 #        if not pp.is_met(request.environ):
 #            flash(pp.message % pp.nombre_permiso, 'warning')
 #            redirect("/usuarios")
-        nav = dict(atras="/", adelante="/proyectos")
+        #nav = dict(atras="/")
+        atras="/"
         return dict(super(UsuarioController, self).new(*args, **kw),
-                     page='Nuevo Usuario', nav=nav)
+                     page='Nuevo Usuario', atras=atras)
  
     @validate(usuario_edit_form, error_handler=edit)
     @expose()
