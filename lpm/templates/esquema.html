@@ -63,7 +63,6 @@
                                     <li class="mid"><a href="${tg.url('/roles')}" class="fly">Rol</a>
                                             <ul>
                                                 <li><a href="${tg.url('/roles/buscar')}">Búsqueda</a></li>
-                                                <li><a href="${tg.url('/roles/mis_roles')}">Mis Roles</a></li>
                                                 <li py:if='request.credentials and "crear rol" in request.credentials["permissions"]'>
                                                     <a href="${tg.url('/roles/new')}">Nuevo</a>
                                                 </li>
@@ -121,35 +120,35 @@
                 <div class="cnttop">
                 </div>
                 <div class="cntmid">
-                	<table>
-                		<tbody>
-                			<tr>
-                				<td class="columna_contenido" aling="left">
-				                    <py:if test="defined('page')">
-				                        <!--
-				                        <div class="currentpage">
-				                         Página Actual: <span py:replace="page"/>
-				                        </div>
-				                        -->
-				                    </py:if>
-				                    <py:with vars="flash=tg.flash_obj.render('flash', use_js=False)">
-				                        <div py:if="flash" py:content="XML(flash)" />
-				                    </py:with>
-				                    <div py:replace="select('*|text()')"/>
-				                 </td>
-				                 <td class="panel_nav" aling="right">
-				                 	<py:if test="defined('nav')">
-					                 	<a class="link_boton" href="${tg.url(nav['atras'])}">               
-						                	<input id="proyectos" class="boton" type="button" value="Atrás"/>
-						                </a>
-						                <a class="link_boton" href="${tg.url(nav['adelante'])}">               
-						                	<input id="proyectos" class="boton" type="button" value="Adelante"/>
-						                </a>
-				                 	</py:if>
-				                 </td>
-			                </tr>
-			             </tbody>
-			        </table>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td class="columna_contenido" aling="left">
+                                    <py:if test="defined('page')">
+                                        <!--
+                                        <div class="currentpage">
+                                         Página Actual: <span py:replace="page"/>
+                                        </div>
+                                        -->
+                                    </py:if>
+                                    <py:with vars="flash=tg.flash_obj.render('flash', use_js=False)">
+                                        <div py:if="flash" py:content="XML(flash)" />
+                                    </py:with>
+                                    <div py:replace="select('*|text()')"/>
+                                 </td>
+                                 <td class="panel_nav" aling="right">
+                                    <py:if test="defined('nav')">
+                                        <a class="link_boton" href="${tg.url(nav['atras'])}">               
+                                            <input id="proyectos" class="boton" type="button" value="Atrás"/>
+                                        </a>
+                                        <a class="link_boton" href="${tg.url(nav['adelante'])}">               
+                                            <input id="proyectos" class="boton" type="button" value="Adelante"/>
+                                        </a>
+                                    </py:if>
+                                 </td>
+                            </tr>
+                         </tbody>
+                    </table>
                     <!-- End of main_content -->
                 </div>
                 <div class="cntbot">
