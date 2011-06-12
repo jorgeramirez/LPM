@@ -303,10 +303,12 @@ class UsuarioController(CrudRestController):
             usuarios = []
             
         tmpl_context.widget = usuario_table
-    
+        
+        atras = '/'
+        
         return dict(lista_elementos=usuarios, page=self.title, titulo=self.title, 
                     modelo=self.model.__name__, columnas=self.columnas,
-                    url_action="/usuarios/", puede_crear=puede_crear)
+                    url_action="/usuarios/", puede_crear=puede_crear, atras=atras)
 
     @expose('lpm.templates.usuario.edit')
     def edit(self, *args, **kw):
@@ -340,8 +342,11 @@ class UsuarioController(CrudRestController):
         tmpl_context.tabla_roles = RolRolTable(DBSession)
         user = Usuario.por_id(args[0])
         page = "Usuario {nombre}".format(nombre=user.nombre_usuario)
+
+        atras='/usuarios'
+        
         return dict(super(UsuarioController, self).edit(*args, **kw), 
-                    page=page, roles=roles, id=args[0])
+                    page=page, roles=roles, id=args[0], atras=atras)
         
     @expose('lpm.templates.usuario.perfil')
     def perfil(self, *args, **kw):
@@ -357,6 +362,8 @@ class UsuarioController(CrudRestController):
         id = Usuario.by_user_name(user)
         ret = self.edit(id.id_usuario,*args, **kw)
         ret["page"] = "Mi perfil"
+        atras = '/'
+        ret["atras"]= atras
         return ret    
 
     @expose('lpm.templates.usuario.new')
@@ -366,8 +373,10 @@ class UsuarioController(CrudRestController):
 #        if not pp.is_met(request.environ):
 #            flash(pp.message % pp.nombre_permiso, 'warning')
 #            redirect("/usuarios")
-        #nav = dict(atras="/")
-        atras="/"
+        if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/":
+            atras = "../"
+        else:
+            atras = "/usuarios"
         return dict(super(UsuarioController, self).new(*args, **kw),
                      page='Nuevo Usuario', atras=atras)
  
@@ -417,13 +426,18 @@ class UsuarioController(CrudRestController):
         tmpl_context.tabla_asignados = rol_user_table
         tmpl_context.tabla_desasignados = rol_user_table
         user = Usuario.por_id(args[0])
+        print user.id_usuario
         page = "Roles de Usuario {nombre}".format(nombre=user.nombre_usuario)
         asignados = roles_usuario_filler.get_value(usuario=user,
                                                           asignados=True, **kw)
         desasignados = roles_usuario_filler.get_value(usuario=user,
                                                        asignados=False, **kw)
+        if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/usuarios/":
+            atras = "/usuarios/"
+        else:
+            atras = '/usuarios/' + str(user.id_usuario) + '/edit'
         return dict(asignados=asignados, desasignados=desasignados,
-                    page=page, id=args[0])
+                    page=page, id=args[0], atras=atras)
 
     @with_trailing_slash
     @paginate('lista_elementos', items_per_page=5)
@@ -435,9 +449,10 @@ class UsuarioController(CrudRestController):
         buscar_table_filler = UsuarioTableFiller(DBSession)
         buscar_table_filler.filtros = kw
         usuarios = buscar_table_filler.get_value()
+        atras = '/'
         return dict(lista_elementos=usuarios, page=self.title, titulo=self.title, 
                     modelo=self.model.__name__, columnas=self.columnas,
-                    url_action="/usuarios/", puede_crear=puede_crear)
+                    url_action="/usuarios/", puede_crear=puede_crear, atras=atras)
     
     @expose('lpm.templates.usuario.roles')
     def desasignar_roles(self, *args, **kw):
