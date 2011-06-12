@@ -364,6 +364,7 @@ class TipoItem(DeclarativeBase):
     #{ Columnas
     id_tipo_item = Column(Integer, autoincrement=True, primary_key=True)
     codigo = Column(Unicode(50), unique=True)
+    nombre = Column(Unicode(50), unique=True, nullable=False)
     descripcion = Column(Unicode(200), nullable=True)
     id_proyecto = Column(Integer, ForeignKey('tbl_proyecto.id_proyecto',
                          ondelete="CASCADE"), nullable=True)
@@ -385,18 +386,18 @@ class TipoItem(DeclarativeBase):
         return cls.tmpl_codigo.format(id_tipo_item=ti.id_tipo_item,
                                       id_proyecto=ti.id_proyecto)    
     
-    def agregar_atributo(self, dict):#todavía no probé
+    def agregar_atributo(self, **kw):#todavía no probé
         """ se espera un valor ya verificado
         se lanza una exepcion si se repite en nombre del atributo"""
         a = AtributosPorTipoItem()
         
         for atr in self.atributos:
-            if (atr.nombre == dict["nombre"]):
+            if (atr.nombre == kw["nombre"]):
                 raise NombreDeAtributoError()
             
-        a.nombre = dict["nombre"]
-        a.tipo = dict["tipo"]
-        a.valor_por_defecto = dict["valor"]
+        a.nombre = kw["nombre"]
+        a.tipo = kw["tipo"]
+        a.valor_por_defecto = kw["valor_por_defecto"]
         self.atributos.append(a)
         #DBSession.add(a)
         DBSession.flush()
@@ -415,26 +416,26 @@ class TipoItem(DeclarativeBase):
             DBSession.add(a_item)
             DBSession.add(a_por_item)      
  
-    def modificar_atributo(self, id_atributo, dict):#todavía no probé
+    def modificar_atributo(self, id_atributo, **kw):#todavía no probé
         atributo = AtributosPorTipoItem.por_id(id_atributo)
         
         #comprueba si se cambió algo
-        if (atributo.nombre != dict["nombre"]):
+        if (atributo.nombre != kw["nombre"]):
             #comprobar si el nuevo nombre no está repetido
             for atr in self.atributos:
-                if (atr.nombre == dict["nombre"]):
+                if (atr.nombre == kw["nombre"]):
                     raise NombreDeAtributoError()
-            atributo.nombre = dict["nombre"]
+            atributo.nombre = kw["nombre"]
             
-        if (atributo.tipo != dict["tipo"]):
+        if (atributo.tipo != kw["tipo"]):
             #comprobar que no hayan items de ese tipo creados
             if (self.items != []):
                 raise TipoAtributoError()
             
-            atributo.tipo = dict["tipo"]
+            atributo.tipo = kw["tipo"]
             
-        if (atributo.valor_por_defecto != dict["valor"]):
-            atributo.valor_por_defecto = dict["valor"]
+        if (atributo.valor_por_defecto != kw["valor_por_defecto"]):
+            atributo.valor_por_defecto = kw["valor_por_defecto"]
 
     @classmethod
     def por_id(cls, id):
@@ -477,4 +478,11 @@ class AtributosPorTipoItem(DeclarativeBase):
         @rtype: L{AtributoPorTipoItem}
         """        
         return DBSession.query(cls).filter_by(id_atributo_por_tipo_item=id).one()
+    
+    def puede_eliminarse(self):
+        """
+        Verifica si el atributo puede eliminarse.
+        """
+        tipo_item = TipoItem.por_id(self.id_tipo_item)
+        return len(tipo_item.items)
 
