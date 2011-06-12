@@ -20,6 +20,7 @@ from lpm.model import (DBSession, Usuario, TipoItem, Permiso, Proyecto,
 from lpm.lib.sproxcustom import CustomTableFiller
 from lpm.lib.sproxcustom import WidgetSelectorDojo, MultipleSelectDojo
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
+from lpm.controllers.atributotipoitem import (AtributosPorTipoItemController)
 
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller
@@ -105,6 +106,7 @@ class TipoPadreField(PropertySingleSelectField):
     def _my_update_params(self, d, nullable=False):
         options = []
         options.append((0, "----------"))
+        #Solo tipos del proyecto FIXME
         tipos_items = DBSession.query(TipoItem).all()
         for ti in tipos_items:
             options.append((ti.id_tipo_item, '%s (%s)' % (ti.codigo, 
@@ -117,6 +119,7 @@ class TipoExportadoField(PropertySingleSelectField):
     def _my_update_params(self, d, nullable=False):
         options = []
         options.append((0, "----------"))
+        #Solo tipos de otros proyectos FIXME
         tipos_items = DBSession.query(TipoItem).all()
         for ti in tipos_items:
             options.append((ti.id_tipo_item, '%s (%s)' % (ti.codigo, 
@@ -172,6 +175,9 @@ class TipoItemController(CrudRestController):
     #{ Variables
     title = u"Administrar Tipos de Ítem"
     action = "/tipositems/"
+    subaction = "/atributostipoitem/"
+    #subcontroller
+    atributostipoitem = AtributosPorTipoItemController(DBSession)
     #{ Plantillas
 
     # No permitir tipo_items anonimos (?)
@@ -203,11 +209,11 @@ class TipoItemController(CrudRestController):
         if request.response_type == 'application/json':
             return self.table_filler.get_value(**kw)
         if not getattr(self.table.__class__, '__retrieves_own_value__', False):
-            tipo_itemes = self.table_filler.get_value(**kw)
+            tipo_items = self.table_filler.get_value(**kw)
         else:
-            tipo_itemes = []
+            tipo_items = []
         tmpl_context.widget = self.table
-        return dict(lista_elementos=tipo_itemes, 
+        return dict(lista_elementos=tipo_items,
                     page=self.title, titulo=self.title, 
                     modelo=self.model.__name__, 
                     columnas=self.columnas,
@@ -223,10 +229,15 @@ class TipoItemController(CrudRestController):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect(self.action)
         tmpl_context.widget = self.edit_form
+        tmpl_context.atributos_table = self.atributostipoitem.table
         value = self.edit_filler.get_value(values={'id_tipo_item': int(args[0])})
+        atributos = self.atributostipoitem.table_filler.get_value(
+                                      values={'id_tipo_item': int(args[0])})
         value['_method'] = 'PUT'
         page = "Tipo Item {nombre}".format(nombre=value["nombre"])
-        return dict(value=value, page=page, atras=self.action)
+        return dict(value=value, atributos=atributos, page=page, 
+                    atras=self.action, url_action=self.action,
+                    id=args[0], url_subaction=self.subaction)
 
     @without_trailing_slash
     @expose('lpm.templates.tipoitem.new')
@@ -257,7 +268,7 @@ class TipoItemController(CrudRestController):
     @expose()
     def put(self, *args, **kw):
         """update a record"""
-        pp = PoseePermiso('modificar tipo_item')
+        pp = PoseePermiso('redefinir tipo item')
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect(self.action)
@@ -271,7 +282,7 @@ class TipoItemController(CrudRestController):
     @expose('lpm.templates.tipoitem.get_all')
     @expose('json')
     def post_buscar(self, *args, **kw):
-        puede_crear = PoseePermiso("crear tipo_item").is_met(request.environ)
+        puede_crear = PoseePermiso("crear tipo item").is_met(request.environ)
         tmpl_context.widget = self.table
         buscar_table_filler = self.table_filler.__class__(DBSession)
         buscar_table_filler.filtros = kw
