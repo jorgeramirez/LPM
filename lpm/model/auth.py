@@ -180,6 +180,9 @@ class Rol(DeclarativeBase):
             pks[i] = int(pk)
         permisos = DBSession.query(Permiso).filter( \
                                             Permiso.id_permiso.in_(pks)).all()
+        if not permisos:
+            return None
+            
         for p in permisos:
             p.roles.append(rol_new)
             
