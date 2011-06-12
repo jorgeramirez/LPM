@@ -53,7 +53,7 @@ Permisos = {
     u"crear tipo item" : u"Permite la definición de un nuevo tipo de ítem",
     u"redefinir tipo item": u"Permite agregar características al tipo de ítem",
     u"consultar tipo item": u"Permite consultar los atributos de " + 
-                             u"un tipo de ítem",
+                            u"un tipo de ítem",
                                 
 #item
     u"crear item": u"Permite crear ítems de un tipo dado",

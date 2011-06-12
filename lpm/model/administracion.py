@@ -364,6 +364,7 @@ class TipoItem(DeclarativeBase):
     #{ Columnas
     id_tipo_item = Column(Integer, autoincrement=True, primary_key=True)
     codigo = Column(Unicode(50), unique=True)
+    nombre = Column(Unicode(50), unique=True, nullable=False)
     descripcion = Column(Unicode(200), nullable=True)
     id_proyecto = Column(Integer, ForeignKey('tbl_proyecto.id_proyecto',
                          ondelete="CASCADE"), nullable=True)

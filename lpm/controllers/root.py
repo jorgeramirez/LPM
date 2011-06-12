@@ -19,6 +19,7 @@ from lpm.controllers.fase import FaseController
 from lpm.controllers.usuario import UsuarioController
 from lpm.controllers.rol import (RolController, RolPlantillaController,
                                  RolContextoController)
+from lpm.controllers.tipoitem import TipoItemController
 
 import hashlib , random
 
@@ -45,7 +46,8 @@ class RootController(BaseController):
     rolescontexto = RolContextoController(DBSession)
     proyectos = ProyectoController(DBSession)
     fases = FaseController(DBSession)
-
+    tipositems = TipoItemController(DBSession)
+    
     error = ErrorController()
 
     @expose('lpm.templates.index')
