@@ -426,7 +426,6 @@ class UsuarioController(CrudRestController):
         tmpl_context.tabla_asignados = rol_user_table
         tmpl_context.tabla_desasignados = rol_user_table
         user = Usuario.por_id(args[0])
-        print user.id_usuario
         page = "Roles de Usuario {nombre}".format(nombre=user.nombre_usuario)
         asignados = roles_usuario_filler.get_value(usuario=user,
                                                           asignados=True, **kw)
