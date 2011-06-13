@@ -15,6 +15,7 @@ from tg.decorators import (paginate, expose, with_trailing_slash,
                            without_trailing_slash)
 from tg import redirect, request, require, flash, url, validate
 
+from lpm.controllers.validaciones.rol_validator import RolFormValidator
 from lpm.model import (DBSession, Usuario, Rol, Permiso, Proyecto, 
                        Fase, TipoItem)
 from lpm.lib.sproxcustom import CustomTableFiller
@@ -223,11 +224,10 @@ class RolAddForm(AddRecordForm):
                        'codigo', 'creado', 'tipo', 'id_proyecto', 'id_fase',
                        'id_tipo_item']
     __require_fields__ = ['nombre_rol', 'permisos']
-    __check_if_unique__ = True
+    __base_validator__ = RolFormValidator
     __field_order__ = ['nombre_rol', 'descripcion', 'permisos']
     __field_attrs__ = {'descripcion' : {'row': '1'},
                        'nombre_rol': { 'maxlength' : '32'}
-                       
                        }
     __widget_selector_type__ = SelectorPermisosSistema
     descripcion = TextArea                         
@@ -263,7 +263,7 @@ class RolEditForm(EditableForm):
                        'codigo', 'creado', 'tipo', 'id_proyecto',
                        'id_fase', 'id_tipo_item']
     __require_fields__ = ['nombre_rol', 'permisos']
-    __check_if_unique__ = True
+    __base_validator__ = RolFormValidator
     __field_order__ = ['nombre_rol', 'descripcion', 'permisos']
     __field_attrs__ = {'descripcion' : {'row': '1'},
                        'nombre_rol': { 'maxlength' : '32'}
@@ -343,10 +343,11 @@ class RolController(CrudRestController):
         else:
             roles = []
         tmpl_context.widget = self.table
+        atras = "/"
         return dict(lista_elementos=roles, page=self.title, titulo=self.title, 
                     modelo=self.model.__name__, columnas=self.columnas,
                     tipo_opciones=self.tipo_opciones, url_action=self.action,
-                    puede_crear=puede_crear)
+                    puede_crear=puede_crear, atras=atras)
 
     @expose('lpm.templates.rol.edit')
     def edit(self, *args, **kw):
@@ -359,8 +360,8 @@ class RolController(CrudRestController):
         value = self.edit_filler.get_value(values={'id_rol': int(args[0])})
         value['_method'] = 'PUT'
         page = "Rol {nombre}".format(nombre=value["nombre_rol"])
-        nav = dict(atras=self.action, adelante=self.action)
-        return dict(value=value, page=page, nav=nav)
+        atras = atras=self.action
+        return dict(value=value, page=page, atras=atras)
 
     @without_trailing_slash
     @expose('lpm.templates.rol.new')
@@ -371,8 +372,11 @@ class RolController(CrudRestController):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect(self.action)
         tmpl_context.widget = self.new_form
-        nav = dict(atras=self.action, adelante=self.action)
-        return dict(value=kw, page="Nuevo Rol", action=self.action, nav=nav)
+        if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/":
+            atras = "../"
+        else:
+            atras = "/roles"
+        return dict(value=kw, page="Nuevo Rol", action=self.action, atras=atras)
     
     @validate(rol_add_form, error_handler=new)
     @expose()
@@ -397,6 +401,8 @@ class RolController(CrudRestController):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect(self.action)
         transaction.begin()
+        print int(args[0])
+        print kw
         Rol.actualizar_rol(int(args[0]), **kw)
         transaction.commit()
         redirect(self.action)
