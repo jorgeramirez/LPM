@@ -3,7 +3,7 @@ from tg import request
 from lpm.lib.util import UrlParser
 from lpm.model import Usuario
 
-from formencode.validators import String, Email, NotEmpty, FieldsMatch, NotEmpty
+from formencode.validators import String, Email, NotEmpty, FieldsMatch, NotEmpty, Int
 from formencode import FancyValidator, Schema, All, Invalid
 
 __all__ = ['UsuarioAddFormValidator','UsuarioEditFormValidator']
@@ -31,6 +31,15 @@ class UniqueNewNroDocumento(FancyValidator):
             raise Invalid('Nro de Documento ya existe en sistema',
                                         value, state)
         return value
+
+class isInt(Int):
+    def _to_python(self, value, state):
+        try:
+            int(value)
+            return value
+        except (ValueError, TypeError):
+            raise Invalid(self.message('integer', state),
+                          value, state)    
 
 class UsuarioAddFormValidator(Schema):
     nombre_usuario = All(String(min=4, max=32,messages={'tooShort':
@@ -64,11 +73,13 @@ class UsuarioAddFormValidator(Schema):
     nro_documento = All(UniqueNewNroDocumento(),String(min=5,max=50,messages = {
             'tooLong': "Nro de Documendo invalido, debe tener 5 digitos como minimo",
             'tooShort': "Nro de Documendo invalido",}),
-             NotEmpty(messages={'empty':'Ingrese numero de documento'}))
+             NotEmpty(messages={'empty':'Ingrese numero de documento'}),
+             isInt(messages={'integer':'Ingrese un numero'}))
     telefono = All(String(min=6,max=15,messages = {
             'tooShort': "Nro de Telefono invalido, debe tener 6 digitos como minimo",
             'tooLong': "Nro de Telefono invalido",}),
-             NotEmpty(messages={'empty':'Ingrese numero de telefono'}))
+             NotEmpty(messages={'empty':'Ingrese numero de telefono'}),
+             isInt(messages={'integer':'Ingrese un numero'}))
              
 
 class UniqueEditEmail(FancyValidator):
@@ -111,4 +122,5 @@ class UsuarioEditFormValidator(UsuarioAddFormValidator):
     nro_documento = All(UniqueEditNroDocumento(),String(min=5,max=50,messages = {
             'tooShort': "Nro de Documendo invalido, debe tener 5 digitos como minimo",
             'tooLong': "Nro de Documendo invalido",}),
-             NotEmpty(messages={'empty':'Ingrese numero de documento'}))
+             NotEmpty(messages={'empty':'Ingrese numero de documento'}),
+             isInt(messages={'integer':'Ingrese un numero'}))
