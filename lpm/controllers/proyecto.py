@@ -193,7 +193,7 @@ class ProyectoEditFiller(EditFormFiller):
     
 proyecto_edit_filler = ProyectoEditFiller(DBSession)
 
-class FasesProyectoTableFiller(FasesTableFiller):
+class FasesProyectoTableFiller(FaseTableFiller):
     def __actions__(self, obj):
         """ Redefinición del método """
         value = super(FasesProyectoTableFiller, self).__actions__(obj)
@@ -393,14 +393,14 @@ class ProyectoController(CrudRestController):
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect("/proyectos")
-        proyecto = Proyectos.por_id(id_proyecto)
+        proyecto = Proyecto.por_id(id_proyecto)
         iniciado = (proyecto.estado == u'Iniciado')
         puede_crear_fase = (not iniciado and
-                            PossePermiso('crear fase', id_proyecto=id_proyecto).\
+                            PoseePermiso('crear fase', id_proyecto=id_proyecto).\
                             is_met(request.environ))
         
         puede_crear_ti = (iniciado and
-                            PossePermiso('crear tipo item', id_proyecto=id_proyecto).\
+                            PoseePermiso('crear tipo item', id_proyecto=id_proyecto).\
                             is_met(request.environ))
         
         tmpl_context.widget = self.edit_form

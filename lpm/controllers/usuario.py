@@ -267,6 +267,7 @@ class UsuarioController(CrudRestController):
     """Controlador de usuarios"""
     #{ Variables
     title = u"Administrar usuarios"
+    action = '/usuarios/'
     #{ Plantillas
 
     # No permitir usuarios anonimos (?)
@@ -281,8 +282,19 @@ class UsuarioController(CrudRestController):
     edit_filler = usuario_edit_filler
 
     #para el form de busqueda
-    columnas = dict(nombre_usuario="texto", nombre="texto", apellido="texto",
-                    email="texto", nro_documento="texto")
+    #columnas = dict(nombre_usuario="texto", nombre="texto", apellido="texto",
+    #                email="texto", nro_documento="texto")
+    opciones = dict(nombre_usuario="Nombre de Usuario", 
+                    nombre="Nombre", 
+                    apellido="Apellido",
+                    email="Email", 
+                    nro_documento="Nro. de Documento")
+    columnas = dict(nombre_usuario="texto", 
+                    nombre="texto", 
+                    apellido="texto",
+                    email="texto", 
+                    nro_documento="entero")
+    #comboboxes = dict()
  
     #{ Métodos
     @with_trailing_slash
@@ -306,9 +318,14 @@ class UsuarioController(CrudRestController):
         
         atras = '/'
         
-        return dict(lista_elementos=usuarios, page=self.title, titulo=self.title, 
-                    modelo=self.model.__name__, columnas=self.columnas,
-                    url_action="/usuarios/", puede_crear=puede_crear, atras=atras)
+        return dict(lista_elementos=usuarios, 
+                    page=self.title, titulo=self.title, 
+                    modelo=self.model.__name__, 
+                    columnas=self.columnas,
+                    opciones=self.opciones,
+                    url_action=self.action, 
+                    puede_crear=puede_crear, 
+                    atras=atras)
 
     @expose('lpm.templates.usuario.edit')
     def edit(self, *args, **kw):
@@ -385,7 +402,7 @@ class UsuarioController(CrudRestController):
         if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/":
             atras = "../"
         else:
-            atras = "/usuarios"
+            atras = self.action
         return dict(super(UsuarioController, self).new(*args, **kw),
                      page='Nuevo Usuario', atras=atras)
  
@@ -441,9 +458,9 @@ class UsuarioController(CrudRestController):
         desasignados = roles_usuario_filler.get_value(usuario=user,
                                                        asignados=False, **kw)
         if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/usuarios/":
-            atras = "/usuarios/"
+            atras = self.action
         else:
-            atras = '/usuarios/' + str(user.id_usuario) + '/edit'
+            atras = self.action + str(user.id_usuario) + '/edit'
         return dict(asignados=asignados, desasignados=desasignados,
                     page=page, id=args[0], atras=atras)
 
@@ -458,9 +475,14 @@ class UsuarioController(CrudRestController):
         buscar_table_filler.filtros = kw
         usuarios = buscar_table_filler.get_value()
         atras = '/'
-        return dict(lista_elementos=usuarios, page=self.title, titulo=self.title, 
-                    modelo=self.model.__name__, columnas=self.columnas,
-                    url_action="/usuarios/", puede_crear=puede_crear, atras=atras)
+        return dict(lista_elementos=usuarios, 
+                    page=self.title, titulo=self.title, 
+                    modelo=self.model.__name__, 
+                    columnas=self.columnas,
+                    opciones=self.opciones,
+                    url_action=self.action, 
+                    puede_crear=puede_crear, 
+                    atras=atras)
     
     @expose('lpm.templates.usuario.roles')
     def desasignar_roles(self, *args, **kw):

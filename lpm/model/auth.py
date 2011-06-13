@@ -81,7 +81,7 @@ class Rol(DeclarativeBase):
     #{ variables
     #template para el codigo (usar metodo format)
     tmpl_codigo = "ROL-{id_rol}-{tipo}"
-    __tipos_posibles = [u'Plantilla', u'Sistema', u'Proyecto',
+    tipos_posibles = [u'Plantilla', u'Sistema', u'Proyecto',
                         u'Fase', u'Tipo de Ítem']
 
     #{ Relations

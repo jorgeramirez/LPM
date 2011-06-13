@@ -321,9 +321,20 @@ class RolController(CrudRestController):
     edit_filler = rol_edit_filler
 
     #para el form de busqueda
-    columnas = dict(codigo="texto", nombre_rol="texto", tipo="combobox")
-    tipo_opciones = [u'Plantilla', u'Sistema', u'Proyecto',
-                        u'Fase', u'Tipo de Ítem']
+    
+    #columnas = dict(codigo="texto", nombre_rol="texto", tipo="combobox")
+    #tipo_opciones = [u'Plantilla', u'Sistema', u'Proyecto',
+    #                    u'Fase', u'Tipo de Ítem']
+
+    opciones = dict(codigo= u'Código',
+                    nombre_rol= u'Nombre',
+                    tipo=u'Tipo'
+                    )
+    columnas = dict(codigo='texto',
+                    nombre_rol='texto',
+                    tipo='combobox'
+                    )
+    comboboxes = dict(tipo=Rol.tipos_posibles)
  
     #{ Métodos
     @with_trailing_slash
@@ -344,10 +355,16 @@ class RolController(CrudRestController):
             roles = []
         tmpl_context.widget = self.table
         atras = "/"
-        return dict(lista_elementos=roles, page=self.title, titulo=self.title, 
-                    modelo=self.model.__name__, columnas=self.columnas,
-                    tipo_opciones=self.tipo_opciones, url_action=self.action,
-                    puede_crear=puede_crear, atras=atras)
+        return dict(lista_elementos=roles, 
+                    page=self.title, 
+                    titulo=self.title, 
+                    modelo=self.model.__name__, 
+                    columnas=self.columnas,
+                    opciones=self.opciones,
+                    comboboxes=self.comboboxes,
+                    url_action=self.action,
+                    puede_crear=puede_crear,
+                    atras=atras)
 
     @expose('lpm.templates.rol.edit')
     def edit(self, *args, **kw):
@@ -419,10 +436,17 @@ class RolController(CrudRestController):
         buscar_table_filler = self.table_filler.__class__(DBSession)
         buscar_table_filler.filtros = kw
         roles = buscar_table_filler.get_value()
-        return  dict(lista_elementos=roles, page=self.title, titulo=self.title, 
-                    modelo=self.model.__name__, columnas=self.columnas,
-                    tipo_opciones=self.tipo_opciones, url_action=self.action,
-                    puede_crear=puede_crear)
+        atras = self.action
+        return dict(lista_elementos=roles, 
+                    page=self.title, 
+                    titulo=self.title, 
+                    modelo=self.model.__name__, 
+                    columnas=self.columnas,
+                    opciones=self.opciones,
+                    comboboxes=self.comboboxes,
+                    url_action=self.action,
+                    puede_crear=puede_crear,
+                    atras=atras)
     #}
     
 

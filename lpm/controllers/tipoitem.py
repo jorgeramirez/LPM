@@ -192,8 +192,15 @@ class TipoItemController(CrudRestController):
     edit_filler = tipo_item_edit_filler
 
     #para el form de busqueda
-    columnas = dict(codigo="texto", nombre="texto")
-    tipo_opciones = []
+    #columnas = dict(codigo="texto", nombre="texto")
+    #tipo_opciones = []
+    opciones = dict(codigo= u'Código',
+                    nombre= u'Nombre'
+                    )
+    columnas = dict(codigo='texto',
+                    nombre='texto'
+                    )
+    #comboboxes = dict()
  
     #{ Métodos
     @with_trailing_slash
@@ -217,7 +224,7 @@ class TipoItemController(CrudRestController):
                     page=self.title, titulo=self.title, 
                     modelo=self.model.__name__, 
                     columnas=self.columnas,
-                    tipo_opciones=self.tipo_opciones, 
+                    opciones=self.opciones, 
                     url_action=self.action,
                     puede_crear=puede_crear)
 
@@ -291,7 +298,7 @@ class TipoItemController(CrudRestController):
                      page=self.title, titulo=self.title,
                      modelo=self.model.__name__, 
                      columnas=self.columnas,
-                     tipo_opciones=self.tipo_opciones, 
+                     opciones=self.opciones, 
                      url_action=self.action,
                      puede_crear=puede_crear)
     #}
