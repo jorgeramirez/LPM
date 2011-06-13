@@ -392,12 +392,16 @@ class RolController(CrudRestController):
     @expose()
     def put(self, *args, **kw):
         """update a record"""
+        print kw
         pp = PoseePermiso('modificar rol')
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect(self.action)
+        id_rol = int(args[0][0])
+        if kw.has_key("id_rol"):
+            del kw["id_rol"]
         transaction.begin()
-        Rol.actualizar_rol(int(args[0]), **kw)
+        Rol.actualizar_rol(id_rol, **kw)
         transaction.commit()
         redirect(self.action)
 
