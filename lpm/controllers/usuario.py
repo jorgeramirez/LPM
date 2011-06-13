@@ -474,7 +474,7 @@ class UsuarioController(CrudRestController):
         buscar_table_filler = UsuarioTableFiller(DBSession)
         buscar_table_filler.filtros = kw
         usuarios = buscar_table_filler.get_value()
-        atras = '/'
+        atras = '/usuarios'
         return dict(lista_elementos=usuarios, 
                     page=self.title, titulo=self.title, 
                     modelo=self.model.__name__, 

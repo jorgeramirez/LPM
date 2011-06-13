@@ -344,6 +344,19 @@ class Proyecto(DeclarativeBase):
         @rtype: L{Proyecto}
         """
         return DBSession.query(cls).filter_by(id_proyecto=id).one()
+        
+    @classmethod
+    def por_nombre(cls, nombre):
+        """
+        Método de clase que realiza las búsquedas por nombre de 
+        proyecto.
+        
+        @param nomre: nombre del elemento a recuperar
+        @type id: C{String}
+        @return: el elemento recuperado
+        @rtype: L{Proyecto}
+        """
+        return DBSession.query(cls).filter_by(nombre=nombre).first()
     
     def obtener_lider(self):
         """

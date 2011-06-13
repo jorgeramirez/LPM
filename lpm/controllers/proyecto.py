@@ -14,6 +14,7 @@ from tg.decorators import (paginate, expose, with_trailing_slash,
                            without_trailing_slash)
 from tg import redirect, request, require, flash, validate, session
 
+from lpm.controllers.validaciones.proyecto_validator import ProyectoAddFormValidator, ProyectoEditFormValidator
 from lpm.model import DBSession, Proyecto, Usuario, Rol
 from lpm.lib.sproxcustom import (CustomTableFiller, 
                                  CustomPropertySingleSelectField)
@@ -168,7 +169,8 @@ class ProyectoAddForm(AddRecordForm):
                        'estado', 'fases', 'tipos_de_item', 'codigo',
                        'numero_fases']
     __field_order__ = ['nombre', 'descripcion']
-
+    __base_validator__ = ProyectoAddFormValidator
+    
     if PoseePermiso('asignar rol').is_met(request.environ):
         lider = LiderField('lider', label_text="Lider", accion="new")
         __field_order__.append('lider')
@@ -181,6 +183,7 @@ class ProyectoEditForm(EditableForm):
     __hide_fields__ = ['id_proyecto', 'fecha_creacion', 'complejidad_total',
                        'estado', 'numero_fases', 'codigo', 'fases', 
                        'tipos_de_item']
+    __base_validator__ = ProyectoEditFormValidator
     if All(PoseePermiso('asignar rol'), 
            PoseePermiso('eliminar rol')).is_met(request.environ):#para qué el permiso de eliminar?
         lider = LiderField('lider', label_text="Lider", 
@@ -271,7 +274,7 @@ class ProyectoController(CrudRestController):
             proyectos = []
             
         tmpl_context.widget = self.table
-            
+        atras = '/'
         return dict(lista_elementos=proyectos, 
                     page=self.title,#session['print'],
                     titulo=self.title, 
@@ -280,7 +283,7 @@ class ProyectoController(CrudRestController):
                     opciones=self.opciones,
                     url_action="/proyectos/",
                     puede_crear=puede_crear,
-                    comboboxes=self.comboboxes)
+                    comboboxes=self.comboboxes, atras=atras)
 
                 
     @without_trailing_slash
@@ -303,7 +306,7 @@ class ProyectoController(CrudRestController):
         buscar_table_filler = ProyectoTableFiller(DBSession)
         buscar_table_filler.filtros = kw
         proyectos = buscar_table_filler.get_value()
-        
+        atras = '/proyectos'
         return dict(lista_elementos=proyectos, 
                     page=self.title, 
                     titulo=self.title, 
@@ -312,7 +315,7 @@ class ProyectoController(CrudRestController):
                     url_action="/proyectos/",
                     puede_crear=puede_crear,
                     comboboxes=self.comboboxes,
-                    opciones=self.opciones)
+                    opciones=self.opciones, atras=atras)
     
     
     @expose('lpm.templates.proyecto.edit')
@@ -328,14 +331,22 @@ class ProyectoController(CrudRestController):
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
         value = self.edit_filler.get_value(values={'id_proyecto': id_proyecto})
         value['_method'] = 'PUT'#?
-        return dict(value=value, page="Modificar Proyecto")
+        if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/":
+            atras = "../"
+        else:
+            atras = "/proyectos"
+        return dict(value=value, page="Modificar Proyecto", atras=atras)
         
     @without_trailing_slash
     @expose('lpm.templates.proyecto.new')
     def new(self, *args, **kw):
         """Display a page to show a new record."""
         tmpl_context.widget = self.new_form
-        return dict(value=kw, page="Nuevo Proyecto")    
+        if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/":
+            atras = "../"
+        else:
+            atras = "/proyectos"
+        return dict(value=kw, page="Nuevo Proyecto", atras=atras)    
     
     @validate(proyecto_add_form, error_handler=new)
     @expose()

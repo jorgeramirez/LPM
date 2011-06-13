@@ -6,7 +6,7 @@ __all__ = ['RolFormValidator']
 class RolFormValidator(Schema):
     nombre_rol = All(String(min=4, max=32,messages={'tooShort':
             'Nombre de rol incorrecto, minimo 4 caracteres','tooLong':
-            'Nombre de rol incorrecto, maximo 70 caracteres'}), 
+            'Nombre de rol incorrecto, maximo 32 caracteres'}), 
             NotEmpty(messages={'empty':
                 'Ingrese un nombre de rol'}))
     descripcion = String(max=100,messages={'tooLong':
