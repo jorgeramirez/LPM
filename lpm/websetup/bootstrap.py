@@ -26,7 +26,7 @@ def bootstrap(command, conf, vars):
         r = model.Rol()
         r.nombre_rol = u'Administrador del Sistema'
         r.descripcion= u'Rol por defecto que tiene todos los permisos del sistema'
-        r.tipo = u"sistema"
+        r.tipo = u"Sistema"
         r.id_fase = 0
         r.id_proyecto = 0
         r.id_tipo_item = 0
@@ -37,7 +37,7 @@ def bootstrap(command, conf, vars):
         rlp.nombre_rol = u"Lider de Proyecto"
         rlp.descripcion = u"Rol Lider de Proyecto, administra componentes" +\
                            "de un proyecto"
-        rlp.tipo = u"plantilla"
+        rlp.tipo = u"Plantilla"
         rlp.id_fase = 0
         rlp.id_proyecto = 0
         rlp.id_tipo_item = 0

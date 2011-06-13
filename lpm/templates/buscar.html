@@ -17,9 +17,13 @@
 <script type="text/javascript">
 
 $(document).ready(function () {
+	
+
 
     $('#form :button[name=add-filter]').live('click', function () {
     	$('#form :input[name=cualquiera]').attr('disabled', true);
+    	$('#form :input[name=cualquiera]').val('');
+   	
         count = $('#form .filters').data('count');
         $('#form .filters').data('count', count + 1);
         
@@ -32,6 +36,7 @@ $(document).ready(function () {
         $(this).parent('.filter').remove();
         count = $('#form .filters').data('count');
         $('#form .filters').data('count', count - 1);
+        
         if(count - 1 == 0) {
         	$('#form :input[name=cualquiera]').attr('disabled', false);
         }
@@ -45,15 +50,24 @@ $(document).ready(function () {
             
             if(template == "fecha"){
                 $('#templates .' + template + '.template').children().clone().appendTo(destination)
-                    .find('[name]').andSelf().trigger('adjust-name')
-                    .datepicker();
-                    
+                    .find('[name]').andSelf().trigger('adjust-name');/*.datepicker({ altFormat: 'yy-mm-dd', buttonText: 'Elegir fecha' });*/
+            	$('.calendario').datepicker({ dateFormat: 'yy-mm-dd' });
+            	/*$('.calendario').datepicker( 'option', 'altFormat', 'yy-mm-dd' );*/
+            } else if(template == "nada") {
+            	//saca el input que quedo colgado
+            	$(this).next('input').remove();
+           	
             }else{
                 $('#templates .' + template + '.template').children().clone().appendTo(destination)
                     .find('[name]').andSelf().trigger('adjust-name');
             }
         }
     });
+/*
+    $(function() {
+		$('#calendario').datepicker({ altFormat: 'yy-mm-dd', buttonText: 'Elegir fecha' });
+	});
+*/
     
     $('#form [name]').live('adjust-name', function (event) {
         count = $(this).parents('.filter').data('count');
@@ -63,6 +77,12 @@ $(document).ready(function () {
     $('#templates .header_filtro').children().clone().appendTo('#form');
     $('#templates .form.template').children().clone().appendTo('#form');
     $('#form .filters').data('count', 0);
+    
+    //validación para campos con solamente numeros enteros
+    $('.solo_entero').live('keyup', function () {
+		$(this).val($(this).val().replace(/[^0-9]/g, ''));
+
+	});
 });
 
 </script>
@@ -86,7 +106,7 @@ $(document).ready(function () {
             <div class="filter">
                 <input id="x_boton" type="button" name="remove-filter" value="x"/>
                 <select name="filter-type">
-                    <option value="" selected="selected">--- Seleccionar un filtro ---</option>
+                    <option value="" selected="selected" data-filter-template-name="nada">--- Seleccionar un filtro ---</option>
                     <py:for each="col in columnas">
                         <option value="$col" data-filter-template-name="${columnas[col]}">${col}</option>
                     </py:for>
@@ -105,8 +125,16 @@ $(document).ready(function () {
             <input type="text" name="texto" style="width:47%;" />
         </div>
         
+        <div class="entero template">
+            <input class="solo_entero" type="text" name="entero" style="width:47%;" />
+        </div>
+        
         <div class="fecha template">
-            <input type="text" id="datepicker" name="fecha" style="width:47%;"/>
+        	<div class="rango_fechas">De
+            <input type="text" class="calendario" name="fecha" style="width:20%;"/>
+            a
+            <input type="text" class="calendario" name="fecha" style="width:20%;"/>
+            </div>
         </div>
 
         <div py:if="defined('tipo_opciones')" class="combobox template">

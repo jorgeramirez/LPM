@@ -19,7 +19,7 @@ from lpm.lib.sproxcustom import (CustomTableFiller,
                                  CustomPropertySingleSelectField)
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
 from lpm.lib.util import UrlParser
-from lpm.controllers.fase import FaseController
+from lpm.controllers.fase import FaseController, FaseTableFiller, FaseTable
 
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, EditFormFiller
@@ -193,7 +193,26 @@ class ProyectoEditFiller(EditFormFiller):
     
 proyecto_edit_filler = ProyectoEditFiller(DBSession)
 
-
+class FasesProyectoTableFiller(FasesTableFiller):
+    def __actions__(self, obj):
+        """ Redefinición del método """
+        value = super(FasesProyectoTableFiller, self).__actions__(obj)
+        
+        if PoseePermiso('modificar fase', 
+                        id_fase=obj.id_fase).is_met(request.environ):
+            value += '<div>' + \
+                        '<a id="mover_arriba" href="'+ str(obj.id_fase) + '" ' + \
+                        'class="' + clase + '">Arriba</a>' + \
+                     '</div><br />'
+                     
+            value += '<div>' + \
+                        '<a id="mover_abajo" href="'+ str(obj.id_fase) + '" ' + \
+                        'class="' + clase + '">Abajo</a>' + \
+                     '</div><br />'
+        return value
+    
+tabla_fases_filler = FasesProyectoTableFiller(DBSession)
+    
 class ProyectoController(CrudRestController):
     """Controlador de Proyectos"""
     #{ Variables
@@ -211,12 +230,27 @@ class ProyectoController(CrudRestController):
     new_form = proyecto_add_form
     edit_form = proyecto_edit_form
     edit_filler = proyecto_edit_filler
-    
+    tabla_fases_filler = tabla_fases_filler
     #para el form de busqueda
-    columnas = dict(nombre="texto", codigo="texto",#lider="text",
-                    estado="combobox")
+    opciones = dict(nombre=u"Nombre de Proyecto",
+                   codigo=u"Código",
+                   estado=u"Estado",
+                   complejidad_total=u"Complejidad Total",
+                   numero_fases=u"Número de Fases",
+                   fecha_creacion=u"Fecha de Creación"
+                   )
+    #el diccionario opciones de tiene lo que se muestra en 
+    #el combobox de selección de filtros,
+    #tiene que tener la misma clave que los valores de columnas
+    columnas = dict(nombre="texto",
+                    codigo="texto",#lider="text",
+                    estado="combobox",
+                    complejidad_total="entero",
+                    numero_fases="entero",
+                    fecha_creacion="fecha"
+                    )
     
-    tipo_opciones = [u'Iniciado', u'No iniciado']
+    comboboxes = dict(estado=Proyecto.estados_posibles)
     
     #{ Métodos
     @with_trailing_slash
@@ -239,12 +273,14 @@ class ProyectoController(CrudRestController):
         tmpl_context.widget = self.table
             
         return dict(lista_elementos=proyectos, 
-                    page=self.title,#session['print'] 
+                    page=self.title,#session['print'],
                     titulo=self.title, 
                     modelo=self.model.__name__, 
                     columnas=self.columnas,
-                    url_action="/proyectos/", puede_crear=puede_crear,
-                    tipo_opciones=self.tipo_opciones)
+                    opciones=self.opciones,
+                    url_action="/proyectos/",
+                    puede_crear=puede_crear,
+                    comboboxes=self.comboboxes)
 
                 
     @without_trailing_slash
@@ -252,35 +288,34 @@ class ProyectoController(CrudRestController):
     @expose('lpm.templates.proyecto.get_all')
     @expose('json')
     def post_buscar(self, *args, **kw):
+        """
+        Controlador que recibe los parámetros de búsqueda para 
+        devolver el resultado esperado.
+        """
+        
         puede_crear = PoseePermiso("crear proyecto").is_met(request.environ)
-
-        '''
         pp = PoseePermiso('consultar proyecto')
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect("/proyectos")
-        filtros = {}
-        col_tmp = "filter-type-{i}"
-        val_tmp_txt = "texto-{i}"
-        val_tmp_date = "fecha-{i}"
-        for i in xrange(0, len(kw) / 2):
-            val_key = val_tmp_txt.format(i=i)
-            if not kw.has_key(val_key):
-                val_key = val_tmp_date.format(i=i)
-            filtros[kw[col_tmp.format(i=i)]] = kw[val_key]
-        '''
+
         tmpl_context.widget = self.table
         buscar_table_filler = ProyectoTableFiller(DBSession)
         buscar_table_filler.filtros = kw
         proyectos = buscar_table_filler.get_value()
         
-        return dict(lista_elementos=proyectos, page=self.title, titulo=self.title, 
-                    modelo=self.model.__name__, columnas=self.columnas,
-                    url_action="/proyectos/", puede_crear=puede_crear,
-                    tipo_opciones=self.tipo_opciones)
+        return dict(lista_elementos=proyectos, 
+                    page=self.title, 
+                    titulo=self.title, 
+                    modelo=self.model.__name__,
+                    columnas=self.columnas,
+                    url_action="/proyectos/",
+                    puede_crear=puede_crear,
+                    comboboxes=self.comboboxes,
+                    opciones=self.opciones)
     
     
-    @expose('lpm.templates.edit')
+    @expose('lpm.templates.proyecto.edit')
     def edit(self, *args, **kw):
         """Despliega una pagina para realizar modificaciones"""
         '''
@@ -292,11 +327,11 @@ class ProyectoController(CrudRestController):
         tmpl_context.widget = self.edit_form
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
         value = self.edit_filler.get_value(values={'id_proyecto': id_proyecto})
-        value['_method'] = 'PUT'
+        value['_method'] = 'PUT'#?
         return dict(value=value, page="Modificar Proyecto")
         
     @without_trailing_slash
-    @expose('lpm.templates.new')
+    @expose('lpm.templates.proyecto.new')
     def new(self, *args, **kw):
         """Display a page to show a new record."""
         tmpl_context.widget = self.new_form
@@ -326,12 +361,20 @@ class ProyectoController(CrudRestController):
         rol_nuevo.codigo = Rol.generar_codigo(rol_nuevo)
         proy.codigo = Proyecto.generar_codigo(proy)
         transaction.commit()
-        redirect("./")
+        
+        #después de crear el proyecto, si el usuario actual es el lider
+        #se redirige a la interface de administración del nuevo proyecto.
+        if (lider.nombre_usuario == request.identity['repoze.who.userid']):
+            redirect("/proyectos/administrar/%s" % str(proy.id_proyecto))
+        else:
+            redirect("/proyectos")
 
     @validate(proyecto_edit_form, error_handler=edit)
     @expose()
     def put(self, *args, **kw):
-        """update"""
+        """Registra los cambios en la edición de un
+        proyecto.
+        """
         if "sprox_id" in kw:
             del kw["sprox_id"]
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
@@ -341,6 +384,44 @@ class ProyectoController(CrudRestController):
         proy.descripcion = unicode(kw["descripcion"])
         transaction.commit()
         redirect("../")
+    
+    @expose('lpm.templates.proyecto.administrar')
+    def administrar(self, id_proyecto, *args, **kw):
+        """Despliega una pagina para admistrar un proyecto"""
+
+        pp = PoseePermiso('modificar proyecto', id_proyecto=id_proyecto)
+        if not pp.is_met(request.environ):
+            flash(pp.message % pp.nombre_permiso, 'warning')
+            redirect("/proyectos")
+        proyecto = Proyectos.por_id(id_proyecto)
+        iniciado = (proyecto.estado == u'Iniciado')
+        puede_crear_fase = (not iniciado and
+                            PossePermiso('crear fase', id_proyecto=id_proyecto).\
+                            is_met(request.environ))
+        
+        puede_crear_ti = (iniciado and
+                            PossePermiso('crear tipo item', id_proyecto=id_proyecto).\
+                            is_met(request.environ))
+        
+        tmpl_context.widget = self.edit_form
+        tmpl_context.tabla_fases = FaseTable(DBSession)
+        tmpl_context.tabla_ti = self.tabla_ti
+        
+        value = self.edit_filler.get_value(values={'id_proyecto': id_proyecto})
+        value['_method'] = 'PUT' #?
+        
+        fases = self.tabla_fases_filler.get_value()
+        tipo_items = self.tabla_ti_filler.get_value()
+        
+        return dict(value=value,
+                    page="Administrar Proyecto %s" % proyecto.nombre,
+                    fases=fasas,
+                    tipo_items=tipo_items,
+                    puede_crear_fase=puede_crear_fases,
+                    puede_crear_ti=puede_crear_ti,
+                    iniciado=iniciado
+                    )
+    
     
     @without_trailing_slash
     @paginate('lista_elementos', items_per_page=5)

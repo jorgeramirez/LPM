@@ -19,7 +19,7 @@ from tw.dojo.selectshuttle import DojoSelectShuttleField
 from sprox.widgets import PropertyMixin
 from sprox.widgetselector import SAWidgetSelector
 
-from sqlalchemy import and_
+from sqlalchemy import and_, between
 from sqlalchemy.sql import func
 
 from lpm.model import DBSession
@@ -43,26 +43,24 @@ class CustomTableFiller(TableFiller):
         Los mismos hay que parsearlos al formato apropiado
         """
         self.__filtros = {}
+        self.buscar_enteros = True
         
         #contaminado código
         if (filtros.has_key('cualquiera')):
             self.cualquiera = filtros['cualquiera']
-        
-        #contiene el nombre de la columna
-        col_tmp = "filter-type-{i}" 
-        #contiene el valor para esa columna.
-        val_tmp_txt = "texto-{i}"   
-        val_tmp_combo = "combobox-{i}"
-        for i in xrange(0, len(filtros) / 2):
-            for tmp in [val_tmp_txt, val_tmp_combo]:
-                val_key = tmp.format(i=i) #valor del filtro
-                _fk = filtros[col_tmp.format(i=i)] #key para self.__filtros
-                if filtros.has_key(val_key):
-                    if self.__filtros.has_key(_fk):
-                        self.__filtros[_fk].append(filtros[val_key])
-                    else:
-                        self.__filtros[_fk] = [filtros[val_key]]
-                    break
+            try:
+                int(self.cualquiera)
+            except:
+                self.buscar_enteros = False      
+        else:
+            for fil_col, fil_val_list in filtros.items():
+                if (not self.__entity__.__mapper__.columns.has_key(fil_col)):
+                    continue
+                if (type(filtros[fil_col]).__name__ == 'list'):
+                    self.__filtros[fil_col] = fil_val_list
+                else:
+                    self.__filtros[fil_col] = [fil_val_list]
+
     filtros = property(get_filtros, set_filtros)
     
     def _do_get_provider_count_and_objs(self, **kw): #sobreescribimos el método
@@ -85,34 +83,48 @@ class CustomTableFiller(TableFiller):
             for key in mapper.columns.keys():
                 column = mapper.columns.get(key)
                  
-
+#                p = p + "/" + str(column) + ":" + column.type.__visit_name__              
                 if column.type.__visit_name__ == 'unicode':
-#                    p = p + "/" + str(column)
-                    res.extend(query.filter(column.ilike(self.cualquiera+"%")).all())
-#                elif column.type.__visit_name__ == 'integer':
-#                    try:
-#                        entero = int(self.cualquiera)
-#                        res.extend(query.filter(column.in_([entero])).all())
-#                    except:
-#                        pass     
+
+                    res.extend(query.filter(column.ilike(self.cualquiera + "%")).all())
+                elif (column.type.__visit_name__ == 'integer' and self.buscar_enteros):
+                    entero = int(self.cualquiera)
+                    res.extend(query.filter(column.in_([entero])).all())
+   
                     
                 filtrados.extend(res)
 #            session["print"] = p
 #            session.save()
             filtrados = self.__remover_duplicados(filtrados)
             return len(filtrados), filtrados
-        
+#        p = ""
         for fil_col, fil_val_list in self.filtros.items(): #filtrado OR
             col = mapper.columns.get(fil_col)
             col_type = col.type.__visit_name__
+            
+#            p = p + "/" + str(col) + ":" + col_type
             if col_type == 'integer':
+                lista = []
                 for i, fvl in enumerate(fil_val_list):
-                    fil_val_list[i] = int(fvl)
-                res = query.filter(col.in_(fil_val_list)).all()
+                    try:
+                        lista.append(int(fvl))
+                    except:
+                        continue
+                res = query.filter(col.in_(lista)).all()
             elif col_type == 'unicode':
                 for fvl in fil_val_list:
                     res.extend(query.filter(col.ilike(fvl)).all())
+            elif col_type == 'datetime':
+                for i in range(0, len(fil_val_list), 2):
+                    date0 = fil_val_list[i]
+                    date1 = fil_val_list[i + 1]
+                    if (date0 == '' or date1 == ''):
+                        continue    
+                    res.extend(query.filter(col.between(date0, date1)))
+                           
             filtrados.extend(res)
+#        session["print"] = p
+#        session.save()
         filtrados = self.__remover_duplicados(filtrados)
         return len(filtrados), filtrados
 

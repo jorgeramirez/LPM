@@ -405,3 +405,23 @@ font-weight:bold;
 text-shadow:0 -1px 0 rgba(0, 0, 0, 0.3);
 }
 
+.footer_filtro {
+clear:both;
+}
+
+/*actions fase*/
+.actions_fase {
+text-align:left; margin-top:2px;
+font-family:sans-serif; font-size:12;
+}
+
+/*rango de fechas para los datepickers */
+.rango_fechas {
+font-size:70%;
+}
+
+.filter {
+float:left;
+width:100%;
+}
+

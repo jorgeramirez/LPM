@@ -37,9 +37,9 @@ class FaseTable(TableBase):
     __model__ = Fase
     __headers__ = { 'id_fase': u'ID',
                     'nombre': u'Nombre',
-                    'posicion': u'Posicion',
-                    'numero_items': u'Nro. de Items', 
-                    'estado':u'Estado',
+                    'posicion': u'Posición',
+                    'numero_items': u'Nro. de Ítems', 
+                    'estado': u'Estado',
                     'codigo': u'Código'
                   }
     __omit_fields__ = ['items', 'id_proyecto', 'id_fase',
@@ -56,13 +56,12 @@ class FaseTableFiller(CustomTableFiller):
     def __actions__(self, obj):
         """Links de acciones para un registro dado"""
         value = '<div>'
-        style = 'text-align:left; margin-top:2px;';
-        style += 'font-family:sans-serif; font-size:12;'
+        clase = 'actions_fase'
         if PoseePermiso('modificar fase', 
                         id_fase=obj.id_fase).is_met(request.environ):
             value += '<div>' + \
                         '<a href="'+ str(obj.id_fase) +'/edit" ' + \
-                        'style="' + style + '">Modificar</a>' + \
+                        'class="' + clase + '">Modificar</a>' + \
                      '</div><br />'
         if PoseePermiso('eliminar fase',
                         id_fase=obj.id_fase).is_met(request.environ):
@@ -70,12 +69,12 @@ class FaseTableFiller(CustomTableFiller):
                      '<input type="hidden" name="_method" value="DELETE" />' +\
                      '<input onclick="return confirm(\'Está seguro?\');" value="Eliminar" type="submit" '+\
                      'style="background-color: transparent; float:left; border:0; color: #286571; display: inline;'+\
-                     'margin: 0; padding: 0;' + style + '"/>'+\
+                     'margin: 0; padding: 0;' + clase + '"/>'+\
                      '</form></div><br />'
         if not_anonymous().is_met(request.environ):
             value += '<div>' + \
                         '<a href="/fases/'+ str(obj.id_fase) +'" ' + \
-                        'style="' + style + '">Ver</a>' + \
+                        'class="' + clase + '">Ver</a>' + \
                      '</div><br />'
         value += '</div>'
         return value
@@ -137,10 +136,12 @@ class FaseController(CrudRestController):
     #{ Variables
     title = u"Administración de Fases"
     allow_only = not_anonymous(u"El usuario debe haber iniciado sesión")
+    
     #{plantillas
     tmp_from_proyecto_action = "/proyectos/%d/fases/buscar"
     tmp_from_proyecto_titulo = "Fases de: %s"
-    tmp_action = "/fases/buscar"
+    tmp_action = "/fases/post_buscar"
+    
     #{ Modificadores
     model = Fase
     table = fase_table
@@ -148,16 +149,50 @@ class FaseController(CrudRestController):
     new_form = fase_add_form
     edit_form = fase_edit_form
     edit_filler = fase_edit_filler
+    
+    opciones = dict(nombre= u'Nombre',
+                    posicion= u'Posición',
+                    numero_items= u'Nro. de Ítems', 
+                    estado= u'Estado',
+                    codigo= u'Código'
+                    )
+    columnas = dict(nombre='texto',
+                    posicion='entero',
+                    numero_items='entero', 
+                    estado='combobox',
+                    codigo='texto'
+                    )
+    comboboxes = dict(estado=Fase.estados_posibles)
+    
     #{ Métodos
     @with_trailing_slash
     @paginate('lista_elementos', items_per_page=5)
-    @expose('lpm.templates.get_all')
+    @expose('lpm.templates.fase.get_all')
     @expose('json')
     def get_all(self, *args, **kw):
         """ 
         Retorna todos los registros
         Retorna una página HTML si no se especifica JSON
         """
+#        puede_crear = PoseePermiso("crear fase").is_met(request.environ)
+        
+        if pylons.request.response_type == 'application/json':
+            return self.table_filler.get_value(**kw)
+        if not getattr(self.table.__class__, '__retrieves_own_value__', False):
+            fases = self.table_filler.get_value(**kw)
+        else:
+            fases = []
+            
+        tmpl_context.widget = self.table
+            
+        return dict(lista_elementos=fases, 
+                    page=self.title,#session['print'],
+                    titulo=self.title, 
+                    modelo=self.model.__name__, 
+                    columnas=self.columnas,
+                    opciones=self.opciones,
+                    url_action="/proyectos/", puede_crear=puede_crear,
+                    comboboxes=self.comboboxes)
         retorno = self.retorno_base()
         if not getattr(self.table.__class__, '__retrieves_own_value__', False):
             fases = self.table_filler.get_value(**kw)
@@ -205,7 +240,7 @@ class FaseController(CrudRestController):
     
     @without_trailing_slash
     @paginate('lista_elementos', items_per_page=5)
-    @expose('lpm.templates.get_all')
+    @expose('lpm.templates.fase.get_all')
     @expose('json')
     def buscar(self, *args, **kw):
         retorno = self.retorno_base()
@@ -226,7 +261,7 @@ class FaseController(CrudRestController):
         return retorno
 
     @without_trailing_slash
-    @expose('lpm.templates.new')
+    @expose('lpm.templates.fase.new')
     def new(self, *args, **kw):
         """Display a page to show a new record."""
         tmpl_context.widget = self.new_form

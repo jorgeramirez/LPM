@@ -23,14 +23,8 @@
         </tr>
         <tr>
             <td>
-                <a py:if="puede_asignar_rol" class="link_boton" href="${tg.url('../roles/' + id)}">
-                    <input id="roles" class="boton" type="button" value="Roles"/>
-                </a>
-                <a class="link_boton" href="${tg.url('../historial/' + id)}">               
-                    <input id="historial" class="boton" type="button" value="Historial"/>
-                </a>
-                <a class="link_boton" href="${tg.url('../proyectos/' + id)}">               
-                    <input id="proyectos" class="boton" type="button" value="Proyectos"/>
+                <a class="link_boton" href="${tg.url(url_action + id + url_subaction + 'new')}">
+                <input id="nuevo_atributo" class="boton" style="width:110px;" type="button" value="Nuevo Atributo"/>
                 </a>
             </td>
         </tr>
@@ -39,8 +33,8 @@
         </tr>
         <tr>
             <td>
-                <h3>Roles del Usuario</h3>
-                ${XML(tmpl_context.tabla_roles(value=roles))}   
+                <h3 style="margin-top:5px;">Atributos</h3>
+                ${XML(tmpl_context.atributos_table(value=atributos))}
             </td>
         </tr>
   </tbody>

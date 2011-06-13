@@ -180,6 +180,9 @@ class Rol(DeclarativeBase):
             pks[i] = int(pk)
         permisos = DBSession.query(Permiso).filter( \
                                             Permiso.id_permiso.in_(pks)).all()
+        if not permisos:
+            return None
+            
         for p in permisos:
             p.roles.append(rol_new)
             
@@ -215,7 +218,8 @@ class Rol(DeclarativeBase):
         rol_mod = Rol.por_id(id_rol)
         for k in ["id_proyecto", "id_fase", "id_tipo_item", "nombre_rol",
                   "descripcion"]:
-            setattr(rol_mod, k, kw[k])
+            if kw.has_key(k):
+                setattr(rol_mod, k, kw[k])
         c = 0
         while c < len(rol_mod.permisos):
             p = rol_mod.permisos[c]
@@ -226,6 +230,9 @@ class Rol(DeclarativeBase):
         if pks:
             permisos = DBSession.query(Permiso).filter( \
                                             Permiso.id_permiso.in_(pks)).all()
+            if not permisos:
+                return None
+                
             for p in permisos:
                 if p not in rol_mod.permisos:
                     p.roles.append(rol_mod)
