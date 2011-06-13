@@ -56,6 +56,7 @@ class Fase(DeclarativeBase):
 
     # template para codificacion
     tmpl_codigo = u"FASE-{id_fase}-PROY-{id_proyecto}"
+    estados_posibles = [u'Inicial', u'Desarrollo', u'Completa', 'Comprometida']
     #{ Relaciones
     items = relation('Item')
     
@@ -187,6 +188,8 @@ class Proyecto(DeclarativeBase):
     
     #template para codificacion
     tmpl_codigo = u"PROY-{id_proyecto}"
+    estados_posibles = [u'Iniciado', u'No iniciado']
+    
     #{ Relaciones
     fases = relation('Fase')
     tipos_de_item = relation('TipoItem')

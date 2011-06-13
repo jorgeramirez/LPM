@@ -317,6 +317,8 @@ class UsuarioController(CrudRestController):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect("/usuarios")
         '''
+        
+        puede_asignar_rol = PoseePermiso("asignar rol").is_met(request.environ)
         class mis_roles_tf(RolRolTableFiller):
             def __actions__(self, obj):
                 """Links de acciones para un registro dado"""
@@ -339,11 +341,16 @@ class UsuarioController(CrudRestController):
         roles = mis_roles_tf(DBSession).get_value(id_usuario=args[0])
         tmpl_context.tabla_roles = RolRolTable(DBSession)
         user = Usuario.por_id(args[0])
-        page = "Usuario {nombre}".format(nombre=user.nombre_usuario)
-        return dict(super(UsuarioController, self).edit(*args, **kw), 
-                    page=page, roles=roles, id=args[0])
+        if (False): # si viene de /usuarios/perfil
+            page = "Mi perfil"
+        else:
+            page = "Usuario {nombre}".format(nombre=user.nombre_usuario)
         
-    @expose('lpm.templates.usuario.perfil')
+        return dict(super(UsuarioController, self).edit(*args, **kw), 
+                    page=page, roles=roles, id=args[0], 
+                    puede_asignar_rol=puede_asignar_rol)
+        
+    @expose()
     def perfil(self, *args, **kw):
         """ Despliega una pagina para modificar el perfil del usuario que 
         inició sesión """
@@ -355,9 +362,9 @@ class UsuarioController(CrudRestController):
         '''
         user = request.identity['repoze.who.userid']
         id = Usuario.by_user_name(user)
-        ret = self.edit(id.id_usuario,*args, **kw)
-        ret["page"] = "Mi perfil"
-        return ret    
+        url = '/usuarios/' + str(id.id_usuario) + '/edit/'
+        redirect(url)
+          
 
     @expose('lpm.templates.usuario.new')
     def new(self, *args, **kw):
