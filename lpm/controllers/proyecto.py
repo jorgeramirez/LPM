@@ -21,6 +21,7 @@ from lpm.lib.sproxcustom import (CustomTableFiller,
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
 from lpm.lib.util import UrlParser
 from lpm.controllers.fase import FaseController, FaseTableFiller, FaseTable
+from lpm.controllers.tipoitem import TipoItemController
 
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, EditFormFiller
@@ -226,6 +227,7 @@ class ProyectoController(CrudRestController):
     allow_only = not_anonymous(u"El usuario debe haber iniciado sesión")
     #{ Sub Controlador     
     fases = FaseController(DBSession)
+    tipositems = TipoItemController(DBSession)
     #{ Modificadores
     model = Proyecto
     table = proyecto_table

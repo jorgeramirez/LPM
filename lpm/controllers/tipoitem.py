@@ -20,6 +20,7 @@ from lpm.model import (DBSession, Usuario, TipoItem, Permiso, Proyecto,
 from lpm.lib.sproxcustom import CustomTableFiller
 from lpm.lib.sproxcustom import WidgetSelectorDojo, MultipleSelectDojo
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
+from lpm.lib.util import UrlParser
 from lpm.controllers.atributotipoitem import (AtributosPorTipoItemController)
 
 from sprox.tablebase import TableBase
@@ -94,6 +95,10 @@ class TipoItemTableFiller(CustomTableFiller):
         if AlgunPermiso(patron="tipo item").is_met(request.environ):
             return super(TipoItemTableFiller,
                          self)._do_get_provider_count_and_objs(**kw)
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        if id_proyecto:
+            proy = Proyecto.por_id(id_proyecto)
+            return len(proy.tipos_de_item), proy.tipos_de_item
         query = DBSession.query(TipoItem)
         return query.count(), query.all()
 
@@ -106,11 +111,13 @@ class TipoPadreField(PropertySingleSelectField):
     def _my_update_params(self, d, nullable=False):
         options = []
         options.append((0, "----------"))
-        #Solo tipos del proyecto FIXME
-        tipos_items = DBSession.query(TipoItem).all()
-        for ti in tipos_items:
-            options.append((ti.id_tipo_item, '%s (%s)' % (ti.codigo, 
-                                                          ti.nombre)))
+        #Solo tipos del proyecto
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        if id_proyecto:
+            proy = Proyecto.por_id(id_proyecto)
+            for ti in proy.tipos_de_item:
+                options.append((ti.id_tipo_item, '%s (%s)' % (ti.nombre, 
+                                                              ti.codigo)))
         d['options'] = options
         return d
 
@@ -119,11 +126,15 @@ class TipoExportadoField(PropertySingleSelectField):
     def _my_update_params(self, d, nullable=False):
         options = []
         options.append((0, "----------"))
-        #Solo tipos de otros proyectos FIXME
-        tipos_items = DBSession.query(TipoItem).all()
-        for ti in tipos_items:
-            options.append((ti.id_tipo_item, '%s (%s)' % (ti.codigo, 
-                                                          ti.nombre)))
+        #Solo tipos de otros proyectos
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        if id_proyecto:
+            tipos_items = DBSession.query(TipoItem) \
+                                   .filter(TipoItem.id_proyecto != id_proyecto) \
+                                   .all()
+            for ti in tipos_items:
+                options.append((ti.id_tipo_item, '%s (%s)' % (ti.nombre, 
+                                                              ti.codigo)))
         d['options'] = options
         return d
   
@@ -133,14 +144,15 @@ class TipoItemAddForm(AddRecordForm):
     __omit_fields__ = ['id_tipo_item', 'id_proyecto', 'codigo',
                        'hijos', 'atributos', 'items']
     __check_if_unique__ = True
-    __field_order__ = ['nombre', 'descripcion', 'id_padre', 'id_exportado',
+    __field_order__ = ['nombre', 'descripcion', 'id_padre', 'id_importado',
                        'mezclar']
     __field_attrs__ = {'descripcion' : {'row': '1'},
                        'nombre': { 'maxlength' : '50'}
                        
                       }
+    __require_fields__ = ['nombre', 'id_padre']
     id_padre = TipoPadreField("id_padre", label_text="Tipo Padre")
-    id_exportado = TipoPadreField("id_exportado", label_text="Exportar De")
+    id_importado = TipoPadreField("id_importado", label_text="Importar De")
     descripcion = TextArea
     mezclar = CheckBox("mezclar", label_text="Mezclar Estructuras")
     
@@ -150,15 +162,16 @@ tipo_item_add_form = TipoItemAddForm(DBSession)
 class TipoItemEditForm(EditableForm):
     __model__ = TipoItem
     __omit_fields__ = ['id_tipo_item', 'id_proyecto', 'codigo', 'hijos', 
-                       'atributos', 'items']
+                       'atributos', 'items', 'id_padre']
     __check_if_unique__ = True
-    __field_order__ = ['nombre', 'descripcion', 'id_padre', 'id_exportado']
+    __field_order__ = ['nombre', 'descripcion']
     __field_attrs__ = {'descripcion' : {'row': '1'},
                        'nombre': { 'maxlength' : '50'}
                        
                       }
-    id_padre = TipoPadreField("id_padre", label_text="Tipo Padre")
-    id_exportado = TipoPadreField("id_exportado", label_text="Exportar De")
+    __require_fields__ = ['nombre']
+    #id_padre = TipoPadreField("id_padre", label_text="Tipo Padre")
+    #id_importado = TipoPadreField("id_importado", label_text="Importar De")
     descripcion = TextArea
 
 tipo_item_edit_form = TipoItemEditForm(DBSession)
@@ -212,7 +225,7 @@ class TipoItemController(CrudRestController):
         Retorna todos los registros
         Retorna una página HTML si no se especifica JSON
         """
-        puede_crear = PoseePermiso("crear tipo item").is_met(request.environ)
+        puede_crear = False
         if request.response_type == 'application/json':
             return self.table_filler.get_value(**kw)
         if not getattr(self.table.__class__, '__retrieves_own_value__', False):
@@ -220,76 +233,126 @@ class TipoItemController(CrudRestController):
         else:
             tipo_items = []
         tmpl_context.widget = self.table
+        url_action = self.action
+        atras = '/'
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        if id_proyecto:
+            url_action = '/proyectos/%d/tipositems/' % id_proyecto
+            atras = url_action
+            puede_crear = PoseePermiso("crear tipo item").is_met(request.environ)
         return dict(lista_elementos=tipo_items,
                     page=self.title, titulo=self.title, 
                     modelo=self.model.__name__, 
                     columnas=self.columnas,
                     opciones=self.opciones, 
-                    url_action=self.action,
-                    puede_crear=puede_crear)
+                    url_action=url_action,
+                    puede_crear=puede_crear,
+                    atras=atras)
 
     @expose('lpm.templates.tipoitem.edit')
     def edit(self, *args, **kw):
         """Despliega una pagina para modificar tipo_item"""
+        url_action = self.action
+        url_subaction = self.subaction
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        id_tipo = UrlParser.parse_id(request.url, "tipositems")
+        if id_proyecto:
+            url_action = '/proyectos/%d/tipositems/' % id_proyecto
+            url_subaction = url_action + 'atributostipoitem/'
         pp = PoseePermiso('redefinir tipo item')
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
-            redirect(self.action)
+            redirect(url_action)
         tmpl_context.widget = self.edit_form
         tmpl_context.atributos_table = self.atributostipoitem.table
-        value = self.edit_filler.get_value(values={'id_tipo_item': int(args[0])})
+        value = self.edit_filler.get_value(values={'id_tipo_item': id_tipo})
         atributos = self.atributostipoitem.table_filler.get_value(
-                                      values={'id_tipo_item': int(args[0])})
+                                      values={'id_tipo_item': id_tipo})
         value['_method'] = 'PUT'
         page = "Tipo Item {nombre}".format(nombre=value["nombre"])
         return dict(value=value, atributos=atributos, page=page, 
                     atras=self.action, url_action=self.action,
-                    id=args[0], url_subaction=self.subaction)
+                    id=id_tipo, url_subaction=self.subaction)
 
     @without_trailing_slash
     @expose('lpm.templates.tipoitem.new')
     def new(self, *args, **kw):
         """Despliega una pagina para crear un tipo_item"""
+        url_action = self.action
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        if id_proyecto:
+            url_action = '/proyectos/%d/tipositems/' % id_proyecto
         pp = PoseePermiso('crear tipo item')
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
-            redirect(self.action)
+            redirect(url_action)
         tmpl_context.widget = self.new_form
         return dict(value=kw, page=u"Nuevo Tipo de Ítem", 
-                    action=self.action, atras=self.action)
+                    action=url_action, atras=url_action)
     
     @validate(tipo_item_add_form, error_handler=new)
     @expose()
     def post(self, *args, **kw):
         """create a new record"""
+        print kw
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        if not id_proyecto:
+            return
+        url_action = '/proyectos/%d/tipositems/' % id_proyecto
         pp = PoseePermiso('crear tipo item')
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
-            redirect(self.action)
+            redirect(url_action)
+        if kw.has_key("sprox_id"):
+            del kw["sprox_id"]
+        id_padre = int(kw["id_padre"])
+        id_importado = int(kw["id_importado"])
+        mezclar = kw["mezclar"]
+        del kw["mezclar"]
+        del kw["id_padre"]
+        del kw["id_importado"]
         transaction.begin()
-        #TODO
+        proy = Proyecto.por_id(id_proyecto)
+        proy.definir_tipo_item(id_padre, id_importado, mezclar, **kw)
         transaction.commit()
-        redirect(self.action)
+        redirect(url_action)
         
     @validate(tipo_item_edit_form, error_handler=edit)
     @expose()
     def put(self, *args, **kw):
         """update a record"""
+        url_action = self.action
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        if id_proyecto:
+            url_action = '/proyectos/%d/tipositems/' % id_proyecto
         pp = PoseePermiso('redefinir tipo item')
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
-            redirect(self.action)
+            redirect(url_action)
+        id_tipo = UrlParser.parse_id(request.url, "tipositems")
         transaction.begin()
-        #TODO
+        tipo = TipoItem.por_id(id_tipo)
+        if kw["nombre"] != tipo.nombre:
+            if TipoItem.por_nombre(kw["nombre"]):
+                return
+        tipo.nombre = unicode(kw["nombre"])
+        tipo.descripcion = unicode(kw["descripcion"])
         transaction.commit()
-        redirect(self.action)
+        redirect(url_action)
 
     @with_trailing_slash
     @paginate('lista_elementos', items_per_page=5)
     @expose('lpm.templates.tipoitem.get_all')
     @expose('json')
     def post_buscar(self, *args, **kw):
-        puede_crear = PoseePermiso("crear tipo item").is_met(request.environ)
+        url_action = self.action
+        atras = '/'
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        puede_crear = False
+        if id_proyecto:
+            url_action = '/proyectos/%d/tipositems/' % id_proyecto
+            atras = url_action
+            puede_crear = PoseePermiso("crear tipo item").is_met(request.environ)
         tmpl_context.widget = self.table
         buscar_table_filler = self.table_filler.__class__(DBSession)
         buscar_table_filler.filtros = kw
@@ -299,6 +362,7 @@ class TipoItemController(CrudRestController):
                      modelo=self.model.__name__, 
                      columnas=self.columnas,
                      opciones=self.opciones, 
-                     url_action=self.action,
-                     puede_crear=puede_crear)
+                     url_action=url_action,
+                     puede_crear=puede_crear,
+                     atras=atras)
     #}

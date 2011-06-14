@@ -14,7 +14,7 @@ el modelo
 
 __all__ = [
     'ModelError', 'NombreDeAtributoError', 'NombreFaseError',
-    'CodigoTipoItemError', 'TipoAtributoError', 'CondicionAprobarError',
+    'NombreTipoItemError', 'TipoAtributoError', 'CondicionAprobarError',
     'BloquearItemError', 'DesBloquearItemError', 'DesAprobarItemError',
     'ModificarItemError'
 ]
@@ -49,9 +49,9 @@ class RelacionError(ModelError):
     def __str__(self):
         return "Error: %s" % self.msg
 
-class CodigoTipoItemError(ModelError):
+class NombreTipoItemError(ModelError):
     def __str__(self):
-        return u"El código para el tipo de item es repetido"
+        return u"El nombre para el tipo de item es repetido"
 
 
 class TipoAtributoError(ModelError):
