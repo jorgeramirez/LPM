@@ -309,8 +309,8 @@ class RolController(CrudRestController):
     rol_tipo = u"Sistema" #indica que el tipo no hay que averiguar.
     #{ Plantillas
 
-    # No permitir rols anonimos (?)
-    allow_only = not_anonymous(u"El rol debe haber iniciado sesión")
+    # No permitir usuarios anonimos (?)
+    allow_only = not_anonymous(u"El usuario debe haber iniciado sesión")
     
     #{ Modificadores
     model = Rol

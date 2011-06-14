@@ -65,23 +65,32 @@ class TipoItemTableFiller(CustomTableFiller):
         value = '<div>'
         clase = 'actions'
         url_cont = "/tipositems/"
+        id = str(obj.id_tipo_item)
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        if id_proyecto:
+            url_cont = "/proyectos/%d/tipositems/" % id_proyecto
         if PoseePermiso('redefinir tipo item').is_met(request.environ):
             value += '<div>' + \
-                        '<a href="' + url_cont + str(obj.id_tipo_item) +'/edit" ' + \
+                        '<a href="' + url_cont + id +'/edit" ' + \
                         'class="' + clase + '">Modificar</a>' + \
                      '</div><br />'
-        if len(obj.items):
-            if PoseePermiso('eliminar tipo item').is_met(request.environ):
-                value += '<div><form method="POST" action="' + url_cont + str(obj.id_tipo_item) + '" class="button-to">'+\
+        if obj.puede_eliminarse():
+            if PoseePermiso('redefinir tipo item').is_met(request.environ):
+                #value += '<div><form method="POST" action="' + id + '" class="button-to">'+\
+                #         '<input type="hidden" name="_method" value="DELETE" />' +\
+                #         '<input onclick="return confirm(\'Está seguro?\');" value="Delete" type="submit" '+\
+                #         'style="background-color: transparent; float:left; border:0; color: #286571;'+\
+                #         'display: inline; margin: 0; padding: 0;" class="' + clase + '"/>'+\
+                #         '</form></div><br />'
+                value += '<div><form method="POST" action="' + id + '" class="button-to">'+\
                          '<input type="hidden" name="_method" value="DELETE" />' +\
-                         '<input onclick="return confirm(\'Está seguro?\');" value="Delete" type="submit" '+\
+                         '<input onclick="return confirm(\'Está seguro?\');" value="Eliminar" type="submit" '+\
                          'style="background-color: transparent; float:left; border:0; color: #286571;'+\
                          'display: inline; margin: 0; padding: 0;" class="' + clase + '"/>'+\
                          '</form></div><br />'
         if PoseePermiso('redefinir tipo item').is_met(request.environ):
             value += '<div>' + \
-                        '<a href="' + url_cont + '/' + str(obj.id_tipo_item) \
-                        + '/atributostipoitem/new" ' + \
+                        '<a href="' + url_cont + id + '/atributostipoitem/new" ' + \
                         'class="' + clase + '">Agregar Atributo</a>' + \
                      '</div><br />'
         value += '</div>'
@@ -121,7 +130,7 @@ class TipoPadreField(PropertySingleSelectField):
         d['options'] = options
         return d
 
-class TipoExportadoField(PropertySingleSelectField):
+class TipoImportadoField(PropertySingleSelectField):
     """Dropdown list para la lista de tipos a exportar"""
     def _my_update_params(self, d, nullable=False):
         options = []
@@ -152,7 +161,7 @@ class TipoItemAddForm(AddRecordForm):
                       }
     __require_fields__ = ['nombre', 'id_padre']
     id_padre = TipoPadreField("id_padre", label_text="Tipo Padre")
-    id_importado = TipoPadreField("id_importado", label_text="Importar De")
+    id_importado = TipoImportadoField("id_importado", label_text="Importar De")
     descripcion = TextArea
     mezclar = CheckBox("mezclar", label_text="Mezclar Estructuras")
     
@@ -161,17 +170,16 @@ tipo_item_add_form = TipoItemAddForm(DBSession)
 
 class TipoItemEditForm(EditableForm):
     __model__ = TipoItem
+    __hide_fields__ = ['id_tipo_item']
     __omit_fields__ = ['id_tipo_item', 'id_proyecto', 'codigo', 'hijos', 
                        'atributos', 'items', 'id_padre']
-    __check_if_unique__ = True
+    #__check_if_unique__ = True
     __field_order__ = ['nombre', 'descripcion']
     __field_attrs__ = {'descripcion' : {'row': '1'},
                        'nombre': { 'maxlength' : '50'}
                        
                       }
     __require_fields__ = ['nombre']
-    #id_padre = TipoPadreField("id_padre", label_text="Tipo Padre")
-    #id_importado = TipoPadreField("id_importado", label_text="Importar De")
     descripcion = TextArea
 
 tipo_item_edit_form = TipoItemEditForm(DBSession)
@@ -270,9 +278,13 @@ class TipoItemController(CrudRestController):
                                       values={'id_tipo_item': id_tipo})
         value['_method'] = 'PUT'
         page = "Tipo Item {nombre}".format(nombre=value["nombre"])
-        return dict(value=value, atributos=atributos, page=page, 
-                    atras=self.action, url_action=self.action,
-                    id=id_tipo, url_subaction=self.subaction)
+        return dict(value=value, 
+                    atributos=atributos, 
+                    page=page, 
+                    atras=url_action, 
+                    url_action=url_action,
+                    id=str(id_tipo), 
+                    url_subaction=self.subaction)
 
     @without_trailing_slash
     @expose('lpm.templates.tipoitem.new')
@@ -365,4 +377,21 @@ class TipoItemController(CrudRestController):
                      url_action=url_action,
                      puede_crear=puede_crear,
                      atras=atras)
+
+    @expose()
+    def post_delete(self, *args, **kw):
+        """This is the code that actually deletes the record"""
+        atras = '/'
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        id_tipo = int(args[0])
+        transaction.begin()
+        if id_proyecto:
+            atras = '/proyectos/%d/tipositems/' % id_proyecto
+            proy = Proyecto.por_id(id_proyecto)
+            proy.eliminar_tipo_item(id_tipo)
+        else:
+            tipo = TipoItem.por_id(id_tipo)
+            DBSession.delete(tipo)
+        transaction.commit()
+        redirect(atras)
     #}

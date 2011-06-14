@@ -212,9 +212,11 @@ class Proyecto(DeclarativeBase):
             for f in self.fases:
                 tipo = TipoItem()
                 tipo.codigo = u"tipo_fase_%d" % f.posicion
-                tipo.descripcion = u"tipo por defecto de la fase número %d" % f.posicion
+                tipo.nombre = u"Tipo de Fase %d" % f.posicion
+                tipo.descripcion = u"Tipo por defecto de la fase número %d" % f.posicion
                 self.tipos_de_item.append(tipo)
                 DBSession.add(tipo)
+                DBSession.flush()
         
     def crear_fase(self, **kw):
         """ Para agregar fases a un proyecto no iniciado
@@ -296,6 +298,7 @@ class Proyecto(DeclarativeBase):
             
         tipo = TipoItem()  
         #tipo.codigo = kw["codigo"]
+        tipo.nombre = kw["nombre"]
         tipo.descripcion = kw["descripcion"]
         papa.hijos.append(tipo)
         
@@ -327,6 +330,8 @@ class Proyecto(DeclarativeBase):
         
         self.tipos_de_item.append(tipo)
         DBSession.add(tipo)
+        DBSession.flush()
+        tipo.codigo = TipoItem.generar_codigo(tipo)
     
     def eliminar_tipo_item(self, id):
         """ elimina un tipo de item si no hay items de ese tipo creados"""
@@ -388,7 +393,7 @@ class TipoItem(DeclarativeBase):
     id_padre = Column(Integer, ForeignKey('tbl_tipo_item.id_tipo_item'))
     
     # template para codificacion
-    tmpl_codigo = u"TI-{id_tipo_item}-PROY-{id_proyecto}"
+    #tmpl_codigo = u"TI-{id_tipo_item}-PROY-{id_proyecto}"
     #{ Relaciones
     hijos = relation('TipoItem')
     atributos = relation('AtributosPorTipoItem')
@@ -396,13 +401,20 @@ class TipoItem(DeclarativeBase):
     #}
     
     @classmethod
-    def generar_codigo(cls, ti):
+    def generar_codigo(cls, tipo):
         """
         Genera el codigo para el elemento pasado como parametro
         """
-        #TODO usar el nombre del tipo
-        return cls.tmpl_codigo.format(id_tipo_item=ti.id_tipo_item,
-                                      id_proyecto=ti.id_proyecto)    
+        #return cls.tmpl_codigo.format(id_tipo_item=ti.id_tipo_item,
+        #                              id_proyecto=ti.id_proyecto)
+        words = tipo.nombre.upper().split()
+        while words.count("DE"):
+            words.remove("DE")
+        siglas = u""
+        for w in words:
+            siglas += w[0]
+        return "-".join([siglas, str(tipo.id_tipo_item), 'PROY', 
+                         str(tipo.id_proyecto)])
     
     def agregar_atributo(self, **kw):#todavía no probé
         """ se espera un valor ya verificado
@@ -417,7 +429,7 @@ class TipoItem(DeclarativeBase):
         a.tipo = kw["tipo"]
         a.valor_por_defecto = kw["valor_por_defecto"]
         self.atributos.append(a)
-        #DBSession.add(a)
+        DBSession.add(a)
         DBSession.flush()
         
         #agregar este atributo a los ítems ya creados, no sé si es necesario
@@ -480,6 +492,12 @@ class TipoItem(DeclarativeBase):
         """
         return DBSession.query(cls).filter_by(nombre=nombre).first()
 
+    def puede_eliminarse(self):
+        """
+        Verifica si el tipo puede eliminarse.
+        """
+        return len(self.items) == 0
+
 
 class AtributosPorTipoItem(DeclarativeBase):
     """
@@ -508,12 +526,13 @@ class AtributosPorTipoItem(DeclarativeBase):
         @return: el elemento recuperado
         @rtype: L{AtributoPorTipoItem}
         """        
-        return DBSession.query(cls).filter_by(id_atributo_por_tipo_item=id).one()
+        return DBSession.query(cls).filter_by(id_atributos_por_tipo_item=id).one()
     
     def puede_eliminarse(self):
         """
         Verifica si el atributo puede eliminarse.
         """
-        tipo_item = TipoItem.por_id(self.id_tipo_item)
-        return len(tipo_item.items)
+        tipo = TipoItem.por_id(self.id_tipo_item)
+        return len(tipo.items) == 0
+        return True
 
