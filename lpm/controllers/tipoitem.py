@@ -102,14 +102,13 @@ class TipoItemTableFiller(CustomTableFiller):
         necesario.
         """
         if AlgunPermiso(patron="tipo item").is_met(request.environ):
-            return super(TipoItemTableFiller,
-                         self)._do_get_provider_count_and_objs(**kw)
-        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        if id_proyecto:
-            proy = Proyecto.por_id(id_proyecto)
-            return len(proy.tipos_de_item), proy.tipos_de_item
-        query = DBSession.query(TipoItem)
-        return query.count(), query.all()
+            id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+            filtrados = DBSession.query(TipoItem).all()
+            if id_proyecto:
+                proy = Proyecto.por_id(id_proyecto)
+                filtrados = proy.tipos_de_item
+            return len(filtrados), filtrados
+        return 0, []
 
 
 tipo_item_table_filler = TipoItemTableFiller(DBSession)
@@ -274,8 +273,7 @@ class TipoItemController(CrudRestController):
         tmpl_context.widget = self.edit_form
         tmpl_context.atributos_table = self.atributostipoitem.table
         value = self.edit_filler.get_value(values={'id_tipo_item': id_tipo})
-        atributos = self.atributostipoitem.table_filler.get_value(
-                                      values={'id_tipo_item': id_tipo})
+        atributos = self.atributostipoitem.table_filler.get_value()
         value['_method'] = 'PUT'
         page = "Tipo Item {nombre}".format(nombre=value["nombre"])
         return dict(value=value, 
@@ -306,7 +304,6 @@ class TipoItemController(CrudRestController):
     @expose()
     def post(self, *args, **kw):
         """create a new record"""
-        print kw
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
         if not id_proyecto:
             return

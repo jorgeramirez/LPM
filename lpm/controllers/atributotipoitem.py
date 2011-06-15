@@ -91,14 +91,15 @@ class AtributosPorTipoItemTableFiller(CustomTableFiller):
     
     def _do_get_provider_count_and_objs(self, **kw):
         """
-        Se muestra la lista de rol si se tiene un permiso 
-        necesario. Caso contrario le muestra sus roles.
+        Se muestra la lista de atributos del tipo de ítem 
+        si se tiene un permiso necesario.
         """
         if AlgunPermiso(patron="tipo item").is_met(request.environ):
-            return super(AtributosPorTipoItemTableFiller,
-                         self)._do_get_provider_count_and_objs(**kw)
-        query = DBSession.query(AtributosPorTipoItem)
-        return query.count(), query.all()
+            id_tipo = UrlParser.parse_id(request.url, "tipositems")
+            query = DBSession.query(AtributosPorTipoItem) \
+                         .filter_by(id_tipo_item=id_tipo)
+            return query.count(), query.all()
+        return 0, []
 
 atributos_por_tipo_item_table_filler = AtributosPorTipoItemTableFiller(DBSession)
 
@@ -219,6 +220,7 @@ class AtributosPorTipoItemController(CrudRestController):
     @validate(atributos_por_tipo_item_add_form, error_handler=new)
     @expose()
     def post(self, *args, **kw):
+        print kw
         """create a new record"""
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
         id_tipo = UrlParser.parse_id(request.url, "tipositems")
@@ -232,7 +234,6 @@ class AtributosPorTipoItemController(CrudRestController):
         if kw.has_key("sprox_id"):
             del kw["sprox_id"]
         transaction.begin()
-        id_tipo = UrlParser.parse_id(request.url, "tipositems")
         tipo = TipoItem.por_id(id_tipo)
         tipo.agregar_atributo(**kw)
         transaction.commit()
@@ -244,6 +245,7 @@ class AtributosPorTipoItemController(CrudRestController):
         """update a record"""
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
         id_tipo = UrlParser.parse_id(request.url, "tipositems")
+        id_atributo = int(args[0])
         atras = self.parent_action + str(id_tipo) + '/edit'
         if id_proyecto:
             atras = "/proyectos/" + str(id_proyecto) + atras
@@ -253,8 +255,6 @@ class AtributosPorTipoItemController(CrudRestController):
             redirect(atras)
         if kw.has_key("sprox_id"):
             del kw["sprox_id"]
-        id_atributo = int(args[0])
-        id_tipo = UrlParser.parse_id(request.url, "tipositems")
         transaction.begin()
         tipo = TipoItem.por_id(id_tipo)
         tipo.modificar_atributo(id_atributo, **kw)

@@ -294,7 +294,7 @@ class Proyecto(DeclarativeBase):
         
         for hijo in papa.hijos:
             if (hijo.nombre == kw["nombre"]):
-                raise CodigoTipoItemError()
+                raise NombreTipoItemError()
             
         tipo = TipoItem()  
         #tipo.codigo = kw["codigo"]
@@ -320,9 +320,17 @@ class Proyecto(DeclarativeBase):
                             continuar = False
                             break
 
-                if (not continuar):#no se agreaga este atributo
+                if (not continuar):#no se agrega este atributo
                     break   
                         
+                nuevo_atr.tipo = atr.tipo
+                nuevo_atr.valor_por_defecto = atr.valor_por_defecto
+                tipo.atributos.append(nuevo_atr)
+                DBSession.add(nuevo_atr)
+        else: #Agregado: copiar estructura del padre si no se importa nada
+            for atr in papa.atributos:
+                nuevo_atr = AtributosPorTipoItem()
+                nuevo_atr.nombre = atr.nombre
                 nuevo_atr.tipo = atr.tipo
                 nuevo_atr.valor_por_defecto = atr.valor_por_defecto
                 tipo.atributos.append(nuevo_atr)
