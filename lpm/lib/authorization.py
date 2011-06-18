@@ -21,16 +21,16 @@ __all__ = ['Permisos', 'PoseePermiso', 'AlgunPermiso']
 # valor: descripcion del permiso
 Permisos = [
 #usuario
-    dict(nombre= u"crear usuario", descripcion= u"Permite crear usuarios", tipo= u"Sistema"),
-    dict(nombre= u"eliminar usuario", descripcion= u"Permite eliminar usuarios", tipo= u"Sistema"),
-    dict(nombre= u"modificar usuario", descripcion= u"Permite modificar valores de atributos de usuarios", tipo= u"Sistema"),
-    dict(nombre= u"consultar usuario", descripcion= u"Permite consultar valores de atributos de usuarios", tipo= u"Sistema"),
+    dict(nombre= u"crear usuario", descripcion= u"Permite crear usuarios", tipo= u"Sistema, Usuario"),
+    dict(nombre= u"eliminar usuario", descripcion= u"Permite eliminar usuarios", tipo= u"Sistema, Usuario"),
+    dict(nombre= u"modificar usuario", descripcion= u"Permite modificar valores de atributos de usuarios", tipo= u"Sistema, Usuario"),
+    dict(nombre= u"consultar usuario", descripcion= u"Permite consultar valores de atributos de usuarios", tipo= u"Sistema, Usuario"),
 #roles
-    dict(nombre= u"crear rol", descripcion= u"Permite realizar la operación de crear un rol", tipo= u"Proyecto, Fase, Tipo Ítem"),
-    dict(nombre= u"eliminar rol", descripcion= u"Permite realizar la operación de eliminar un rol", tipo= u"Proyecto, Fase, Tipo Ítem"),
-    dict(nombre= u"modificar rol", descripcion= u"Permite modificar un rol", tipo= u"Proyecto, Fase, Tipo Ítem"),
-    dict(nombre= u"asignar-desasignar rol", descripcion= u"Permite realizar la operación de asignar un rol", tipo= u"Proyecto, Fase, Tipo Ítem"),
-    dict(nombre= u"consultar rol", descripcion= u"Permite consultar atributos de un rol", tipo= u"Proyecto, Fase, Tipo Ítem"),
+    dict(nombre= u"crear rol", descripcion= u"Permite realizar la operación de crear un rol", tipo= u"Proyecto, Fase, Tipo Ítem, Rol"),
+    dict(nombre= u"eliminar rol", descripcion= u"Permite realizar la operación de eliminar un rol", tipo= u"Proyecto, Fase, Tipo Ítem, Rol"),
+    dict(nombre= u"modificar rol", descripcion= u"Permite modificar un rol", tipo= u"Proyecto, Fase, Tipo Ítem, Rol"),
+    dict(nombre= u"asignar-desasignar rol", descripcion= u"Permite realizar la operación de asignar un rol", tipo= u"Proyecto, Fase, Tipo Ítem, Rol"),
+    dict(nombre= u"consultar rol", descripcion= u"Permite consultar atributos de un rol", tipo= u"Proyecto, Fase, Tipo Ítem, Rol"),
 #proyecto
     dict(nombre= u"consultar proyecto", descripcion= (u"Permite consultar valores de atributos de " +
                            u"proyecto"), tipo= u"Proyecto"),
@@ -136,13 +136,14 @@ class AlgunPermiso(Predicate):
         Método inicializador
         
         @param kw: Parametros para inicializar
-        @keyword patron: El patron para el nombre del permiso.
+        @keyword tipo: El tipo de permiso (Rol, Usuario, Proyecto, Fase, Tipo Ítem).
         """
         self.id_proyecto = 0
         self.id_fase = 0
         self.id_tipo_item = 0
-        self.patron = unicode(kw["patron"])
-        del kw["patron"]
+        
+        self.tipo = unicode(kw["tipo"])
+        del kw["tipo"]
         for key in ["id_proyecto", "id_fase", "id_tipo_item"]:
             if kw.has_key(key):
                 setattr(self, key, int(kw[key]))
@@ -159,7 +160,7 @@ class AlgunPermiso(Predicate):
             algun = False
             for p in r.permisos:
                 if p.nombre_permiso.find(u"consultar") < 0 and \
-                   p.nombre_permiso.find(self.patron) > 0:
+                   p.tipo.find(self.tipo) >= 0:
                     algun = True
                     break
             if not algun:
