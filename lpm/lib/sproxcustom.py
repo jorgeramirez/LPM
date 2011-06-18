@@ -44,7 +44,7 @@ class CustomTableFiller(TableFiller):
         """
         self.__filtros = {}
         self.buscar_enteros = True
-        
+
         #contaminado código
         if (filtros.has_key('cualquiera')):
             self.cualquiera = filtros['cualquiera']

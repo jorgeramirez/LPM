@@ -37,5 +37,7 @@ class UrlParser(object):
             partes.remove("administrar")
         for i, v in enumerate(partes):
             if v == name:
-                return int(partes[i + 1])
-        return None
+                try:
+                    return int(partes[i + 1])
+                except:
+                    return None
