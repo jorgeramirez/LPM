@@ -137,6 +137,41 @@ class FaseController(CrudRestController):
     """Controlador de Fases"""
     def __init__(self, DBS, id_proyecto=None):
         self.id_proyecto = id_proyecto
+        class FasesProyectoTableFiller(FaseTableFiller):
+    ##Suspendido, queda para el final... si se hace...
+    #    def __actions__(self, obj):
+    #        """ Redefinición del método """
+    #        value = super(FasesProyectoTableFiller, self).__actions__(obj)
+    #        
+    #        accion = "Modificar"
+    #        if (self.iniciado):
+    #            accion = "Administrar"
+    #            
+    #        if PoseePermiso('modificar fase', 
+    #                        id_fase=obj.id_fase).is_met(request.environ):
+    #            if (not self.iniciado):
+    #                value += '<div>' + \
+    #                            '<a id="mover_arriba" href="'+ str(obj.id_fase) + '" ' + \
+    #                            'class="' + clase + '">Arriba</a>' + \
+    #                         '</div><br />'
+    #                         
+    #                value += '<div>' + \
+    #                            '<a id="mover_abajo" href="'+ str(obj.id_fase) + '" ' + \
+    #                            'class="' + clase + '">Abajo</a>' + \
+    #                         '</div><br />'
+    #            else:
+    # 
+            def __init__(self, DBS, id_proyecto=None):
+                self.id_proyecto = id_proyecto
+                super(FasesProyectoTableFiller, self).__init__(DBS)
+                                
+            def _do_get_provider_count_and_objs(self, **kw):
+                fases = []
+                if self.id_proyecto:
+                    fases = Proyecto.por_id(self.id_proyecto).fases
+                return len(fases), fases
+        if id_proyecto:
+            self.table_filler = FasesProyectoTableFiller(DBSession, id_proyecto)
         super(FaseController, self).__init__(DBS)
         
     #{ Variables
@@ -149,7 +184,7 @@ class FaseController(CrudRestController):
     tmp_action = "/fases/post_buscar"
     
     #{ Modificadores
-    class FasesProyectoTableFiller(FaseTableFiller):
+#    class FasesProyectoTableFiller(FaseTableFiller):
 ##Suspendido, queda para el final... si se hace...
 #    def __actions__(self, obj):
 #        """ Redefinición del método """
@@ -173,13 +208,13 @@ class FaseController(CrudRestController):
 #                         '</div><br />'
 #            else:
 # 
-        def __init__(self, DBS, id_proyecto=None):
-            self.id_proyecto = id_proyecto
-            super(FasesProyectoTableFiller, self).__init__(DBSession, self.id_proyecto)
-                            
-        def _do_get_provider_count_and_objs(self, **kw):
-            fases = Proyecto.por_id(self.id_proyecto).fases
-            return len(fases), fases  
+#        def __init__(self, DBS, id_proyecto=None):
+#            self.id_proyecto = id_proyecto
+#            super(FasesProyectoTableFiller, self).__init__(DBSession, self.id_proyecto)
+#                            
+#        def _do_get_provider_count_and_objs(self, **kw):
+#            fases = Proyecto.por_id(self.id_proyecto).fases
+#            return len(fases), fases  
                      
     model = Fase
     table = fase_table
@@ -207,7 +242,7 @@ class FaseController(CrudRestController):
     #{ Métodos
     @with_trailing_slash
     @paginate('lista_elementos', items_per_page=5)
-    @expose('lpm.templates.fase.get_all')
+    @expose('lpm.templates.fases.get_all')
     @expose('json')
     def get_all(self, *args, **kw):
         """ 
@@ -280,7 +315,7 @@ class FaseController(CrudRestController):
     
     @without_trailing_slash
     @paginate('lista_elementos', items_per_page=5)
-    @expose('lpm.templates.fase.get_all')
+    @expose('lpm.templates.fases.get_all')
     @expose('json')
     def buscar(self, *args, **kw):
         retorno = self.retorno_base()
@@ -301,7 +336,7 @@ class FaseController(CrudRestController):
         return retorno
 
     @without_trailing_slash
-    @expose('lpm.templates.fase.new')
+    @expose('lpm.templates.fases.new')
     def new(self, *args, **kw):
         """Display a page to show a new record."""
         tmpl_context.widget = self.new_form
@@ -320,7 +355,7 @@ class FaseController(CrudRestController):
             transaction.commit()
         redirect("./")
     
-    @expose('lpm.templates.edit')
+    @expose('lpm.templates.fases.edit')
     def edit(self, *args, **kw):
         """Despliega una pagina para realizar modificaciones"""
         pp = PoseePermiso('modificar fase', id_fase=args[0])

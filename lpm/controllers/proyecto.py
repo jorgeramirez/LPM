@@ -224,9 +224,10 @@ class ProyectoController(CrudRestController):
     tmp_action = "/proyectos/buscar"
     # No permitir usuarios anonimos (?)
     allow_only = not_anonymous(u"El usuario debe haber iniciado sesión")
-    #{ Sub Controlador     
-    fases = FaseController(DBSession)
-    tipositems = TipoItemController(DBSession)
+    #{ Sub Controlador
+    id_proy = UrlParser.parse_id(request.url, "proyectos")
+    fases = FaseController(DBSession, id_proy)
+    tipositems = TipoItemController(DBSession, id_proy)
     #{ Modificadores
     model = Proyecto
     table = proyecto_table
@@ -383,7 +384,7 @@ class ProyectoController(CrudRestController):
         #después de crear el proyecto, si el usuario actual es el lider
         #se redirige a la interface de administración del nuevo proyecto.
         if (nombre_lider == request.identity['repoze.who.userid']):
-            redirect("/proyectos/administrar/%s" % str(proy.id_proyecto))
+            redirect("/proyectos/administrar/%d" % proy.id_proyecto)
         else:
             redirect("/proyectos")
 
@@ -404,7 +405,7 @@ class ProyectoController(CrudRestController):
         redirect("../")
     
     @expose('lpm.templates.proyecto.administrar')
-    def administrar(self, id_proyecto, *args, **kw):
+    def administrar(self, id_proyecto ,*args, **kw):
         """Despliega una pagina para admistrar un proyecto"""
 
         pp = PoseePermiso('modificar proyecto', id_proyecto=id_proyecto)
@@ -414,7 +415,7 @@ class ProyectoController(CrudRestController):
         proyecto = Proyecto.por_id(id_proyecto)
         iniciado = (proyecto.estado == u'Iniciado')
         
-        puede_crear_fase = (not iniciado and
+        puede_crear_fases = (not iniciado and
                             PoseePermiso('crear fase', id_proyecto=id_proyecto).\
                             is_met(request.environ))
         
@@ -422,24 +423,39 @@ class ProyectoController(CrudRestController):
                             PoseePermiso('crear tipo item', id_proyecto=id_proyecto).\
                             is_met(request.environ))
         
+        puede_asignar_rol = PoseePermiso('asignar-desasignar rol', 
+                                         id_proyecto = id_proyecto). \
+                                         is_met(request.environ)
+
+        puede_crear_rol = PoseePermiso('crear rol', 
+                                         id_proyecto = id_proyecto). \
+                                         is_met(request.environ)
+        
         tmpl_context.widget = self.edit_form
         
             
-        tmpl_context.tabla_fases = FasesProyectoTableFiller(DBSession)
-        tmpl_context.tabla_ti = TiProyectoTableFiller(DBSession)
+        #tmpl_context.tabla_fases = FasesProyectoTableFiller(DBSession)
+        #tmpl_context.tabla_ti = TiProyectoTableFiller(DBSession)
+        tmpl_context.tabla_fases = self.fases.table
+        tmpl_context.tabla_ti = self.tipositems.table
         
         value = self.edit_filler.get_value(values={'id_proyecto': id_proyecto})
         
-        fases = self.fases.get_all()['value']#tabla_fases_filler.get_value()
-        tipo_items = self.tipositem.get_all()['value']#self.tabla_ti_filler.get_value()
+        #fases = self.fases.get_all()['value']#tabla_fases_filler.get_value()
+        #tipo_items = self.tipositems.get_all()['value']#self.tabla_ti_filler.get_value()
+        fases = self.fases.table_filler.get_value()
+        tipo_items = self.tipositems.table_filler.get_value()
         
         return dict(value=value,
                     page="Administrar Proyecto %s" % proyecto.nombre,
-                    fases=fasas,
+                    fases=fases,
                     tipo_items=tipo_items,
                     puede_crear_fase=puede_crear_fases,
                     puede_crear_ti=puede_crear_ti,
-                    iniciado=iniciado
+                    iniciado=iniciado,
+                    puede_crear_rol=puede_crear_rol,
+                    puede_asignar_rol=puede_asignar_rol,
+                    id=id_proyecto
                     )
     
     
@@ -475,7 +491,7 @@ class ProyectoController(CrudRestController):
         retorno["page"] =  "Mis Proyectos"
         return dict(value=value,
                     page="Administrar Proyecto %s" % proyecto.nombre,
-                    fases=fasas,
+                    fases=fases,
                     tipo_items=tipo_items,
                     puede_crear_fase=puede_crear_fases,
                     puede_crear_ti=puede_crear_ti,

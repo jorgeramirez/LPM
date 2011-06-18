@@ -194,7 +194,19 @@ class TipoItemController(CrudRestController):
     """Controlador para tipos de item"""
     def __init__(self, DBS, id_proyecto=None):
         self.id_proyecto = id_proyecto
-        super(FaseController, self).__init__(DBS)
+        class TiProyectoTableFiller(TipoItemTableFiller):
+            def __init__(self, DBS, id_proyecto=None):
+                self.id_proyecto = id_proyecto
+                super(TiProyectoTableFiller, self).__init__(DBS)
+                
+            def _do_get_provider_count_and_objs(self, **kw):
+                tipos = []
+                if self.id_proyecto:
+                    tipos = Proyecto.por_id(self.id_proyecto).tipos_de_item
+                return len(tipos), tipos
+        if id_proyecto:
+            self.table_filler = TiProyectoTableFiller(DBSession, id_proyecto)
+        super(TipoItemController, self).__init__(DBS)
         
     #{ Variables
     title = u"Administrar Tipos de Ítem"
@@ -208,19 +220,20 @@ class TipoItemController(CrudRestController):
     allow_only = not_anonymous(u"El usuario debe haber iniciado sesión")
     
     #{ Modificadores
-    class TiProyectoTableFiller(TipoItemTableFiller):
-        def __init__(self, DBS, id_proyecto=None):
-            self.id_proyecto = id_proyecto
-            super(FasesProyectoTableFiller, self).__init(DBS)
-            
-        def _do_get_provider_count_and_objs(self, **kw):
-            tipos = Proyecto.por_id(self.id_proyecto).tipos_de_item
-            return len(tipos), tipos 
+    #class TiProyectoTableFiller(TipoItemTableFiller):
+    #    def __init__(self, DBS, id_proyecto=None):
+    #        self.id_proyecto = id_proyecto
+    #        super(FasesProyectoTableFiller, self).__init(DBS)
+    #        
+    #    def _do_get_provider_count_and_objs(self, **kw):
+    #        tipos = Proyecto.por_id(self.id_proyecto).tipos_de_item
+    #        return len(tipos), tipos 
         
     model = TipoItem
     table = tipo_item_table
 
-    table_filler = TiProyectoTableFiller(DBSession, self.id_proyecto)
+    #table_filler = TiProyectoTableFiller(DBSession, self.id_proyecto)
+    table_filler = tipo_item_table_filler
     new_form = tipo_item_add_form
     edit_form = tipo_item_edit_form
     edit_filler = tipo_item_edit_filler

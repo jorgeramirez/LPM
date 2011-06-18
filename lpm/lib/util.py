@@ -33,6 +33,8 @@ class UrlParser(object):
         """
         if not url: return
         partes = url.split("/")
+        if "administrar" in partes:
+            partes.remove("administrar")
         for i, v in enumerate(partes):
             if v == name:
                 return int(partes[i + 1])
