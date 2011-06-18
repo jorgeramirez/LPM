@@ -337,7 +337,7 @@ class UsuarioController(CrudRestController):
             redirect("/usuarios")
         '''
         
-        puede_asignar_rol = PoseePermiso("asignar rol").is_met(request.environ)
+        puede_asignar_rol = PoseePermiso("asignar-desasignar rol").is_met(request.environ)
         class mis_roles_tf(RolRolTableFiller):
             def __actions__(self, obj):
                 """Links de acciones para un registro dado"""

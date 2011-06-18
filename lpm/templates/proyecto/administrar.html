@@ -16,21 +16,37 @@
         <tr>
             <td>
                 <div style="height:0px;"> &nbsp; </div>
+                <h2 style="margin-top:1px; padding-left: 60px;">$page</h2>
                 <div style="float:left; padding-left: 95px;" class="crud_edit">
-                    <h2 style="margin-top:1px; padding-left: 60px;">$page</h2>
+                    
                      ${XML(tmpl_context.widget(value=value, action='./'))}
                 </div>
             </td>
+            <td valign="top">
+            	<div style="clear:both;">
+                <a py:if="puede_asignar_rol" class="link_boton" href="${tg.url(id + '/rol/proyecto')}">
+                    <input id="roles" style="margin-top:0; float:right;" class="boton" type="button" value="Asignar Rol"/>
+                </a>
+                
+                </div>
+                <br />
+                <div style="clear:both;">
+                <a py:if="puede_crear_rol"class="link_boton" href="${tg.url(id + '/rol/new/')}">               
+                    <input id="historial" class="boton" style="float:right;" type="button" value="Crear Rol"/>
+                </a>
+                </div>
+                <br />
+            </td>
         </tr>
         <tr>
-            <td>
+            <td colspan="2">
                 <a py:if="puede_crear_fase" class="link_boton" href="${tg.url('/fases/new')}">
-                    <input id="nueva_fase" class="boton" type="button" value="Nueva Fase"/>
+                    <input id="nueva_fase" class="boton" type="button" value="Nueva Fase"/ style="margin-top: 10px; width: 160px;>
                 </a>
             </td>
         </tr>
         <tr>
-            <td>
+            <td  colspan="2">
                 <div id="tabla_fases" style="margin-top: 10px;">
                     ${XML(tmpl_context.tabla_fases(value=fases))}
                 </div>
@@ -39,17 +55,17 @@
         <tr>
             <div style="clear:both;"></div>
         </tr>
-        <tr>
+        <tr colspan="2">
             <td>
                 <a py:if="puede_crear_ti" class="link_boton" href="${tg.url('/tipo_items/new')}">
-                    <input id="nuevo_ti" class="boton" type="button" value="Nuevo Tipo de Ítem"/>
+                    <input id="nuevo_ti" class="boton" type="button" value="Nuevo Tipo de Ítem" style="margin-top: 10px; width: 160px;/>
                 </a>
             </td>
         </tr>
         <tr>
             <div style="clear:both;"></div>
         </tr>
-        <tr>
+        <tr  colspan="2">
             <td>
                 <div py:if="iniciado" id="tabla_ti" style="margin-top: 10px;">
                     ${XML(tmpl_context.tabla_ti(value=tipo_items))} 

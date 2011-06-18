@@ -9,7 +9,8 @@ import transaction
 import logging
 
 def bootstrap(command, conf, vars):
-    """Place any commands to setup lpm here"""
+    """Realiza la creación de las tablas y los contenidos
+    por defecto del sistema"""
 
     # <websetup.bootstrap.before.auth
     from sqlalchemy.exc import IntegrityError
@@ -37,7 +38,7 @@ def bootstrap(command, conf, vars):
         rlp.nombre_rol = u"Lider de Proyecto"
         rlp.descripcion = u"Rol Lider de Proyecto, administra componentes" +\
                            "de un proyecto"
-        rlp.tipo = u"Plantilla"
+        rlp.tipo = u"Plantilla proyecto"
         rlp.id_fase = 0
         rlp.id_proyecto = 0
         rlp.id_tipo_item = 0
@@ -46,21 +47,17 @@ def bootstrap(command, conf, vars):
         rlp.codigo = model.Rol.generar_codigo(rlp)
         r.codigo = model.Rol.generar_codigo(r)
         
-        p = model.Permiso()
-        p.nombre_permiso = u'manage'
-        p.descripcion = u'This permission give an administrative right to the bearer'
-        p.roles.append(r)
-        model.DBSession.add(p)
-        
         #permisos del sistema
         print "Creando los permisos del sistema..."
-        for perm, desc in Permisos.items():
+        for perm in Permisos:
             p = model.Permiso()
-            p.nombre_permiso = perm
-            p.descripcion = desc
+            p.nombre_permiso = perm['nombre']
+            p.descripcion = perm['descripcion']
+            p.tipo = perm['tipo']
             p.roles.append(r) # Administrador del sistema.
-            if perm.find('usuario') < 0 and perm.find('rol') < 0:
-                p.roles.append(rlp) #Líder de Proyecto.
+            
+            if (perm['tipo'] != u'Sistema'):
+                p.roles.append(rlp) #Líder de Proyecto.            
 
         model.DBSession.flush()
         ####Asignar los permisos para lider de proyecto
@@ -71,7 +68,7 @@ def bootstrap(command, conf, vars):
         import traceback
         print traceback.format_exc()
         transaction.abort()
-        print 'Continuing with bootstrapping...'
+        print u'Ocurrió una excepción...'
         
 
     # <websetup.bootstrap.after.auth>

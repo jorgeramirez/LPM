@@ -381,7 +381,7 @@ class Proyecto(DeclarativeBase):
                                    Rol.id_proyecto == self.id_proyecto)).first()
         if rol:
             return rol.usuarios[0]
-        return None
+        return ""
 
 
 class TipoItem(DeclarativeBase):

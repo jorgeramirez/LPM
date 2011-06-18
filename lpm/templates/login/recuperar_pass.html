@@ -14,10 +14,31 @@
 <body>
 <div id="loginform">
 <form action="${tg.url('/enviar_pass')}" method="post" accept-charset="UTF-8" class="loginfields">
-    <h2><span>Ingrese su nombre de usuario</span></h2>
-    <label for="loginusername">username:</label><input type="text" id="loginusername" name="loginusernamegiven" class="text"></input><br/>
-    <input type="submit" id="submit" value="Enviar" />
-    <br/>   
+    <table>
+    <tbody>
+	    <tr>
+	    	<td  colspan="2">
+    			<div class="color-sombra"><span style="font-size:18px; margin: 2px 2px 2px 0;">Ingrese su nombre de usuario</span></div>
+	    		<br/>
+	    		<br/>
+	    	</td>
+	    </tr>
+	    <tr>
+	    	<td>
+		    	<label style="float:right;" for="loginusername">Nombre de Usuario</label>
+	    	</td>
+	    	<td>
+	    		<input style="float:right;" type="text" id="loginusername" name="loginusernamegiven" class="text"></input>
+		    	<br/>
+	    	</td>
+	    </tr>
+	    <tr>
+		    <td colspan="2">
+	    		<input type="submit" class="ingresar-btn" id="submit" value="Enviar" />
+	    	</td>
+	    </tr>
+    </tbody>
+    </table>
 </form>
 
 

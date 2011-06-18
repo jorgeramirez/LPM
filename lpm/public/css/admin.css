@@ -27,9 +27,18 @@ a.edit_link{
     background-color: #eee;
 }
 .crud_table .grid th{
-    background: url("/images/menubg.png") no-repeat scroll -20px top transparent;
+    background: url("/images/blank.gif") no-repeat scroll -20px top transparent;
     color: #fff;
-    font-weight: normal;
+    font-size: 1.2em;
+    font-family:arial, verdana, sans-serif;
+    line-height:27px;
+    color:#ddd;
+    text-decoration:none;
+
+    font-size:11px;
+
+    font-weight:bold;
+    text-shadow:0 -1px 0 rgba(0, 0, 0, 0.3);
     text-transform: capitalize;
 }
 .crud_table .grid td a{
@@ -57,3 +66,33 @@ a.edit_link{
     font-size: 12px;
 }
 
+/*paginacion*/
+
+
+.pager_curpage, .pager_link{
+    font-family: arial,verdana,sans-serif;
+/*    font-size:1.2em;*/
+    color:#dddddd;
+    background-color:#247ebd;
+    display: inline;
+    padding: 1px 6px 1px 6px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+.pager_link:hover{
+color: #FFFFFF;
+background-color:#246ebd;
+}
+
+.pager_curpage {
+color:#111111;
+font-weight: bold;
+}
+
+/*forularios*/
+.textfield {
+width:200px;
+
+}

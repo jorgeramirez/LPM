@@ -78,6 +78,8 @@ class FaseTableFiller(CustomTableFiller):
                      '</div><br />'
         value += '</div>'
         return value
+    
+
 
 fase_table_filler = FaseTableFiller(DBSession)
 
@@ -133,6 +135,10 @@ fase_edit_filler = FaseEditFiller(DBSession)
 
 class FaseController(CrudRestController):
     """Controlador de Fases"""
+    def __init__(self, DBS, id_proyecto=None):
+        self.id_proyecto = id_proyecto
+        super(FaseController, self).__init__(DBS)
+        
     #{ Variables
     title = u"Administración de Fases"
     allow_only = not_anonymous(u"El usuario debe haber iniciado sesión")
@@ -143,9 +149,43 @@ class FaseController(CrudRestController):
     tmp_action = "/fases/post_buscar"
     
     #{ Modificadores
+    class FasesProyectoTableFiller(FaseTableFiller):
+##Suspendido, queda para el final... si se hace...
+#    def __actions__(self, obj):
+#        """ Redefinición del método """
+#        value = super(FasesProyectoTableFiller, self).__actions__(obj)
+#        
+#        accion = "Modificar"
+#        if (self.iniciado):
+#            accion = "Administrar"
+#            
+#        if PoseePermiso('modificar fase', 
+#                        id_fase=obj.id_fase).is_met(request.environ):
+#            if (not self.iniciado):
+#                value += '<div>' + \
+#                            '<a id="mover_arriba" href="'+ str(obj.id_fase) + '" ' + \
+#                            'class="' + clase + '">Arriba</a>' + \
+#                         '</div><br />'
+#                         
+#                value += '<div>' + \
+#                            '<a id="mover_abajo" href="'+ str(obj.id_fase) + '" ' + \
+#                            'class="' + clase + '">Abajo</a>' + \
+#                         '</div><br />'
+#            else:
+# 
+        def __init__(self, DBS, id_proyecto=None):
+            self.id_proyecto = id_proyecto
+            super(FasesProyectoTableFiller, self).__init__(DBSession, self.id_proyecto)
+                            
+        def _do_get_provider_count_and_objs(self, **kw):
+            fases = Proyecto.por_id(self.id_proyecto).fases
+            return len(fases), fases  
+                     
     model = Fase
     table = fase_table
     table_filler = fase_table_filler
+    
+        
     new_form = fase_add_form
     edit_form = fase_edit_form
     edit_filler = fase_edit_filler

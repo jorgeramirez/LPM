@@ -10,7 +10,7 @@ con los módulos de autorización y autenticación
 
 @since: 1.0
 """
-from repoze.what.predicates import Predicate, is_anonymous
+from repoze.what.predicates import Predicate, is_anonymous, has_permission
 from lpm.model import Usuario
 
 __all__ = ['Permisos', 'PoseePermiso', 'AlgunPermiso']
@@ -19,118 +19,55 @@ __all__ = ['Permisos', 'PoseePermiso', 'AlgunPermiso']
 # Diccionario que define los permisos del sistema
 # clave: nombre del permiso
 # valor: descripcion del permiso
-Permisos = {
+Permisos = [
 #usuario
-    u"crear usuario": u"Permite crear usuarios",
-    u"eliminar usuario": u"Permite eliminar usuarios",
-    u"modificar usuario": u"Permite modificar valores de atributos de usuarios",
-    u"consultar usuario": u"Permite consultar valores de atributos de usuarios",
-
+    dict(nombre= u"crear usuario", descripcion= u"Permite crear usuarios", tipo= u"Sistema"),
+    dict(nombre= u"eliminar usuario", descripcion= u"Permite eliminar usuarios", tipo= u"Sistema"),
+    dict(nombre= u"modificar usuario", descripcion= u"Permite modificar valores de atributos de usuarios", tipo= u"Sistema"),
+    dict(nombre= u"consultar usuario", descripcion= u"Permite consultar valores de atributos de usuarios", tipo= u"Sistema"),
 #roles
-    u"crear rol": u"Permite realizar la operación de crear un rol",
-    u"eliminar rol": u"Permite realizar la operación de eliminar un rol",
-    u"modificar rol": u"Permite modificar un rol",
-    u"asignar rol": u"Permite realizar la operación de asignar un rol",
-    u"consultar rol": u"Permite consultar atributos de un rol",
-
+    dict(nombre= u"crear rol", descripcion= u"Permite realizar la operación de crear un rol", tipo= u"Proyecto, Fase, Tipo Ítem"),
+    dict(nombre= u"eliminar rol", descripcion= u"Permite realizar la operación de eliminar un rol", tipo= u"Proyecto, Fase, Tipo Ítem"),
+    dict(nombre= u"modificar rol", descripcion= u"Permite modificar un rol", tipo= u"Proyecto, Fase, Tipo Ítem"),
+    dict(nombre= u"asignar-desasignar rol", descripcion= u"Permite realizar la operación de asignar un rol", tipo= u"Proyecto, Fase, Tipo Ítem"),
+    dict(nombre= u"consultar rol", descripcion= u"Permite consultar atributos de un rol", tipo= u"Proyecto, Fase, Tipo Ítem"),
 #proyecto
-    u"consultar proyecto": u"Permite consultar valores de atributos de " +
-                           u"proyecto",
-    u"modificar proyecto": u"Permite modificar valores de atributos de " +
-                           u"proyecto",
-    u"iniciar proyecto": u"Permite realizar la operación de iniciar un " +
-                         u"proyecto",
-    u"crear proyecto": u"Permite crear proyectos",
-    u"eliminar proyecto": u"Permite eliminar proyectos",
+    dict(nombre= u"consultar proyecto", descripcion= (u"Permite consultar valores de atributos de " +
+                           u"proyecto"), tipo= u"Proyecto"),
+    dict(nombre= u"modificar proyecto", descripcion= (u"Permite modificar valores de atributos de " +
+                           u"proyecto"), tipo= u"Proyecto"),
+    dict(nombre= u"iniciar proyecto", descripcion= (u"Permite realizar la operación de iniciar un " +
+                         u"proyecto"), tipo= u"Proyecto"),
+    dict(nombre= u"crear proyecto", descripcion= u"Permite crear proyectos", tipo= u"Sistema"),
+    dict(nombre= u"eliminar proyecto", descripcion= u"Permite eliminar proyectos", tipo= u"Sistema"),
     
 #fases
-    u"crear fase": u"Permite crear fases",
-    u"modificar fase": u"Permite modificar valores de atributos de una fase",
-    u"eliminar fase": u"Permite eliminar una fase",
-    u"consultar fase": u"Permite consultar valores de atributos de fase",
+    dict(nombre= u"crear fase", descripcion= u"Permite crear fases", tipo= u"Proyecto"),
+    dict(nombre= u"modificar fase", descripcion= u"Permite modificar valores de atributos de una fase", tipo= u"Proyecto, Fase"),
+    dict(nombre= u"eliminar fase", descripcion= u"Permite eliminar una fase", tipo= u"Proyecto, Fase"),
+    dict(nombre= u"consultar fase", descripcion= u"Permite consultar valores de atributos de fase", tipo= u"Proyecto, Fase"),
     
 #tipo de item
-    u"crear tipo item" : u"Permite la definición de un nuevo tipo de ítem",
-    u"redefinir tipo item": u"Permite agregar características al tipo de ítem",
-    u"consultar tipo item": u"Permite consultar los atributos de " + 
-                            u"un tipo de ítem",
+    dict(nombre= u"crear tipo item" , descripcion= u"Permite la definición de un nuevo tipo de ítem", tipo= u"Proyecto, Fase"),
+    dict(nombre= u"redefinir tipo item", descripcion= u"Permite agregar características al tipo de ítem", tipo= u"Proyecto, Fase, Tipo Ítem"),
+    dict(nombre= u"consultar tipo item", descripcion= u"Permite consultar los atributos de " + 
+                            u"un tipo de ítem", tipo= u"Proyecto, Fase, Tipo Ítem"),
                                 
 #item
-    u"crear item": u"Permite crear ítems de un tipo dado",
-    u"modificar item": u"Permite modificar valores de atributos del ítem",
-    u"consultar item": u"Permite consultar valores de atributos de ítem",
-    u"aprobar-desaprobar item": u"Permite realizar la operación de aprobar un ítem",
-    u"eliminar-revivir item": u"Permite realizar la operación de eliminar un ítem",
-    u"calcular impacto": u"Permite realizar la operación calcular impacto",
+    dict(nombre= u"crear item", descripcion= u"Permite crear ítems de un tipo dado", tipo= u"Proyecto, Fase, Tipo Ítem"),
+    dict(nombre= u"modificar item", descripcion= u"Permite modificar valores de atributos del ítem", tipo= u"Proyecto, Fase, Tipo Ítem"),
+    dict(nombre= u"consultar item", descripcion= u"Permite consultar valores de atributos de ítem", tipo= u"Proyecto, Fase, Tipo Ítem"),
+    dict(nombre= u"aprobar-desaprobar item", descripcion= u"Permite realizar la operación de aprobar un ítem", tipo= u"Proyecto, Fase, Tipo Ítem"),
+    dict(nombre= u"eliminar-revivir item", descripcion= u"Permite realizar la operación de eliminar un ítem", tipo= u"Proyecto, Fase, Tipo Ítem"),
+    dict(nombre= u"calcular impacto", descripcion= u"Permite realizar la operación calcular impacto", tipo= u"Proyecto, Fase, Tipo Ítem"),
     
 #lb
-    u"crear lb": u"Permite crear una Línea Base",
-    u"abrir lb": u"Permite realizar la operación de abrir una línea base",
-    u"cerrar lb": u"Permite realizar la operación de cerrar una línea base",
-    u"consultar lb": u"Permite consultar la información almacenada en una " +
-                      u"línea base",
+    dict(nombre= u"crear lb", descripcion= u"Permite crear una Línea Base", tipo= u"Proyecto, Fase"),
+    dict(nombre= u"abrir-cerrar lb", descripcion= u"Permite realizar la operación de abrir o cerrar una línea base", tipo= u"Proyecto, Fase"),
+    dict(nombre= u"consultar lb", descripcion= (u"Permite consultar la información almacenada en una " +
+                      u"línea base"), tipo= u"Proyecto, Fase")
         
-    
-##tipo de item
-#    u"crear tipo item" : u"Permite la definición de un nuevo tipo de ítem",
-#    u"redefinir tipo item": u"Permite agregar características al tipo de ítem",
-#    u"consultar tipo item": u"Permite consultar los atributos de " + 
-#                             u"un tipo de ítem",
-#                                
-##item
-#    u"crear item": u"Permite crear ítems de un tipo dado",
-#    u"modificar item": u"Permite modificar valores de atributos del ítem",
-#    u"agregar relacion": u"Permite relacionar un ítem con otro",
-#    u"eliminar relacion": u"Permite eliminar la relación entre dos ítems",
-#    u"consultar item": u"Permite consultar valores de atributos de ítem",
-#    u"aprobar item": u"Permite realizar la operación de aprobar un ítem",
-#    u"desaprobar item": u"Permite realizar la operación de desaprobar un ítem",
-#    u"eliminar item": u"Permite realizar la operación de eliminar un ítem",
-#    u"revivir item": u"Permite realizar la operación de revivir un ítem",
-#    u"calcular impacto": u"Permite realizar la operación calcular impacto",
-#    
-#    
-##lb
-#    u"crear lb": u"Permite crear una Línea Base",
-#    u"abrir lb": u"Permite realizar la operación de abrir una línea base",
-#    u"cerrar lb": u"Permite realizar la operación de cerrar una línea base",
-#    u"consultar lb": u"Permite consultar la información almacenada en una " +
-#                      u"línea base",
-#        
-##roles
-#    u"crear rol": u"Permite realizar la operación de crear un rol",
-#    u"eliminar rol": u"Permite realizar la operación de eliminar un rol",
-#    u"asignar rol": u"Permite realizar la operación de asignar un rol",
-#    u"desasignar rol": u"Permite realizar la operación de desasignar un rol",
-#    u"consultar rol": u"Permite consultar atributos de un rol",
-#    
-##permisos
-#    u"asignar permiso": u"Permite asignar permisos a roles",
-#    u"desasignar permiso": u"Permite desasignar permisos a roles",
-#
-##proyecto
-#    u"consultar proyecto": u"Permite consultar valores de atributos de " +
-#                           u"proyecto",
-#    u"modificar proyecto": u"Permite modificar valores de atributos de " +
-#                           u"proyecto",
-#    u"administrar proyecto": u"Permite administrar componentes de proyecto",
-#    u"iniciar proyecto": u"Permite realizar la operación de iniciar un " +
-#                         u"proyecto",
-#    u"crear proyecto": u"Permite crear proyectos",
-#    u"eliminar proyecto": u"Permite eliminar proyectos",
-#
-##usuario
-#    u"crear usuario": u"Permite crear usuarios",
-#    u"eliminar usuario": u"Permite eliminar usuarios",
-#    u"modificar usuario": u"Permite modificar valores de atributos de usuarios",
-#    u"consultar usuario": u"Permite consultar valores de atributos de usuarios",
-#    
-##fases
-#    u"crear fase": u"Permite crear fases",
-#    u"modificar fase": u"Permite modificar valores de atributos de una fase",
-#    u"eliminar fase": u"Permite eliminar una fase",
-#    u"consultar fase": u"Permite consultar valores de atributos de fase"
-}
+]
 
 class PoseePermiso(Predicate):
     """
@@ -162,23 +99,30 @@ class PoseePermiso(Predicate):
             self.unmet()
         nombre_usuario = credentials['repoze.what.userid']
         usuario = Usuario.by_user_name(nombre_usuario)
+        
         for r in usuario.roles:
                 tiene = False
                 for p in r.permisos:
                     if p.nombre_permiso == self.nombre_permiso:
                         tiene = True
+                        
                 if not tiene: 
                     continue
+                
                 if r.es_rol_sistema():
                     return
+                
                 if self.id_proyecto == r.id_proyecto:
                     if r.id_fase == 0 and r.id_tipo_item == 0:
                         return
+                    
                 if self.id_fase == r.id_fase:
                     if r.id_tipo_item == 0:
                         return
+                    
                 if self.id_tipo_item == r.id_tipo_item:
                     return
+                
         self.unmet(self.message % self.nombre_permiso)
         
 class AlgunPermiso(Predicate):

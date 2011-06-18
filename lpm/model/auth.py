@@ -80,9 +80,14 @@ class Rol(DeclarativeBase):
 
     #{ variables
     #template para el codigo (usar metodo format)
-    tmpl_codigo = "ROL-{id_rol}-{tipo}"
-    tipos_posibles = [u'Plantilla', u'Sistema', u'Proyecto',
-                        u'Fase', u'Tipo de Ítem']
+    tmpl_codigo = "rol-{id_rol}-{tipo}"
+    tipos_posibles = {u'Plantilla proyecto' : 'plant-proy',
+                      u'Plantilla fase' : 'plant-fase',
+                      u'Plantilla tipo ítem' : 'plant-ti', 
+                      u'Sistema' : 'sis',
+                      u'Proyecto' : 'proy',                        
+                      u'Fase' : 'fase', 
+                      u'Tipo de Ítem' : 'ti'}
 
     #{ Relations
 
@@ -94,7 +99,7 @@ class Rol(DeclarativeBase):
         """
         Genera el codigo para el rol dado como parametro
         """
-        return cls.tmpl_codigo.format(id_rol=rol.id_rol, tipo=rol.tipo)
+        return cls.tmpl_codigo.format(id_rol=rol.id_rol, tipo=rol.tipos_posibles[rol.tipo])
         
     def __repr__(self):
         return ('<Rol: name=%s>' % self.nombre_rol).encode('utf-8')
@@ -121,11 +126,11 @@ class Rol(DeclarativeBase):
         base_query = DBSession.query(Rol)
         if "id" in kw:
             rol = base_query.filter(and_(Rol.id_rol == int(kw["id"]),
-                                        Rol.tipo == u"Plantilla")).one()
+                                        Rol.tipo.like(u"Plantilla%"))).first()
         elif "nombre_rol" in kw:
             rol = base_query.filter(and_(
                                     Rol.nombre_rol == kw["nombre_rol"],
-                                    Rol.tipo == u"Plantilla")).one()
+                                    Rol.tipo.like(u"Plantilla%"))).first()
         return rol
     
     @classmethod
@@ -141,7 +146,7 @@ class Rol(DeclarativeBase):
         desasignados = []
         #falta discrimininar el tipo
         for r in roles:
-            if r.tipo == u"Plantilla":
+            if (r.tipo.find(u"Plantilla") > 0):
                 continue
             esta = False
             for u in r.usuarios:
@@ -186,18 +191,21 @@ class Rol(DeclarativeBase):
         for p in permisos:
             p.roles.append(rol_new)
             
-        #seteamos el tipo
-        if kw["tipo"] == "deducir":
-            #calculamos el tipo para el rol con contexto
-            rol_new.tipo = u"Tipo de Ítem"
-            for p in permisos:
-                np = p.nombre_permiso
-                if (np.find("item") > 0 and np.find("tipo item") < 0) or \
-                      np.find("lb") > 0 or np.find("impacto") > 0:
-                    rol_new.tipo = u"Fase"
-                elif np.find("proyecto") > 0 or np.find("fase") > 0:
-                    rol_new.tipo = u"Proyecto"
-                    break
+#        #seteamos el tipo
+#        if kw["tipo"] == "deducir":
+#            #calculamos el tipo para el rol con contexto
+#            rol_new.tipo = u"Tipo de Ítem"
+#            for p in permisos:
+#                np = p.nombre_permiso
+#                if (np.find("item") > 0 and np.find("tipo item") < 0) or \
+#                      np.find("lb") > 0 or np.find("impacto") > 0:
+#                    rol_new.tipo = u"Fase"
+#                elif np.find("proyecto") > 0 or np.find("fase") > 0:
+#                    rol_new.tipo = u"Proyecto"
+#                    break
+#        else:
+#            rol_new.tipo = kw['tipo']
+            
         DBSession.flush()
         rol_new.codigo = Rol.generar_codigo(rol_new)
         DBSession.add(rol_new)
@@ -253,7 +261,43 @@ class Rol(DeclarativeBase):
             rol_mod.tipo = tipo
         return rol_mod
     #}
-
+    
+    @classmethod
+    def actualizar_rol(cls, **kw):
+        """Actualiza un rol"""
+        if "sprox_id" in kw:
+            del kw["sprox_id"]
+        pks = kw["permisos"]
+        for i, pk in enumerate(pks):
+            pks[i] = int(pk)
+        del kw["permisos"]
+        for k in ["id_proyecto", "id_fase", "id_tipo_item"]:
+            if kw.has_key(k):
+                kw[k] = int(kw[k])
+        rol_mod = Rol.por_id(kw['id_rol'])
+        for k in ["id_proyecto", "id_fase", "id_tipo_item", "nombre_rol",
+                  "descripcion"]:
+            if kw.has_key(k):
+                setattr(rol_mod, k, kw[k])
+        c = 0
+        while c < len(rol_mod.permisos):
+            p = rol_mod.permisos[c]
+            if p.id_permiso not in pks:
+                del rol_mod.permisos[c]
+            else:
+                c += 1
+        if pks:
+            permisos = DBSession.query(Permiso).filter( \
+                                            Permiso.id_permiso.in_(pks)).all()
+            if not permisos:
+                return None
+                
+            for p in permisos:
+                if p not in rol_mod.permisos:
+                    p.roles.append(rol_mod)
+        
+        return rol_mod
+    #}
 
 # The 'info' argument we're passing to the email_address and password columns
 # contain metadata that Rum (http://python-rum.org/) can use generate an
@@ -389,7 +433,7 @@ class Permiso(DeclarativeBase):
     id_permiso = Column(Integer, autoincrement=True, primary_key=True)
     nombre_permiso = Column(Unicode(32), unique=True, nullable=False)
     descripcion = Column(Unicode(100))
-
+    tipo = Column(Unicode(30))
     #{ Relations
 
     roles = relation(Rol, secondary=group_permission_table,
@@ -432,18 +476,26 @@ class Permiso(DeclarativeBase):
         """
         Método de clase que retorna los permisos de nivel de sistema.
         """
-        return DBSession.query(Permiso).filter( \
-                   or_(Permiso.nombre_permiso.ilike("%rol%"), 
-                       Permiso.nombre_permiso.ilike("%usuario%"))).all()
+        return DBSession.query(Permiso).filter(Permiso.tipo == 'Sistema').all()
 
     @classmethod
-    def permisos_con_contexto(cls):
+    def permisos_proyectos(cls):
         """
         Método de clase que retorna los permisos que poseen un contexto.
         """
-        return DBSession.query(Permiso).filter(not_( \
-                   or_(Permiso.nombre_permiso.ilike("%rol%"), 
-                       Permiso.nombre_permiso.ilike("%usuario%")))).all()
+        return DBSession.query(Permiso).filter(Permiso.tipo.like("%Proyecto%")).all()
+    @classmethod
+    def permisos_fases(cls):
+        """
+        Método de clase que retorna los permisos que poseen un contexto.
+        """
+        return DBSession.query(Permiso).filter(Permiso.tipo.like("%Fase%")).all()
+    @classmethod
+    def permisos_ti(cls):
+        """
+        Método de clase que retorna los permisos que poseen un contexto.
+        """
+        return DBSession.query(Permiso).filter(Permiso.tipo.like("%Tipo%")).all()                                                                 
     #}
 
 

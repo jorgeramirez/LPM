@@ -21,7 +21,7 @@ from lpm.lib.sproxcustom import (CustomTableFiller,
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
 from lpm.lib.util import UrlParser
 from lpm.controllers.fase import FaseController, FaseTableFiller, FaseTable
-from lpm.controllers.tipoitem import TipoItemController
+from lpm.controllers.tipoitem import TipoItemController, TipoItemTableFiller
 
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, EditFormFiller
@@ -40,17 +40,21 @@ from tw.forms import TextField
 class ProyectoTable(TableBase):
     __model__ = Proyecto
     __headers__ = {'id_proyecto': u'ID', 'fecha_creacion': u'Creación',
-                   'complejidad_total': u'Complejidad Total', 'estado': u'Estado',
-                   'numero_fases': u'Nro. de Fases', 'descripcion': u'Descripción',
-                   'project_leader': 'Lider de Proyecto', 'codigo': u"Código"
+                   'complejidad_total': u'Compl.', 'estado': u'Estado',
+                   'numero_fases': u'#Fases', 'descripcion': u'Descripción',
+                   'project_leader': 'Lider', 'codigo': u"Código"
                   }
     __omit_fields__ = ['fases', 'tipos_de_item', 'id_proyecto', 'descripcion']
     __default_column_width__ = '15em'
+    __field_order__ = ['codigo', 'nombre', 'numero_fases', 'estado',
+                        'project_leader', 'complejidad_total',
+                        'fecha_creacion']
     __column_widths__ = {'complejidad_total': "25em",
                          'numero_fases': "35em",
                          '__actions__' : "50em",
                          'codigo': "30em"
                         }
+    __field_attrs__ = {'completidad_total': { 'text-aling' : 'center'}}
     __add_fields__ = {'project_leader':None}
     
 proyecto_table = ProyectoTable(DBSession)
@@ -126,7 +130,17 @@ class ProyectoTableFiller(CustomTableFiller):
                 c += 1
             if c == len(filtrados):
                 break
+            
         return len(filtrados), filtrados
+    
+        if AlgunPermiso(patron="tipo item").is_met(request.environ):
+            id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+            filtrados = DBSession.query(TipoItem).all()
+            if id_proyecto:
+                proy = Proyecto.por_id(id_proyecto)
+                filtrados = proy.tipos_de_item
+            return len(filtrados), filtrados
+        return 0, []
 
 proyecto_table_filler = ProyectoTableFiller(DBSession)
 
@@ -143,7 +157,7 @@ class LiderField(CustomPropertySingleSelectField):
                 lider = proy.obtener_lider()
                 options.append((lider.id_usuario, '%s (%s)'%(lider.nombre_usuario, 
                                 lider.nombre + " " + lider.apellido)))
-                if (PoseePermiso('asignar rol').is_met(request.environ)):
+                if (PoseePermiso('asignar-desasignar rol').is_met(request.environ)):
                     usuarios = DBSession.query(Usuario).\
                         filter(Usuario.id_usuario!=lider.id_usuario).all()
                     for u in usuarios:
@@ -172,7 +186,7 @@ class ProyectoAddForm(AddRecordForm):
     __field_order__ = ['nombre', 'descripcion']
     __base_validator__ = ProyectoAddFormValidator
     
-    if PoseePermiso('asignar rol').is_met(request.environ):
+    if PoseePermiso('asignar-desasignar rol').is_met(request.environ):
         lider = LiderField('lider', label_text="Lider", accion="new")
         __field_order__.append('lider')
 
@@ -181,12 +195,12 @@ proyecto_add_form = ProyectoAddForm(DBSession)
 
 class ProyectoEditForm(EditableForm):
     __model__ = Proyecto
-    __hide_fields__ = ['id_proyecto', 'fecha_creacion', 'complejidad_total',
+    __hide_fields__ = ['id_proyecto']
+    __omit_fields__ = ['fecha_creacion', 'complejidad_total',
                        'estado', 'numero_fases', 'codigo', 'fases', 
                        'tipos_de_item']
     __base_validator__ = ProyectoEditFormValidator
-    if All(PoseePermiso('asignar rol'), 
-           PoseePermiso('eliminar rol')).is_met(request.environ):#para qué el permiso de eliminar?
+    if PoseePermiso('asignar-desasignar rol').is_met(request.environ):
         lider = LiderField('lider', label_text="Lider", 
                            accion="edit")
 
@@ -197,25 +211,10 @@ class ProyectoEditFiller(EditFormFiller):
     
 proyecto_edit_filler = ProyectoEditFiller(DBSession)
 
-class FasesProyectoTableFiller(FaseTableFiller):
-    def __actions__(self, obj):
-        """ Redefinición del método """
-        value = super(FasesProyectoTableFiller, self).__actions__(obj)
-        
-        if PoseePermiso('modificar fase', 
-                        id_fase=obj.id_fase).is_met(request.environ):
-            value += '<div>' + \
-                        '<a id="mover_arriba" href="'+ str(obj.id_fase) + '" ' + \
-                        'class="' + clase + '">Arriba</a>' + \
-                     '</div><br />'
-                     
-            value += '<div>' + \
-                        '<a id="mover_abajo" href="'+ str(obj.id_fase) + '" ' + \
-                        'class="' + clase + '">Abajo</a>' + \
-                     '</div><br />'
-        return value
+
+
     
-tabla_fases_filler = FasesProyectoTableFiller(DBSession)
+#tabla_fases_filler = FasesProyectoTableFiller(DBSession)
     
 class ProyectoController(CrudRestController):
     """Controlador de Proyectos"""
@@ -235,7 +234,7 @@ class ProyectoController(CrudRestController):
     new_form = proyecto_add_form
     edit_form = proyecto_edit_form
     edit_filler = proyecto_edit_filler
-    tabla_fases_filler = tabla_fases_filler
+    tabla_fases_filler = None#tabla_fases_filler
     #para el form de busqueda
     opciones = dict(nombre=u"Nombre de Proyecto",
                    codigo=u"Código",
@@ -270,7 +269,7 @@ class ProyectoController(CrudRestController):
         puede_crear = PoseePermiso("crear proyecto").is_met(request.environ)
         if pylons.request.response_type == 'application/json':
             return self.table_filler.get_value(**kw)
-        if not getattr(self.table.__class__, '__retrieves_own_value__', False):
+        if not getattr(self.table.__class__, ' ', False):
             proyectos = self.table_filler.get_value(**kw)
         else:
             proyectos = []
@@ -278,14 +277,16 @@ class ProyectoController(CrudRestController):
         tmpl_context.widget = self.table
         atras = '/'
         return dict(lista_elementos=proyectos, 
-                    page=self.title,#session['print'],
+                    page=self.title,
                     titulo=self.title, 
                     modelo=self.model.__name__, 
                     columnas=self.columnas,
                     opciones=self.opciones,
                     url_action="/proyectos/",
                     puede_crear=puede_crear,
-                    comboboxes=self.comboboxes, atras=atras)
+                    comboboxes=self.comboboxes,
+                    atras=atras
+                    )
 
                 
     @without_trailing_slash
@@ -309,6 +310,7 @@ class ProyectoController(CrudRestController):
         buscar_table_filler.filtros = kw
         proyectos = buscar_table_filler.get_value()
         atras = '/proyectos'
+        
         return dict(lista_elementos=proyectos, 
                     page=self.title, 
                     titulo=self.title, 
@@ -317,7 +319,9 @@ class ProyectoController(CrudRestController):
                     url_action="/proyectos/",
                     puede_crear=puede_crear,
                     comboboxes=self.comboboxes,
-                    opciones=self.opciones, atras=atras)
+                    opciones=self.opciones,
+                    atras=atras
+                    )
     
     
     @expose('lpm.templates.proyecto.edit')
@@ -357,14 +361,15 @@ class ProyectoController(CrudRestController):
             del kw["sprox_id"]
         id_proy_lider = int(kw["lider"])
         del kw["lider"]
-        transaction.begin()
+        #transaction.begin()
         proy = Proyecto(**kw)
         lider = Usuario.por_id(id_proy_lider)
+        nombre_lider = lider.nombre_usuario
         rol_template = Rol.obtener_rol_plantilla(nombre_rol=u"Lider de Proyecto")
         rol_nuevo = Rol(id_fase=0, id_tipo_item=0)
         rol_nuevo.nombre_rol = rol_template.nombre_rol
         rol_nuevo.descripcion = rol_template.descripcion
-        rol_nuevo.tipo = u"proyecto"
+        rol_nuevo.tipo = u"Proyecto"
         rol_nuevo.usuarios.append(lider)
         for perm in rol_template.permisos:
             perm.roles.append(rol_nuevo)
@@ -373,11 +378,11 @@ class ProyectoController(CrudRestController):
         rol_nuevo.id_proyecto = proy.id_proyecto
         rol_nuevo.codigo = Rol.generar_codigo(rol_nuevo)
         proy.codigo = Proyecto.generar_codigo(proy)
-        transaction.commit()
+        #transaction.commit()
         
         #después de crear el proyecto, si el usuario actual es el lider
         #se redirige a la interface de administración del nuevo proyecto.
-        if (lider.nombre_usuario == request.identity['repoze.who.userid']):
+        if (nombre_lider == request.identity['repoze.who.userid']):
             redirect("/proyectos/administrar/%s" % str(proy.id_proyecto))
         else:
             redirect("/proyectos")
@@ -408,6 +413,7 @@ class ProyectoController(CrudRestController):
             redirect("/proyectos")
         proyecto = Proyecto.por_id(id_proyecto)
         iniciado = (proyecto.estado == u'Iniciado')
+        
         puede_crear_fase = (not iniciado and
                             PoseePermiso('crear fase', id_proyecto=id_proyecto).\
                             is_met(request.environ))
@@ -417,14 +423,15 @@ class ProyectoController(CrudRestController):
                             is_met(request.environ))
         
         tmpl_context.widget = self.edit_form
-        tmpl_context.tabla_fases = FaseTable(DBSession)
-        tmpl_context.tabla_ti = self.tabla_ti
+        
+            
+        tmpl_context.tabla_fases = FasesProyectoTableFiller(DBSession)
+        tmpl_context.tabla_ti = TiProyectoTableFiller(DBSession)
         
         value = self.edit_filler.get_value(values={'id_proyecto': id_proyecto})
-        value['_method'] = 'PUT' #?
         
-        fases = self.tabla_fases_filler.get_value()
-        tipo_items = self.tabla_ti_filler.get_value()
+        fases = self.fases.get_all()['value']#tabla_fases_filler.get_value()
+        tipo_items = self.tipositem.get_all()['value']#self.tabla_ti_filler.get_value()
         
         return dict(value=value,
                     page="Administrar Proyecto %s" % proyecto.nombre,
@@ -438,13 +445,13 @@ class ProyectoController(CrudRestController):
     
     @without_trailing_slash
     @paginate('lista_elementos', items_per_page=5)
-    @expose('lpm.templates.get_all')
+    @expose('lpm.templates.proyecto.get_all')
     @expose('json')
     def mis_proyectos(self, *args, **kw):
-        ia = is_anonymous()
-        if ia.is_met(request.environ):
-            flash(ia.message, 'warning')
-            redirect("/")
+#        ia = is_anonymous()
+#        if ia.is_met(request.environ):
+#            flash(ia.message, 'warning')
+#            redirect("/")
         tmpl_context.widget = self.table
         
         class mp_filler(ProyectoTableFiller):
@@ -466,5 +473,12 @@ class ProyectoController(CrudRestController):
         retorno = self.retorno_base()
         retorno["lista_elementos"] = proyectos
         retorno["page"] =  "Mis Proyectos"
-        return retorno
+        return dict(value=value,
+                    page="Administrar Proyecto %s" % proyecto.nombre,
+                    fases=fasas,
+                    tipo_items=tipo_items,
+                    puede_crear_fase=puede_crear_fases,
+                    puede_crear_ti=puede_crear_ti,
+                    iniciado=iniciado
+                    )
     #}

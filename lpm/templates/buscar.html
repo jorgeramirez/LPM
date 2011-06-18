@@ -17,19 +17,17 @@
 <script type="text/javascript">
 
 $(document).ready(function () {
-    
-
-
+	
     $('#form :button[name=add-filter]').live('click', function () {
-        $('#form :input[name=cualquiera]').attr('disabled', true);
-        $('#form :input[name=cualquiera]').val('');
-    
+    	$('#form :input[name=cualquiera]').attr('disabled', true);
+    	$('#form :input[name=cualquiera]').val('');
+   	
         count = $('#form .filters').data('count');
         $('#form .filters').data('count', count + 1);
         
-        $('#templates .filter.template').children().clone().appendTo('#form .filters')
+        $('#templates .filter_template').children().clone().appendTo('#form .filters')
             .data('count', count)
-            .find('[name]').trigger('adjust-name');
+            .find('[name]').trigger('adjust-name-select');
     });
     
     $('#form :button[name^=remove-filter]').live('click', function () {
@@ -38,9 +36,9 @@ $(document).ready(function () {
         $('#form .filters').data('count', count - 1);
         
         if(count - 1 == 0) {
-            $('#form :input[name=cualquiera]').attr('disabled', false);
+        	$('#form :input[name=cualquiera]').attr('disabled', false);
         }
-            
+        	
     });
     
     $('#form select[name^=filter-type]').live('change', function () {
@@ -49,51 +47,45 @@ $(document).ready(function () {
             destination = $(this).next('span').children().remove().end();
             
             if(template == "fecha"){
-                $('#templates .' + template + '.template').children().clone().appendTo(destination)
-                    .find('[name]').andSelf().trigger('adjust-name');/*.datepicker({ altFormat: 'yy-mm-dd', buttonText: 'Elegir fecha' });*/
-                $('.calendario').datepicker({ dateFormat: 'yy-mm-dd' });
-                /*$('.calendario').datepicker( 'option', 'altFormat', 'yy-mm-dd' );*/
+                $('#templates .rango_fechas.' + $(this).val() ).children().clone().appendTo(destination)
+                    .find('[name]').andSelf().datepicker({dateFormat: 'yy-mm-dd'});
+            	/*$('.calendario').datepicker({dateFormat: 'yy-mm-dd'});*/
+
             } else if(template == "nada") {
-                //saca el input que quedo colgado
-                $(this).next('input').remove();
-            
-            }else{
-                $('#templates .' + template + '.template').children().clone().appendTo(destination)
-                    .find('[name]').andSelf().trigger('adjust-name');
+            	//saca el input que quedo colgado
+            	$(this).next().remove();
+           	
+            } else {
+                $('#templates .' + template + '.' + $(this).val() ).children().clone().appendTo(destination)
+                    .find('[name]').andSelf();
             }
         }
     });
-/*
-    $(function() {
-        $('#calendario').datepicker({ altFormat: 'yy-mm-dd', buttonText: 'Elegir fecha' });
-    });
-*/
     
-    $('#form [name]').live('adjust-name', function (event) {
+    $('#form [name]').live('adjust-name-select', function (event) {
         count = $(this).parents('.filter').data('count');
         $(this).attr('name', $(this).attr('name') + '-' + count);
     });
-  
+    
     $('#templates .header_filtro').children().clone().appendTo('#form');
     $('#templates .form.template').children().clone().appendTo('#form');
     $('#form .filters').data('count', 0);
     
     //validación para campos con solamente numeros enteros
     $('.solo_entero').live('keyup', function () {
-        $(this).val($(this).val().replace(/[^0-9]/g, ''));
-
-    });
+		$(this).val($(this).val().replace(/[^0-9]/g, ''));
+	});
 });
 
 </script>
 <div>
-    <div class="buscar">
-    <div id="templates">
-        <div class="header_filtro">
-            <!--<span style="margin-top:5px; margin-left:40px; font-size:15;">En ${modelo}s</span>-->
-            <input id="buscar_cualquiera" type="text" name="cualquiera" />
-            <input id="buscar_boton" class="boton" type="submit" value="Buscar"/>    
-        </div>
+	<div class="buscar">
+	<div id="templates">
+   		<div class="header_filtro">
+	        <!--<span style="margin-top:5px; margin-left:40px; font-size:15;">En ${modelo}s</span>-->
+	        <input id="buscar_cualquiera" type="text" name="cualquiera" />
+	        <input id="buscar_boton" class="boton" type="submit" value="Buscar"/>    
+    	</div>
     
         <div class="form template">
             <div class="filters">
@@ -102,12 +94,12 @@ $(document).ready(function () {
                 <input  id="filtro_boton" type="button" name="add-filter" value="Agregar Filtro" />  
             </div>
         </div>
-        <div class="filter template">
+        <div class="filter_template">
             <div class="filter">
                 <input id="x_boton" type="button" name="remove-filter" value="x"/>
                 <select name="filter-type">
                     <option value="" selected="selected" data-filter-template-name="nada">--- Seleccionar un filtro ---</option>
-                    <py:for each="col in opciones">
+                    <py:for each="col in columnas">
                         <option value="$col" data-filter-template-name="${columnas[col]}">${opciones[col]}</option>
                     </py:for>
                 </select>
@@ -117,39 +109,39 @@ $(document).ready(function () {
             </div>
         </div>
         
-        <div class="name template">
-            <input type="text" name="name" />
-        </div>
-        
-        <div class="texto template">
-            <input type="text" name="texto" style="width:47%;" />
-        </div>
-        
-        <div class="entero template">
-            <input class="solo_entero" type="text" name="entero" style="width:47%;" />
-        </div>
-        
-        <div class="fecha template">
-            <div class="rango_fechas">De
-            <input type="text" class="calendario" name="fecha" style="width:20%;"/>
-            a
-            <input type="text" class="calendario" name="fecha" style="width:20%;"/>
-            </div>
-        </div>
+	    <py:for each="col in columnas">
+	    	<py:choose test="columnas[col]">
+	    		<py:when test="'texto'">
+		    		<div class="${'texto ' + col}">
+		    			<input type="text" name="${col}" style="width:47%;" />
+		    		</div>
+		    	</py:when>
+		    	<py:when test="'entero'">
+		    		<div class="${'entero ' + col}">
+		    			<input class="solo_entero" type="text" name="${col}" style="width:47%;" />
+		    		</div>
+		    	</py:when>
+		    	<py:when test="'fecha'">
+		    		<div class="${'rango_fechas ' + col}">
+				            <label class="rango_fechas">De</label><input type="text" class="calendario" name="${col}" style="width:20%;"/>
+				            <label class="rango_fechas"> A</label><input type="text" class="calendario" name="${col}" style="width:20%;"/>
 
-        <py:if test="defined('comboboxes')">
-            <py:for each="column in comboboxes">
-                <div class="combobox template">
-                    <select name="combobox" style="width:47%;">
-                        <option value="" selected="selected">--- Seleccionar ---</option>
-                        <py:for each="opt in comboboxes[column]">
-                            <option value="$opt">${opt}</option>
-                        </py:for>
-                    </select>
-                </div>
-            </py:for>
-        </py:if>
-        
+			        </div>
+		    	</py:when>
+		    	<py:when test="'combobox'">
+		    		<div class="${'combobox ' + col}">
+			            <select name="${col}" style="width:47%;">
+			                <option value="" selected="selected">--- Seleccionar Tipo ---</option>
+			                	<py:for each="opt in comboboxes[col]">
+			                    	<option value="${opt}">${opt}</option>
+			                	</py:for>       
+			            </select>
+			        </div>
+		    	</py:when>
+		    </py:choose>
+		 </py:for>
+		    
+
     </div>
     
     <form id="form" method="post" action="${url_action}post_buscar/">

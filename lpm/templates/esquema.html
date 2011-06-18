@@ -53,7 +53,7 @@
                                 <ul class="sub">
                                     <li><a href="${tg.url('/usuarios')}" class="fly">Usuario</a>
                                             <ul>
-                                                <li><a href="${tg.url('/usuarios/buscar')}">Búsqueda</a></li>
+                                                <li><a href="${tg.url('/usuarios')}">Búsqueda</a></li>
                                                 <li><a href="${tg.url('/usuarios/perfil')}">Perfil</a></li>
                                                 <li py:if='request.credentials and "crear usuario" in request.credentials["permissions"]'>
                                                     <a href="${tg.url('/usuarios/new')}">Nuevo</a>
@@ -62,23 +62,30 @@
                                     </li>
                                     <li class="mid"><a href="${tg.url('/roles')}" class="fly">Rol</a>
                                             <ul>
-                                                <li><a href="${tg.url('/roles/buscar')}">Búsqueda</a></li>
+                                                <li><a href="${tg.url('/roles/')}">Búsqueda</a></li>
                                                 <li py:if='request.credentials and "crear rol" in request.credentials["permissions"]'>
-                                                    <a href="${tg.url('/roles/new')}">Nuevo</a>
+                                                    <a href="${tg.url('/roles/new')}">De Sistema</a>
                                                 </li>
-                                                <li class="mid"><a href="${tg.url('/rolesplantilla/')}" class="fly">Plantilla</a>
-                                                        <ul>
-                                                            <li><a href="${tg.url('/rolesplantilla/buscar')}">Búsqueda</a></li>
-                                                            <li py:if='request.credentials and "crear rol" in request.credentials["permissions"]'>
-                                                                <a href="${tg.url('/rolesplantilla/new')}">Nuevo</a>
-                                                            </li>
-                                                        </ul>
-                                                </li>                                                
                                             </ul>
-                                    </li>
+                                     </li>
+                                     <li class="mid"><a href="${tg.url('/rolesplantilla/')}" class="fly">Rol Plantilla</a>
+                                            <ul>
+                                                <li><a href="${tg.url('/rolesplantilla/')}">Búsqueda</a></li>
+                                                <li py:if='request.credentials and "crear rol" in request.credentials["permissions"]'>
+                                                    <a href="${tg.url('/rolesplantilla/new/proyecto')}">De Proyecto</a>
+                                                </li>
+                                                <li py:if='request.credentials and "crear rol" in request.credentials["permissions"]'>
+                                                    <a href="${tg.url('/rolesplantilla/new/fase')}">De Fase</a>
+                                                </li>
+                                                <li py:if='request.credentials and "crear rol" in request.credentials["permissions"]'>
+                                                    <a href="${tg.url('/rolesplantilla/new/ti')}">De Tipo Ítem</a>
+                                                </li>
+                                            </ul>
+                                     </li>                                                
+
                                     <li><a href="${tg.url('/proyectos')}" class="fly">Proyecto</a>
                                             <ul>
-                                                <li><a href="${tg.url('/proyectos/buscar')}">Búsqueda</a></li>
+                                                <li><a href="${tg.url('/proyectos/')}">Búsqueda</a></li>
                                                 <li><a href="${tg.url('/proyectos/mis_proyectos')}">Mis Proyectos</a></li>
                                                 <li py:if='request.credentials and "crear proyecto" in request.credentials["permissions"]'>
                                                     <a href="${tg.url('/proyectos/new')}">Nuevo</a>
@@ -88,14 +95,14 @@
                                     </li>
                                    <li><a href="${tg.url('/fases')}" class="fly">Fase</a>
                                             <ul>
-                                                <li><a href="${tg.url('/fases/buscar')}">Búsqueda</a></li>
+                                                <li><a href="${tg.url('/fases/')}">Búsqueda</a></li>
                                                 <li><a href="${tg.url('/fases/')}">Participando</a></li>
                                                 <!-- <li><a href="#nogo5">Nueva(?)</a></li> -->
                                             </ul>
                                     </li>
                                     <li><a href="${tg.url('/tipositems')}" class="fly">Tipos de Ítem</a>
                                             <ul>
-                                                <li><a href="${tg.url('/tipositems/buscar')}">Búsqueda</a></li>
+                                                <li><a href="${tg.url('/tipositems/')}">Búsqueda</a></li>
                                                 <!-- <li><a href="#nogo5">Nuevo(?)</a></li> -->
                                             </ul>
                                     </li>

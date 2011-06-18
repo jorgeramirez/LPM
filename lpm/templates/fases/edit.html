@@ -6,10 +6,10 @@
 <head>
 <title>$page</title>
 </head>
-<body class="tundra">
+<body>
   <div style="height:0px;"> &nbsp; </div>
+  <h2 style="margin-top:1px; padding-left: 60px;">$page</h2>
   <div style="float:left; padding-left: 95px;" class="crud_edit">
-    <h2 style="margin-top:1px; padding-left: 60px;">$page</h2>
     <table cellspacing="0" cellpadding="2" border="0">
     <tbody>
         <tr>
@@ -17,30 +17,51 @@
                 ${XML(tmpl_context.widget(value=value))}
                 
             </td>
+            <td valign="top">
+            	<div style="clear:both;">
+                <a py:if="puede_asignar_rol" class="link_boton" href="${tg.url('/rol/fase')}">
+                    <input id="roles" style="margin-top:0; float:right;" class="boton" type="button" value="Asignar Rol"/>
+                </a>
+                
+                </div>
+                <br />
+                <div style="clear:both;">
+                <a py:if="puede_crear_rol"class="link_boton" href="${tg.url(id + '/rol/new/')}">               
+                    <input id="historial" class="boton" style="float:right;" type="button" value="Crear Rol"/>
+                </a>
+                </div>
+                <br />
+            </td>
         </tr>
         <tr>
-            <div style="clear:both;"></div>
+		    <td  colspan="2">
+		        <a py:if="puede_crear_item" class="link_boton" href="${tg.url(id + '/items/new')}">
+		            <input id="nuevo_item" style="margin-bottom:10px;" class="boton" type="button" value="Nuevo"/>
+		        </a>
+		    </td>
         </tr>
         <tr>
-            <td>
-                <a class="link_boton" href="${tg.url('../roles/' + id)}">
-                <input id="roles" class="boton" type="button" value="Roles"/>
-                </a>
-                <a class="link_boton" href="${tg.url('../historial/' + id)}">               
-                <input id="historial" class="boton" type="button" value="Historial"/>
-                </a>
-                <a class="link_boton" href="${tg.url('../proyectos/' + id)}">               
-                <input id="proyectos" class="boton" type="button" value="Proyectos"/>
-                </a>
+            <td  colspan="2">
+                <div id="tabla_items" class="crud_table" style="height:65%; width:700px; margin-top: 10px;">
+                    ${XML(tmpl_context.tabla_items(value=items))}
+                </div>
             </td>
         </tr>
         <tr>
             <div style="clear:both;"></div>
         </tr>
         <tr>
-            <td>
-                <h3>Roles del Usuario</h3>
-                ${XML(tmpl_context.tabla_roles(value=roles))}   
+            <td  colspan="2">
+          
+                <input py:if="puede_crear_lb" class="boton" type="submit" value="Generar LB" style="margin-top: 10px; width: 160px;"/>
+                </form>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <div id="tabla_desasignados" class="crud_table" style="height:65%; width:700px; margin-top: 10px;">
+                    ${XML(tmpl_context.tabla_lb(value=lbs))} 
+                </div>
             </td>
         </tr>
   </tbody>

@@ -17,7 +17,9 @@ color:#969696;
 
 .clear { clear:both;}
 
-
+table {
+font-size:100%;
+}
 .alignright { text-align:right;}
 .aligncenter { text-align:center;}
 
@@ -35,13 +37,20 @@ a:hover{text-decoration:none;}
 h1 { font-size:2.91em; color:#303030; font-weight:normal; line-height:.9em; margin-bottom:14px;}
 h1 span { color:#65696d; font-size:.69em; display:block; padding-top:4px;}
 h1 span em { font-style:normal; color:#01a5e4;}
-h2 {/*font-size:2.91em;*/ color:#303030; font-weight:normal; line-height:.9em; margin-bottom:14px;}
+h2 {font-size:2em;color:#247ebd; font-weight:normal; line-height:.9em; margin-bottom:14px; text-transform: capitalize;
+font-weight:bold;
+text-shadow:0 3px 3px rgba(0, 0, 0, 0.3);}
 h3 { font-size:1.27em; color:#3f4449; font-weight:normal;}
 h3 a {color:#3f4449; }
 h4 { font-size:1.27em; color:#3f4449; font-weight:normal; margin-bottom:17px;}
 h4 a {color:#3f4449; }
 
-
+.color-sombra {
+font-weight:normal;
+color:#247ebd;
+font-weight:bold;
+text-shadow:0 3px 3px rgba(0, 0, 0, 0.3);
+}
 /*header*/
 
 #site_center {
@@ -126,7 +135,7 @@ line-height: normal;
 background-repeat: repeat-y;
 padding: 0 15px;
 min-height: 400px;
-height: 500px;
+height: auto;
 margin: 0;
 padding: 0;
 line-height: normal;
@@ -336,6 +345,7 @@ padding-right:10px;
 /*filtros*/
 .buscar {
 width:55%;
+margin-bottom: 25px;
 }
 
 #buscar_boton {
@@ -423,5 +433,11 @@ font-size:70%;
 .filter {
 float:left;
 width:100%;
+}
+
+/*forms*/
+.fieldcol, .labelcol {
+padding-top:1px;
+padding-bottom:3px;
 }
 

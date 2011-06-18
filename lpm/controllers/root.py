@@ -17,8 +17,8 @@ from lpm.controllers.error import ErrorController
 from lpm.controllers.proyecto import ProyectoController
 from lpm.controllers.fase import FaseController
 from lpm.controllers.usuario import UsuarioController
-from lpm.controllers.rol import (RolController, RolPlantillaController,
-                                 RolContextoController)
+from lpm.controllers.rol import (RolController, RolPlantillaController)
+#                                 RolContextoController)
 from lpm.controllers.tipoitem import TipoItemController
 
 import hashlib , random
@@ -43,29 +43,22 @@ class RootController(BaseController):
     usuarios = UsuarioController(DBSession)
     roles = RolController(DBSession)
     rolesplantilla = RolPlantillaController(DBSession)
-    rolescontexto = RolContextoController(DBSession)
+#    rolescontexto = RolContextoController(DBSession)
     proyectos = ProyectoController(DBSession)
     fases = FaseController(DBSession)
     tipositems = TipoItemController(DBSession)
-    
-    error = ErrorController()
+
 
     @expose('lpm.templates.index')
     def index(self):
         """Handle the front-page."""
         return dict(page='index')
-
+    
     @expose('lpm.templates.data')
     @expose('json')
     def data(self, **kw):
         """This method showcases how you can use the same controller for a data page and a display page"""
         return dict(params=kw)
-
-    @expose('lpm.templates.index')
-   # @require(predicates.has_permission('manage', msg=l_('Only for managers')))
-    def m(self, **kw):
-        """Illustrate how a page for managers only works."""
-        return dict(page=session['a'])
 
     @expose('lpm.templates.login.login')
     def login(self, came_from=url('/')):
@@ -126,3 +119,10 @@ class RootController(BaseController):
         flash(_('We hope to see you soon!'))
         #redirect(came_from)
         redirect(url('/'))
+    
+    @expose('lpm.templates.index')
+    def default(self, *args, **kw):
+        """Handle the front-page."""
+        flash(_('Recurso no encontrado'), 'warning')
+        redirect('/')
+        return dict(page='index')

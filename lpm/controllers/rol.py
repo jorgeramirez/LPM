@@ -18,7 +18,7 @@ from tg import redirect, request, require, flash, url, validate
 from lpm.controllers.validaciones.rol_validator import RolFormValidator
 from lpm.model import (DBSession, Usuario, Rol, Permiso, Proyecto, 
                        Fase, TipoItem)
-from lpm.lib.sproxcustom import CustomTableFiller
+from lpm.lib.sproxcustom import CustomTableFiller, CustomPropertySingleSelectField
 from lpm.lib.sproxcustom import WidgetSelectorDojo, MultipleSelectDojo
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
 
@@ -70,17 +70,26 @@ class RolTableFiller(CustomTableFiller):
         value = '<div>'
         clase = 'actions'
         url_cont = ""
-        if obj.tipo == "Sistema":
+        contexto = ""
+        if (obj.tipo == "Sistema"):
             url_cont = "/roles/"
-        elif obj.tipo == "Plantilla":
+        elif (obj.tipo.find(u"Plantilla") >= 0):
             url_cont = "/rolesplantilla/"
+            if (obj.tipo.find(u"proyecto") > 0):
+                contexto = "proyecto"
+            elif (obj.tipo.find(u"fase") > 0):
+                contexto = "fase"
+            else:
+                contexto = "ti"
         else:
             url_cont = "/rolescontexto/"
+            
         if PoseePermiso('modificar rol').is_met(request.environ):
             value += '<div>' + \
-                        '<a href="' + url_cont + str(obj.id_rol) +'/edit" ' + \
-                        'class="' + clase + '">Modificar</a>' + \
+                        '<a href="' +  url_cont + str(obj.id_rol) + "/edit?contexto="+  \
+                        contexto + '" class="' + clase + '">Modificar</a>' + \
                      '</div><br />'
+        #falta implementar!
         if PoseePermiso('eliminar rol').is_met(request.environ):
             value += '<div><form method="POST" action="' + url_cont + str(obj.id_rol) + '" class="button-to">'+\
                      '<input type="hidden" name="_method" value="DELETE" />' +\
@@ -113,9 +122,14 @@ class RolPlantillaTableFiller(RolTableFiller):
         necesario.
         """
         if AlgunPermiso(patron="rol").is_met(request.environ):
-            query = DBSession.query(Rol).filter(Rol.tipo.like(u"Plantilla"))
-            return query.count(), query.all()
-        return 0, []
+            count, roles = super(RolPlantillaTableFiller,
+                                 self)._do_get_provider_count_and_objs(**kw)
+        filtrados = []                       
+        for r in roles:
+            if (r.tipo.find("Plantilla") >= 0):
+                filtrados.append(r)
+                
+        return len(filtrados), filtrados
 
 rol_plantilla_table_filler = RolPlantillaTableFiller(DBSession)
 
@@ -174,16 +188,18 @@ class CodTipoItemField(PropertySingleSelectField):
 
 #para mejorar el multiple selector hecho en dojo
 class PermisosMultipleSelect(MultipleSelectDojo):
+    
     def _my_update_params(self, d, nullable=False):
         options, selected = [], []
         permisos = self.get_permisos()
         for p in permisos:
-            if d['value'] and p.id_permiso in d['value']: #seleccionados
+            if d['value'] and (p.id_permiso in d['value']): #seleccionados
                 selected.append((p.id_permiso, '%s' % p.nombre_permiso))
             else:
                 options.append((p.id_permiso, '%s' % p.nombre_permiso))
         d['options'] = options
         d['selected_options'] = selected
+#        a = 1/0
         return d
     
     def get_permisos(self):
@@ -195,25 +211,34 @@ class PermisosSistemaMultipleSelect(PermisosMultipleSelect):
     def get_permisos(self):
         return Permiso.permisos_de_sistema()
 
-
-class PermisosPlantillaMultipleSelect(PermisosMultipleSelect):
+class PermisosPlantillaTiMultipleSelect(PermisosMultipleSelect):
     def get_permisos(self):
-        return DBSession.query(Permiso).all()
-
-
+        return Permiso.permisos_ti()
+    
+class PermisosPlantillaFaseMultipleSelect(PermisosMultipleSelect):
+    def get_permisos(self):
+        return Permiso.permisos_fases()
+    
+class PermisosPlantillaProyMultipleSelect(PermisosMultipleSelect):
+    def get_permisos(self):
+        return Permiso.permisos_proyectos()
+    
 class PermisosContextoMultipleSelect(PermisosMultipleSelect):
     def get_permisos(self):
         return Permiso.permisos_con_contexto()
 
-
 class SelectorPermisosSistema(WidgetSelectorDojo):
     default_multiple_select_field_widget_type = PermisosSistemaMultipleSelect
 
-
-class SelectorPermisosPlantilla(WidgetSelectorDojo):
-    default_multiple_select_field_widget_type = PermisosPlantillaMultipleSelect
-
-
+class SelectorPermisosPlantillaProy(WidgetSelectorDojo):
+    default_multiple_select_field_widget_type = PermisosPlantillaProyMultipleSelect
+    
+class SelectorPermisosPlantillaFase(WidgetSelectorDojo):
+    default_multiple_select_field_widget_type = PermisosPlantillaFaseMultipleSelect
+    
+class SelectorPermisosPlantillaTi(WidgetSelectorDojo):
+    default_multiple_select_field_widget_type = PermisosPlantillaTiMultipleSelect
+    
 class SelectorPermisosContexto(WidgetSelectorDojo):
     default_multiple_select_field_widget_type = PermisosContextoMultipleSelect
 
@@ -233,12 +258,22 @@ class RolAddForm(AddRecordForm):
     descripcion = TextArea                         
     
 rol_add_form = RolAddForm(DBSession)
-
+    
 
 class RolPlantillaAddForm(RolAddForm):
-    __widget_selector_type__ = SelectorPermisosPlantilla
-
-rol_plantilla_add_form = RolPlantillaAddForm(DBSession)
+    def __init__(self, DBS, selector):
+        self.__widget_selector_type__ = selector
+        super(RolPlantillaAddForm, self).__init__(DBS)
+ 
+    __hide_fields__ = ['tipo']
+    __omit_fields__ = ['id_rol', 'usuarios',
+                       'codigo', 'creado', 'id_proyecto', 'id_fase',
+                       'id_tipo_item']
+    __field_order__ = ['nombre_rol', 'descripcion', 'permisos']
+    
+    
+rol_plantilla_add_form = None
+#rol_plantilla_add_form = RolPlantillaAddForm(DBSession)
 
 
 class RolContextoAddForm(RolAddForm):
@@ -254,7 +289,6 @@ class RolContextoAddForm(RolAddForm):
     
 rol_contexto_add_form = RolContextoAddForm(DBSession)
     
-
 
 class RolEditForm(EditableForm):
     __model__ = Rol
@@ -276,9 +310,19 @@ rol_edit_form = RolEditForm(DBSession)
 
 
 class RolPlantillaEditForm(RolEditForm):
-    __widget_selector_type__ = SelectorPermisosPlantilla
+    def __init__(self, DBS, selector):
+        self.__widget_selector_type__ = selector
+        super(RolPlantillaEditForm, self).__init__(DBS)
+
+    __hide_fields__ = ['id_rol', 'tipo']
+    __omit_fields__ = ['usuarios',
+                       'codigo', 'creado', 'id_proyecto', 'id_fase',
+                       'id_tipo_item']
+    __field_order__ = ['id_rol', 'nombre_rol', 'descripcion', 'tipo', 'permisos']
+
     
-rol_plantilla_edit_form = RolPlantillaEditForm(DBSession)
+rol_plantilla_edit_form = None       
+#rol_plantilla_edit_form = RolPlantillaEditForm(DBSession)
 
 
 class RolContextoEditForm(RolEditForm):
@@ -375,7 +419,7 @@ class RolController(CrudRestController):
             redirect(self.action)
         tmpl_context.widget = self.edit_form
         value = self.edit_filler.get_value(values={'id_rol': int(args[0])})
-        value['_method'] = 'PUT'
+#        value['_method'] = 'PUT'
         page = "Rol {nombre}".format(nombre=value["nombre_rol"])
         atras = atras=self.action
         return dict(value=value, page=page, atras=atras)
@@ -404,7 +448,8 @@ class RolController(CrudRestController):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect(self.action)
         transaction.begin()
-        kw["tipo"] = self.rol_tipo
+        if (not kw.has_key('tipo')):
+            kw["tipo"] = self.rol_tipo
         Rol.crear_rol(**kw)
         transaction.commit()
         redirect(self.action)
@@ -448,7 +493,7 @@ class RolController(CrudRestController):
                     puede_crear=puede_crear,
                     atras=atras)
     #}
-    
+       
 
 class RolPlantillaController(RolController):
     """Controlador de roles de tipo plantilla"""
@@ -461,88 +506,201 @@ class RolPlantillaController(RolController):
     model = Rol
     table = rol_table
     table_filler = rol_plantilla_table_filler
-    new_form = rol_plantilla_add_form
-    edit_form = rol_plantilla_edit_form
+    new_form = None
+    edit_form = None
     edit_filler = rol_edit_filler
 
     #para el form de busqueda
-    columnas = dict(codigo="texto", nombre_rol="texto")
-    tipo_opciones = []
+    opciones = dict(codigo= u'Código',
+                    nombre_rol= u'Nombre',
+                    tipo=u'Tipo'
+                    )
+    columnas = dict(codigo='texto',
+                    nombre_rol='texto',
+                    tipo='combobox'
+                    )
     
+    tipos = []
+    for i in Rol.tipos_posibles.keys():
+        if (i.find("Plantilla") >= 0):
+            tipos.append(i)
+
+      
+    comboboxes = dict(tipo=tipos)
+ 
     #{ Métodos
-    @expose('lpm.templates.rol.edit')
-    def edit(self, *args, **kw):
-        """Despliega una pagina para modificar rol"""
-        return super(RolPlantillaController, self).edit(*args, **kw)
-
-    @without_trailing_slash
-    @expose('lpm.templates.rol.new')
-    def new(self, *args, **kw):
-        return super(RolPlantillaController, self).new(*args, **kw)
-
-    @validate(rol_plantilla_add_form, error_handler=new)
-    @expose()
-    def post(self, *args, **kw):
-        super(RolPlantillaController, self).post(*args, **kw)
-
-    @validate(rol_plantilla_edit_form, error_handler=edit)
-    @expose()
-    def put(self, *args, **kw):
-        super(RolPlantillaController, self).put(*args, **kw)
-
     @with_trailing_slash
     @paginate('lista_elementos', items_per_page=5)
     @expose('lpm.templates.rol.get_all')
     @expose('json')
-    def post_buscar(self, *args, **kw):
-        return super(RolPlantillaController, self).post_buscar(*args, **kw)
-    #}
-
-
-class RolContextoController(RolController):
-    """Controlador de roles con contexto"""
-    #{ Variables
-    title = u"Administrar Roles con Contexto"
-    action = "/rolescontexto/"
-    rol_tipo = u"deducir" #indica que el tipo hay que deducir.
-    
-    #{ Modificadores
-    model = Rol
-    table = rol_table
-    table_filler = rol_contexto_table_filler
-    new_form = rol_contexto_add_form
-    edit_form = rol_contexto_edit_form
-    edit_filler = rol_edit_filler
-
-    #para el form de busqueda
-    columnas = dict(codigo="texto", nombre_rol="texto")
-    tipo_opciones = [u'Proyecto', u'Fase', u'Tipo de Ítem']
-    
-    #{ Métodos
-    @expose('lpm.templates.rol.edit')
-    def edit(self, *args, **kw):
-        """Despliega una pagina para modificar rol"""
-        return super(RolContextoController, self).edit(*args, **kw)
-
-    @without_trailing_slash
-    @expose('lpm.templates.rol.new')
-    def new(self, *args, **kw):
-        return super(RolContextoController, self).new(*args, **kw)
+    def get_all(self, *args, **kw):
+        """ 
+        Retorna todos los registros
+        Retorna una página HTML si no se especifica JSON
+        """
+        puede_crear = PoseePermiso("crear rol").is_met(request.environ)
+        if request.response_type == 'application/json':
+            return self.table_filler.get_value(**kw)
+        if not getattr(self.table.__class__, '__retrieves_own_value__', False):
+            roles = self.table_filler.get_value(**kw)
+        else:
+            roles = []
+        tmpl_context.widget = self.table
         
-    @validate(rol_contexto_add_form, error_handler=new)
-    @expose()
-    def post(self, *args, **kw):
-        super(RolContextoController, self).post(*args, **kw)
-
-    @validate(rol_contexto_edit_form, error_handler=edit)
-    @expose()
-    def put(self, *args, **kw):
-        super(RolContextoController, self).put(*args, **kw)
-
+        return dict(lista_elementos=roles, 
+                    page=self.title, 
+                    titulo=self.title, 
+                    modelo=self.model.__name__, 
+                    columnas=self.columnas,
+                    opciones=self.opciones,
+                    comboboxes=self.comboboxes,
+                    url_action=self.action,
+                    puede_crear=puede_crear,
+                    )
+        
     @with_trailing_slash
     @paginate('lista_elementos', items_per_page=5)
     @expose('lpm.templates.rol.get_all')
     @expose('json')
     def post_buscar(self, *args, **kw):
-        return super(RolContextoController, self).post_buscar(*args, **kw)
+        puede_crear = PoseePermiso("crear rol").is_met(request.environ)
+        tmpl_context.widget = self.table
+        buscar_table_filler = self.table_filler.__class__(DBSession)
+        buscar_table_filler.filtros = kw
+        roles = buscar_table_filler.get_value()
+        #a = 1 / 0
+        return dict(lista_elementos=roles, 
+                    page=self.title, 
+                    titulo=self.title, 
+                    modelo=self.model.__name__, 
+                    columnas=self.columnas,
+                    opciones=self.opciones,
+                    comboboxes=self.comboboxes,
+                    url_action=self.action,
+                    puede_crear=puede_crear,
+                    )
+        
+    @with_trailing_slash
+    @expose('lpm.templates.rol.edit')
+    def edit(self, id, *args, **kw):
+        """Despliega una pagina para modificar rol"""
+#        a = 1/0 
+        if (not kw['contexto']):
+            redirect('../')
+        elif (kw['contexto'] == "proyecto"):
+            selector = SelectorPermisosPlantillaProy
+        elif (kw['contexto'] == "fase"):
+            selector = SelectorPermisosPlantillaFase
+        elif (kw['contexto'] == "ti"):
+            selector = SelectorPermisosPlantillaTi
+           
+        self.edit_form = RolPlantillaEditForm(DBS=DBSession, selector=selector)     
+        tmpl_context.widget = self.edit_form
+        rol_plantilla_edit_form = self.edit_form
+        
+        
+        page="Editar Rol Plantilla de {contexto}".format(contexto=kw['contexto'])
+        
+        value = self.edit_filler.get_value(values={'id_rol': int(id)})
+#        value['_method'] = 'PUT'#?
+        
+        return dict(value=value, page=page)
+    
+    @without_trailing_slash
+    @expose('lpm.templates.rol.new')
+    def new(self, contexto=None, *args, **kw):
+        if (not contexto):
+            redirect('../')
+        elif (contexto == "proyecto"):
+            selector = SelectorPermisosPlantillaProy
+            kw['tipo'] = u'Plantilla {contexto}'.format(contexto=contexto)
+        elif (contexto == "fase"):
+            selector = SelectorPermisosPlantillaFase
+            kw['tipo'] = u'Plantilla {contexto}'.format(contexto=contexto)
+        elif (contexto == "ti"):
+            selector = SelectorPermisosPlantillaTi
+            kw['tipo'] = u'Plantilla tipo ítem'
+            
+        self.new_form = RolPlantillaAddForm(DBS=DBSession, selector=selector)     
+        tmpl_context.widget = self.new_form
+        rol_plantilla_add_form = self.new_form
+        
+        page="Nuevo Rol Plantilla de {contexto}".format(contexto=contexto)
+        
+        return dict(value=kw, page=page, action="../")
+
+    #@validate(rol_plantilla_add_form, error_handler=new)
+    @expose()
+    def post(self, *args, **kw):
+        """ Crea un nuevo rol plantilla"""
+        pp = PoseePermiso('crear rol')
+        if not pp.is_met(request.environ):
+            flash(pp.message % pp.nombre_permiso, 'warning')
+            redirect(self.action)
+        
+        Rol.crear_rol(**kw)
+        redirect(self.action)
+
+   #@validate(rol_plantilla_edit_form, error_handler=edit)
+    @expose()
+    def put(self, *args, **kw):
+        """actualiza un rol"""
+
+        pp = PoseePermiso('modificar rol')
+        if not pp.is_met(request.environ):
+            flash(pp.message % pp.nombre_permiso, 'warning')
+            redirect(self.action)
+
+        Rol.actualizar_rol(**kw)
+        redirect(self.action)
+    
     #}
+
+
+#class RolContextoController(RolController):
+#    """Controlador de roles con contexto"""
+#    #{ Variables
+#    title = u"Administrar Roles con Contexto"
+#    action = "/rolescontexto/"
+#    rol_tipo = u"deducir" #indica que el tipo hay que deducir.
+#    
+#    #{ Modificadores
+#    model = Rol
+#    table = rol_table
+#    table_filler = rol_contexto_table_filler
+#    new_form = rol_contexto_add_form
+#    edit_form = rol_contexto_edit_form
+#    edit_filler = rol_edit_filler
+#
+#    #para el form de busqueda
+#    columnas = dict(codigo="texto", nombre_rol="texto")
+#    tipo_opciones = [u'Proyecto', u'Fase', u'Tipo de Ítem']
+#    
+#    #{ Métodos
+#    @expose('lpm.templates.rol.edit')
+#    def edit(self, *args, **kw):
+#        """Despliega una pagina para modificar rol"""
+#        return super(RolContextoController, self).edit(*args, **kw)
+#
+#    @without_trailing_slash
+#    @expose('lpm.templates.rol.new')
+#    def new(self, *args, **kw):
+#        return super(RolContextoController, self).new(*args, **kw)
+#        
+#    @validate(rol_contexto_add_form, error_handler=new)
+#    @expose()
+#    def post(self, *args, **kw):
+#        super(RolContextoController, self).post(*args, **kw)
+#
+#    @validate(rol_contexto_edit_form, error_handler=edit)
+#    @expose()
+#    def put(self, *args, **kw):
+#        super(RolContextoController, self).put(*args, **kw)
+#
+#    @with_trailing_slash
+#    @paginate('lista_elementos', items_per_page=5)
+#    @expose('lpm.templates.rol.get_all')
+#    @expose('json')
+#    def post_buscar(self, *args, **kw):
+#        return super(RolContextoController, self).post_buscar(*args, **kw)
+#    #}

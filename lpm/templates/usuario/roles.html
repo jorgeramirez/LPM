@@ -12,20 +12,20 @@
 </head>
 <body class="tundra">
   <div style="height:0px;"> &nbsp; </div>
+  <h2 style="margin-top:1px; padding-left: 60px;">$page</h2>
   <div style="float:left; padding-left: 95px;" class="crud_edit">
-    <h2 style="margin-top:1px; padding-left: 60px;">$page</h2>
     <table cellspacing="0" cellpadding="2" border="0">
     <tbody>
         <tr>
             <td>
                 <form id="form_desasignar" method="POST" action="${tg.url('../desasignar_roles/' + id)}">
-                <input id="desasignar" class="button" type="submit" value="Desasignar Seleccionados" style="margin-top: 10px;"/>
+                <input id="desasignar" class="boton" type="submit" value="Desasignar Seleccionados" style="margin-top: 10px; width: 160px;"/>
                 </form>
             </td>
         </tr>
         <tr>
             <td>
-                <div id="tabla_asignados" style="margin-top: 10px;">
+                <div id="tabla_asignados" class="crud_table" style="height:65%; width:700px; margin-top: 10px;">
                     ${XML(tmpl_context.tabla_asignados(value=asignados))}
                 </div>
             </td>
@@ -34,18 +34,18 @@
             <div style="clear:both;"></div>
         </tr>
         <tr>
-            <td>
-                <form id="form_asignar" method="POST" action="${tg.url('../asignar_roles/' + id)}">
-                <input id="asignar" class="button" type="submit" value="Asignar Seleccionados" style="margin-top: 10px;"/>
-                </form>
-            </td>
-        </tr>
-        <tr>
             <div style="clear:both;"></div>
         </tr>
         <tr>
             <td>
-                <div id="tabla_desasignados" style="margin-top: 10px;">
+                <form id="form_asignar" method="POST" action="${tg.url('../asignar_roles/' + id)}">
+                <input id="asignar" class="boton" type="submit" value="Asignar Seleccionados" style="margin-top: 10px; width: 160px;"/>
+                </form>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div id="tabla_desasignados" class="crud_table" style="height:65%; width:700px; margin-top: 10px;">
                     ${XML(tmpl_context.tabla_desasignados(value=desasignados))} 
                 </div>
             </td>
