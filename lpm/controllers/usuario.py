@@ -96,7 +96,7 @@ class UsuarioTableFiller(CustomTableFiller):
         Se muestra la lista de usuario si se tiene un permiso 
         necesario. Caso contrario se muestra solo su usuario
         """
-        if AlgunPermiso(patron="usuario").is_met(request.environ):
+        if AlgunPermiso(tipo="Usuario").is_met(request.environ):
             return super(UsuarioTableFiller,
                          self)._do_get_provider_count_and_objs(**kw)
         username = request.credentials['repoze.what.userid']
@@ -419,7 +419,7 @@ class UsuarioController(CrudRestController):
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect(self.action)
-        transaction.begin()
+
         usuario = Usuario.por_id(args[0])
         usuario.nombre = kw["nombre"]
         usuario.apellido = kw["apellido"]
@@ -427,7 +427,7 @@ class UsuarioController(CrudRestController):
         usuario.telefono = kw["telefono"]
         usuario.nro_documento = kw["nro_documento"]
         usuario.password = kw["nuevo_password"]
-        transaction.commit()      
+    
         redirect("../") 
     
     @validate(usuario_add_form, error_handler=new)
@@ -439,10 +439,9 @@ class UsuarioController(CrudRestController):
             del kw["repita_password"]
         if kw["nro_documento"]:
             kw["nro_documento"] = int(kw["nro_documento"])
-        transaction.begin()
+            
         usuario = Usuario(**kw)
         DBSession.add(usuario)
-        transaction.commit()
         redirect("./")
 
     @expose('lpm.templates.usuario.roles')

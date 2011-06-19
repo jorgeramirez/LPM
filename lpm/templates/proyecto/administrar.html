@@ -11,28 +11,32 @@
 <script src="${tg.url('/javascript/usuario_roles.js')}"></script>
 </head>
 <body>
+	<div style="height:0px;"> &nbsp; </div>
+	<h2 style="margin-top:1px; padding-left: 60px;">$page</h2>
+	<div style="float:left; padding-left: 95px;" class="crud_edit">             
     <table cellspacing="0" cellpadding="2" border="0">
     <tbody>
         <tr>
-            <td>
-                <div style="height:0px;"> &nbsp; </div>
-                <h2 style="margin-top:1px; padding-left: 60px;">$page</h2>
-                <div style="float:left; padding-left: 95px;" class="crud_edit">
-                    
-                     ${XML(tmpl_context.widget(value=value, action='./'))}
-                </div>
+            <td> 
+                ${XML(tmpl_context.widget(value=value, action='./'))}        
             </td>
             <td valign="top">
                 <div style="clear:both;">
-                <a py:if="puede_asignar_rol" class="link_boton" href="${tg.url(id + '/rol/proyecto')}">
+                <a py:if="puede_asignar_rol" class="link_boton" href="${tg.url('/rol/proyecto')}">
                     <input id="roles" style="margin-top:0; float:right;" class="boton" type="button" value="Asignar Rol"/>
                 </a>
                 
                 </div>
                 <br />
                 <div style="clear:both;">
-                <a py:if="puede_crear_rol" class="link_boton" href="${tg.url(id + '/rol/new/')}">
+                <a py:if="puede_crear_rol" class="link_boton" href="${tg.url('/rol/new/')}">
                     <input id="historial" class="boton" style="float:right;" type="button" value="Crear Rol"/>
+                </a>
+                </div>
+                <br />
+                <div style="clear:both;">
+                <a py:if="puede_iniciar" class="link_boton" href="${tg.url('/proyectos/iniciar/' + id)}">
+                    <input id="iniciar" class="boton" style="float:right;" type="button" value="Iniciar"/>
                 </a>
                 </div>
                 <br />
@@ -40,15 +44,17 @@
         </tr>
         <tr>
             <td colspan="2">
-                <a py:if="puede_crear_fase" class="link_boton" href="${tg.url('/fases/new')}">
-                    <input id="nueva_fase" class="boton" type="button" value="Nueva Fase" style="margin-top: 10px; width: 160px;"/>
+                <a py:if="puede_crear_fase" class="link_boton" href="${tg.url('./fases/new')}">
+                    <input id="nueva_fase" class="boton" type="button" value="Nueva Fase" style="margin-top: 10px;"/>
                 </a>
             </td>
         </tr>
         <tr>
             <td  colspan="2">
                 <div id="tabla_fases" style="margin-top: 10px;">
-                    ${XML(tmpl_context.tabla_fases(value=fases))}
+	                <div class="crud_table" style="height:65%; width:700px; margin-top: 5px;">
+	                    ${XML(tmpl_context.tabla_fases(value=fases))}
+	                </div>
                 </div>
             </td>
         </tr>
@@ -57,7 +63,7 @@
         </tr>
         <tr colspan="2">
             <td>
-                <a py:if="puede_crear_ti" class="link_boton" href="${tg.url('/tipo_items/new')}">
+                <a py:if="puede_crear_ti" class="link_boton" href="${tg.url('./tipositems/new')}">
                     <input id="nuevo_ti" class="boton" type="button" value="Nuevo Tipo de Ítem" style="margin-top: 10px; width: 160px;"/>
                 </a>
             </td>
@@ -68,13 +74,15 @@
         <tr  colspan="2">
             <td>
                 <div py:if="iniciado" id="tabla_ti" style="margin-top: 10px;">
-                    ${XML(tmpl_context.tabla_ti(value=tipo_items))} 
+	                <div class="crud_table" style="height:65%; width:700px; margin-top: 5px;">
+	                    ${XML(tmpl_context.tabla_ti(value=tipo_items))} 
+	                </div>
                 </div>
             </td>
         </tr>
   </tbody>
   </table>
+  </div>  
   <div style="height:0px; clear:both;"> &nbsp; </div>
-  <div id="dummy"></div>
 </body>
 </html>

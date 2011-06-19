@@ -63,7 +63,7 @@ class CustomTableFiller(TableFiller):
 
     filtros = property(get_filtros, set_filtros)
     
-    def _do_get_provider_count_and_objs(self, **kw): #sobreescribimos el método
+    def _do_get_provider_count_and_objs(self, order=None, **kw): #sobreescribimos el método
         """
         Este método define como la consulta a la base de
         datos se debe realizar.
@@ -77,7 +77,10 @@ class CustomTableFiller(TableFiller):
 
         if not self.filtros:
             if (self.cualquiera == ""):
-                return query.count, query.all()
+                if (order):
+                    return query.count, query.order_by(order).all()
+                else:
+                    return query.count, query.all()
             
             #contaminando código
             for key in mapper.columns.keys():
@@ -87,10 +90,11 @@ class CustomTableFiller(TableFiller):
                 if column.type.__visit_name__ == 'unicode':
 
                     res.extend(query.filter(column.ilike(self.cualquiera + "%")).all())
+#                    query = query.filter(column.ilike(self.cualquiera + "%"))
                 elif (column.type.__visit_name__ == 'integer' and self.buscar_enteros):
                     entero = int(self.cualquiera)
                     res.extend(query.filter(column.in_([entero])).all())
-   
+#                    query = query.filter(column.in_([entero]))
                     
                 filtrados.extend(res)
 # session["print"] = p

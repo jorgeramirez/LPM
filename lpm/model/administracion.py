@@ -15,6 +15,7 @@ import os
 from datetime import datetime
 
 from sqlalchemy import ForeignKey, Column, and_
+from sqlalchemy import desc
 from sqlalchemy.types import Integer, Unicode, DateTime
 from sqlalchemy.orm import relation, backref
 from sqlalchemy.exc import IntegrityError
@@ -55,7 +56,7 @@ class Fase(DeclarativeBase):
     estado = Column(Unicode(20), nullable=True, default=u"Inicial")
 
     # template para codificacion
-    tmpl_codigo = u"FASE-{id_fase}-PROY-{id_proyecto}"
+    tmpl_codigo = u"fase-{posicion}-proy-{id_proyecto}"
     estados_posibles = [u'Inicial', u'Desarrollo', u'Completa', 'Comprometida']
     #{ Relaciones
     items = relation('Item')
@@ -166,7 +167,7 @@ class Fase(DeclarativeBase):
         """
         Genera el codigo para la fase dada como parametro
         """
-        return cls.tmpl_codigo.format(id_fase=fase.id_fase,
+        return cls.tmpl_codigo.format(posicion=fase.posicion,
                                       id_proyecto=fase.id_proyecto)
      
 
@@ -187,7 +188,7 @@ class Proyecto(DeclarativeBase):
     numero_fases = Column(Integer, nullable=False, default=0)
     
     #template para codificacion
-    tmpl_codigo = u"PROY-{id_proyecto}"
+    tmpl_codigo = u"proy-{id_proyecto}"
     estados_posibles = [u'Iniciado', u'No iniciado']
     
     #{ Relaciones
@@ -223,9 +224,21 @@ class Proyecto(DeclarativeBase):
         se le pasa un  diccionario con los atributos para la nueva fase"""
         if (self.estado == u"No Iniciado"):
             print "Creando fase..."
-            self.numero_fases += 1
-            fase = Fase(**kw)
-            self.fases.append(fase)            
+            self.numero_fases += 1    
+            #se inserta en la posicion indicada
+            i = int(kw['posicion'])
+
+            ordenado = DBSession.query(Fase).filter_by(id_proyecto=self.id_proyecto).order_by(Fase.posicion.desc())   
+            
+            for f in ordenado:
+                print f.posicion
+                if (f.posicion >= i):
+                    f.posicion += 1
+                    f.codigo = Fase.generar_codigo(f)
+                    DBSession.flush()
+                           
+            fase = Fase(**kw)            
+            self.fases.append(fase)             
             DBSession.add(fase)
             DBSession.flush()
             fase.codigo = Fase.generar_codigo(fase)
@@ -274,6 +287,8 @@ class Proyecto(DeclarativeBase):
             for f in self.fases:
                 if (f.posicion > posicion):
                     f.posicion -= 1
+                    f.codigo = Fase.generar_codigo(f)
+                    DBSession.flush()
                     
     def eliminar(self):
         """ Elimina el proyecto con todo lo asociado, fases, tipos de items """

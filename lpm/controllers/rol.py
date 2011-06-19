@@ -105,7 +105,7 @@ class RolTableFiller(CustomTableFiller):
         Se muestra la lista de rol si se tiene un permiso 
         necesario. Caso contrario le muestra sus roles.
         """
-        if AlgunPermiso(patron="rol").is_met(request.environ):
+        if AlgunPermiso(tipo="Rol").is_met(request.environ):
             return super(RolTableFiller,
                          self)._do_get_provider_count_and_objs(**kw)
         username = request.credentials['repoze.what.userid']
@@ -121,7 +121,7 @@ class RolPlantillaTableFiller(RolTableFiller):
         Se muestra la lista de rol si se tiene un permiso 
         necesario.
         """
-        if AlgunPermiso(patron="rol").is_met(request.environ):
+        if AlgunPermiso(tipo="Rol").is_met(request.environ):
             count, roles = super(RolPlantillaTableFiller,
                                  self)._do_get_provider_count_and_objs(**kw)
         filtrados = []                       
@@ -140,7 +140,7 @@ class RolContextoTableFiller(RolTableFiller):
         Se muestra la lista de rol si se tiene un permiso 
         necesario.
         """
-        if AlgunPermiso(patron="rol").is_met(request.environ):
+        if AlgunPermiso(tipo="Rol").is_met(request.environ):
             query = DBSession.query(Rol).filter(Rol.tipo.in_([u"Proyecto",
                                                 u"Fase", u"Tipo de Ítem"]))
             return query.count(), query.all()

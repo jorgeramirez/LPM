@@ -41,3 +41,25 @@ class UrlParser(object):
                     return int(partes[i + 1])
                 except:
                     return None
+        return None
+
+    @classmethod
+    def parse_nombre(cls, url=None, name=None):
+        """
+        Verifica si se encuentra nombre en la url.
+        
+        @url: la url a parsear
+        @type url: C{str}
+        @name: el nombre del elemento a buscar en la url
+        @type name: C{str}
+        @return: si el nombre está o no en la url
+        @rtype: C{boolean}
+        """
+        if not url: return
+        partes = url.split("/")
+
+        for i, v in enumerate(partes):
+            if v == name:
+                return True
+
+        return False

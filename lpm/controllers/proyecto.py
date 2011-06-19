@@ -24,14 +24,16 @@ from lpm.controllers.fase import FaseController, FaseTableFiller, FaseTable
 from lpm.controllers.tipoitem import TipoItemController, TipoItemTableFiller
 
 from sprox.tablebase import TableBase
-from sprox.fillerbase import TableFiller, EditFormFiller
+from sprox.fillerbase import TableFiller, EditFormFiller, RecordFiller
 from sprox.fillerbase import EditFormFiller
 from sprox.formbase import AddRecordForm, EditableForm
-
+from sprox.recordviewbase import RecordViewBase
 from repoze.what.predicates import not_anonymous, is_anonymous, All
 
 import pylons
 from pylons import tmpl_context
+from pylons.decorators import rest
+
 
 import transaction
 
@@ -54,7 +56,7 @@ class ProyectoTable(TableBase):
                          '__actions__' : "50em",
                          'codigo': "30em"
                         }
-    __field_attrs__ = {'completidad_total': { 'text-aling' : 'center'}}
+    __field_attrs__ = {'completidad_total': { 'text-aling' : 'center'}}#?
     __add_fields__ = {'project_leader':None}
     
 proyecto_table = ProyectoTable(DBSession)
@@ -78,7 +80,7 @@ class ProyectoTableFiller(CustomTableFiller):
         if PoseePermiso('modificar proyecto',
                         id_proyecto=obj.id_proyecto).is_met(request.environ):
             value += '<div>' + \
-                        '<a href="/proyectos/'+ str(obj.id_proyecto) + '/edit" ' + \
+                        '<a href="./'+ str(obj.id_proyecto) + '/edit" ' + \
                         'class="' + clase + '">Modificar</a>' + \
                      '</div><br />'
 
@@ -86,7 +88,7 @@ class ProyectoTableFiller(CustomTableFiller):
                         id_proyecto=obj.id_proyecto).is_met(request.environ):
             value += '<div><form method="POST" action="' + str(obj.id_proyecto) + '" class="button-to">'+\
                      '<input type="hidden" name="_method" value="DELETE" />' +\
-                     '<input onclick="return confirm(\'Está seguro?\');" value="Delete" type="submit" '+\
+                     '<input onclick="return confirm(\'¿Está seguro?\');" value="Delete" type="submit" '+\
                      'style="background-color: transparent; float:left; border:0; color: #286571;'+\
                      'display: inline; margin: 0; padding: 0;" class="' + clase + '"/>'+\
                      '</form></div><br />'
@@ -95,7 +97,7 @@ class ProyectoTableFiller(CustomTableFiller):
             if PoseePermiso('iniciar proyecto', 
                         id_proyecto=obj.id_proyecto).is_met(request.environ):
                 value += '<div>' + \
-                            '<a href="/proyectos/' + str(obj.id_proyecto) + '/iniciar/" ' +\
+                            '<a href="./iniciar/' + str(obj.id_proyecto) + '" ' +\
                             'class="' + clase + '">Iniciar</a>' + \
                          '</div><br />'
         value += '</div>'
@@ -107,6 +109,7 @@ class ProyectoTableFiller(CustomTableFiller):
         solamente los proyectos para los cuales tenemos
         algun permiso.
         """
+        #verificar si filtra adecuadamente segun permisos
         count, filtrados = super(ProyectoTableFiller, self). \
                                  _do_get_provider_count_and_objs(**kw)
         if count == 0:
@@ -132,8 +135,8 @@ class ProyectoTableFiller(CustomTableFiller):
                 break
             
         return len(filtrados), filtrados
-    
-        if AlgunPermiso(patron="tipo item").is_met(request.environ):
+        #???
+        if AlgunPermiso(tipo="Tipo").is_met(request.environ):
             id_proyecto = UrlParser.parse_id(request.url, "proyectos")
             filtrados = DBSession.query(TipoItem).all()
             if id_proyecto:
@@ -200,6 +203,7 @@ class ProyectoEditForm(EditableForm):
                        'estado', 'numero_fases', 'codigo', 'fases', 
                        'tipos_de_item']
     __base_validator__ = ProyectoEditFormValidator
+    #__disable_fields__ = ['nombre']
     if PoseePermiso('asignar-desasignar rol').is_met(request.environ):
         lider = LiderField('lider', label_text="Lider", 
                            accion="edit")
@@ -210,8 +214,6 @@ class ProyectoEditFiller(EditFormFiller):
     __model__ = Proyecto
     
 proyecto_edit_filler = ProyectoEditFiller(DBSession)
-
-
 
     
 #tabla_fases_filler = FasesProyectoTableFiller(DBSession)
@@ -226,8 +228,8 @@ class ProyectoController(CrudRestController):
     allow_only = not_anonymous(u"El usuario debe haber iniciado sesión")
     #{ Sub Controlador
     id_proy = UrlParser.parse_id(request.url, "proyectos")
-    fases = FaseController(DBSession, id_proy)
-    tipositems = TipoItemController(DBSession, id_proy)
+    fases = FaseController(DBSession)
+    tipositems = TipoItemController(DBSession)
     #{ Modificadores
     model = Proyecto
     table = proyecto_table
@@ -269,7 +271,7 @@ class ProyectoController(CrudRestController):
         """
         puede_crear = PoseePermiso("crear proyecto").is_met(request.environ)
         if pylons.request.response_type == 'application/json':
-            return self.table_filler.get_value(**kw)
+            return dict(lista=self.table_filler.get_value(**kw))
         if not getattr(self.table.__class__, ' ', False):
             proyectos = self.table_filler.get_value(**kw)
         else:
@@ -289,6 +291,21 @@ class ProyectoController(CrudRestController):
                     atras=atras
                     )
 
+    def get_one(self, *args, **kw):
+        pass
+     
+    @expose()
+    def iniciar(self, id_proyecto):
+        """Inicia un proyecto"""
+        
+#        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        if (not PoseePermiso('iniciar proyecto', 
+                        id_proyecto=id_proyecto).is_met(request.environ)):
+            flash("No puedes iniciar el proyecto", "warning")
+            
+        proy = Proyecto.por_id(id_proyecto)
+        proy.iniciar_proyecto()
+        redirect('./')
                 
     @without_trailing_slash
     @paginate('lista_elementos', items_per_page=5)
@@ -310,6 +327,7 @@ class ProyectoController(CrudRestController):
         buscar_table_filler = ProyectoTableFiller(DBSession)
         buscar_table_filler.filtros = kw
         proyectos = buscar_table_filler.get_value()
+        
         atras = '/proyectos'
         
         return dict(lista_elementos=proyectos, 
@@ -325,24 +343,24 @@ class ProyectoController(CrudRestController):
                     )
     
     
-    @expose('lpm.templates.proyecto.edit')
-    def edit(self, *args, **kw):
-        """Despliega una pagina para realizar modificaciones"""
-        '''
-        pp = PoseePermiso('modificar proyecto', id_proyecto=args[0])
-        if not pp.is_met(request.environ):
-            flash(pp.message % pp.nombre_permiso, 'warning')
-            redirect("/proyectos")
-        '''
-        tmpl_context.widget = self.edit_form
-        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        value = self.edit_filler.get_value(values={'id_proyecto': id_proyecto})
-        value['_method'] = 'PUT'#?
-        if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/":
-            atras = "../"
-        else:
-            atras = "/proyectos"
-        return dict(value=value, page="Modificar Proyecto", atras=atras)
+#    @expose('lpm.templates.proyecto.edit')
+#    def edit(self, *args, **kw):
+#        """Despliega una pagina para realizar modificaciones"""
+#        '''
+#        pp = PoseePermiso('modificar proyecto', id_proyecto=args[0])
+#        if not pp.is_met(request.environ):
+#            flash(pp.message % pp.nombre_permiso, 'warning')
+#            redirect("/proyectos")
+#        '''
+#        tmpl_context.widget = self.edit_form
+#        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+#        value = self.edit_filler.get_value(values={'id_proyecto': id_proyecto})
+#        #value['_method'] = 'PUT'#?
+#        if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/":
+#            atras = "../"
+#        else:
+#            atras = "/proyectos"
+#        return dict(value=value, page="Modificar Proyecto", atras=atras)
         
     @without_trailing_slash
     @expose('lpm.templates.proyecto.new')
@@ -384,30 +402,16 @@ class ProyectoController(CrudRestController):
         #después de crear el proyecto, si el usuario actual es el lider
         #se redirige a la interface de administración del nuevo proyecto.
         if (nombre_lider == request.identity['repoze.who.userid']):
-            redirect("/proyectos/administrar/%d" % proy.id_proyecto)
+            redirect("/proyectos/%d/edit" % proy.id_proyecto)
         else:
             redirect("/proyectos")
 
-    @validate(proyecto_edit_form, error_handler=edit)
-    @expose()
-    def put(self, *args, **kw):
-        """Registra los cambios en la edición de un
-        proyecto.
-        """
-        if "sprox_id" in kw:
-            del kw["sprox_id"]
-        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        transaction.begin()
-        proy = Proyecto.por_id(id_proyecto)
-        proy.nombre = unicode(kw["nombre"])
-        proy.descripcion = unicode(kw["descripcion"])
-        transaction.commit()
-        redirect("../")
-    
-    @expose('lpm.templates.proyecto.administrar')
-    def administrar(self, id_proyecto ,*args, **kw):
-        """Despliega una pagina para admistrar un proyecto"""
 
+    #@rest.dispatch_on(PUT='put')
+    @expose('lpm.templates.proyecto.administrar')
+    def edit(self, id_proyecto,*args, **kw):
+        """Despliega una pagina para admistrar un proyecto"""
+#        id_proyecto = args[0]
         pp = PoseePermiso('modificar proyecto', id_proyecto=id_proyecto)
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
@@ -431,6 +435,10 @@ class ProyectoController(CrudRestController):
                                          id_proyecto = id_proyecto). \
                                          is_met(request.environ)
         
+        puede_iniciar = (not iniciado and PoseePermiso('iniciar proyecto', \
+                                                      id_proyecto=id_proyecto). \
+                                                      is_met(request.environ))
+        
         tmpl_context.widget = self.edit_form
         
             
@@ -440,12 +448,12 @@ class ProyectoController(CrudRestController):
         tmpl_context.tabla_ti = self.tipositems.table
         
         value = self.edit_filler.get_value(values={'id_proyecto': id_proyecto})
-        
+        value['_method'] = 'PUT'
         #fases = self.fases.get_all()['value']#tabla_fases_filler.get_value()
         #tipo_items = self.tipositems.get_all()['value']#self.tabla_ti_filler.get_value()
-        fases = self.fases.table_filler.get_value()
-        tipo_items = self.tipositems.table_filler.get_value()
-        
+        fases = self.fases.table_filler.get_value(id_proyecto=id_proyecto, **kw)
+        tipo_items = self.tipositems.table_filler.get_value(id_proyecto=id_proyecto, **kw)
+
         return dict(value=value,
                     page="Administrar Proyecto %s" % proyecto.nombre,
                     fases=fases,
@@ -455,8 +463,25 @@ class ProyectoController(CrudRestController):
                     iniciado=iniciado,
                     puede_crear_rol=puede_crear_rol,
                     puede_asignar_rol=puede_asignar_rol,
+                    puede_iniciar=puede_iniciar,
                     id=id_proyecto
                     )
+    
+    @validate(proyecto_edit_form, error_handler=edit)
+    @expose()
+    def put(self, *args, **kw):
+        """Registra los cambios en la edición de un
+        proyecto.
+        """
+        if "sprox_id" in kw:
+            del kw["sprox_id"]
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        transaction.begin()
+        proy = Proyecto.por_id(id_proyecto)
+        proy.nombre = unicode(kw["nombre"])
+        proy.descripcion = unicode(kw["descripcion"])
+        transaction.commit()
+        redirect("../")
     
     
     @without_trailing_slash
@@ -497,4 +522,11 @@ class ProyectoController(CrudRestController):
                     puede_crear_ti=puede_crear_ti,
                     iniciado=iniciado
                     )
+        
+    @expose('lpm.templates.index')
+    def _default(self, *args, **kw):
+        """Maneja las urls no encontradas"""
+        flash(_('Recurso no encontrado'), 'warning')
+        redirect('/')
+        return dict(page='index')
     #}

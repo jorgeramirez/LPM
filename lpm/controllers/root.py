@@ -121,8 +121,8 @@ class RootController(BaseController):
         redirect(url('/'))
     
     @expose('lpm.templates.index')
-    def default(self, *args, **kw):
-        """Handle the front-page."""
+    def _default(self, *args, **kw):
+        """Maneja las urls no encontradas"""
         flash(_('Recurso no encontrado'), 'warning')
         redirect('/')
         return dict(page='index')
