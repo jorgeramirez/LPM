@@ -165,13 +165,13 @@ class AlgunPermiso(Predicate):
                     break
             if not algun:
                 continue
-            if r.es_rol_sistema():
+            if (r.es_rol_sistema()):
                 return
-            if self.id_proyecto == r.id_proyecto:
-                if r.id_fase == 0 and r.id_tipo_item == 0:
+            if (self.id_proyecto == r.id_proyecto):
+                if (r.tipo == u"Proyecto"):
                     return
-            if self.id_fase == r.id_fase:
-                if r.id_tipo_item == 0:
+            if (self.id_fase == r.id_fase):
+                if (r.tipo == u"Fase"):
                     return
             if self.id_tipo_item == r.id_tipo_item:
                 return

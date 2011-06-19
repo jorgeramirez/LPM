@@ -23,6 +23,11 @@ a.edit_link{
     border-collapse: collapse;
     border: 1px solid #ccc;
 }
+
+.crud_table {
+    margin-bottom: 60px;
+}
+
 .crud_table .grid .odd{
     background-color: #eee;
 }

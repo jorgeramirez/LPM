@@ -59,7 +59,8 @@ class Fase(DeclarativeBase):
     tmpl_codigo = u"fase-{posicion}-proy-{id_proyecto}"
     estados_posibles = [u'Inicial', u'Desarrollo', u'Completa', 'Comprometida']
     #{ Relaciones
-    items = relation('Item')
+    items = relation('Item', cascade="delete")
+    roles = relation('Rol', cascade="delete")
     
     def lineas_bases(self):# este todavía no probé
         return DBSession.query(LB).join(LB.items, ItemsPorLB.propiedad_item).\
@@ -192,8 +193,9 @@ class Proyecto(DeclarativeBase):
     estados_posibles = [u'Iniciado', u'No iniciado']
     
     #{ Relaciones
-    fases = relation('Fase')
-    tipos_de_item = relation('TipoItem')
+    fases = relation('Fase', cascade="delete")
+    tipos_de_item = relation('TipoItem', cascade="delete")
+    roles = relation('Rol', cascade="delete")
     #}
 
     @classmethod
@@ -418,9 +420,10 @@ class TipoItem(DeclarativeBase):
     # template para codificacion
     #tmpl_codigo = u"TI-{id_tipo_item}-PROY-{id_proyecto}"
     #{ Relaciones
-    hijos = relation('TipoItem')
-    atributos = relation('AtributosPorTipoItem')
-    items = relation('Item')
+    hijos = relation('TipoItem', cascade="delete")
+    atributos = relation('AtributosPorTipoItem', cascade="delete")
+    items = relation('Item', cascade="delete")
+    roles = relation('Rol', cascade="delete")
     #}
     
     @classmethod
@@ -500,7 +503,7 @@ class TipoItem(DeclarativeBase):
         @return: el elemento recuperado
         @rtype: L{TipoItem}
         """        
-        return DBSession.query(cls).filter_by(id_tipo_item=id).one()
+        return DBSession.query(cls).filter_by(id_tipo_item=id).first()
 
     @classmethod
     def por_nombre(cls, nombre):

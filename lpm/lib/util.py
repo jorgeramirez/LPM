@@ -53,7 +53,7 @@ class UrlParser(object):
         @name: el nombre del elemento a buscar en la url
         @type name: C{str}
         @return: si el nombre está o no en la url
-        @rtype: C{boolean}
+        @rtype: C{bool}
         """
         if not url: return
         partes = url.split("/")

@@ -28,9 +28,9 @@ def bootstrap(command, conf, vars):
         r.nombre_rol = u'Administrador del Sistema'
         r.descripcion= u'Rol por defecto que tiene todos los permisos del sistema'
         r.tipo = u"Sistema"
-        r.id_fase = 0
-        r.id_proyecto = 0
-        r.id_tipo_item = 0
+#        r.id_fase = 0
+#        r.id_proyecto = 0
+#        r.id_tipo_item = 0
         r.usuarios.append(u)
         
         #Rol Lider de Proyecto
@@ -39,9 +39,9 @@ def bootstrap(command, conf, vars):
         rlp.descripcion = u"Rol Lider de Proyecto, administra componentes" +\
                            "de un proyecto"
         rlp.tipo = u"Plantilla proyecto"
-        rlp.id_fase = 0
-        rlp.id_proyecto = 0
-        rlp.id_tipo_item = 0
+#        rlp.id_fase = 0
+#        rlp.id_proyecto = 0
+#        rlp.id_tipo_item = 0
         model.DBSession.add_all([r, rlp])
         model.DBSession.flush()
         rlp.codigo = model.Rol.generar_codigo(rlp)

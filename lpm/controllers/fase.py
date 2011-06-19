@@ -12,7 +12,7 @@ Módulo que define el controlador de fases.
 from tgext.crud import CrudRestController
 from tg.decorators import (paginate, expose, with_trailing_slash,
                            without_trailing_slash)
-from tg import redirect, request, validate
+from tg import redirect, request, validate, flash
 
 from lpm.model import DBSession, Fase, Proyecto
 from lpm.lib.sproxcustom import (CustomTableFiller,
@@ -43,7 +43,7 @@ class FaseTable(TableBase):
                     'codigo': u'Código'
                   }
     __omit_fields__ = ['items', 'id_proyecto', 'id_fase', 
-                       'numero_lb', 'descripcion']
+                       'numero_lb', 'descripcion', 'roles']
     __default_column_width__ = '15em'
     __column_widths__ = { 'descripcion': "35em", '__actions__': "50em"}
     
@@ -155,7 +155,8 @@ class PosicionField(CustomPropertySingleSelectField):
 class FaseAddForm(AddRecordForm):
     __model__ = Fase
     __omit_fields__ = ['id_fase', 'numero_items', 'numero_lb',
-                       'estado', 'id_proyecto', 'codigo', 'items']
+                       'estado', 'id_proyecto', 'codigo', 'items',
+                       'roles']
     posicion = PosicionField("posicion", accion="new")
 
 fase_add_form = FaseAddForm(DBSession)
@@ -259,10 +260,11 @@ class FaseController(CrudRestController):
         puede_crear = False
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
         titulo = self.title
+        '''
         pp = PoseePermiso('consultar fases')
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
-                
+        '''        
         if(id_proyecto):#significa que se está en el controlador que está en proyectos
             puede_crear = PoseePermiso("crear fase").is_met(request.environ)
             proy = Proyecto.por_id(id_proyecto)

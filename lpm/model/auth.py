@@ -74,9 +74,15 @@ class Rol(DeclarativeBase):
     tipo = Column(Unicode(50), nullable=False)
 
     #Para relacionar un rol con un recurso específico
-    id_proyecto = Column(Integer, default=0)
-    id_fase = Column(Integer, default=0)
-    id_tipo_item = Column(Integer, default=0)
+    id_proyecto = Column(Integer, ForeignKey('tbl_proyecto.id_proyecto',
+                                             ondelete="CASCADE",
+                                             onupdate="CASCADE"))
+    id_fase = Column(Integer, ForeignKey('tbl_fase.id_fase',
+                                         ondelete="CASCADE",
+                                         onupdate="CASCADE"))
+    id_tipo_item = Column(Integer, ForeignKey('tbl_tipo_item.id_tipo_item',
+                                              ondelete="CASCADE",
+                                              onupdate="CASCADE"))
 
     #{ variables
     #template para el codigo (usar metodo format)
@@ -113,7 +119,7 @@ class Rol(DeclarativeBase):
         @return: True en caso de ser un rol de sistema, sino False
         @rtype: C{bool}
         """
-        return (self.id_proyecto + self.id_fase + self.id_tipo_item) == 0
+        return (self.tipo == u"Sistema")
     
     @classmethod
     def obtener_rol_plantilla(cls, **kw):
@@ -134,6 +140,41 @@ class Rol(DeclarativeBase):
         return rol
     
     @classmethod
+    def nuevo_rol_desde_plantilla(cls, plantilla=None, id_plantilla=None, id=None):
+        """
+        Crea un rol a partir de una plantilla
+        
+        @param plantilla: rol del tipo plantilla.
+        @param id_plantilla: id del rol del tipo plantilla.
+        @param id: identificador con el qué asociar al rol.
+        """
+        base_query = DBSession.query(Rol)
+        if (id_plantilla):
+            plantilla = base_query.filter(Rol.id_rol == int(id_plantilla)).first()
+            
+        rol = Rol()
+        rol.nombre_rol = plantilla.nombre_rol
+        rol.descripcion = plantilla.descripcion
+        if (plantilla.tipo == u"Plantilla proyecto"):
+            rol.tipo = u"Proyecto"
+            rol.id_proyecto = id
+        elif (plantilla.tipo == u"Plantilla fase"):
+            rol.tipo = u"Fase"
+            rol.id_fase = id
+        elif (plantilla.tipo == u"Plantilla tipo ítem"):
+            rol.tipo = u"Tipo de Ítem"
+            rol.id_tipo_item = id
+        
+        for perm in plantilla.permisos:
+            perm.roles.append(rol)
+              
+        DBSession.add(rol)
+        DBSession.flush
+        rol.codigo = Rol.generar_codigo(rol)
+        
+        return rol
+    
+    @classmethod
     def roles_desasignados(cls, usuario):
         """
         Obtiene los roles que no están asignados al usuario
@@ -146,7 +187,7 @@ class Rol(DeclarativeBase):
         desasignados = []
         #falta discrimininar el tipo
         for r in roles:
-            if (r.tipo.find(u"Plantilla") > 0):
+            if (r.tipo.find(u"Plantilla") >= 0):
                 continue
             esta = False
             for u in r.usuarios:
@@ -168,7 +209,7 @@ class Rol(DeclarativeBase):
         @return: el elemento recuperado
         @rtype: L{Rol}
         """        
-        return DBSession.query(cls).filter_by(id_rol=id).one()
+        return DBSession.query(cls).filter_by(id_rol=id).first()
 
     @classmethod
     def crear_rol(cls, **kw):
@@ -211,56 +252,56 @@ class Rol(DeclarativeBase):
         DBSession.add(rol_new)
         return rol_new
 
-    @classmethod
-    def actualizar_rol(cls, id_rol, **kw):
-        """Actualiza un rol"""
-        if "sprox_id" in kw:
-            del kw["sprox_id"]
-        pks = kw["permisos"]
-        for i, pk in enumerate(pks):
-            pks[i] = int(pk)
-        del kw["permisos"]
-        for k in ["id_proyecto", "id_fase", "id_tipo_item"]:
-            if kw.has_key(k):
-                kw[k] = int(kw[k])
-        rol_mod = Rol.por_id(id_rol)
-        for k in ["id_proyecto", "id_fase", "id_tipo_item", "nombre_rol",
-                  "descripcion"]:
-            if kw.has_key(k):
-                setattr(rol_mod, k, kw[k])
-        c = 0
-        while c < len(rol_mod.permisos):
-            p = rol_mod.permisos[c]
-            if p.id_permiso not in pks:
-                del rol_mod.permisos[c]
-            else:
-                c += 1
-        if pks:
-            permisos = DBSession.query(Permiso).filter( \
-                                            Permiso.id_permiso.in_(pks)).all()
-            if not permisos:
-                return None
-                
-            for p in permisos:
-                if p not in rol_mod.permisos:
-                    p.roles.append(rol_mod)
-        
-        #seteamos el tipo
-        if rol_mod.tipo not in ["Sistema", "Plantilla"]:
-            tipo = ""
-            for p in permisos:
-                np = p.nombre_permiso
-                if np.find("tipo de item") > 0:
-                    tipo = u"Tipo de Ítem"
-                if (np.find("item") > 0 and np.find("tipo item") < 0) or \
-                      np.find("lb") > 0 or np.find("impacto") > 0:
-                    tipo = u"Fase"
-                elif np.find("proyecto") > 0 or np.find("fase") > 0:
-                    tipo = u"Proyecto"
-                    break
-            rol_mod.tipo = tipo
-        return rol_mod
-    #}
+#    @classmethod
+#    def actualizar_rol(cls, id_rol, **kw):
+#        """Actualiza un rol"""
+#        if "sprox_id" in kw:
+#            del kw["sprox_id"]
+#        pks = kw["permisos"]
+#        for i, pk in enumerate(pks):
+#            pks[i] = int(pk)
+#        del kw["permisos"]
+#        for k in ["id_proyecto", "id_fase", "id_tipo_item"]:
+#            if kw.has_key(k):
+#                kw[k] = int(kw[k])
+#        rol_mod = Rol.por_id(id_rol)
+#        for k in ["id_proyecto", "id_fase", "id_tipo_item", "nombre_rol",
+#                  "descripcion"]:
+#            if kw.has_key(k):
+#                setattr(rol_mod, k, kw[k])
+#        c = 0
+#        while c < len(rol_mod.permisos):
+#            p = rol_mod.permisos[c]
+#            if p.id_permiso not in pks:
+#                del rol_mod.permisos[c]
+#            else:
+#                c += 1
+#        if pks:
+#            permisos = DBSession.query(Permiso).filter( \
+#                                            Permiso.id_permiso.in_(pks)).all()
+#            if not permisos:
+#                return None
+#                
+#            for p in permisos:
+#                if p not in rol_mod.permisos:
+#                    p.roles.append(rol_mod)
+#        
+#        #seteamos el tipo
+#        if rol_mod.tipo not in ["Sistema", "Plantilla"]:
+#            tipo = ""
+#            for p in permisos:
+#                np = p.nombre_permiso
+#                if np.find("tipo de item") > 0:
+#                    tipo = u"Tipo de Ítem"
+#                if (np.find("item") > 0 and np.find("tipo item") < 0) or \
+#                      np.find("lb") > 0 or np.find("impacto") > 0:
+#                    tipo = u"Fase"
+#                elif np.find("proyecto") > 0 or np.find("fase") > 0:
+#                    tipo = u"Proyecto"
+#                    break
+#            rol_mod.tipo = tipo
+#        return rol_mod
+#    #}
     
     @classmethod
     def actualizar_rol(cls, **kw):

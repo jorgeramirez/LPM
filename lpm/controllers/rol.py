@@ -91,7 +91,7 @@ class RolTableFiller(CustomTableFiller):
                      '</div><br />'
         #falta implementar!
         if PoseePermiso('eliminar rol').is_met(request.environ):
-            value += '<div><form method="POST" action="' + url_cont + str(obj.id_rol) + '" class="button-to">'+\
+            value += '<div><form method="POST" action="./' + str(obj.id_rol) + '" class="button-to">'+\
                      '<input type="hidden" name="_method" value="DELETE" />' +\
                      '<input onclick="return confirm(\'Está seguro?\');" value="Delete" type="submit" '+\
                      'style="background-color: transparent; float:left; border:0; color: #286571;'+\

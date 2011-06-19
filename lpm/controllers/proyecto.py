@@ -46,7 +46,8 @@ class ProyectoTable(TableBase):
                    'numero_fases': u'#Fases', 'descripcion': u'Descripción',
                    'project_leader': 'Lider', 'codigo': u"Código"
                   }
-    __omit_fields__ = ['fases', 'tipos_de_item', 'id_proyecto', 'descripcion']
+    __omit_fields__ = ['fases', 'tipos_de_item', 'id_proyecto', 'descripcion',
+                       'roles']
     __default_column_width__ = '15em'
     __field_order__ = ['codigo', 'nombre', 'numero_fases', 'estado',
                         'project_leader', 'complejidad_total',
@@ -185,7 +186,7 @@ class ProyectoAddForm(AddRecordForm):
     __model__ = Proyecto
     __omit_fields__ = ['id_proyecto', 'fecha_creacion', 'complejidad_total',
                        'estado', 'fases', 'tipos_de_item', 'codigo',
-                       'numero_fases']
+                       'numero_fases', 'roles']
     __field_order__ = ['nombre', 'descripcion']
     __base_validator__ = ProyectoAddFormValidator
     
@@ -201,7 +202,7 @@ class ProyectoEditForm(EditableForm):
     __hide_fields__ = ['id_proyecto']
     __omit_fields__ = ['fecha_creacion', 'complejidad_total',
                        'estado', 'numero_fases', 'codigo', 'fases', 
-                       'tipos_de_item']
+                       'tipos_de_item', 'roles']
     __base_validator__ = ProyectoEditFormValidator
     #__disable_fields__ = ['nombre']
     if PoseePermiso('asignar-desasignar rol').is_met(request.environ):
@@ -385,19 +386,15 @@ class ProyectoController(CrudRestController):
         lider = Usuario.por_id(id_proy_lider)
         nombre_lider = lider.nombre_usuario
         rol_template = Rol.obtener_rol_plantilla(nombre_rol=u"Lider de Proyecto")
-        rol_nuevo = Rol(id_fase=0, id_tipo_item=0)
-        rol_nuevo.nombre_rol = rol_template.nombre_rol
-        rol_nuevo.descripcion = rol_template.descripcion
-        rol_nuevo.tipo = u"Proyecto"
-        rol_nuevo.usuarios.append(lider)
-        for perm in rol_template.permisos:
-            perm.roles.append(rol_nuevo)
-        DBSession.add_all([proy, rol_nuevo])
+        DBSession.add(proy)
         DBSession.flush()
-        rol_nuevo.id_proyecto = proy.id_proyecto
-        rol_nuevo.codigo = Rol.generar_codigo(rol_nuevo)
+        rol_nuevo = Rol.nuevo_rol_desde_plantilla(plantilla=rol_template,
+                                                  id=proy.id_proyecto)
+        #Rol(id_fase=0, id_tipo_item=0)
+
         proy.codigo = Proyecto.generar_codigo(proy)
-        #transaction.commit()
+        rol_nuevo.usuarios.append(lider)
+
         
         #después de crear el proyecto, si el usuario actual es el lider
         #se redirige a la interface de administración del nuevo proyecto.
@@ -405,6 +402,9 @@ class ProyectoController(CrudRestController):
             redirect("/proyectos/%d/edit" % proy.id_proyecto)
         else:
             redirect("/proyectos")
+        
+        
+
 
 
     #@rest.dispatch_on(PUT='put')
