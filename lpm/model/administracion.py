@@ -56,11 +56,12 @@ class Fase(DeclarativeBase):
     estado = Column(Unicode(20), nullable=True, default=u"Inicial")
 
     # template para codificacion
-    tmpl_codigo = u"fase-{posicion}-proy-{id_proyecto}"
+    tmpl_codigo = u"fase-{posicion}/p-{id_proyecto}"
     estados_posibles = [u'Inicial', u'Desarrollo', u'Completa', 'Comprometida']
     #{ Relaciones
     items = relation('Item', cascade="delete")
     roles = relation('Rol', cascade="delete")
+    tipos_de_item = relation('TipoItem', cascade="delete")
     
     def lineas_bases(self):# este todavía no probé
         return DBSession.query(LB).join(LB.items, ItemsPorLB.propiedad_item).\
@@ -214,9 +215,11 @@ class Proyecto(DeclarativeBase):
             
             for f in self.fases:
                 tipo = TipoItem()
-                tipo.codigo = u"tipo_fase_%d" % f.posicion
-                tipo.nombre = u"Tipo de Fase %d" % f.posicion
+                tipo.codigo = u"ti-base/f-{pos}/p-{id}".format(pos=f.posicion,
+                                                               id=self.id_proyecto)
+                tipo.nombre = u"Base de Fase %d" % f.posicion
                 tipo.descripcion = u"Tipo por defecto de la fase número %d" % f.posicion
+                f.tipos_de_item.append(tipo)
                 self.tipos_de_item.append(tipo)
                 DBSession.add(tipo)
                 DBSession.flush()
@@ -297,18 +300,20 @@ class Proyecto(DeclarativeBase):
         DBSession.delete(self)
         
     def definir_tipo_item(self, id_papa, id_importado=None, mezclar=False, **kw):#todavía no probé
-        """ @param id_papa : dice de quien hereda la estructura
-            @param kw diccionario que contiene los datos para el nuevo tipo
-            @param importado si se especifica es id del tipo de item proveniente de
+        """ 
+            @param id_papa : dice de quien hereda la estructura, el id_fase del papa es el id_fase
+            del nuevo item
+            @param kw : diccionario que contiene los datos para el nuevo tipo
+            @param : importado si se especifica es id del tipo de item proveniente de
             otro proyecto.
-            @param mezclar cuando se repite un nombre en los atributos del tipo de item
+            @param : mezclar cuando se repite un nombre en los atributos del tipo de item
             si es True entonces se coloca "import." como prefijo al nombre del
             atributo importado, si es False el atributo en el tipo importado no se
             agrega (sólo queda el del padre) 
         """
         
         papa = TipoItem.por_id(id_papa)
-        
+        fase = Fase.por_id(papa.id_fase)
         for hijo in papa.hijos:
             if (hijo.nombre == kw["nombre"]):
                 raise NombreTipoItemError()
@@ -317,6 +322,7 @@ class Proyecto(DeclarativeBase):
         #tipo.codigo = kw["codigo"]
         tipo.nombre = kw["nombre"]
         tipo.descripcion = kw["descripcion"]
+        fase.tipos_de_item.append(tipo)
         papa.hijos.append(tipo)
         
         if (id_importado):
@@ -344,14 +350,14 @@ class Proyecto(DeclarativeBase):
                 nuevo_atr.valor_por_defecto = atr.valor_por_defecto
                 tipo.atributos.append(nuevo_atr)
                 DBSession.add(nuevo_atr)
-        else: #Agregado: copiar estructura del padre si no se importa nada
-            for atr in papa.atributos:
-                nuevo_atr = AtributosPorTipoItem()
-                nuevo_atr.nombre = atr.nombre
-                nuevo_atr.tipo = atr.tipo
-                nuevo_atr.valor_por_defecto = atr.valor_por_defecto
-                tipo.atributos.append(nuevo_atr)
-                DBSession.add(nuevo_atr)
+#        else: #Agregado: copiar estructura del padre si no se importa nada
+#            for atr in papa.atributos:
+#                nuevo_atr = AtributosPorTipoItem()
+#                nuevo_atr.nombre = atr.nombre
+#                nuevo_atr.tipo = atr.tipo
+#                nuevo_atr.valor_por_defecto = atr.valor_por_defecto
+#                tipo.atributos.append(nuevo_atr)
+#                DBSession.add(nuevo_atr)
         
         self.tipos_de_item.append(tipo)
         DBSession.add(tipo)
@@ -411,14 +417,17 @@ class TipoItem(DeclarativeBase):
     #{ Columnas
     id_tipo_item = Column(Integer, autoincrement=True, primary_key=True)
     codigo = Column(Unicode(50), unique=True)
-    nombre = Column(Unicode(50), unique=True, nullable=False)
+    nombre = Column(Unicode(50), nullable=False)
     descripcion = Column(Unicode(200), nullable=True)
     id_proyecto = Column(Integer, ForeignKey('tbl_proyecto.id_proyecto',
-                         ondelete="CASCADE"), nullable=True)
-    id_padre = Column(Integer, ForeignKey('tbl_tipo_item.id_tipo_item'))
+                                             ondelete="CASCADE"), nullable=True)
+    id_fase = Column(Integer, ForeignKey('tbl_fase.id_fase',
+                                         ondelete="CASCADE"), nullable=True)
+    id_padre = Column(Integer, ForeignKey('tbl_tipo_item.id_tipo_item',
+                                          ondelete="CASCADE"), nullable=True)
     
     # template para codificacion
-    #tmpl_codigo = u"TI-{id_tipo_item}-PROY-{id_proyecto}"
+    tmpl_codigo = u"{siglas}-ti-{id}/f-{pos}/p-{proy}"
     #{ Relaciones
     hijos = relation('TipoItem', cascade="delete")
     atributos = relation('AtributosPorTipoItem', cascade="delete")
@@ -433,18 +442,40 @@ class TipoItem(DeclarativeBase):
         """
         #return cls.tmpl_codigo.format(id_tipo_item=ti.id_tipo_item,
         #                              id_proyecto=ti.id_proyecto)
-        words = tipo.nombre.upper().split()
-        while words.count("DE"):
-            words.remove("DE")
+        words = tipo.nombre.lower().split()
+        while words.count("de"):
+            words.remove("de")
         siglas = u""
         for w in words:
             siglas += w[0]
-        return "-".join([siglas, str(tipo.id_tipo_item), 'PROY', 
-                         str(tipo.id_proyecto)])
+            
+        fase = Fase.por_id(tipo.id_fase)
+            
+        return cls.tmpl_codigo.format(siglas=siglas, id=tipo.id_tipo_item,
+                                  pos=fase.posicion, proy=tipo.id_proyecto)
+#        return "-".join([siglas, str(tipo.id_tipo_item), 'proy', 
+#                         str(tipo.id_proyecto)])
+        
     
+    def es_o_es_hijo(self, id):
+        """Verifica si 
+        @param id: es este tipo de item o es hijo de ese tipo de ítem"""
+        if (self.id_tipo_item == id):
+            return True
+        
+        actual = self
+        while (actual.id_padre != None):
+            actual = TipoItem.por_id(actual.id_padre)
+            if (actual.id_tipo_item == id):
+                return True
+            
+        return False
+            
     def agregar_atributo(self, **kw):#todavía no probé
         """ se espera un valor ya verificado
-        se lanza una exepcion si se repite en nombre del atributo"""
+        se lanza una exepcion si se repite en nombre del atributo
+        en el tipo de item actual."""
+        
         a = AtributosPorTipoItem()
         
         for atr in self.atributos:
@@ -457,7 +488,7 @@ class TipoItem(DeclarativeBase):
         self.atributos.append(a)
         DBSession.add(a)
         DBSession.flush()
-        
+                   
         #agregar este atributo a los ítems ya creados, no sé si es necesario
         for i in self.items:
             a_item = AtributosDeItems()
@@ -522,7 +553,7 @@ class TipoItem(DeclarativeBase):
         """
         Verifica si el tipo puede eliminarse.
         """
-        return len(self.items) == 0
+        return (len(self.items) == 0 and self.id_padre != None)
 
 
 class AtributosPorTipoItem(DeclarativeBase):
