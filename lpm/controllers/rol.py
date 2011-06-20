@@ -281,6 +281,7 @@ class RolContextoAddForm(RolAddForm):
     __field_order__ = ['nombre_rol', 'descripcion',
                         'id_proyecto', 'id_fase', 'id_tipo_item',
                         'permisos']
+    __base_validator__ = RolFormValidator
     __widget_selector_type__ = SelectorPermisosContexto
     id_proyecto = CodProyectoField("id_proyecto", label_text="Proyecto")
     id_fase = CodFaseField("id_fase", label_text="Fase")
@@ -323,6 +324,7 @@ class RolPlantillaEditForm(RolEditForm):
     
 rol_plantilla_edit_form = None       
 #rol_plantilla_edit_form = RolPlantillaEditForm(DBSession)
+
 
 
 class RolContextoEditForm(RolEditForm):
@@ -421,7 +423,7 @@ class RolController(CrudRestController):
         value = self.edit_filler.get_value(values={'id_rol': int(args[0])})
 #        value['_method'] = 'PUT'
         page = "Rol {nombre}".format(nombre=value["nombre_rol"])
-        atras = atras=self.action
+        atras = self.action
         return dict(value=value, page=page, atras=atras)
 
     @without_trailing_slash
@@ -458,7 +460,6 @@ class RolController(CrudRestController):
     @expose()
     def put(self, *args, **kw):
         """update a record"""
-        print kw
         pp = PoseePermiso('modificar rol')
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
@@ -546,7 +547,7 @@ class RolPlantillaController(RolController):
         else:
             roles = []
         tmpl_context.widget = self.table
-        
+        atras = '/'
         return dict(lista_elementos=roles, 
                     page=self.title, 
                     titulo=self.title, 
@@ -556,6 +557,7 @@ class RolPlantillaController(RolController):
                     comboboxes=self.comboboxes,
                     url_action=self.action,
                     puede_crear=puede_crear,
+                    atras=atras
                     )
         
     @with_trailing_slash
@@ -569,6 +571,7 @@ class RolPlantillaController(RolController):
         buscar_table_filler.filtros = kw
         roles = buscar_table_filler.get_value()
         #a = 1 / 0
+        atras = self.action
         return dict(lista_elementos=roles, 
                     page=self.title, 
                     titulo=self.title, 
@@ -578,7 +581,7 @@ class RolPlantillaController(RolController):
                     comboboxes=self.comboboxes,
                     url_action=self.action,
                     puede_crear=puede_crear,
-                    )
+                    atras=atras)
         
     @with_trailing_slash
     @expose('lpm.templates.rol.edit')
@@ -603,8 +606,13 @@ class RolPlantillaController(RolController):
         
         value = self.edit_filler.get_value(values={'id_rol': int(id)})
 #        value['_method'] = 'PUT'#?
+
+        if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/":
+            atras = "../"
+        else:
+            atras = "/rolesplantilla"
         
-        return dict(value=value, page=page)
+        return dict(value=value, page=page, atras=atras)
     
     @without_trailing_slash
     @expose('lpm.templates.rol.new')
@@ -627,12 +635,18 @@ class RolPlantillaController(RolController):
         
         page="Nuevo Rol Plantilla de {contexto}".format(contexto=contexto)
         
-        return dict(value=kw, page=page, action="../")
+        if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/":
+            atras = "/"
+        else:
+            atras = "/rolesplantilla"
+        
+        return dict(value=kw, page=page, action="../", atras=atras)
 
     #@validate(rol_plantilla_add_form, error_handler=new)
     @expose()
     def post(self, *args, **kw):
         """ Crea un nuevo rol plantilla"""
+        print kw
         pp = PoseePermiso('crear rol')
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')

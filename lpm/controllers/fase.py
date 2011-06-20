@@ -241,6 +241,7 @@ class FaseController(CrudRestController):
             
         tmpl_context.widget = self.table
   
+        atras = "/"
         return dict(lista_elementos=fases, 
                     page=titulo,
                     titulo=self.title, 
@@ -249,7 +250,8 @@ class FaseController(CrudRestController):
                     opciones=self.opciones,
                     url_action=self.tmp_action,
                     puede_crear=puede_crear,
-                    comboboxes=self.comboboxes
+                    comboboxes=self.comboboxes,
+                    atras=atras
                     )
     
     @without_trailing_slash
@@ -281,7 +283,7 @@ class FaseController(CrudRestController):
         buscar_table_filler = FaseTableFiller(DBSession)
         buscar_table_filler.filtros = kw
         fases = buscar_table_filler.get_value(id_proyecto=id_proyecto)
-        atras = './'
+        atras = '/fases'
         
         return dict(lista_elementos=fases, 
                     page=self.title, 

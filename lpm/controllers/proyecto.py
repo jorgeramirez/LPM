@@ -444,6 +444,10 @@ class ProyectoController(CrudRestController):
         fases = self.fases.table_filler.get_value(id_proyecto=id_proyecto, **kw)
         tipo_items = self.tipositems.table_filler.get_value(id_proyecto=id_proyecto, **kw)
 
+        if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/":
+            atras = "../"
+        else:
+            atras = "/proyectos"
         return dict(value=value,
                     page="Administrar Proyecto %s" % proyecto.nombre,
                     fases=fases,
@@ -454,7 +458,8 @@ class ProyectoController(CrudRestController):
                     puede_crear_rol=puede_crear_rol,
                     puede_asignar_rol=puede_asignar_rol,
                     puede_iniciar=puede_iniciar,
-                    id=id_proyecto
+                    id=id_proyecto,
+                    atras=atras
                     )
     
     @validate(proyecto_edit_form, error_handler=edit)

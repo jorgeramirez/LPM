@@ -361,7 +361,10 @@ class UsuarioController(CrudRestController):
         tmpl_context.tabla_roles = RolRolTable(DBSession)
         user = Usuario.por_id(args[0])
         
-        atras='/usuarios'
+        if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/":
+            atras = "/"
+        else:
+            atras = '/usuarios'
         
         if (False): # si viene de /usuarios/perfil
             page = "Mi perfil"
