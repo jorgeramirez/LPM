@@ -392,7 +392,7 @@ class UsuarioController(CrudRestController):
         user = request.identity['repoze.who.userid']
         id = Usuario.by_user_name(user)
 
-        url = '/usuarios/' + str(id.id_usuario) + '/edit/'
+        url = '/usuarios/' + str(id.id_usuario) + '/edit'
         redirect(url)
 
     @expose('lpm.templates.usuario.new')
