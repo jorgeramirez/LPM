@@ -453,16 +453,19 @@ class ItemController(CrudRestController):
     def edit(self, *args, **kw):
         """Despliega una pagina para realizar modificaciones"""
         
-        id_fase = UrlParser.parse_id(request.url, "fases")
+        #id_fase = UrlParser.parse_id(request.url, "fases")
+        id_item = UrlParser.parse_id(request.url, "items")
+        atras = "../"
+        if UrlParser.parse_nombre(request.url, "fases"):
+            atras = "../../edit"
+        item = Item.por_id(id_item)
         puede_modificar = PoseePermiso('modificar item', 
-                                       id_fase=id_fase).is_met(request.environ)
+                                       id_fase=item.id_fase).is_met(request.environ)
         if not puede_modificar:
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect("./")
         tmpl_context.widget = self.edit_form
         tmpl_context.tabla_atributos = self.atributos.table
-        id_item = UrlParser.parse_id(request.url, "items")
-        item = Item.por_id(id_item)
         atributos = self.atributos.table_filler \
                         .get_value(id_version=item.id_propiedad_item)
         
@@ -470,12 +473,14 @@ class ItemController(CrudRestController):
         rel_table_filler = RelacionItemTableFiller(DBSession)
         relaciones = rel_table_filler.get_value(id_version=item.id_propiedad_item)
         value = self.edit_filler.get_value(values={'id_item': id_item})
+        page = u"Modificar Ítem: %s" % value["codigo"]
         return dict(value=value,
-                    page=u"Modificar Ítem",
+                    page=page,
                     id=str(id_item),
                     puede_relacionar=puede_modificar,
                     atributos=atributos,
-                    relaciones=relaciones
+                    relaciones=relaciones,
+                    atras=atras
                     )
         
     @validate(item_edit_form, error_handler=edit)

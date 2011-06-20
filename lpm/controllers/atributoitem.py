@@ -75,6 +75,9 @@ class AtributoItemTableFiller(CustomTableFiller):
         controller = "./atributos/" + id
         id_item = UrlParser.parse_id(request.url, "items")
         item = Item.por_id(id_item)
+        
+        if UrlParser.parse_nombre(request.url, "atributos"):
+            controller = id
 
         if PoseePermiso('modificar item', 
                         id_fase=item.id_fase).is_met(request.environ):
@@ -115,7 +118,7 @@ class AtributoItemEditForm(EditableForm):
                        'id_atributos_de_items', 'atributo']
     __add_fields__ = {"valor": None, "nombre": None}
     valor = TextField("valor", label_text="Valor")
-    valor = TextField("nombre", label_text="Nombre")
+    nombre = TextField("nombre", label_text="Nombre")
     __field_order__ = ["nombre", "valor"]
 
 
@@ -126,11 +129,13 @@ class AtributoItemEditFiller(EditFormFiller):
     __model__ = AtributosPorItem
     __add_fields__ = {"valor": None, "nombre": None}
     
-    def valor(self, obj, **kw):
-        pass
-    
     def nombre(self, obj, **kw):
-        pass
+        id = obj.atributo.id_atributos_por_tipo_item
+        attr_por_tipo = AtributosPorTipoItem.por_id(id)
+        return attr_por_tipo.nombre
+    
+    def valor(self, obj, **kw):
+        return obj.atributo.valor
 
 atributo_item_edit_filler = AtributoItemEditFiller(DBSession)
 
@@ -267,7 +272,8 @@ class AtributoItemController(CrudRestController):
         value = self.edit_filler.get_value(values={'id_atributos_por_item': id})                                
         tmpl_context.widget = self.edit_form
         return dict(value=value,
-                    page=titulo
+                    page=titulo,
+                    atras="../../edit"
                     )
         
     @validate(atributo_item_edit_form, error_handler=edit)
