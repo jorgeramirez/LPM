@@ -667,12 +667,32 @@ class AtributosDeItems(DeclarativeBase):
     
     def _get_valor(self):
         """ dependiendo del tipo retorna un valor"""
-        pass
+        #Implementacion Parcial
+        #api = AtributosPorTipoItem.por_id(self.id_atributos_por_tipo_item)
+        #if api.tipo == u"Numérico":
+        #    return int(self._valor)
+        #elif api.tipo == u"Fecha":
+        #    return self._valor
+        #else:
+        #    return self._valor
+        return self._valor
     
     def _set_valor(self, valor):
         """ dependiendo del tipo del valor, verifica que sea válido,
          si no lanza una excepción (?) """
-        pass
+        #Implementacion parcial
+        #api = AtributosPorTipoItem.por_id(self.id_atributos_por_tipo_item)
+        #if api.tipo == u"Numérico":
+        #    try:
+        #        self._valor = int(valor)
+        #    except:
+        #        #excepcion?
+        #        return
+        #elif api.tipo == u"Fecha":
+        #    self._valor = valor
+        #else:
+        #    self._valor = valor
+        self._valor = valor
     
     valor = synonym('_valor', descriptor=property(_get_valor, _set_valor))
     

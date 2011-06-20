@@ -60,7 +60,7 @@ class FaseTableFiller(CustomTableFiller):
         clase = 'actions_fase'
         #poco elegante pero ...
         controller = "./fases/" + str(obj.id_fase)
-
+        
         #si está en la tabla que está en edit proyecto necesita esta parte del url
         if (UrlParser.parse_nombre(request.url, "fases")):
             controller =  str(obj.id_fase)
@@ -291,7 +291,8 @@ class FaseController(CrudRestController):
                     titulo=self.title, 
                     modelo=self.model.__name__,
                     columnas=self.columnas,
-                    url_action=self.tmp_action,
+                    #url_action=self.tmp_action,
+                    url_action="../", #por /post_buscar/
                     puede_crear=puede_crear,
                     comboboxes=self.comboboxes,
                     opciones=self.opciones,

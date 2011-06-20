@@ -165,7 +165,7 @@ class VersionController(CrudRestController):
         id_item = UrlParser.parse_id(request.url, "items")
         if id_item:
            item = Item.por_id(id_item)
-           titulo = "Versiones del Ítem: %s" % item.codigo 
+           titulo = u"Versiones del Ítem: %s" % item.codigo 
         tmpl_context.widget = self.table
         versiones = self.table_filler.get_value(id_item=id_item, **kw)
         return dict(lista_elementos=versiones, 
@@ -192,7 +192,7 @@ class VersionController(CrudRestController):
         id_item = UrlParser.parse_id(request.url, "items")
         if id_item:
            item = Item.por_id(id_item)
-           titulo = "Versiones del Ítem: %s" % item.codigo 
+           titulo = u"Versiones del Ítem: %s" % item.codigo 
         tmpl_context.widget = self.table
         buscar_table_filler = VersionTableFiller(DBSession)
         buscar_table_filler.filtros = kw

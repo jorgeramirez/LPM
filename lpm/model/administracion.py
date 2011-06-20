@@ -111,29 +111,36 @@ class Fase(DeclarativeBase):
                 else:
                     self.estado = u"Desarrollo"
 
-    def crear_item(self, id_tipo):#todavía no probé
-        """ Crear un itema en la esta fase
-        dict contiene los datos para inicializarlo"""
+    def crear_item(self, id_tipo, **kw):#todavía no probé
+        """ Crear un item en esta fase
+            @param id_tipo: el identificador del tipo de ítem
+            @param kw: contiene los datos para inicializar su propiedad
+        """
         #crear el item
+        tipo = TipoItem.por_id(id_tipo)
+        self.numero_items += 1
         item = Item()
         item.id_tipo_item = id_tipo
+        item.numero = self.numero_items
+        item.numero_por_tipo = len(tipo.items) + 1
         #su propiedad
         p_item = PropiedadItem()
         p_item.version = 1
-        p_item.complejidad = 5
-        p_item.prioridad = 5
+        #p_item.complejidad = 5
+        #p_item.prioridad = 5
+        p_item.complejidad = int(kw["complejidad"])
+        p_item.prioridad = int(kw["prioridad"])
         p_item.estado = u"Desaprobado"
         #los atributos de su tipo
-        tipo = TipoItem.por_id(id_tipo)
         
         for atr in tipo.atributos:
             a_item = AtributosDeItems()
             a_item.valor = atr.valor_por_defecto
-            a_item.id_atributos_por_tipo_de_item = atr.\
+            a_item.id_atributos_por_tipo_item = atr.\
             id_atributos_por_tipo_item
             
             a_por_item = AtributosPorItem()
-            a_por_item.atributos = a_item
+            a_por_item.atributo = a_item
             p_item.atributos.append(a_por_item)
             DBSession.add(a_item)
             DBSession.add(a_por_item)

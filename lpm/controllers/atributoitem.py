@@ -16,7 +16,7 @@ from tg.decorators import (paginate, expose, with_trailing_slash,
 from tg import redirect, request, validate, flash
 
 from lpm.model import (DBSession, AtributosDeItems, AtributosPorItem, Item, 
-                       TipoItem, Fase)
+                       TipoItem, Fase, PropiedadItem, AtributosPorTipoItem)
 from lpm.lib.sproxcustom import (CustomTableFiller,
                                  CustomPropertySingleSelectField)
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
@@ -55,10 +55,12 @@ class AtributoItemTableFiller(CustomTableFiller):
     __add_fields__ = {'nombre': None, 'valor': None}
     
     def nombre(self, obj, **kw):
-        pass
+        id = obj.atributo.id_atributos_por_tipo_item
+        attr_por_tipo = AtributosPorTipoItem.por_id(id)
+        return attr_por_tipo.nombre
     
     def valor(self, obj, **kw):
-        pass
+        return obj.atributo.valor
     
     def __actions__(self, obj):
         """Links de acciones para un registro dado"""

@@ -14,7 +14,7 @@ from tg.decorators import (paginate, expose, with_trailing_slash,
                            without_trailing_slash)
 from tg import redirect, request, validate, flash
 
-from lpm.model import DBSession, Item, TipoItem, Fase, Proyecto
+from lpm.model import DBSession, Item, TipoItem, Fase, PropiedadItem
 from lpm.lib.sproxcustom import (CustomTableFiller,
                                  CustomPropertySingleSelectField)
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
@@ -70,19 +70,24 @@ class ItemTableFiller(CustomTableFiller):
                       'codigo_fase': None, 'complejidad': None}
     
     def codigo_tipo(self, obj, **kw):
-        pass
+        ti = TipoItem.por_id(obj.id_tipo_item)
+        return ti.codigo
     
     def version_actual(self, obj, **kw):
-        pass
+        p_item = PropiedadItem.por_id(obj.id_propiedad_item)
+        return p_item.version
     
     def estado(self, obj, **kw):
-        pass
+        p_item = PropiedadItem.por_id(obj.id_propiedad_item)
+        return p_item.estado
 
     def codigo_fase(self, obj, **kw):
-        pass
+        fase = Fase.por_id(obj.id_fase)
+        return fase.codigo
     
     def complejidad(self, obj, **kw):
-        pass
+        p_item = PropiedadItem.por_id(obj.id_propiedad_item)
+        return p_item.complejidad
         
     def __actions__(self, obj):
         """Links de acciones para un registro dado"""
@@ -250,10 +255,12 @@ class ItemEditFiller(EditFormFiller):
     __add_fields__ = {"complejidad": None, "prioridad": None}
     
     def complejidad(self, obj, **kw):
-        pass
+        p_item = PropiedadItem.por_id(obj.id_propiedad_item)
+        return p_item.complejidad
     
     def prioridad(self, obj, **kw):
-        pass
+        p_item = PropiedadItem.por_id(obj.id_propiedad_item)
+        return p_item.prioridad
 
 item_edit_filler = ItemEditFiller(DBSession)
 
@@ -435,9 +442,11 @@ class ItemController(CrudRestController):
         if "sprox_id" in kw:
             del kw["sprox_id"]
         id_fase = UrlParser.parse_id(request.url, "fases")
+        id_tipo = int(kw["id_tipo_item"])
+        del kw["id_tipo_item"]
         if id_fase:
-            #TODO
-            pass
+            fase = Fase.por_id(id_fase)
+            fase.crear_item(id_tipo, **kw)
         redirect("./")
     
     @expose('lpm.templates.item.edit')

@@ -35,6 +35,9 @@ class UrlParser(object):
         partes = url.split("/")
         if "administrar" in partes:
             partes.remove("administrar")
+        if "post_buscar" in partes:
+            partes.remove("post_buscar")
+            
         for i, v in enumerate(partes):
             if v == name:
                 try:
