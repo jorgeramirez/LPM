@@ -299,7 +299,7 @@ class ProyectoController(CrudRestController):
         proy = Proyecto.por_id(id_proyecto)
         proy.iniciar_proyecto()
         
-        redirect('/proyectos/%d/edit' % id_proyecto)
+        redirect('/proyectos/%s/edit' % id_proyecto)
                 
     @without_trailing_slash
     @paginate('lista_elementos', items_per_page=5)

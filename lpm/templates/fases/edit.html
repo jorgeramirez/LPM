@@ -18,7 +18,7 @@
                 
             </td>
             <td valign="top">
-            	<div style="clear:both;">
+                <div style="clear:both;">
                 <a py:if="puede_asignar_rol" class="link_boton" href="${tg.url('/rol/fase')}">
                     <input id="roles" style="margin-top:0; float:right;" class="boton" type="button" value="Asignar Rol"/>
                 </a>
@@ -34,11 +34,11 @@
             </td>
         </tr>
         <tr>
-		    <td  colspan="2">
-		        <a py:if="puede_crear_item" class="link_boton" href="${tg.url(id + '/items/new')}">
-		            <input id="nuevo_item" style="margin-bottom:10px;" class="boton" type="button" value="Nuevo"/>
-		        </a>
-		    </td>
+            <td  colspan="2">
+                <a py:if="puede_crear_item" class="link_boton" href="${tg.url('./items/new')}">
+                    <input id="nuevo_item" style="margin-bottom:10px;" class="boton" type="button" value="Nuevo Item"/>
+                </a>
+            </td>
         </tr>
         <tr>
             <td  colspan="2">

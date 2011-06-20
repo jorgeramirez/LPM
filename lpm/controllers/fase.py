@@ -20,6 +20,7 @@ from lpm.lib.sproxcustom import (CustomTableFiller,
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
 from lpm.lib.util import UrlParser
 from lpm.controllers.tipoitem import TipoItemController, TipoItemTableFiller
+from lpm.controllers.item import ItemController
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, EditFormFiller
 from sprox.fillerbase import EditFormFiller
@@ -193,7 +194,7 @@ class FaseController(CrudRestController):
     
     #Subcontrolador
     tipositems = TipoItemController(DBSession)
-    
+    items = ItemController(DBSession)
     #{ Modificadores
 
                      
@@ -349,7 +350,8 @@ class FaseController(CrudRestController):
         value = self.edit_filler.get_value(values={'id_fase': id_fase})
         #value['_method'] = 'PUT'
         
-        tmpl_context.tabla_items = self.table   
+        tmpl_context.tabla_items = self.items.table
+        items = self.items.table_filler.get_value(id_fase=id_fase)
         tmpl_context.tabla_lb = self.table
         return dict(value=value,
                     page="Modificar Fase",
@@ -358,7 +360,7 @@ class FaseController(CrudRestController):
                     puede_crear_item=True,
                     puede_crear_lb=True,
                     id=str(id_fase),
-                    items=[],
+                    items=items,
                     lbs=[])
         
     @validate(fase_edit_form, error_handler=edit)

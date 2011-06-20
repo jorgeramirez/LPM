@@ -83,7 +83,7 @@ class UsuarioTableFiller(CustomTableFiller):
                      'display: inline; margin: 0; padding: 0;" class="' + clase + '"/>'+\
                      '</form></div><br />'
 
-        if PoseePermiso('asignar rol').is_met(request.environ):
+        if PoseePermiso('asignar-desasignar rol').is_met(request.environ):
             value += '<div>' + \
                         '<a href="/usuarios/roles/' + str(obj.id_usuario) + '" ' +\
                         'class="' + clase + '">Roles</a>' + \
@@ -211,21 +211,21 @@ class RolTableFiller(TableFiller):
         return checkbox
     
     def proyecto(self, obj, **kw):
-        if obj.id_proyecto != 0:
+        if obj.id_proyecto:
             proy = Proyecto.por_id(obj.id_proyecto)
             return proy.nombre
         else:
             return u"---------"
 
     def fase(self, obj, **kw):
-        if obj.id_fase != 0:
+        if obj.id_fase:
             fase = Fase.por_id(obj.id_fase)
             return fase.nombre
         else:
             return u"---------"
             
     def tipo_item(self, obj, **kw):
-        if obj.id_tipo_item != 0:
+        if obj.id_tipo_item:
             tipo_item = TipoItem.por_id(obj.id_tipo_item)
             return tipo_item.codigo
         else:
@@ -450,7 +450,6 @@ class UsuarioController(CrudRestController):
     @expose('lpm.templates.usuario.roles')
     def roles(self, *args, **kw):
         """ Asignar y desasignar Roles """
-
         tmpl_context.tabla_asignados = rol_user_table
         tmpl_context.tabla_desasignados = rol_user_table
         user = Usuario.por_id(args[0])
