@@ -30,6 +30,7 @@ from sqlalchemy.types import Integer, Unicode, Boolean, LargeBinary, DateTime
 from sqlalchemy.orm import relation, synonym, backref
 
 from lpm.model import *
+import lpm.model#Para elementos de administracion y gestconf
 from lpm.model.excepciones import *
 
 
@@ -61,7 +62,8 @@ class Item(DeclarativeBase):
 
     
     #template para codificacion
-    tmpl_codigo = u"IT-{id_item}-TI-{id_tipo_item}"
+    #tmpl_codigo = u"IT-{id_item}-TI-{id_tipo_item}"
+    tmpl_codigo = u"{siglas}-{numero_por_tipo}/f-{pos}/p-{proy}"
     estados_posibles = [u"Desaprobado", u"Aprobado", u"Bloqueado", u"Eliminado", 
                         u"Revisión-Bloq", u"Revisión-Desbloq"]
     #{ Relaciones
@@ -74,9 +76,13 @@ class Item(DeclarativeBase):
         """
         Genera el codigo para el elemento pasado como parametro
         """
-        ##TODO generar codigo en base al codigo de su Tipo de Item
-        return cls.tmpl_codigo.format(id_item=item.id_item,
-                                      id_tipo_item=item.id_tipo_item)
+        tipo = lpm.model.TipoItem.por_id(item.id_tipo_item)
+        siglas = tipo.codigo.split("-")[0]
+        fase = lpm.model.Fase.por_id(tipo.id_fase)
+        return cls.tmpl_codigo.format(siglas=siglas,
+                                      numero_por_tipo=item.numero_por_tipo,
+                                      pos=fase.posicion,
+                                      proy=tipo.id_proyecto)
     
     def aprobar(self): #jorge (falta probar)
         """
@@ -668,31 +674,29 @@ class AtributosDeItems(DeclarativeBase):
     def _get_valor(self):
         """ dependiendo del tipo retorna un valor"""
         #Implementacion Parcial
-        #api = AtributosPorTipoItem.por_id(self.id_atributos_por_tipo_item)
-        #if api.tipo == u"Numérico":
-        #    return int(self._valor)
-        #elif api.tipo == u"Fecha":
-        #    return self._valor
-        #else:
-        #    return self._valor
-        return self._valor
+        api = lpm.model.AtributosPorTipoItem.por_id(self.id_atributos_por_tipo_item)
+        if api.tipo == u"Numérico":
+            return int(self._valor)
+        elif api.tipo == u"Fecha":
+            return self._valor
+        else:
+            return self._valor
     
     def _set_valor(self, valor):
         """ dependiendo del tipo del valor, verifica que sea válido,
          si no lanza una excepción (?) """
         #Implementacion parcial
-        #api = AtributosPorTipoItem.por_id(self.id_atributos_por_tipo_item)
-        #if api.tipo == u"Numérico":
-        #    try:
-        #        self._valor = int(valor)
-        #    except:
-        #        #excepcion?
-        #        return
-        #elif api.tipo == u"Fecha":
-        #    self._valor = valor
-        #else:
-        #    self._valor = valor
-        self._valor = valor
+        api = lpm.model.AtributosPorTipoItem.por_id(self.id_atributos_por_tipo_item)
+        if api.tipo == u"Numérico":
+            try:
+                self._valor = int(valor)
+            except:
+                #excepcion?
+                return
+        elif api.tipo == u"Fecha":
+            self._valor = valor
+        else:
+            self._valor = valor
     
     valor = synonym('_valor', descriptor=property(_get_valor, _set_valor))
     

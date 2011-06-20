@@ -123,6 +123,7 @@ class Fase(DeclarativeBase):
         item.id_tipo_item = id_tipo
         item.numero = self.numero_items
         item.numero_por_tipo = len(tipo.items) + 1
+        item.codigo = Item.generar_codigo(item)
         #su propiedad
         p_item = PropiedadItem()
         p_item.version = 1
@@ -135,10 +136,10 @@ class Fase(DeclarativeBase):
         
         for atr in tipo.atributos:
             a_item = AtributosDeItems()
-            a_item.valor = atr.valor_por_defecto
             a_item.id_atributos_por_tipo_item = atr.\
             id_atributos_por_tipo_item
-            
+            a_item.valor = atr.valor_por_defecto
+                        
             a_por_item = AtributosPorItem()
             a_por_item.atributo = a_item
             p_item.atributos.append(a_por_item)

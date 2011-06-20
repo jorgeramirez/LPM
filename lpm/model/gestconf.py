@@ -32,6 +32,7 @@ from sqlalchemy.orm import relation, backref
 
 from lpm.model import *
 
+
 __all__ = ['LB', 'HistorialLB', 'ItemsPorLB']
 
 class LB(DeclarativeBase):
