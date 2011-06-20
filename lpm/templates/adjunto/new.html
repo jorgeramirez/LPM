@@ -1,0 +1,17 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<xi:include href="esquema.html" />
+<head>
+<title>$page</title>
+</head>
+<body >
+  <div style="height:0px;"> &nbsp; </div>
+  <h2 style="margin-top:1px; padding-left: 60px;">$page</h2>
+  <div style="float:left; padding-left: 95px;" class="crud_add">
+     ${XML(tmpl_context.widget(value=value, action='./'))}
+  </div>
+  <div style="height:0px; clear:both;"> &nbsp; </div>
+</body>
+</html>

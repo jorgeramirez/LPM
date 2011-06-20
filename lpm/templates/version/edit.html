@@ -1,0 +1,46 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<xi:include href="esquema.html" />
+<head>
+<title>$page</title>
+</head>
+<body>
+  <div style="height:0px;"> &nbsp; </div>
+  <h2 style="margin-top:1px; padding-left: 60px;">$page</h2>
+  <div style="float:left; padding-left: 95px;" class="crud_edit">
+    <table cellspacing="0" cellpadding="2" border="0">
+    <tbody>
+        <tr>
+            <td>
+                ${XML(tmpl_context.widget(value=value, action='./'))}
+                
+            </td>
+        </tr>
+        <tr>
+            <td  colspan="2">
+                <h3 style="margin-top:5px;">Atributos</h3>
+                <div id="tabla_atributos" class="crud_table" style="height:65%; width:700px; margin-top: 10px;">
+                    ${XML(tmpl_context.tabla_atributos(value=atributos))}
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <div style="clear:both;"></div>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <h3 style="margin-top:5px;">Atributos</h3>
+                <div id="tabla_relaciones" class="crud_table" style="height:65%; width:700px; margin-top: 10px;">
+                    ${XML(tmpl_context.tabla_relaciones(value=relaciones))} 
+                </div>
+            </td>
+        </tr>
+  </tbody>
+  </table>
+  </div>
+  <div style="height:0px; clear:both;"> &nbsp; </div>
+
+</body>
+</html>

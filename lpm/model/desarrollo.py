@@ -62,6 +62,8 @@ class Item(DeclarativeBase):
     
     #template para codificacion
     tmpl_codigo = u"IT-{id_item}-TI-{id_tipo_item}"
+    estados_posibles = [u"Desaprobado", u"Aprobado", u"Bloqueado", u"Eliminado", 
+                        u"Revisión-Bloq", u"Revisión-Desbloq"]
     #{ Relaciones
     propiedad_item_versiones = relation('PropiedadItem')
     
@@ -72,6 +74,7 @@ class Item(DeclarativeBase):
         """
         Genera el codigo para el elemento pasado como parametro
         """
+        ##TODO generar codigo en base al codigo de su Tipo de Item
         return cls.tmpl_codigo.format(id_item=item.id_item,
                                       id_tipo_item=item.id_tipo_item)
     
@@ -360,13 +363,14 @@ class PropiedadItem(DeclarativeBase):
         relacion.tipo = tipo
         relacion.set_codigo()
         rel_por_item = RelacionPorItem()
-        rel_por_item.relaciones.append(relacion) 
+        #rel_por_item.relaciones.append(relacion)
+        rel_por_item.relacion = relacion
         DBSession.add(relacion)
         
         p_item_ant.relaciones.append(rel_por_item)
         self.relaciones.append(rel_por_item)
         DBSession.add(rel_por_item)
-        #no hace falta agregar p_item_ant verdad?  
+        #no hace falta agregar p_item_ant verdad?
             
     def _detectar_bucle(self):   
         """ 
@@ -520,7 +524,15 @@ class RelacionPorItem(DeclarativeBase):
     revisar = Column(Boolean, nullable=False, default=False)
    
     #{ Relaciones
-    relaciones = relation("Relacion")
+    
+    # Segun la pagina de SqlAlchemy
+    #Many to one places a foreign key in the parent table referencing the 
+    #child. The mapping setup is identical to one-to-many, however SQLAlchemy 
+    #creates the relationship as a scalar attribute on the parent object 
+    #referencing a single instance of the child object.
+    
+    #relaciones = relation("Relacion")
+    relacion = relation("Relacion")
     
     #Métodos de clase
     @classmethod
@@ -721,11 +733,23 @@ class ArchivosPorItem(DeclarativeBase):
     
     #{ Relaciones
     archivo = relation("ArchivosExternos")
-    #} 
-    
+
+    #{ Métodos
     def agregar_archivo(self):
         pass
 
+    @classmethod
+    def por_id(cls, id):
+        """
+        Método de clase que realiza las búsquedas por identificador.
+        
+        @param id: identificador del elemento a recuperar
+        @type id: C{Integer}
+        @return: el elemento recuperado
+        @rtype: L{ArchivosExternos}
+        """
+        return DBSession.query(cls).filter_by(id_archivo_externo=id)
+    #} 
 
 class HistorialItems(DeclarativeBase):
     """
