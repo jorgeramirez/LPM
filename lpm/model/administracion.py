@@ -447,23 +447,23 @@ class TipoItem(DeclarativeBase):
         """
         Genera el codigo para el elemento pasado como parametro
         """
-        #return cls.tmpl_codigo.format(id_tipo_item=ti.id_tipo_item,
-        #                              id_proyecto=ti.id_proyecto)
         words = tipo.nombre.lower().split()
         while words.count("de"):
             words.remove("de")
         siglas = u""
         for w in words:
             siglas += w[0]
-            
+        
+        #comprobar que las siglas sean únicas.
+        query = DBSession.query(TipoItem).filter(TipoItem.codigo.like(siglas + "%"))
+        if query.count():
+            siglas += str(query.count())
+        
         fase = Fase.por_id(tipo.id_fase)
             
         return cls.tmpl_codigo.format(siglas=siglas, id=tipo.id_tipo_item,
                                   pos=fase.posicion, proy=tipo.id_proyecto)
-#        return "-".join([siglas, str(tipo.id_tipo_item), 'proy', 
-#                         str(tipo.id_proyecto)])
-        
-    
+
     def es_o_es_hijo(self, id):
         """Verifica si 
         @param id: es este tipo de item o es hijo de ese tipo de ítem"""
