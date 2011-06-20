@@ -473,7 +473,7 @@ class ItemController(CrudRestController):
         return dict(value=value,
                     page=u"Modificar Ítem",
                     id=str(id_item),
-                    puede_modificar=puede_modificar,
+                    puede_relacionar=puede_modificar,
                     atributos=atributos,
                     relaciones=relaciones
                     )

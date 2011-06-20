@@ -176,7 +176,7 @@ class VersionController(CrudRestController):
                     opciones=self.opciones,
                     url_action=self.tmp_action,
                     comboboxes=self.comboboxes,
-                    atras="../"
+                    atras="../../"
                     )
     
     @without_trailing_slash

@@ -17,7 +17,7 @@ from tg import redirect, request, validate, flash
 from tg.controllers import CUSTOM_CONTENT_TYPE
 
 from lpm.model import (DBSession, ArchivosExternos, ArchivosPorItem, 
-                      Item, TipoItem, Fase, Proyecto)
+                      Item, TipoItem, Fase, Proyecto, PropiedadItem)
 from lpm.lib.sproxcustom import (CustomTableFiller,
                                  CustomPropertySingleSelectField)
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
@@ -162,7 +162,7 @@ class AdjuntoController(CrudRestController):
                     opciones=self.opciones,
                     url_action=self.tmp_action,
                     puede_crear=puede_crear,
-                    atras="../"
+                    atras="../../"
                     )
     
     @without_trailing_slash
