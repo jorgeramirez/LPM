@@ -136,15 +136,7 @@ class ProyectoTableFiller(CustomTableFiller):
                 break
             
         return len(filtrados), filtrados
-        #???
-        if AlgunPermiso(tipo="Tipo").is_met(request.environ):
-            id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-            filtrados = DBSession.query(TipoItem).all()
-            if id_proyecto:
-                proy = Proyecto.por_id(id_proyecto)
-                filtrados = proy.tipos_de_item
-            return len(filtrados), filtrados
-        return 0, []
+
 
 proyecto_table_filler = ProyectoTableFiller(DBSession)
 
@@ -306,7 +298,8 @@ class ProyectoController(CrudRestController):
             
         proy = Proyecto.por_id(id_proyecto)
         proy.iniciar_proyecto()
-        redirect('./')
+        
+        redirect('/proyectos/%d/edit' % id_proyecto)
                 
     @without_trailing_slash
     @paginate('lista_elementos', items_per_page=5)
@@ -402,9 +395,6 @@ class ProyectoController(CrudRestController):
             redirect("/proyectos/%d/edit" % proy.id_proyecto)
         else:
             redirect("/proyectos")
-        
-        
-
 
 
     #@rest.dispatch_on(PUT='put')

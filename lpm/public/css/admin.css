@@ -32,7 +32,7 @@ a.edit_link{
     background-color: #eee;
 }
 .crud_table .grid th{
-    background: url("/images/blank.gif") no-repeat scroll -20px top transparent;
+    background: url("/images/blank.gif") repeat-x scroll -20px top transparent;
     color: #fff;
     font-size: 1.2em;
     font-family:arial, verdana, sans-serif;

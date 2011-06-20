@@ -7,14 +7,13 @@
 <title>$page</title>
 </head>
 <body>
-  <div class="cntmid">
-      <h2 style="margin-top:1px; padding-left: 60px;">$page</h2>
+    <h2 style="margin-top:1px; padding-left: 60px;">$page</h2>
     <div style="padding-left: 95px;">
     <table cellspacing="0" cellpadding="2" border="0">
     <tbody>
         <tr>
             <td>
-                <a py:if="puede_crear" class="link_boton" href="${tg.url(url_action + 'new')}">
+                <a py:if="puede_crear" class="link_boton" href="${tg.url('./new')}">
                     <input id="nuevo_rol" style="margin-bottom:10px;" class="boton" type="button" value="Nuevo"/>
                 </a>
             </td>
@@ -34,6 +33,5 @@
     </tbody>
     </table>  
     </div>
-  </div>
 </body>
 </html>

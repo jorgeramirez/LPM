@@ -517,7 +517,7 @@ class Permiso(DeclarativeBase):
         """
         Método de clase que retorna los permisos de nivel de sistema.
         """
-        return DBSession.query(Permiso).filter(Permiso.tipo == 'Sistema').all()
+        return DBSession.query(Permiso).filter(Permiso.tipo.like("%Sistema%")).all()
 
     @classmethod
     def permisos_proyectos(cls):

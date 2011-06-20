@@ -19,7 +19,7 @@ from lpm.lib.sproxcustom import (CustomTableFiller,
                                  CustomPropertySingleSelectField)
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
 from lpm.lib.util import UrlParser
-
+from lpm.controllers.tipoitem import TipoItemController, TipoItemTableFiller
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, EditFormFiller
 from sprox.fillerbase import EditFormFiller
@@ -43,7 +43,7 @@ class FaseTable(TableBase):
                     'codigo': u'Código'
                   }
     __omit_fields__ = ['items', 'id_proyecto', 'id_fase', 
-                       'numero_lb', 'descripcion', 'roles']
+                       'numero_lb', 'descripcion', 'roles', 'tipos_de_item']
     __default_column_width__ = '15em'
     __column_widths__ = { 'descripcion': "35em", '__actions__': "50em"}
     
@@ -156,7 +156,7 @@ class FaseAddForm(AddRecordForm):
     __model__ = Fase
     __omit_fields__ = ['id_fase', 'numero_items', 'numero_lb',
                        'estado', 'id_proyecto', 'codigo', 'items',
-                       'roles']
+                       'roles', 'tipos_de_item']
     posicion = PosicionField("posicion", accion="new")
 
 fase_add_form = FaseAddForm(DBSession)
@@ -165,7 +165,8 @@ fase_add_form = FaseAddForm(DBSession)
 class FaseEditForm(EditableForm):
     __model__ = Fase
     __hide_fields__ = ['id_fase', 'numero_items', 'numero_lb',
-                       'estado', 'codigo', 'id_proyecto', 'items']
+                       'estado', 'codigo', 'id_proyecto', 'items',
+                       'roles', 'tipos_de_item']
     posicion = PosicionField("posicion", accion="edit")
 
 fase_edit_form = FaseEditForm(DBSession)
@@ -189,6 +190,9 @@ class FaseController(CrudRestController):
     tmp_from_proyecto_action = "/proyectos/%d/fases/buscar"
     tmp_from_proyecto_titulo = "Fases de proyecto: %s"
     tmp_action = "./"
+    
+    #Subcontrolador
+    tipositems = TipoItemController(DBSession)
     
     #{ Modificadores
 
@@ -363,10 +367,10 @@ class FaseController(CrudRestController):
             del kw["sprox_id"]
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
         id_fase = UrlParser.parse_id(request.url, "fases")
-        transaction.begin()
+
         if id_proyecto:
             proy = Proyecto.por_id(id_proyecto)
             proy.modificar_fase(id_fase, **kw)
-        transaction.commit()
+
         redirect("../")
     #}

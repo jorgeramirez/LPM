@@ -35,6 +35,7 @@ from tw.forms.fields import (PasswordField, TextField, TextArea, Button,
 
 from repoze.what.predicates import not_anonymous
 
+from sqlalchemy import or_, and_
 from tg import tmpl_context, request
 
 import transaction
@@ -46,7 +47,8 @@ class TipoItemTable(TableBase):
                    'proyecto' : u"Proyecto"
                   }
     __omit_fields__ = ['id_tipo_item', 'id_proyecto', 'id_padre',
-                       'hijos', 'atributos', 'items', 'descripcion']
+                       'hijos', 'atributos', 'items', 'descripcion',
+                       'roles', 'id_fase']
     __default_column_width__ = '15em'
     __column_widths__ = {'codigo': "35em",
                          '__actions__' : "50em"
@@ -58,20 +60,26 @@ tipo_item_table = TipoItemTable(DBSession)
 class TipoItemTableFiller(CustomTableFiller):
     __model__ = TipoItem
     __omit_fields__ = ['id_tipo_item', 'id_proyecto', 'id_padre',
-                       'hijos', 'atributos', 'items']
+                       'hijos', 'atributos', 'items', 'roles']
    
     def __actions__(self, obj):
         """Links de acciones para un registro dado"""
         value = '<div>'
         clase = 'actions'
-        url_cont = "/tipositems/"
-        id = str(obj.id_tipo_item)
-        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        if id_proyecto:
-            url_cont = "/proyectos/%d/tipositems/" % id_proyecto
+#        url_cont = "/tipositems/"
+        url_cont = "./tipositems/" + str(obj.id_tipo_item)
+        
+        #si está en la tabla que está en edit proyecto necesita esta parte del url
+        if (UrlParser.parse_nombre(request.url, "tipositems")):
+            url_cont =  str(obj.id_tipo_item)
+            
+#        id = str(obj.id_tipo_item)
+#        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+#        if id_proyecto:
+#            url_cont = "/proyectos/%d/tipositems/" % id_proyecto
         if PoseePermiso('redefinir tipo item').is_met(request.environ):
             value += '<div>' + \
-                        '<a href="' + url_cont + id +'/edit" ' + \
+                        '<a href="./' + url_cont + '/edit" ' + \
                         'class="' + clase + '">Modificar</a>' + \
                      '</div><br />'
         if obj.puede_eliminarse():
@@ -82,7 +90,7 @@ class TipoItemTableFiller(CustomTableFiller):
                 #         'style="background-color: transparent; float:left; border:0; color: #286571;'+\
                 #         'display: inline; margin: 0; padding: 0;" class="' + clase + '"/>'+\
                 #         '</form></div><br />'
-                value += '<div><form method="POST" action="' + id + '" class="button-to">'+\
+                value += '<div><form method="POST" action="' + url_cont + '" class="button-to">'+\
                          '<input type="hidden" name="_method" value="DELETE" />' +\
                          '<input onclick="return confirm(\'Está seguro?\');" value="Eliminar" type="submit" '+\
                          'style="background-color: transparent; float:left; border:0; color: #286571;'+\
@@ -90,25 +98,50 @@ class TipoItemTableFiller(CustomTableFiller):
                          '</form></div><br />'
         if PoseePermiso('redefinir tipo item').is_met(request.environ):
             value += '<div>' + \
-                        '<a href="' + url_cont + id + '/atributostipoitem/new" ' + \
+                        '<a href="' + url_cont + '/atributostipoitem/new" ' + \
                         'class="' + clase + '">Agregar Atributo</a>' + \
                      '</div><br />'
         value += '</div>'
         return value
     
-    def _do_get_provider_count_and_objs(self, **kw):
+    def _do_get_provider_count_and_objs(self, id_proyecto=None, id_fase=None, **kw):
         """
         Se muestra la lista de tipos de item si se tienen los permisos
         necesario.
         """
-        if AlgunPermiso(patron="tipo item").is_met(request.environ):
-            id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-            filtrados = DBSession.query(TipoItem).all()
-            if id_proyecto:
-                proy = Proyecto.por_id(id_proyecto)
-                filtrados = proy.tipos_de_item
+        count, lista = super(TipoItemTableFiller, self).\
+                            _do_get_provider_count_and_objs(**kw)
+        filtrados = []                    
+        
+        if (id_fase):
+            id_fase = int(id_fase) #por si las dudas
+            ap = AlgunPermiso(tipo='Tipo', id_fase=id_fase).is_met(request.environ)
+
+            if (ap):
+                for t in lista:
+                    if (t.id_fase == id_fase):
+                        if (AlgunPermiso(tipo='Tipo', id_tipo_item=t.id_tipo_item).is_met(request.environ)):
+                            filtrados.append(t)
+                
             return len(filtrados), filtrados
-        return 0, []
+        
+        if (id_proyecto):
+            id_proyecto = int(id_proyecto)
+            ap = AlgunPermiso(tipo='Tipo', id_proyecto=id_proyecto).is_met(request.environ)
+
+            if (ap):
+                for t in lista:
+                    if (t.id_proyecto == id_proyecto):
+                        if (AlgunPermiso(tipo='Tipo', id_tipo_item=t.id_tipo_item).is_met(request.environ)):
+                            filtrados.append(t)
+                
+            return len(filtrados), filtrados     
+        
+        for t in lista:
+            if (AlgunPermiso(tipo='Tipo', id_tipo_item=t.id_tipo_item).is_met(request.environ)):
+                filtrados.append(t)
+        
+        return len(filtrados), filtrados        
 
 
 tipo_item_table_filler = TipoItemTableFiller(DBSession)
@@ -118,14 +151,27 @@ class TipoPadreField(PropertySingleSelectField):
     """Dropdown list para el tipo padre de un tipo de item"""
     def _my_update_params(self, d, nullable=False):
         options = []
-        options.append((0, "----------"))
-        #Solo tipos del proyecto
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        if id_proyecto:
-            proy = Proyecto.por_id(id_proyecto)
-            for ti in proy.tipos_de_item:
+        id_fase = UrlParser.parse_id(request.url, "fases")
+        if (self.accion == "new"):
+            if (id_fase):
+                tipos = Fase.por_id(id_fase).tipos_de_item
+                
+            elif (id_proyecto):
+                tipos = Proyecto.por_id(id_proyecto).tipos_de_item
+                
+            for ti in tipos:
                 options.append((ti.id_tipo_item, '%s (%s)' % (ti.nombre, 
                                                               ti.codigo)))
+        if (self.accion == "edit"):
+            id_tipo = UrlParser.parse_id(request.url, "tipositems")
+            ti = TipoItem.por_id(id_tipo)
+            padre = TipoItem.por_id(ti.id_padre)
+            if padre:
+                options.append((ti.id_padre, '%s (%s)' % (padre.nombre, 
+                                                          padre.codigo)))
+            else:
+                options.append((ti.id_padre, 'Tipo base'))
         d['options'] = options
         return d
 
@@ -133,16 +179,34 @@ class TipoImportadoField(PropertySingleSelectField):
     """Dropdown list para la lista de tipos a exportar"""
     def _my_update_params(self, d, nullable=False):
         options = []
-        options.append((0, "----------"))
+        options.append((None, '-----------------'))
         #Solo tipos de otros proyectos
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        if id_proyecto:
-            tipos_items = DBSession.query(TipoItem) \
-                                   .filter(TipoItem.id_proyecto != id_proyecto) \
-                                   .all()
+        id_fase = UrlParser.parse_id(request.url, "fases")
+        if (self.accion == "new"):
+            if id_proyecto:
+                #importa de otras fases tambien
+                if (id_fase):
+                    tipos_items = DBSession.query(TipoItem) \
+                                       .filter(or_(TipoItem.id_proyecto != id_proyecto,
+                                                   and_(TipoItem.id_proyecto == id_proyecto,
+                                                        TipoItem.id_fase != id_fase))) \
+                                       .all()
+                else:
+                    tipos_items = DBSession.query(TipoItem) \
+                                       .filter(TipoItem.id_proyecto != id_proyecto) \
+                                       .all()
             for ti in tipos_items:
-                options.append((ti.id_tipo_item, '%s (%s)' % (ti.nombre, 
-                                                              ti.codigo)))
+                #solo si posee algun permiso sobre el tipo de item
+                if (AlgunPermiso(tipo="Tipo", id_tipo_item=ti.id_tipo_item)):
+                    options.append((ti.id_tipo_item, '%s (%s)' % (ti.nombre, 
+                                                                  ti.codigo)))
+#        if (self.accion == "edit"):
+#            id_tipo = UrlParser.parse_id(request.url, "tipositems")
+#            ti = TipoItem.por_id(id_tipo)
+#            options.append((ti.id_tipo_item, '%s (%s)' % (ti.nombre, 
+#                                                          ti.codigo)))
+            
         d['options'] = options
         return d
   
@@ -150,7 +214,7 @@ class TipoImportadoField(PropertySingleSelectField):
 class TipoItemAddForm(AddRecordForm):
     __model__ = TipoItem
     __omit_fields__ = ['id_tipo_item', 'id_proyecto', 'codigo',
-                       'hijos', 'atributos', 'items']
+                       'hijos', 'atributos', 'items', 'roles', 'id_fase']
     __check_if_unique__ = True
     __field_order__ = ['nombre', 'descripcion', 'id_padre', 'id_importado',
                        'mezclar']
@@ -159,8 +223,8 @@ class TipoItemAddForm(AddRecordForm):
                        
                       }
     __require_fields__ = ['nombre', 'id_padre']
-    id_padre = TipoPadreField("id_padre", label_text="Tipo Padre")
-    id_importado = TipoImportadoField("id_importado", label_text="Importar De")
+    id_padre = TipoPadreField("id_padre", accion="new", label_text="Tipo Padre")
+    id_importado = TipoImportadoField("id_importado", accion="new", label_text="Importar De")
     descripcion = TextArea
     mezclar = CheckBox("mezclar", label_text="Mezclar Estructuras")
     
@@ -171,14 +235,16 @@ class TipoItemEditForm(EditableForm):
     __model__ = TipoItem
     __hide_fields__ = ['id_tipo_item']
     __omit_fields__ = ['id_tipo_item', 'id_proyecto', 'codigo', 'hijos', 
-                       'atributos', 'items', 'id_padre']
+                       'atributos', 'items', 'roles', 'id_fase']
     #__check_if_unique__ = True
-    __field_order__ = ['nombre', 'descripcion']
+    __field_order__ = ['nombre', 'descripcion', 'id_padre' ]
     __field_attrs__ = {'descripcion' : {'row': '1'},
                        'nombre': { 'maxlength' : '50'}
                        
                       }
     __require_fields__ = ['nombre']
+    id_padre = TipoPadreField("id_padre", accion="edit", label_text="Tipo Padre")
+   
     descripcion = TextArea
 
 tipo_item_edit_form = TipoItemEditForm(DBSession)
@@ -192,26 +258,13 @@ tipo_item_edit_filler = TipoItemEditFiller(DBSession)
 
 class TipoItemController(CrudRestController):
     """Controlador para tipos de item"""
-    def __init__(self, DBS, id_proyecto=None):
-        self.id_proyecto = id_proyecto
-        class TiProyectoTableFiller(TipoItemTableFiller):
-            def __init__(self, DBS, id_proyecto=None):
-                self.id_proyecto = id_proyecto
-                super(TiProyectoTableFiller, self).__init__(DBS)
-                
-            def _do_get_provider_count_and_objs(self, **kw):
-                tipos = []
-                if self.id_proyecto:
-                    tipos = Proyecto.por_id(self.id_proyecto).tipos_de_item
-                return len(tipos), tipos
-        if id_proyecto:
-            self.table_filler = TiProyectoTableFiller(DBSession, id_proyecto)
-        super(TipoItemController, self).__init__(DBS)
         
     #{ Variables
     title = u"Administrar Tipos de Ítem"
     action = "/tipositems/"
     subaction = "/atributostipoitem/"
+    tmp_from_proyecto_titulo = "Tipos de Ítems de proyecto: %s"
+    tmp_from_fase_titulo = "Tipos de Ítems de fase: %s"
     #subcontroller
     atributostipoitem = AtributosPorTipoItemController(DBSession)
     #{ Plantillas
@@ -220,27 +273,17 @@ class TipoItemController(CrudRestController):
     allow_only = not_anonymous(u"El usuario debe haber iniciado sesión")
     
     #{ Modificadores
-    #class TiProyectoTableFiller(TipoItemTableFiller):
-    #    def __init__(self, DBS, id_proyecto=None):
-    #        self.id_proyecto = id_proyecto
-    #        super(FasesProyectoTableFiller, self).__init(DBS)
-    #        
-    #    def _do_get_provider_count_and_objs(self, **kw):
-    #        tipos = Proyecto.por_id(self.id_proyecto).tipos_de_item
-    #        return len(tipos), tipos 
+
         
     model = TipoItem
     table = tipo_item_table
-
-    #table_filler = TiProyectoTableFiller(DBSession, self.id_proyecto)
     table_filler = tipo_item_table_filler
     new_form = tipo_item_add_form
     edit_form = tipo_item_edit_form
     edit_filler = tipo_item_edit_filler
 
     #para el form de busqueda
-    #columnas = dict(codigo="texto", nombre="texto")
-    #tipo_opciones = []
+
     opciones = dict(codigo= u'Código',
                     nombre= u'Nombre'
                     )
@@ -260,20 +303,30 @@ class TipoItemController(CrudRestController):
         Retorna una página HTML si no se especifica JSON
         """
         puede_crear = False
-        if request.response_type == 'application/json':
-            return self.table_filler.get_value(**kw)
-        if not getattr(self.table.__class__, '__retrieves_own_value__', False):
-            tipo_items = self.table_filler.get_value(**kw)
-        else:
-            tipo_items = []
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        id_fase = UrlParser.parse_id(request.url, "fases")
+        titulo = self.title
+      
+        if(id_proyecto):#significa que se está en el controlador que está en proyectos
+            
+            puede_crear = PoseePermiso("crear tipo item").is_met(request.environ)
+            proy = Proyecto.por_id(id_proyecto)
+            if (id_fase):
+                fase = Fase.por_id(id_fase)
+                titulo = self.tmp_from_fase_titulo % fase.nombre
+        
+            
+        tipo_items = self.table_filler.get_value(id_proyecto=id_proyecto, id_fase=id_fase, **kw)
+
         tmpl_context.widget = self.table
         url_action = self.action
         atras = '/'
-        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        if id_proyecto:
-            url_action = '/proyectos/%d/tipositems/' % id_proyecto
-            atras = url_action
-            puede_crear = PoseePermiso("crear tipo item").is_met(request.environ)
+        
+#        if id_proyecto:
+#            url_action = '/proyectos/%d/tipositems/' % id_proyecto
+#            atras = url_action
+#            puede_crear = PoseePermiso("crear tipo item").is_met(request.environ)
+            
         return dict(lista_elementos=tipo_items,
                     page=self.title, titulo=self.title, 
                     modelo=self.model.__name__, 
@@ -281,7 +334,8 @@ class TipoItemController(CrudRestController):
                     opciones=self.opciones, 
                     url_action=url_action,
                     puede_crear=puede_crear,
-                    atras=atras)
+                    atras=atras
+                    )
 
     @expose('lpm.templates.tipoitem.edit')
     def edit(self, *args, **kw):
@@ -309,20 +363,32 @@ class TipoItemController(CrudRestController):
                     atras=url_action, 
                     url_action=url_action,
                     id=str(id_tipo), 
-                    url_subaction=self.subaction)
+                    url_subaction=self.subaction,
+                    puede_asignar_rol=True,
+                    puede_crear_rol=True
+                    )
 
     @without_trailing_slash
     @expose('lpm.templates.tipoitem.new')
     def new(self, *args, **kw):
         """Despliega una pagina para crear un tipo_item"""
-        url_action = self.action
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        id_fase = UrlParser.parse_id(request.url, "proyectos")
+        if(not id_proyecto):
+            redirect("./")
+            
+        url_action = self.action
+        
         if id_proyecto:
             url_action = '/proyectos/%d/tipositems/' % id_proyecto
+            if id_fase:
+                url_action = '/proyectos/%d/fases/%d/tipositems/' % (id_proyecto, id_fase)
+                
         pp = PoseePermiso('crear tipo item')
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
-            redirect(url_action)
+            redirect("./")
+            
         tmpl_context.widget = self.new_form
         return dict(value=kw, page=u"Nuevo Tipo de Ítem", 
                     action=url_action, atras=url_action)
@@ -334,23 +400,30 @@ class TipoItemController(CrudRestController):
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
         if not id_proyecto:
             return
+        
         url_action = '/proyectos/%d/tipositems/' % id_proyecto
         pp = PoseePermiso('crear tipo item')
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect(url_action)
+            
         if kw.has_key("sprox_id"):
             del kw["sprox_id"]
+            
         id_padre = int(kw["id_padre"])
-        id_importado = int(kw["id_importado"])
+        id_importado = kw["id_importado"]
+        
+        if (kw["id_importado"]):
+            id_importado = int(kw["id_importado"])
+            
         mezclar = kw["mezclar"]
         del kw["mezclar"]
         del kw["id_padre"]
         del kw["id_importado"]
-        transaction.begin()
+        
         proy = Proyecto.por_id(id_proyecto)
         proy.definir_tipo_item(id_padre, id_importado, mezclar, **kw)
-        transaction.commit()
+
         redirect(url_action)
         
     @validate(tipo_item_edit_form, error_handler=edit)
@@ -366,41 +439,58 @@ class TipoItemController(CrudRestController):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect(url_action)
         id_tipo = UrlParser.parse_id(request.url, "tipositems")
-        transaction.begin()
+
         tipo = TipoItem.por_id(id_tipo)
         if kw["nombre"] != tipo.nombre:
             if TipoItem.por_nombre(kw["nombre"]):
+                flash("Ya existe un tipo en esta fase con ese nombre", "warning")
                 return
+            
         tipo.nombre = unicode(kw["nombre"])
         tipo.descripcion = unicode(kw["descripcion"])
-        transaction.commit()
-        redirect(url_action)
 
+        redirect(url_action)
+    
+    
+    def get_one(self, *args, **kw):
+        pass
+    
     @with_trailing_slash
     @paginate('lista_elementos', items_per_page=5)
     @expose('lpm.templates.tipoitem.get_all')
     @expose('json')
     def post_buscar(self, *args, **kw):
-        url_action = self.action
-        atras = '/'
-        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
         puede_crear = False
-        if id_proyecto:
-            url_action = '/proyectos/%d/tipositems/' % id_proyecto
-            atras = url_action
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        id_fase = UrlParser.parse_id(request.url, "fases")
+        titulo = self.title
+      
+        if(id_proyecto):#significa que se está en el controlador que está en proyectos
+            
             puede_crear = PoseePermiso("crear tipo item").is_met(request.environ)
+            proy = Proyecto.por_id(id_proyecto)
+            if (id_fase):
+                fase = Fase.por_id(id_fase)
+                titulo = self.tmp_from_fase_titulo % fase.nombre
+        
+        
         tmpl_context.widget = self.table
+        
         buscar_table_filler = self.table_filler.__class__(DBSession)
         buscar_table_filler.filtros = kw
-        tipos_items = buscar_table_filler.get_value()
+        tipos_items = buscar_table_filler.get_value(id_proyecto=id_proyecto, id_fase=id_fase)
+        
+        atras = "./"
+        
         return  dict(lista_elementos=tipos_items, 
                      page=self.title, titulo=self.title,
                      modelo=self.model.__name__, 
                      columnas=self.columnas,
                      opciones=self.opciones, 
-                     url_action=url_action,
+                     url_action=self.action,
                      puede_crear=puede_crear,
-                     atras=atras)
+                     atras=atras
+                     )
 
     @expose()
     def post_delete(self, *args, **kw):
@@ -408,7 +498,7 @@ class TipoItemController(CrudRestController):
         atras = '/'
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
         id_tipo = int(args[0])
-        transaction.begin()
+
         if id_proyecto:
             atras = '/proyectos/%d/tipositems/' % id_proyecto
             proy = Proyecto.por_id(id_proyecto)
@@ -416,6 +506,6 @@ class TipoItemController(CrudRestController):
         else:
             tipo = TipoItem.por_id(id_tipo)
             DBSession.delete(tipo)
-        transaction.commit()
+
         redirect(atras)
     #}

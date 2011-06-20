@@ -94,11 +94,17 @@ class AtributosPorTipoItemTableFiller(CustomTableFiller):
         Se muestra la lista de atributos del tipo de ítem 
         si se tiene un permiso necesario.
         """
-        if AlgunPermiso(patron="tipo item").is_met(request.environ):
+        if AlgunPermiso(tipo="Tipo").is_met(request.environ):
             id_tipo = UrlParser.parse_id(request.url, "tipositems")
-            query = DBSession.query(AtributosPorTipoItem) \
-                         .filter_by(id_tipo_item=id_tipo)
-            return query.count(), query.all()
+            ti = TipoItem.por_id(id_tipo)
+            lista = ti.atributos
+            actual = ti.id_padre
+            while (actual):
+                papa = TipoItem.por_id(actual)
+                lista.extend(papa.atributos)
+                actual = papa.id_padre
+
+            return len(lista), lista
         return 0, []
 
 atributos_por_tipo_item_table_filler = AtributosPorTipoItemTableFiller(DBSession)
@@ -220,23 +226,23 @@ class AtributosPorTipoItemController(CrudRestController):
     @validate(atributos_por_tipo_item_add_form, error_handler=new)
     @expose()
     def post(self, *args, **kw):
-        print kw
         """create a new record"""
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
         id_tipo = UrlParser.parse_id(request.url, "tipositems")
         atras = self.parent_action + str(id_tipo) + '/edit'
         if id_proyecto:
             atras = "/proyectos/" + str(id_proyecto) + atras
+            
         pp = PoseePermiso('redefinir tipo item')
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect(atras)
         if kw.has_key("sprox_id"):
             del kw["sprox_id"]
-        transaction.begin()
+
         tipo = TipoItem.por_id(id_tipo)
         tipo.agregar_atributo(**kw)
-        transaction.commit()
+
         redirect(atras)
         
     @validate(atributos_por_tipo_item_edit_form, error_handler=edit)

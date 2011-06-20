@@ -61,8 +61,8 @@
         <tr>
             <div style="clear:both;"></div>
         </tr>
-        <tr colspan="2">
-            <td>
+        <tr>
+            <td  colspan="2">
                 <a py:if="puede_crear_ti" class="link_boton" href="${tg.url('./tipositems/new')}">
                     <input id="nuevo_ti" class="boton" type="button" value="Nuevo Tipo de Ítem" style="margin-top: 10px; width: 160px;"/>
                 </a>
@@ -71,8 +71,8 @@
         <tr>
             <div style="clear:both;"></div>
         </tr>
-        <tr  colspan="2">
-            <td>
+        <tr>
+            <td  colspan="2">
                 <div py:if="iniciado" id="tabla_ti" style="margin-top: 10px;">
 	                <div class="crud_table" style="height:65%; width:700px; margin-top: 5px;">
 	                    ${XML(tmpl_context.tabla_ti(value=tipo_items))} 
