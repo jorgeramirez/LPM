@@ -239,11 +239,13 @@ class VersionController(CrudRestController):
         atributos = self.atributos.table_filler.get_value(id_version=id)        
         tmpl_context.tabla_relaciones = self.relaciones.table
         relaciones = self.relaciones.table_filler.get_value(id_version=id)
+        atras = "../"
         return dict(value=value,
                     page=page,
                     id=str(id_item),
                     atributos=atributos,
-                    relaciones=relaciones
+                    relaciones=relaciones,
+                    atras=atras
                     )
         
     @expose()

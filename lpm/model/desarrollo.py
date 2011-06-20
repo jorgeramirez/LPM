@@ -210,7 +210,7 @@ class Item(DeclarativeBase):
         DBSession.flush()
         self.id_propiedad_item = p_item_revivido.id_propiedad_item
     
-    def modificar(self, id_usuario, dict): #jorge
+    def modificar(self, id_usuario, **kw): #jorge
         """ 
         Modifica los valores de la propiedad del ítem.
         
@@ -231,8 +231,8 @@ class Item(DeclarativeBase):
         p_item_mod.estado = u"Desaprobado"
         for attr in ["prioridad", "complejidad"]:
             valor = getattr(p_item, attr)
-            setattr(p_item_mod, attr, dict[attr])
-            if valor != dict[attr]:
+            setattr(p_item_mod, attr, kw[attr])
+            if valor != kw[attr]:
                 hist_items = HistorialItems()
                 hist_items.tipo_modificacion = u"Modificado " + attr
                 hist_items.usuario = Usuario.por_id(id_usuario)

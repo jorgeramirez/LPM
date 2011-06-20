@@ -14,7 +14,8 @@ from tg.decorators import (paginate, expose, with_trailing_slash,
                            without_trailing_slash)
 from tg import redirect, request, validate, flash
 
-from lpm.model import DBSession, Item, TipoItem, Fase, PropiedadItem
+from lpm.model import DBSession, Item, TipoItem, Fase, PropiedadItem, Usuario
+from lpm.model.excepciones import *
 from lpm.lib.sproxcustom import (CustomTableFiller,
                                  CustomPropertySingleSelectField)
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
@@ -237,11 +238,10 @@ item_add_form = ItemAddForm(DBSession)
 
 class ItemEditForm(EditableForm):
     __model__ = Item
-    __hide_fields__ = ['id_item', 'numero', 'numero_por_tipo', 'id_fase'
-                       'id_propiedad_item', 'propiedad_item_versiones',
-                       'codigo', 'id_tipo_item']
+    __hide_fields__ = ['id_item', 'codigo', 'numero', 'numero_por_tipo', 
+                       'id_tipo_item', 'id_fase', 'id_propiedad_item', 
+                       'propiedad_item_versiones']
     __add_fields__ = {"complejidad": None, "prioridad": None}
-    id_tipo_item = TipoItemField("id_tipo_item", label_text=u"Tipo de Ítem")
     complejidad = ComplejidadPrioridadField("complejidad", 
                                             label_text="Complejidad")
     prioridad = ComplejidadPrioridadField("prioridad", 
@@ -253,7 +253,7 @@ item_edit_form = ItemEditForm(DBSession)
 class ItemEditFiller(EditFormFiller):
     __model__ = Item
     __add_fields__ = {"complejidad": None, "prioridad": None}
-    
+
     def complejidad(self, obj, **kw):
         p_item = PropiedadItem.por_id(obj.id_propiedad_item)
         return p_item.complejidad
@@ -486,13 +486,24 @@ class ItemController(CrudRestController):
     @validate(item_edit_form, error_handler=edit)
     @expose()
     def put(self, *args, **kw):
-        """update"""
+        """Actualiza un item. Especificamente su prioridad o complejidad"""
         if "sprox_id" in kw:
             del kw["sprox_id"]
+        kw["complejidad"] = int(kw["complejidad"])
+        kw["prioridad"] = int(kw["prioridad"])
+        atras = "../"
         id_item = UrlParser.parse_id(request.url, "items")
-        id_fase = UrlParser.parse_id(request.url, "fases")
-        #TODO
-        redirect("../")
+        if UrlParser.parse_nombre(request.url, "fases"):
+            atras = "../../edit"
+        item = Item.por_id(id_item)
+        user_name = request.credentials["repoze.what.userid"]
+        user = Usuario.by_user_name(user_name)
+        try:
+            item.modificar(user.id_usuario, **kw)
+        except ModificarItemError, err:
+            #manejar excepcion
+            redirect(atras)
+        redirect(atras)
     
     @expose('lpm.templates.item.relaciones')
     def relacionar_item(self, *args, **kw):
