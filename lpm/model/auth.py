@@ -222,8 +222,11 @@ class Rol(DeclarativeBase):
             if kw.has_key(k):
                 kw[k] = int(kw[k])
         rol_new = Rol(**kw)
-        for i, pk in enumerate(pks):
-            pks[i] = int(pk)
+        if type(pks).__name__ == 'list':
+            for i, pk in enumerate(pks):
+                pks[i] = int(pk)
+        else:
+            pks = [int(pks)]
         permisos = DBSession.query(Permiso).filter( \
                                             Permiso.id_permiso.in_(pks)).all()
         if not permisos:
@@ -309,8 +312,11 @@ class Rol(DeclarativeBase):
         if "sprox_id" in kw:
             del kw["sprox_id"]
         pks = kw["permisos"]
-        for i, pk in enumerate(pks):
-            pks[i] = int(pk)
+        if type(pks).__name__ == 'list':
+            for i, pk in enumerate(pks):
+                pks[i] = int(pk)
+        else:
+            pks = [int(pks)]
         del kw["permisos"]
         for k in ["id_proyecto", "id_fase", "id_tipo_item"]:
             if kw.has_key(k):

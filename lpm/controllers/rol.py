@@ -71,18 +71,30 @@ class RolTableFiller(CustomTableFiller):
         clase = 'actions'
         url_cont = ""
         contexto = ""
+#        if (obj.tipo == "Sistema"):
+#            url_cont = "/roles/"
+#        elif (obj.tipo.find(u"Plantilla") >= 0):
+#            url_cont = "/rolesplantilla/"
+#            if (obj.tipo.find(u"proyecto") > 0):
+#                contexto = "proyecto"
+#            elif (obj.tipo.find(u"fase") > 0):
+#                contexto = "fase"
+#            else:
+#                contexto = "ti"
+#       else:
+#            url_cont = "/rolescontexto/"
+
         if (obj.tipo == "Sistema"):
             url_cont = "/roles/"
-        elif (obj.tipo.find(u"Plantilla") >= 0):
+        else:
             url_cont = "/rolesplantilla/"
-            if (obj.tipo.find(u"proyecto") > 0):
+            tipo = obj.tipo.lower()
+            if (tipo.find(u"proyecto") >= 0):
                 contexto = "proyecto"
-            elif (obj.tipo.find(u"fase") > 0):
+            elif (tipo.find(u"fase") >= 0):
                 contexto = "fase"
             else:
                 contexto = "ti"
-        else:
-            url_cont = "/rolescontexto/"
             
         if PoseePermiso('modificar rol').is_met(request.environ):
             value += '<div>' + \
@@ -605,6 +617,11 @@ class RolPlantillaController(RolController):
         page="Editar Rol Plantilla de {contexto}".format(contexto=kw['contexto'])
         
         value = self.edit_filler.get_value(values={'id_rol': int(id)})
+        
+        #agregado
+        if value["tipo"].find("Plantilla") < 0:
+            page="Editar Rol de {contexto}".format(contexto=kw['contexto'])
+            
 #        value['_method'] = 'PUT'#?
 
         if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/":
