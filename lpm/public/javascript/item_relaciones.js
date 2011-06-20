@@ -32,8 +32,8 @@ $(function(){
         return false;
     });
 
-    $("#form_fase_siguiente").submit(function(){
-        var asig_pks = $("#tabla_item_fase_siguiente :checkbox").filter(":checked");
+    $("#form_fase_actual").submit(function(){
+        var asig_pks = $("#tabla_item_fase_actual :checkbox").filter(":checked");
         var asig_kw = new Object();
 
         $(asig_pks).each(function(n){
@@ -50,8 +50,8 @@ $(function(){
                 var responseText = jqXHR.responseText;
                 var tbl_html = jQuery("<div>")
                                .append(responseText.replace(rscript, ""))
-                               .find("#tabla_item_fase_siguiente");
-                $("#tabla_item_fase_siguiente").html(tbl_html);
+                               .find("#tabla_item_fase_actual");
+                $("#tabla_item_fase_actual").html(tbl_html);
             }
         });
         return false;
