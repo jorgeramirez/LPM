@@ -15,7 +15,7 @@ from tg.decorators import (paginate, expose, with_trailing_slash,
                            without_trailing_slash)
 from tg import redirect, request, validate, flash
 
-from lpm.model import DBSession, PropiedadItem, Item, TipoItem, Fase, Proyecto
+from lpm.model import (DBSession, PropiedadItem, Item, TipoItem, Usuario)
 from lpm.lib.sproxcustom import (CustomTableFiller,
                                  CustomPropertySingleSelectField)
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
@@ -94,7 +94,7 @@ class VersionTableFiller(CustomTableFiller):
         if id_item:
             id_item = int(id_item)
             item = Item.por_id(id_item)
-            for p_item in item.propiedad_item_versiones:
+            for p_item in reversed(item.propiedad_item_versiones):
                 if p_item in lista:
                     filtrados.append(p_item)
         return len(filtrados), filtrados
@@ -251,4 +251,18 @@ class VersionController(CrudRestController):
     @expose()
     def put(self, *args, **kw):
         pass
+
+    @expose()
+    def revertir(self, *args, **kw):
+        """
+        Revierte el ítem en cuestion a la version indicada.
+        """
+        id_item = UrlParser.parse_id(request.url, "items")
+        id_version = int(args[0])
+        if not id_item:
+            redirect("../")
+        item = Item.por_id(id_item)
+        user = Usuario.by_user_name(request.credentials["repoze.what.userid"])
+        item.revertir(id_version, user)
+        redirect("../")
     #}

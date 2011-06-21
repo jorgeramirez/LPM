@@ -96,25 +96,23 @@ class Item(DeclarativeBase):
             aprobación del ítem
         """
         p_item = PropiedadItem.por_id(self.id_propiedad_item)
-        fase = Fase.por_id(self.id_fase)
+        fase = lpm.model.Fase.por_id(self.id_fase)
         anteriores_count = DBSession.query(Relacion).filter_by( \
             id_posterior=self.id_item).count()
         
         if fase.posicion > 1 and anteriores_count == 0:
-            raise CondicionAprobarError( \
-                u"El ítem debe tener al menos un antecesor o padre")
+            raise CondicionAprobarError(u"El ítem debe tener al menos un antecesor o padre")
                         
         for rpi in p_item.relaciones:
             if rpi.relacion.id_anterior == self.id_item: 
                 continue
             item_ant = Item.por_id(rpi.relacion.id_anterior)
             p_item_ant = PropiedadItem.por_id(item_ant.id_propiedad_item)
-            iplb = ItemsPorLB.filter_by_id_item(p_item_ant.id_propiedad_item)
-            lb = LB.por_id(iplb.id_lb)
+            iplb = lpm.model.ItemsPorLB.filter_by_id_item(p_item_ant.id_propiedad_item)
+            lb = lpm.model.LB.por_id(iplb.id_lb)
             if lb.estado != u"Cerrada":
-                raise CondicionAprobarError( \
-                    "Todos los antecesores y padres " + 
-                    "deben estar en una LB cerrada")
+                raise CondicionAprobarError(u"Todos los antecesores y padres " + \
+                                            "deben estar en una LB cerrada")
         
         if p_item.estado == u"Desaprobado":
             for rpi in p_item.relaciones:
@@ -138,8 +136,8 @@ class Item(DeclarativeBase):
         elif p_item.estado == u"Revision-Desbloq":
             p_item.estado = u"Desaprobado"
 
-            iplb = ItemsPorLB.filter_by_id_item(p_item.id_propiedad_item)
-            lb = Lb.por_id(iplb.id_lb)
+            iplb = lpm.model.ItemsPorLB.filter_by_id_item(p_item.id_propiedad_item)
+            lb = lpm.model.Lb.por_id(iplb.id_lb)
             lb.romper()
         else:
             raise DesAprobarItemError()
@@ -185,8 +183,9 @@ class Item(DeclarativeBase):
         Elimina un ítem
         """
         p_item = PropiedadItem.por_id(self.id_propiedad_item)
+        if p_item.estado in [u"Bloqueado", u"Eliminado", u"Revisión-Bloq"]:
+            raise EliminarItemError()
         p_item.estado = u"Eliminado"
-        DBSession.add(p_item)
     
     def revivir(self):
         """
@@ -202,8 +201,8 @@ class Item(DeclarativeBase):
         p_item_revivido.version = p_item.version + 1
         p_item_revivido.complejidad = p_item.complejidad
         p_item_revivido.prioridad = p_item.prioridad
-        p_item_revivido.atributos = list(p_item.atributos)
-        p_item_revivido.archivos = list(p_item.archivos)
+        p_item_revivido.incorporar_atributos(p_item.atributos)
+        p_item_revivido.incorporar_archivos(p_item.archivos)
         p_item_revivido.estado = u"Desaprobado"
         self.propiedad_item_versiones.append(p_item_revivido)
         DBSession.add(p_item_revivido)
@@ -250,7 +249,7 @@ class Item(DeclarativeBase):
         """ ayuda a modificar() """
         pass
     
-    def revertir(self, version): #jorge, falta probar
+    def revertir(self, id_version, usuario): #jorge, falta probar
         """
         Modifica el Ítem a una versión específica.
         
@@ -262,11 +261,11 @@ class Item(DeclarativeBase):
         se tenían con ítems que al momento de la reversión están en 
         estado "Eliminado"
         
-        @param version: la versión a la que se desea volver
-        @type version: C{Integer}
+        @param id_version: identificador de la versión a la que se desea volver
+        @type id_version: C{Integer}
         """
         p_item_actual = PropiedadItem.por_id(self.id_propiedad_item)
-        p_item_version = PropiedadItem.por_id_version(self.id_item, version)
+        p_item_version = PropiedadItem.por_id(id_version)
         p_item_nuevo = PropiedadItem()
         p_item_nuevo.version = p_item_actual.version + 1
         p_item_nuevo.estado = u"Desaprobado"
@@ -274,12 +273,14 @@ class Item(DeclarativeBase):
         p_item_nuevo.complejidad = p_item_version.complejidad
         p_item_nuevo.incorporar_archivos(p_item_version.archivos)
         if len(p_item_version.atributos) < len(p_item_actual.atributos):
-            tipo_item = TipoItem.por_id(self.id_tipo_item)
+            tipo_item = lpm.model.TipoItem.por_id(self.id_tipo_item)
             for attr_por_tipo in tipo_item.atributos:
                 attr_por_item = AtributosPorItem()
                 attr_de_item = p_item_version.obtener_atributo(attr_por_tipo)
                 if not attr_de_item:
                     attr_de_item = AtributosDeItems()
+                    attr_de_item.id_atributos_por_tipo_item = attr_por_tipo. \
+                                                  id_atributos_por_tipo_item
                     attr_de_item.valor = attr_por_tipo.valor_por_defecto
                 attr_por_item.atributo = attr_de_item
                 p_item_nuevo.atributos.append(attr_por_item)
@@ -299,8 +300,9 @@ class Item(DeclarativeBase):
         hist_items = HistorialItems()
         hist_items.tipo_modificacion = u"Reversión De: %d A: %d" % \
             (p_item_actual.version, p_item_version.version)
-        hist_items.usuario = Usuario.por_id(id_usuario)
+        hist_items.usuario = usuario
         hist_items.item = p_item_nuevo
+        self.propiedad_item_versiones.append(p_item_nuevo)
         DBSession.add_all([p_item_nuevo, hist_items])
         DBSession.flush()
         self.id_propiedad_item = p_item_nuevo.id_propiedad_item

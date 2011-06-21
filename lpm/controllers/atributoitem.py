@@ -300,6 +300,6 @@ class AtributoItemController(CrudRestController):
             try:
                 p_item.modificar_atributo(user, id, valor)
             except ModificarItemError, err:
-                pass #TODO
+                flash(unicode(err), 'warning')
         redirect("../")
     #}

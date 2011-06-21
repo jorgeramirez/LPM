@@ -16,7 +16,7 @@ __all__ = [
     'ModelError', 'NombreDeAtributoError', 'NombreFaseError',
     'NombreTipoItemError', 'TipoAtributoError', 'CondicionAprobarError',
     'BloquearItemError', 'DesBloquearItemError', 'DesAprobarItemError',
-    'ModificarItemError'
+    'ModificarItemError', 'EliminarItemError'
 ]
 
 
@@ -47,7 +47,7 @@ class RelacionError(ModelError):
         self.msg = msg
     
     def __str__(self):
-        return "Error: %s" % self.msg
+        return u"Error: %s" % self.msg
 
 class NombreTipoItemError(ModelError):
     def __str__(self):
@@ -77,7 +77,7 @@ class CondicionAprobarError(ModelError):
         self.msg = msg
     
     def __str__(self):
-        return "Error: %s" % self.msg
+        return u"Error: %s" % self.msg
 
 
 class BloquearItemError(ModelError):
@@ -112,7 +112,7 @@ class ModificarItemError(ModelError):
     """
     def __str__(self):
         return u"Error: No puede modificar un ítem en estado " + \
-            "Bloqueado, Revision-Bloq o Eliminado"
+               u"Bloqueado, Revision-Bloq o Eliminado"
 
 class RevivirItemError(ModelError):
     """
@@ -121,3 +121,12 @@ class RevivirItemError(ModelError):
     """
     def __str__(self):
         return u"Error: Para revivir un ítem, el mismo debio haber sido eliminado"
+
+
+class EliminarItemError(ModelError):
+    """
+    Excepcion lanzada cuando se intenta eliminar un L{Item}
+    con estado igual a "Bloqueado", "Revision-Bloq" o "Eliminado"
+    """
+    def __str__(self):
+        return u"Error: No puede eliminar un ítem en estado Bloqueado, Revision-Bloq o Eliminado"

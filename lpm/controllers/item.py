@@ -58,8 +58,8 @@ class ItemTable(TableBase):
                        'id_fase']
     __default_column_width__ = '15em'
     __column_widths__ = { '__actions__': "50em"}
-    __field_order__ = ["codigo", "complejidad", "codigo_tipo",
-                       "version_actual", "estado", "codigo_fase"]
+    __field_order__ = ["codigo", "version_actual", "complejidad", 
+                       "codigo_tipo", "estado", "codigo_fase"]
     
 item_table = ItemTable(DBSession)
 
@@ -143,16 +143,12 @@ class ItemTableFiller(CustomTableFiller):
                          'style="background-color: transparent; float:left; border:0; color: #286571; display: inline;'+\
                          'margin: 0; padding: 0;' + clase + '"/>'+\
                          '</form></div><br />'
-            elif revivir:
-                value += '<div>' + \
-                            '<a href="./'+ controller + '/revivir' +'" ' + \
-                            'class="' + clase + '">Revivir</a>' + \
-                         '</div><br />'
         
         if controller.isalnum():
             controller = './'
         else:
             controller = './items/'
+            
         if PoseePermiso('aprobar-desaprobar item', 
                         id_fase=obj.id_fase).is_met(request.environ):
             if aprobar:
@@ -170,6 +166,14 @@ class ItemTableFiller(CustomTableFiller):
                 value += '<div>' + \
                             '<a href="' + controller + 'calcular_impacto/' +str(obj.id_item) +'" ' + \
                             'class="' + clase + '">Calcular Impacto</a>' + \
+                         '</div><br />'
+
+        if PoseePermiso('eliminar-revivir item', 
+                        id_fase=obj.id_fase).is_met(request.environ):
+            if revivir:
+                value += '<div>' + \
+                            '<a href="' + controller + 'revivir/' +str(obj.id_item) +'" ' + \
+                            'class="' + clase + '">Revivir</a>' + \
                          '</div><br />'
         value += '</div>'
         return value
@@ -438,14 +442,15 @@ class ItemController(CrudRestController):
                     atras='./')
     
     @expose()
-    def post_delete(self, id):
-        """Elimina una fase de la bd si el proyecto no está iniciado"""
-        item = Item.por_id(id)
-        #TODO
-        if UrlParser.parse_nombre(request.url, "fases"):
-            redirect('../')
-        redirect('./')
-        
+    def post_delete(self, id_item):
+        """Elimina un item"""
+        item = Item.por_id(int(id_item))
+        try:
+            item.eliminar()
+            flash(u"Ítem Eliminado")
+        except EliminarItemError, err:
+            flash(unicode(err), 'warning')
+        redirect("./")
         
     @validate(item_add_form, error_handler=new)
     @expose()
@@ -542,4 +547,43 @@ class ItemController(CrudRestController):
     @expose('lpm.templates.item.impacto')
     def calcular_impacto(self, *args, **kw):
         pass
+    
+    @expose()
+    def revivir(self, *args, **kw):
+        """
+        Revive un ítem que se encuentra en estado eliminado.
+        """
+        item = Item.por_id(int(args[0]))
+        try:
+            item.revivir()
+            flash(u"Ítem Revivido")
+        except RevivirItemError, err:
+            flash(unicode(err), 'warning')
+        redirect("../")
+        
+    @expose()
+    def aprobar(self, *args, **kw):
+        """
+        Aprueba un ítem.
+        """
+        item = Item.por_id(int(args[0]))
+        try:
+            item.aprobar()
+            flash(u"Ítem Aprobado")
+        except CondicionAprobarError, err:
+            flash(unicode(err), 'warning')
+        redirect("../")
+        
+    @expose()
+    def desaprobar(self, *args, **kw):
+        """
+        Desaprueba un ítem.
+        """
+        item = Item.por_id(int(args[0]))
+        try:
+            item.desaprobar()
+            flash(u"Ítem Desaprobado")
+        except DesAprobarItemError, err:
+            flash(unicode(err), 'warning')
+        redirect("../")
     #}
