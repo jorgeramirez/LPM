@@ -277,10 +277,11 @@ class RolPlantillaAddForm(RolAddForm):
         self.__widget_selector_type__ = selector
         super(RolPlantillaAddForm, self).__init__(DBS)
  
-    __hide_fields__ = ['tipo']
-    __omit_fields__ = ['id_rol', 'usuarios',
-                       'codigo', 'creado', 'id_proyecto', 'id_fase',
-                       'id_tipo_item']
+    __hide_fields__ = ['tipo', 'id_proyecto', 'id_tipo_item', 'id_fase']
+    #__omit_fields__ = ['id_rol', 'usuarios',
+    #                   'codigo', 'creado', 'id_proyecto', 'id_fase',
+    #                   'id_tipo_item'
+    __omit_fields__ = ['id_rol', 'usuarios', 'codigo', 'creado']
     __field_order__ = ['nombre_rol', 'descripcion', 'permisos']
     
     
@@ -607,6 +608,7 @@ class RolPlantillaController(RolController):
         elif (kw['contexto'] == "fase"):
             selector = SelectorPermisosPlantillaFase
         elif (kw['contexto'] == "ti"):
+            kw["contexto"] = u"Tipo de Ítem"
             selector = SelectorPermisosPlantillaTi
            
         self.edit_form = RolPlantillaEditForm(DBS=DBSession, selector=selector)     
@@ -614,13 +616,13 @@ class RolPlantillaController(RolController):
         rol_plantilla_edit_form = self.edit_form
         
         
-        page="Editar Rol Plantilla de {contexto}".format(contexto=kw['contexto'])
+        page=u"Editar Rol Plantilla de {contexto}".format(contexto=kw['contexto'])
         
         value = self.edit_filler.get_value(values={'id_rol': int(id)})
         
         #agregado
         if value["tipo"].find("Plantilla") < 0:
-            page="Editar Rol de {contexto}".format(contexto=kw['contexto'])
+            page=u"Editar Rol de {contexto}".format(contexto=kw['contexto'])
             
 #        value['_method'] = 'PUT'#?
 
@@ -634,23 +636,39 @@ class RolPlantillaController(RolController):
     @without_trailing_slash
     @expose('lpm.templates.rol.new')
     def new(self, contexto=None, *args, **kw):
+        page = u"Nuevo Rol Plantilla de {contexto}"
         if (not contexto):
             redirect('../')
         elif (contexto == "proyecto"):
             selector = SelectorPermisosPlantillaProy
             kw['tipo'] = u'Plantilla {contexto}'.format(contexto=contexto)
+
+            if kw.has_key("id_proyecto"): #desde edit de proyecto
+                kw["tipo"] = u"Proyecto"
+                page = u"Nuevo Rol de {contexto}"
+
         elif (contexto == "fase"):
             selector = SelectorPermisosPlantillaFase
             kw['tipo'] = u'Plantilla {contexto}'.format(contexto=contexto)
+            
+            if kw.has_key("id_fase"): #desde edit de fase
+                kw["tipo"] = u"Fase"
+                page = u"Nuevo Rol de {contexto}"
+
         elif (contexto == "ti"):
             selector = SelectorPermisosPlantillaTi
             kw['tipo'] = u'Plantilla tipo ítem'
+            contexto = u"Tipo de Ítem"
+            if kw.has_key("id_tipo_item"): #desde edit de tipo de item
+                kw["tipo"] = u"Tipo de Ítem"
+                page = u"Nuevo Rol de {contexto}"
+
             
         self.new_form = RolPlantillaAddForm(DBS=DBSession, selector=selector)     
         tmpl_context.widget = self.new_form
         rol_plantilla_add_form = self.new_form
         
-        page="Nuevo Rol Plantilla de {contexto}".format(contexto=contexto)
+        page = page.format(contexto=contexto)
         
         if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/":
             atras = "/"

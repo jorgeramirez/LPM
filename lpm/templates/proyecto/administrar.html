@@ -11,9 +11,9 @@
 <script src="${tg.url('/javascript/usuario_roles.js')}"></script>
 </head>
 <body>
-	<div style="height:0px;"> &nbsp; </div>
-	<h2 style="margin-top:1px; padding-left: 60px;">$page</h2>
-	<div style="float:left; padding-left: 95px;" class="crud_edit">             
+    <div style="height:0px;"> &nbsp; </div>
+    <h2 style="margin-top:1px; padding-left: 60px;">$page</h2>
+    <div style="float:left; padding-left: 95px;" class="crud_edit">             
     <table cellspacing="0" cellpadding="2" border="0">
     <tbody>
         <tr>
@@ -29,7 +29,7 @@
                 </div>
                 <br />
                 <div style="clear:both;">
-                <a py:if="puede_crear_rol" class="link_boton" href="${tg.url('/rol/new/')}">
+                <a py:if="puede_crear_rol" class="link_boton" href="${tg.url('/rolesplantilla/new/proyecto?id_proyecto=' + id)}">
                     <input id="historial" class="boton" style="float:right;" type="button" value="Crear Rol"/>
                 </a>
                 </div>
@@ -52,9 +52,9 @@
         <tr>
             <td  colspan="2">
                 <div id="tabla_fases" style="margin-top: 10px;">
-	                <div class="crud_table" style="height:65%; width:700px; margin-top: 5px;">
-	                    ${XML(tmpl_context.tabla_fases(value=fases))}
-	                </div>
+                    <div class="crud_table" style="height:65%; width:700px; margin-top: 5px;">
+                        ${XML(tmpl_context.tabla_fases(value=fases))}
+                    </div>
                 </div>
             </td>
         </tr>
@@ -74,9 +74,9 @@
         <tr>
             <td  colspan="2">
                 <div py:if="iniciado" id="tabla_ti" style="margin-top: 10px;">
-	                <div class="crud_table" style="height:65%; width:700px; margin-top: 5px;">
-	                    ${XML(tmpl_context.tabla_ti(value=tipo_items))} 
-	                </div>
+                    <div class="crud_table" style="height:65%; width:700px; margin-top: 5px;">
+                        ${XML(tmpl_context.tabla_ti(value=tipo_items))} 
+                    </div>
                 </div>
             </td>
         </tr>

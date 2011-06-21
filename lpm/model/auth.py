@@ -216,17 +216,25 @@ class Rol(DeclarativeBase):
         """ Crea un nuevo rol """
         if "sprox_id" in kw:
             del kw["sprox_id"]
+        if "permisos_src" in kw: #campo que genera dojo
+            del kw["permisos_src"]
+            
         pks = kw["permisos"]
         del kw["permisos"]
         for k in ["id_proyecto", "id_fase", "id_tipo_item"]:
             if kw.has_key(k):
-                kw[k] = int(kw[k])
+                if kw[k]:
+                    kw[k] = int(kw[k])
+                else:
+                    del kw[k]
         rol_new = Rol(**kw)
+        
         if type(pks).__name__ == 'list':
             for i, pk in enumerate(pks):
                 pks[i] = int(pk)
         else:
             pks = [int(pks)]
+
         permisos = DBSession.query(Permiso).filter( \
                                             Permiso.id_permiso.in_(pks)).all()
         if not permisos:
@@ -234,21 +242,6 @@ class Rol(DeclarativeBase):
             
         for p in permisos:
             p.roles.append(rol_new)
-            
-#        #seteamos el tipo
-#        if kw["tipo"] == "deducir":
-#            #calculamos el tipo para el rol con contexto
-#            rol_new.tipo = u"Tipo de Ítem"
-#            for p in permisos:
-#                np = p.nombre_permiso
-#                if (np.find("item") > 0 and np.find("tipo item") < 0) or \
-#                      np.find("lb") > 0 or np.find("impacto") > 0:
-#                    rol_new.tipo = u"Fase"
-#                elif np.find("proyecto") > 0 or np.find("fase") > 0:
-#                    rol_new.tipo = u"Proyecto"
-#                    break
-#        else:
-#            rol_new.tipo = kw['tipo']
             
         DBSession.flush()
         rol_new.codigo = Rol.generar_codigo(rol_new)
@@ -311,12 +304,16 @@ class Rol(DeclarativeBase):
         """Actualiza un rol"""
         if "sprox_id" in kw:
             del kw["sprox_id"]
+        if "permisos_src" in kw: #campo que genera dojo
+            del kw["permisos_src"]
+            
         pks = kw["permisos"]
         if type(pks).__name__ == 'list':
             for i, pk in enumerate(pks):
                 pks[i] = int(pk)
         else:
             pks = [int(pks)]
+            
         del kw["permisos"]
         for k in ["id_proyecto", "id_fase", "id_tipo_item"]:
             if kw.has_key(k):
