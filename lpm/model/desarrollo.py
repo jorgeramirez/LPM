@@ -210,7 +210,7 @@ class Item(DeclarativeBase):
         DBSession.flush()
         self.id_propiedad_item = p_item_revivido.id_propiedad_item
     
-    def modificar(self, id_usuario, **kw): #jorge
+    def modificar(self, usuario, **kw): #jorge
         """ 
         Modifica los valores de la propiedad del ítem.
         
@@ -235,7 +235,7 @@ class Item(DeclarativeBase):
             if valor != kw[attr]:
                 hist_items = HistorialItems()
                 hist_items.tipo_modificacion = u"Modificado " + attr
-                hist_items.usuario = Usuario.por_id(id_usuario)
+                hist_items.usuario = usuario
                 hist_items.item = p_item_mod
                 DBSession.add(hist_items)
         p_item_mod.incorporar_relaciones(p_item.relaciones)
@@ -345,8 +345,39 @@ class PropiedadItem(DeclarativeBase):
     atributos = relation('AtributosPorItem')
     #}
     
-    def modificar_atributo(self):
-        pass
+    def modificar_atributo(self, usuario, id_atributo, valor):
+        """
+        Modifica un atributo de la propiedad del item. Este atributo
+        corresponde a uno de los atributos introducidos por el tipo de ítem.
+        """
+        if self.estado in [u"Bloqueado", u"Eliminado", u"Revisión-Bloq"]:
+            raise ModificarItemError()
+        p_item_mod = PropiedadItem()
+        p_item_mod.version = self.version + 1
+        p_item_mod.estado = u"Desaprobado"
+        p_item_mod.complejidad = self.complejidad
+        p_item_mod.prioridad = self.prioridad
+        p_item_mod.incorporar_relaciones(self.relaciones)
+        p_item_mod.incorporar_archivos(self.archivos)
+        p_item_mod.incorporar_atributos(self.atributos, 
+                                        id_ignorado=id_atributo)
+        api = AtributosPorItem.por_id(id_atributo)
+        attr_de_item = AtributosDeItems()
+        attr_de_item.id_atributos_por_tipo_item = api.atributo.id_atributos_por_tipo_item
+        attr_de_item.valor = valor
+        api_mod = AtributosPorItem()
+        api_mod.atributo = attr_de_item
+        p_item_mod.atributos.append(api_mod)
+        hist_items = HistorialItems()
+        hist_items.tipo_modificacion = u"Mod. Atributo Especifico"
+        hist_items.usuario = usuario
+        hist_items.item = p_item_mod
+        item = Item.por_id(self.id_item_actual)
+        item.propiedad_item_versiones.append(p_item_mod)
+        DBSession.add_all([p_item_mod, hist_items, attr_de_item, api_mod])
+        DBSession.flush()
+        item.id_propiedad_item = p_item_mod.id_propiedad_item
+
     
     def agregar_relacion(self, id_antecesor, tipo):#nahuel
         """
@@ -481,7 +512,7 @@ class PropiedadItem(DeclarativeBase):
             self.relaciones.append(rpi_nuevo)
             DBSession.add(rpi_nuevo)
 
-    def incorporar_atributos(self, atributos):
+    def incorporar_atributos(self, atributos, id_ignorado=None):
         """
         Agrega los atributos al objecto. Se utiliza cuando se crean
         nuevas versiones, de manera tal que la nueva versión continue
@@ -489,8 +520,11 @@ class PropiedadItem(DeclarativeBase):
         
         @param atributos: lista de objetos L{AtributosPorItem}
         @type atributos: C{list}
+        @param id_ignorado: identificador del atributo a ignorar.
         """
         for api in atributos:
+            if api.id_atributos_por_item == id_ignorado:
+                continue
             attr_nuevo = AtributosPorItem()
             attr_nuevo.atributo = api.atributo
             self.atributos.append(attr_nuevo)
@@ -724,6 +758,19 @@ class AtributosPorItem(DeclarativeBase):
     
     def modificar_atributo(self, id, valor):
         pass
+        
+    @classmethod
+    def por_id(cls, id):
+        """
+        Método de clase que realiza las búsquedas por identificador.
+        
+        @param id: identificador del elemento a recuperar
+        @type id: C{Integer}
+        @return: el elemento recuperado
+        @rtype: L{AtributosPorItem}
+        """
+        return DBSession.query(cls).filter_by(id_atributos_por_item=id).one()
+
 
 
 class ArchivosExternos(DeclarativeBase):
@@ -772,7 +819,7 @@ class ArchivosPorItem(DeclarativeBase):
         @return: el elemento recuperado
         @rtype: L{ArchivosExternos}
         """
-        return DBSession.query(cls).filter_by(id_archivo_externo=id)
+        return DBSession.query(cls).filter_by(id_archivo_externo=id).one()
     #} 
 
 class HistorialItems(DeclarativeBase):

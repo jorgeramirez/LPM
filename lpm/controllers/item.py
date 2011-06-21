@@ -510,7 +510,7 @@ class ItemController(CrudRestController):
         user_name = request.credentials["repoze.what.userid"]
         user = Usuario.by_user_name(user_name)
         try:
-            item.modificar(user.id_usuario, **kw)
+            item.modificar(user, **kw)
         except ModificarItemError, err:
             #manejar excepcion
             redirect(atras)

@@ -16,7 +16,9 @@ from tg.decorators import (paginate, expose, with_trailing_slash,
 from tg import redirect, request, validate, flash
 
 from lpm.model import (DBSession, AtributosDeItems, AtributosPorItem, Item, 
-                       TipoItem, Fase, PropiedadItem, AtributosPorTipoItem)
+                       TipoItem, Fase, PropiedadItem, AtributosPorTipoItem,
+                       Usuario)
+from lpm.model.excepciones import ModificarItemError
 from lpm.lib.sproxcustom import (CustomTableFiller,
                                  CustomPropertySingleSelectField)
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
@@ -194,7 +196,8 @@ class AtributoItemController(CrudRestController):
                     modelo=self.model.__name__, 
                     columnas=self.columnas,
                     opciones=self.opciones,
-                    url_action=self.tmp_action
+                    url_action=self.tmp_action,
+                    atras="../../"
                     )
     
     @without_trailing_slash
@@ -283,13 +286,20 @@ class AtributoItemController(CrudRestController):
         if "sprox_id" in kw:
             del kw["sprox_id"]
         id_item = UrlParser.parse_id(request.url, "items")
-        id = int(args[0]) #identificador del atributo
         if UrlParser.parse_nombre(request.url, "versiones"):
             #No debe poder modificarse, solo visualizar. TODO
             redirect('../')
         if id_item:
             #desde controller de items.
+            id = int(args[0]) #identificador del atributo
             item = Item.por_id(id_item)
-        #TODO
+            p_item = PropiedadItem.por_id(item.id_propiedad_item)
+            valor = kw["valor"]
+            user_name = request.credentials["repoze.what.userid"]
+            user = Usuario.by_user_name(user_name)
+            try:
+                p_item.modificar_atributo(user, id, valor)
+            except ModificarItemError, err:
+                pass #TODO
         redirect("../")
     #}
