@@ -235,7 +235,7 @@ class Item(DeclarativeBase):
                 hist_items = HistorialItems()
                 hist_items.tipo_modificacion = u"Modificado " + attr
                 hist_items.usuario = usuario
-                hist_items.item = p_item_mod
+                hist_items.item = p_item
                 DBSession.add(hist_items)
         p_item_mod.incorporar_relaciones(p_item.relaciones)
         p_item_mod.incorporar_atributos(p_item.atributos)
@@ -301,7 +301,7 @@ class Item(DeclarativeBase):
         hist_items.tipo_modificacion = u"Reversión De: %d A: %d" % \
             (p_item_actual.version, p_item_version.version)
         hist_items.usuario = usuario
-        hist_items.item = p_item_nuevo
+        hist_items.item = p_item_actual
         self.propiedad_item_versiones.append(p_item_nuevo)
         DBSession.add_all([p_item_nuevo, hist_items])
         DBSession.flush()
@@ -320,7 +320,42 @@ class Item(DeclarativeBase):
         @return: el elemento recuperado
         @rtype: L{Item}
         """
-        return DBSession.query(cls).filter_by(id_item=id).one()    
+        return DBSession.query(cls).filter_by(id_item=id).one()
+    
+    def adjuntar_archivo(self, nombre_archivo, archivo, usuario):
+        """
+        Adjunta un archivo al item
+        
+        @param nombre_archivo: nombre del archivo.
+        @param archivo: el contenido del archivo.
+        @param usuario: el usuario que adjunta el archivo.
+        """
+        p_item = PropiedadItem.por_id(self.id_propiedad_item)
+        if p_item.estado in [u"Bloqueado", u"Eliminado", u"Revisión-Bloq"]:
+            raise AdjuntarArchivoError()
+        p_item_mod = PropiedadItem()
+        p_item_mod.version = p_item.version + 1
+        p_item_mod.estado = u"Desaprobado" #?
+        p_item_mod.complejidad = p_item.complejidad
+        p_item_mod.prioridad = p_item.prioridad
+        p_item_mod.incorporar_relaciones(p_item.relaciones)
+        p_item_mod.incorporar_atributos(p_item.atributos)
+        p_item_mod.incorporar_archivos(p_item.archivos)
+        new_file = ArchivosExternos(nombre_archivo=unicode(nombre_archivo), 
+                                    archivo=archivo)
+        api = ArchivosPorItem()
+        api.archivo = new_file
+        p_item_mod.archivos.append(api)
+        self.propiedad_item_versiones.append(p_item_mod)
+        hist_items = HistorialItems()
+        hist_items.tipo_modificacion = u"Adjuntar Archivo"
+        hist_items.usuario = usuario
+        hist_items.item = p_item
+        DBSession.add_all([new_file, hist_items, api, p_item_mod])
+        DBSession.flush()
+        self.id_propiedad_item = p_item_mod.id_propiedad_item
+        
+        
 
 class PropiedadItem(DeclarativeBase):
     """
@@ -373,7 +408,7 @@ class PropiedadItem(DeclarativeBase):
         hist_items = HistorialItems()
         hist_items.tipo_modificacion = u"Mod. Atributo Especifico"
         hist_items.usuario = usuario
-        hist_items.item = p_item_mod
+        hist_items.item = self
         item = Item.por_id(self.id_item_actual)
         item.propiedad_item_versiones.append(p_item_mod)
         DBSession.add_all([p_item_mod, hist_items, attr_de_item, api_mod])
@@ -784,8 +819,20 @@ class ArchivosExternos(DeclarativeBase):
     
     #{ Columnas
     id_archivo_externo = Column(Integer, autoincrement=True, primary_key=True)
-    archivo = Column(LargeBinary(2048), nullable=False)
+    archivo = Column(LargeBinary, nullable=False)
     nombre_archivo = Column(Unicode(50), nullable=False)
+
+    @classmethod
+    def por_id(cls, id):
+        """
+        Método de clase que realiza las búsquedas por identificador.
+        
+        @param id: identificador del elemento a recuperar
+        @type id: C{Integer}
+        @return: el elemento recuperado
+        @rtype: L{ArchivosExternos}
+        """
+        return DBSession.query(cls).filter_by(id_archivo_externo=id).one()
     #}
 
 

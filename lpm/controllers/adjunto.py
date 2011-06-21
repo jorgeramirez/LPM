@@ -13,11 +13,12 @@ a un ítem.
 from tgext.crud import CrudRestController
 from tg.decorators import (paginate, expose, with_trailing_slash,
                            without_trailing_slash)
-from tg import redirect, request, validate, flash
+from tg import redirect, request, validate, flash, response
 from tg.controllers import CUSTOM_CONTENT_TYPE
 
 from lpm.model import (DBSession, ArchivosExternos, ArchivosPorItem, 
-                      Item, TipoItem, Fase, Proyecto, PropiedadItem)
+                      Item, TipoItem, Usuario, PropiedadItem)
+from lpm.model.excepciones import *
 from lpm.lib.sproxcustom import (CustomTableFiller,
                                  CustomPropertySingleSelectField)
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
@@ -50,6 +51,7 @@ adjunto_table = AdjuntoTable(DBSession)
 
 class AdjuntoTableFiller(CustomTableFiller):
     __model__ = ArchivosExternos
+    __omit_fields__ = ['id_archivo_externo', 'archivo']
     
     def __actions__(self, obj):
         """Links de acciones para un registro dado"""
@@ -98,7 +100,7 @@ adjunto_table_filler = AdjuntoTableFiller(DBSession)
 
 class AdjuntoAddForm(AddRecordForm):
     __model__ = ArchivosExternos
-    __omit_fields__ = ['id_archivo_externo']
+    __omit_fields__ = ['id_archivo_externo', 'nombre_archivo']
     archivo = FileField("archivo", label_text="Archivo")
 
 adjunto_add_form = AdjuntoAddForm(DBSession)
@@ -226,7 +228,7 @@ class AdjuntoController(CrudRestController):
         """Display a page to show a new record."""
         tmpl_context.widget = self.new_form
         return dict(value=kw,
-                    page=u"Nuevo Archivo", 
+                    page=u"Adjuntar Archivo", 
                     atras='./')
     
     @expose()
@@ -236,18 +238,24 @@ class AdjuntoController(CrudRestController):
         #TODO
         redirect('./')
         
-        
-    @validate(adjunto_add_form, error_handler=new)
     @expose()
-    def post(self, *args, **kw):
-        if "sprox_id" in kw:
-            del kw["sprox_id"]
-        #TODO
+    def post(self, archivo=None, **kw):
+        id_item = UrlParser.parse_id(request.url, "items")
+        item = Item.por_id(id_item)
+        user = Usuario.by_user_name(request.credentials["repoze.what.userid"])
+        contenido = archivo.value #archivo.file.read()
+        try:
+            item.adjuntar_archivo(archivo.filename, contenido, user)
+        except AdjuntarArchivoError, err:
+            flash(unicode(err), 'warning')
         redirect("./")
 
-    @without_trailing_slash
     @expose(content_type=CUSTOM_CONTENT_TYPE)
     def descargar(self, *args, **kw):
-        #TODO
-        pass
+        id_archivo = int(args[0])
+        ae = ArchivosExternos.por_id(id_archivo)
+        response.headers["Content-Type"] = "application/octet-stream"
+        disp = 'attachment; filename="' + ae.nombre_archivo + '"'
+        response.headers["Content-Disposition"] = disp
+        return ae.archivo
     #}
