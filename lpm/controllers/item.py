@@ -148,18 +148,29 @@ class ItemTableFiller(CustomTableFiller):
                             '<a href="./'+ controller + '/revivir' +'" ' + \
                             'class="' + clase + '">Revivir</a>' + \
                          '</div><br />'
-        if PoseePermiso('aprobar-desaprobar item'):
+        
+        if controller.isalnum():
+            controller = './'
+        else:
+            controller = './items/'
+        if PoseePermiso('aprobar-desaprobar item', 
+                        id_fase=obj.id_fase).is_met(request.environ):
             if aprobar:
                 value += '<div>' + \
-                            '<a href="./'+ controller + '/aprobar' +'" ' + \
+                            '<a href="' + controller + 'aprobar/' +str(obj.id_item) +'" ' + \
                             'class="' + clase + '">Aprobar</a>' + \
                          '</div><br />'
             elif desaprobar:
                 value += '<div>' + \
-                            '<a href="./'+ controller + '/desaprobar' +'" ' + \
+                            '<a href="' + controller + 'desaprobar/' +str(obj.id_item) +'" ' + \
                             'class="' + clase + '">Desaprobar</a>' + \
                          '</div><br />'
-
+        if PoseePermiso('calcular impacto', 
+                        id_fase=obj.id_fase).is_met(request.environ):
+                value += '<div>' + \
+                            '<a href="' + controller + 'calcular_impacto/' +str(obj.id_item) +'" ' + \
+                            'class="' + clase + '">Calcular Impacto</a>' + \
+                         '</div><br />'
         value += '</div>'
         return value
     
@@ -526,5 +537,9 @@ class ItemController(CrudRestController):
     def eliminar_relaciones(self, *args, **kw):
         #se lo llama desde la pagina de edit, al marcar las relaciones
         #y luego seleccionar Eliminar. Ajax.
+        pass
+    
+    @expose('lpm.templates.item.impacto')
+    def calcular_impacto(self, *args, **kw):
         pass
     #}

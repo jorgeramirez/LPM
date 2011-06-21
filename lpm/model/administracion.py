@@ -410,7 +410,7 @@ class Proyecto(DeclarativeBase):
         rol = DBSession.query(Rol).filter(and_( \
                                    Rol.nombre_rol == "Lider de Proyecto", 
                                    Rol.id_proyecto == self.id_proyecto)).first()
-        if rol:
+        if rol and rol.usuarios:
             return rol.usuarios[0]
         return ""
 
@@ -500,9 +500,10 @@ class TipoItem(DeclarativeBase):
         #agregar este atributo a los ítems ya creados, no sé si es necesario
         for i in self.items:
             a_item = AtributosDeItems()
-            a_item.valor = a.valor_por_defecto
-            a_item.id_atributos_por_tipo_de_item = a.\
+            a_item.id_atributos_por_tipo_item = a.\
             id_atributos_por_tipo_item
+            a_item.valor = a.valor_por_defecto
+
             
             a_por_item = AtributosPorItem()
             a_por_item.atributo = a_item
