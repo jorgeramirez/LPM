@@ -175,7 +175,8 @@ class Rol(DeclarativeBase):
         return rol
     
     @classmethod
-    def roles_desasignados(cls, usuario):
+    def roles_desasignados(cls, usuario, id_proyecto=None,
+                           id_fase=None, id_tipo_item=None):
         """
         Obtiene los roles que no están asignados al usuario
         
@@ -187,7 +188,19 @@ class Rol(DeclarativeBase):
         desasignados = []
         #falta discrimininar el tipo
         for r in roles:
-            if (r.tipo.find(u"Plantilla") >= 0):
+            if id_proyecto:
+                if r.tipo != u"Plantilla proyecto" and \
+                   r.id_proyecto != id_proyecto:
+                    continue
+            elif id_fase:
+                if r.tipo != u"Plantilla fase" and \
+                   r.id_fase != id_fase:
+                    continue
+            elif id_tipo_item:
+                if r.tipo != u"Plantilla tipo ítem" and \
+                   r.id_tipo_item != id_tipo_item:
+                    continue
+            elif (r.tipo.find(u"Plantilla") >= 0):
                 continue
             esta = False
             for u in r.usuarios:

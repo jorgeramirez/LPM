@@ -9,6 +9,11 @@ $(function(){
     $("#form_desasignar").submit(function(){
         var desa_pks = $("#tabla_asignados :checkbox").filter(":checked");
         var desa_kw = new Object();
+        
+        ctx = $("#contexto").attr('value');
+        val_ctx = $("#valor_contexto").attr('value');
+        desa_kw[ctx] = val_ctx;
+        
         $(desa_pks).each(function(n){
             desa_kw[n] = $(this).attr("id");
         });
@@ -39,6 +44,10 @@ $(function(){
     $("#form_asignar").submit(function(){
         var asig_pks = $("#tabla_desasignados :checkbox").filter(":checked");
         var asig_kw = new Object();
+
+        ctx = $("#contexto").attr('value');
+        val_ctx = $("#valor_contexto").attr('value');
+        asig_kw[ctx] = val_ctx;
 
         $(asig_pks).each(function(n){
             asig_kw[n] = $(this).attr("id");

@@ -68,8 +68,27 @@ class UsuarioTableFiller(CustomTableFiller):
 
     def __actions__(self, obj):
         """Links de acciones para un registro dado"""
-        value = '<div>'
-        clase = 'actions'   
+
+        clase = 'actions'
+        value = "<div>"
+        kw = request.params
+        contexto=""
+        if kw.has_key("id_proyecto"):
+            contexto="id_proyecto"
+        elif kw.has_key("id_fase"):
+            contexto="id_fase"
+        elif kw.has_key("id_tipo_item"):
+            contexto="id_tipo_item"
+
+        if contexto:
+            id = kw[contexto]
+            url = "/usuarios/roles/{id}?{ctx}={val}"
+            url = url.format(id=obj.id_usuario, ctx=contexto, val=kw[contexto])
+            value = '<div>' + \
+                    '<a href="' + url + '" class="' + clase + '">Asignar</a>' + \
+                    '</div>'
+            return value
+        
         if PoseePermiso('modificar usuario').is_met(request.environ):
             value += '<div>' + \
                         '<a href="/usuarios/'+ str(obj.id_usuario) +'/edit" ' + \
@@ -231,23 +250,52 @@ class RolTableFiller(TableFiller):
         else:
             return u"---------"
     
-    def _do_get_provider_count_and_objs(self,
-                                         usuario=None, asignados=True, **kw):
+    def _do_get_provider_count_and_objs(self, usuario=None, asignados=True, 
+                                        id_proyecto=None, id_fase=None,
+                                        id_tipo_item=None, **kw):
+
         if (not asignados):
-            roles = Rol.roles_desasignados(usuario.id_usuario)
+            roles = Rol.roles_desasignados(usuario.id_usuario, id_proyecto,
+                                           id_fase, id_tipo_item)
         elif (asignados):
             roles = usuario.roles
-            
+            if id_proyecto or id_fase or id_tipo_item:
+                roles = []
+                for r in usuario.roles:
+                    if id_proyecto and r.id_proyecto != id_proyecto:
+                        continue
+                    elif id_fase and r.id_fase != id_fase:
+                        continue
+                    elif id_tipo_item and r.id_tipo_item != id_tipo_item:
+                        continue
+                    roles.append(r)
+
         return len(roles), roles
 
     def __actions__(self, obj):
         """Links de acciones para un registro dado"""
+
         value = '<div>'
-        clase = 'actions'   
+        clase = 'actions'
+        contexto = ""
+        url_cont = ""
+        
+        if (obj.tipo == "Sistema"):
+            url_cont = "/roles/"
+        else:
+            url_cont = "/rolesplantilla/"
+            tipo = obj.tipo.lower()
+            if (tipo.find(u"proyecto") >= 0):
+                contexto = "proyecto"
+            elif (tipo.find(u"fase") >= 0):
+                contexto = "fase"
+            else:
+                contexto = "ti"
+
         if PoseePermiso('modificar rol').is_met(request.environ):
             value += '<div>' + \
-                        '<a href="/roles/'+ str(obj.id_rol) +'/edit" ' + \
-                        'class="' + clase + '">Modificar</a>' + \
+                        '<a href="' +  url_cont + str(obj.id_rol) + "/edit?contexto="+  \
+                        contexto + '" class="' + clase + '">Modificar</a>' + \
                      '</div><br />'
         if PoseePermiso('eliminar rol').is_met(request.environ):
             value += '<div><form method="POST" action="/roles/' + str(obj.id_rol) + '" class="button-to">'+\
@@ -258,8 +306,7 @@ class RolTableFiller(TableFiller):
                      '</form></div><br />'
         value += '</div>'
         return value
-
-
+        
 roles_usuario_filler = RolTableFiller(DBSession)
 
 
@@ -307,6 +354,8 @@ class UsuarioController(CrudRestController):
         Retorna una página HTML si no se especifica JSON
         """
         puede_crear = PoseePermiso("crear usuario").is_met(request.environ)
+        titulo = self.title
+
         if request.response_type == 'application/json':
             return self.table_filler.get_value(**kw)
         if not getattr(self.table.__class__, '__retrieves_own_value__', False):
@@ -317,9 +366,14 @@ class UsuarioController(CrudRestController):
         tmpl_context.widget = usuario_table
         
         atras = '/'
-        
+
+        if kw.has_key("id_proyecto") or kw.has_key("id_fase") \
+                                     or kw.has_key("id_tipo_item"):
+            titulo = u"Seleccionar Usuario"
+            puede_crear = False
+            
         return dict(lista_elementos=usuarios, 
-                    page=self.title, titulo=self.title, 
+                    page=titulo, titulo=titulo, 
                     modelo=self.model.__name__, 
                     columnas=self.columnas,
                     opciones=self.opciones,
@@ -341,14 +395,27 @@ class UsuarioController(CrudRestController):
         class mis_roles_tf(RolRolTableFiller):
             def __actions__(self, obj):
                 """Links de acciones para un registro dado"""
-                value = '<div>'
-                clase = 'actions'   
+                clase = 'actions'
+                contexto = ""
+                url_cont = ""
+                
+                if (obj.tipo == "Sistema"):
+                    url_cont = "/roles/"
+                else:
+                    url_cont = "/rolesplantilla/"
+                    tipo = obj.tipo.lower()
+                    if (tipo.find(u"proyecto") >= 0):
+                        contexto = "proyecto"
+                    elif (tipo.find(u"fase") >= 0):
+                        contexto = "fase"
+                    else:
+                        contexto = "ti"
+
                 if PoseePermiso('modificar rol').is_met(request.environ):
-                    value += '<div>' + \
-                                '<a href="/roles/'+ str(obj.id_rol) + '/edit/" ' + \
-                                'class="' + clase + '">Ver</a>' + \
-                             '</div><br />'
-                value += '</div>'           
+                    value = '<div>' + \
+                                '<a href="' +  url_cont + str(obj.id_rol) + "/edit?contexto="+  \
+                                contexto + '" class="' + clase + '">Ver</a>' + \
+                             '</div>'
                 return value
 
             def _do_get_provider_count_and_objs(self, **kw):
@@ -383,12 +450,6 @@ class UsuarioController(CrudRestController):
     def perfil(self, *args, **kw):
         """ Despliega una pagina para modificar el perfil del usuario que 
         inició sesión """
-        '''
-        pp = PoseePermiso('modificar usuario', id_usuario=args[0])
-        if not pp.is_met(request.environ):
-            flash(pp.message % pp.nombre_permiso, 'warning')
-            redirect("/usuarios")
-        '''
         user = request.identity['repoze.who.userid']
         id = Usuario.by_user_name(user)
 
@@ -454,6 +515,16 @@ class UsuarioController(CrudRestController):
         tmpl_context.tabla_desasignados = rol_user_table
         user = Usuario.por_id(args[0])
         page = "Roles de Usuario {nombre}".format(nombre=user.nombre_usuario)
+
+        contexto=""
+        valor = None
+        for k in ["id_fase", "id_proyecto", "id_tipo_item"]:
+            if kw.has_key(k):
+                kw[k] = int(kw[k])
+                contexto = k
+                valor = kw[k]
+                break
+                
         asignados = roles_usuario_filler.get_value(usuario=user,
                                                           asignados=True, **kw)
         desasignados = roles_usuario_filler.get_value(usuario=user,
@@ -462,8 +533,13 @@ class UsuarioController(CrudRestController):
             atras = self.action
         else:
             atras = self.action + str(user.id_usuario) + '/edit'
-        return dict(asignados=asignados, desasignados=desasignados,
-                    page=page, id=args[0], atras=atras)
+        return dict(asignados=asignados, 
+                    desasignados=desasignados,
+                    page=page, 
+                    id=args[0], 
+                    atras=atras,
+                    contexto=contexto,
+                    valor_contexto=valor)
 
     @with_trailing_slash
     @paginate('lista_elementos', items_per_page=5)
@@ -491,7 +567,10 @@ class UsuarioController(CrudRestController):
         if kw:
             pks = []
             for k, pk in kw.items():
-                pks.append(int(pk))
+                try:
+                    pks.append(int(pk))
+                except:
+                    pass
             transaction.begin()
             user = Usuario.por_id(int(args[0]))
             c = 0
@@ -501,7 +580,7 @@ class UsuarioController(CrudRestController):
                 else:
                     c += 1
             transaction.commit()
-        return self.roles(*args)
+        return self.roles(*args, **kw)
 
     @expose('lpm.templates.usuario.roles')
     def asignar_roles(self, *args, **kw):
@@ -509,12 +588,15 @@ class UsuarioController(CrudRestController):
         if kw:
             pks = []
             for k, pk in kw.items():
-                pks.append(int(pk))
+                try:
+                    pks.append(int(pk))
+                except:
+                    pass
             transaction.begin()
             user = Usuario.por_id(int(args[0]))
             roles = DBSession.query(Rol).filter(Rol.id_rol.in_(pks)).all()
             for r in roles:
                 r.usuarios.append(user)
             transaction.commit()
-        return self.roles(*args)
+        return self.roles(*args, **kw)
     #}
