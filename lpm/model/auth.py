@@ -169,7 +169,7 @@ class Rol(DeclarativeBase):
             perm.roles.append(rol)
               
         DBSession.add(rol)
-        DBSession.flush
+        DBSession.flush()
         rol.codigo = Rol.generar_codigo(rol)
         
         return rol

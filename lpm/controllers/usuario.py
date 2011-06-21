@@ -567,10 +567,9 @@ class UsuarioController(CrudRestController):
         if kw:
             pks = []
             for k, pk in kw.items():
-                try:
-                    pks.append(int(pk))
-                except:
-                    pass
+                if not k.isalnum():
+                    continue
+                pks.append(int(pk))
             transaction.begin()
             user = Usuario.por_id(int(args[0]))
             c = 0
@@ -588,15 +587,23 @@ class UsuarioController(CrudRestController):
         if kw:
             pks = []
             for k, pk in kw.items():
-                try:
-                    pks.append(int(pk))
-                except:
-                    pass
+                if not k.isalnum():
+                    continue
+                pks.append(int(pk))
             transaction.begin()
             user = Usuario.por_id(int(args[0]))
             roles = DBSession.query(Rol).filter(Rol.id_rol.in_(pks)).all()
             for r in roles:
-                r.usuarios.append(user)
+                if r.tipo.find("Plantilla") >= 0: #crear rol a partir de plantilla
+                    id = None
+                    for k in ["id_proyecto", "id_fase", "id_tipo_item"]:
+                        if kw.has_key(k):
+                            id = kw[k]
+                            break
+                    rol_new = Rol.nuevo_rol_desde_plantilla(plantilla=r, id=id)
+                    rol_new.usuarios.append(user)
+                else:
+                    r.usuarios.append(user)
             transaction.commit()
         return self.roles(*args, **kw)
     #}
