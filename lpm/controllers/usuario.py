@@ -398,7 +398,7 @@ class UsuarioController(CrudRestController):
                 clase = 'actions'
                 contexto = ""
                 url_cont = ""
-                
+                value = "<div></div>"
                 if (obj.tipo == "Sistema"):
                     url_cont = "/roles/"
                 else:
@@ -410,7 +410,7 @@ class UsuarioController(CrudRestController):
                         contexto = "fase"
                     else:
                         contexto = "ti"
-
+                
                 if PoseePermiso('modificar rol').is_met(request.environ):
                     value = '<div>' + \
                                 '<a href="' +  url_cont + str(obj.id_rol) + "/edit?contexto="+  \

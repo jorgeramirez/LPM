@@ -87,7 +87,7 @@ class FaseTableFiller(CustomTableFiller):
                      
         if not_anonymous().is_met(request.environ):
             value += '<div>' + \
-                        '<a href="./fases/'+ str(obj.id_fase) +'" ' + \
+                        '<a href="./'+ controller +'/edit" ' + \
                         'class="' + clase + '">Ver</a>' + \
                      '</div><br />'
         value += '</div>'
