@@ -5,6 +5,35 @@
 <xi:include href="esquema.html" />
 <head>
 <title>$page</title>
+<link href="${tg.url('/css/jquery-ui.css')}" rel="stylesheet" type="text/css"/>
+<script src="${tg.url('/javascript/jquery-1.5.1.min.js')}"></script>
+<script src="${tg.url('/javascript/jquery-ui-1.8.13.custom.min.js')}"></script>
+<script type="text/javascript">
+
+/**
+ * Validador para el atributo de item
+ **/
+$(function(){
+    $("input#tipo").attr("disabled", true);
+    $("input#nombre").attr("disabled", true);
+    var tipo = $("input#tipo").val();
+    if(tipo == "Texto"){
+        $("input#valor").live('keyup', function(){
+            $(this).val($(this).val().replace(/[0-9]/g, ''));
+        });
+    }else if(tipo == "Fecha"){
+        $("input#valor").datepicker({dateFormat: 'yy-mm-dd'});
+    }else{
+        $("input#valor").live('keyup', function(){
+        $(this).val($(this).val().replace(/[^0-9]/g, ''));
+        });
+    }
+    $("form").submit(function(){
+        $("input#tipo").attr("disabled", false);
+        $("input#nombre").attr("disabled", false);
+    });
+});
+</script>
 </head>
 <body>
   <div style="height:0px;"> &nbsp; </div>

@@ -41,20 +41,20 @@ import transaction
 
 class AtributoItemTable(TableBase):
     __model__ = AtributosPorItem
-    __headers__ = {'nombre': u'Nombre', 'valor': u'Valor'}
-    __add_fields__ = {'nombre': None, 'valor': None}
+    __headers__ = {'nombre': u'Nombre', 'valor': u'Valor', 'tipo': u'Tipo'}
+    __add_fields__ = {'nombre': None, 'valor': None, 'tipo': None}
     __omit_fields__ = ['id_atributos_por_item', 'id_propiedad_item',
                        'id_atributos_de_items', 'atributo']
     __default_column_width__ = '15em'
     __column_widths__ = { '__actions__': "50em"}
-    __field_order__ = ['nombre', 'valor']
+    __field_order__ = ['nombre', 'tipo', 'valor']
     
 atributo_item_table = AtributoItemTable(DBSession)
 
 
 class AtributoItemTableFiller(CustomTableFiller):
     __model__ = AtributosPorItem
-    __add_fields__ = {'nombre': None, 'valor': None}
+    __add_fields__ = {'nombre': None, 'valor': None, 'tipo': None}
     
     def nombre(self, obj, **kw):
         id = obj.atributo.id_atributos_por_tipo_item
@@ -63,6 +63,11 @@ class AtributoItemTableFiller(CustomTableFiller):
     
     def valor(self, obj, **kw):
         return obj.atributo.valor
+    
+    def tipo(self, obj, **kw):
+        id = obj.atributo.id_atributos_por_tipo_item
+        attr_por_tipo = AtributosPorTipoItem.por_id(id)
+        return attr_por_tipo.tipo
     
     def __actions__(self, obj):
         """Links de acciones para un registro dado"""
@@ -118,10 +123,11 @@ class AtributoItemEditForm(EditableForm):
     __model__ = AtributosPorItem
     __hide_fields__ = ['id_atributos_por_item', 'id_propiedad_item',
                        'id_atributos_de_items', 'atributo']
-    __add_fields__ = {"valor": None, "nombre": None}
+    __add_fields__ = {"valor": None, "nombre": None, "tipo": None}
     valor = TextField("valor", label_text="Valor")
     nombre = TextField("nombre", label_text="Nombre")
-    __field_order__ = ["nombre", "valor"]
+    tipo = TextField("tipo", label_text="Tipo")
+    __field_order__ = ["nombre", "tipo", "valor"]
 
 
 atributo_item_edit_form = AtributoItemEditForm(DBSession)
@@ -129,7 +135,7 @@ atributo_item_edit_form = AtributoItemEditForm(DBSession)
 
 class AtributoItemEditFiller(EditFormFiller):
     __model__ = AtributosPorItem
-    __add_fields__ = {"valor": None, "nombre": None}
+    __add_fields__ = {"valor": None, "nombre": None, "tipo": None}
     
     def nombre(self, obj, **kw):
         id = obj.atributo.id_atributos_por_tipo_item
@@ -138,6 +144,11 @@ class AtributoItemEditFiller(EditFormFiller):
     
     def valor(self, obj, **kw):
         return obj.atributo.valor
+    
+    def tipo(self, obj, **kw):
+        id = obj.atributo.id_atributos_por_tipo_item
+        attr_por_tipo = AtributosPorTipoItem.por_id(id)
+        return attr_por_tipo.tipo
 
 atributo_item_edit_filler = AtributoItemEditFiller(DBSession)
 
