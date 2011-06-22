@@ -179,7 +179,40 @@ class Fase(DeclarativeBase):
         """
         return cls.tmpl_codigo.format(posicion=fase.posicion,
                                       id_proyecto=fase.id_proyecto)
-     
+    
+    def puede_crear_item(self):
+        """
+        Verifica si se pueden crear ítems en la fase.
+        """
+        puede = True
+        proy = Proyecto.por_id(self.id_proyecto)
+        if proy.estado == "No Iniciado":
+            return False
+        if self.posicion == 1 and self.estado == "Comprometida":
+            puede = False
+        elif self.posicion > 1:
+            fase_ant = Fase.por_posicion(self.id_proyecto, self.posicion - 1)
+            if self.estado == "Inicial":
+                if fase_ant.estado not in [u"Desarollo", u"Completa"]:
+                    puede = False
+            elif self.estado == "Comprometida":
+                puede = False
+        return puede
+    
+    @classmethod
+    def por_posicion(cls, id_proyecto, posicion):
+        """
+        Método de clase que realiza las búsquedas por posicion de la fase.
+        
+        @param id_proyecto: identificador del proyecto
+        @type id_proyecto: C{Integer}
+        @param posicion: posicion de la fase a recuperar
+        @type posicion: C{Integer}
+        @return: el elemento recuperado
+        @rtype: L{Fase}
+        """
+        return DBSession.query(cls).filter(and_(cls.id_proyecto == id_proyecto,
+                                                cls.posicion == posicion)).one()
 
 class Proyecto(DeclarativeBase):
     """

@@ -378,6 +378,8 @@ class ItemController(CrudRestController):
             # desde el controlador de fases
             puede_crear = PoseePermiso("crear item", id_fase=id_fase).is_met(request.environ)
             fase = Fase.por_id(id_fase)
+            if puede_crear:
+                puede_crear = fase.puede_crear_item()
             titulo = u"Ítems de Fase: %s" % fase.nombre
         items = self.table_filler.get_value(id_fase=id_fase, **kw)
         tmpl_context.widget = self.table
@@ -406,8 +408,11 @@ class ItemController(CrudRestController):
         titulo = self.title
         if id_fase: 
             # desde el controlador de fases
-            puede_crear = PoseePermiso("crear item", id_fase=id_fase).is_met(request.environ)
+            puede_crear = PoseePermiso("crear item", 
+                                       id_fase=id_fase).is_met(request.environ)
             fase = Fase.por_id(id_fase)
+            if puede_crear:
+                puede_crear = fase.puede_crear_item()
             titulo = u"Ítems de Fase: %s" % fase.nombre
 
         tmpl_context.widget = self.table

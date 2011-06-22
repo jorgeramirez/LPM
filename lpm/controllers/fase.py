@@ -341,6 +341,13 @@ class FaseController(CrudRestController):
         """Despliega una pagina para realizar modificaciones"""
         
         id_fase = UrlParser.parse_id(request.url, "fases")
+
+        fase = Fase.por_id(int(id_fase))
+        puede_crear_item = PoseePermiso("crear item", 
+                                       id_fase=id_fase).is_met(request.environ)
+        if puede_crear_item:
+            puede_crear_item = fase.puede_crear_item()
+        
         pp = PoseePermiso('modificar fase', id_fase=id_fase)
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
@@ -349,6 +356,7 @@ class FaseController(CrudRestController):
         tmpl_context.widget = FaseEditForm(DBSession)
         
         value = self.edit_filler.get_value(values={'id_fase': id_fase})
+        
         #value['_method'] = 'PUT'
         
         tmpl_context.tabla_items = self.items.table
@@ -358,7 +366,7 @@ class FaseController(CrudRestController):
                     page="Modificar Fase",
                     puede_asignar_rol=True,
                     puede_crear_rol=True,
-                    puede_crear_item=True,
+                    puede_crear_item=puede_crear_item,
                     puede_crear_lb=True,
                     id=str(id_fase),
                     items=items,
