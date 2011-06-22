@@ -146,10 +146,12 @@ class VersionController(CrudRestController):
                     )
     columnas = dict(version=u'entero',
                     estado= u'combobox',
-                    complejidad=u'entero',
-                    prioridad =u'entero'
+                    complejidad=u'combobox',
+                    prioridad =u'combobox'
                     )
-    comboboxes = dict(estado=Item.estados_posibles)
+    comboboxes = dict(estado=Item.estados_posibles,
+                      complejidad=range(1,11),
+                      prioridad=range(1,11))
     
     #{ Métodos
     @with_trailing_slash
