@@ -10,7 +10,8 @@ class TestRol(ModelTest):
     klass = model.Rol
     attrs = dict(
         nombre_rol = u"test_group",
-        descripcion = u"Test Group"
+        descripcion = u"Test Group",
+        tipo=u"Proyecto"
         )
 
 

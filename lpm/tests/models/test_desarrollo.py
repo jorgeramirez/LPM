@@ -27,11 +27,12 @@ class TestItem(ModelTest):
         p = Proyecto(nombre=u"proyecto1", descripcion=u"Proyecto Uno")
         DBSession.add(p)
         DBSession.flush()
-        p.crear_fase(dict(nombre=u"fase1", descripcion=u"fase uno"))
+        p.crear_fase(nombre=u"fase1", descripcion=u"fase uno", posicion=1)
         DBSession.flush()
         tipo_item = TipoItem()
         tipo_item.codigo = u"cu"
         tipo_item.id_proyecto = p.id_proyecto
+        tipo_item.nombre = u"Caso de Uso"
         p_item = PropiedadItem()
         p_item.version = 1
         p_item.complejidad = 5
@@ -77,7 +78,6 @@ class TestItem(ModelTest):
     
     def test_modificar_item(self):
         """Modificar Item funciona correctamente"""
-        mods = dict(complejidad=8, prioridad=10)
         u = Usuario()
         u.nombre_usuario = u'admin'
         u.nombre = u'Administrador'
@@ -86,7 +86,7 @@ class TestItem(ModelTest):
         u.password = u'administrador'
         DBSession.add(u)
         DBSession.flush()
-        self.obj.modificar(u.id_usuario, mods)
+        self.obj.modificar(u, complejidad=8, prioridad=10)
         p_item = PropiedadItem.por_id(self.obj.id_propiedad_item)
         eq_(p_item.complejidad, 8)
 
