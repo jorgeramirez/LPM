@@ -16,7 +16,8 @@ __all__ = [
     'ModelError', 'NombreDeAtributoError', 'NombreFaseError',
     'NombreTipoItemError', 'TipoAtributoError', 'CondicionAprobarError',
     'BloquearItemError', 'DesBloquearItemError', 'DesAprobarItemError',
-    'ModificarItemError', 'EliminarItemError', 'AdjuntarArchivoError'
+    'ModificarItemError', 'EliminarItemError', 'AdjuntarArchivoError',
+    'EliminarArchivoAdjuntoError'
 ]
 
 
@@ -139,3 +140,12 @@ class AdjuntarArchivoError(ModelError):
     """
     def __str__(self):
         return u"Error: No puede adjuntar un archivo a un ítem en estado Bloqueado, Revision-Bloq o Eliminado"
+
+
+class EliminarArchivoAdjuntoError(ModelError):
+    """
+    Excepcion lanzada cuando se intenta eliminar un archivo de un L{Item}
+    con estado igual a "Bloqueado", "Revision-Bloq" o "Eliminado"
+    """
+    def __str__(self):
+        return u"Error: No puede eliminar un archivo de un ítem en estado Bloqueado, Revision-Bloq o Eliminado"

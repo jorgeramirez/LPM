@@ -355,6 +355,35 @@ class Item(DeclarativeBase):
         DBSession.flush()
         self.id_propiedad_item = p_item_mod.id_propiedad_item
         
+    def eliminar_archivo_adjunto(self, id_archivo, usuario):
+        """
+        Elimina un el archivo adjunto indicado como parámetro:
+        
+        @id_archivo: identificador del archivo a eliminar
+        @type id_archivo: C{int}
+        @usuario: el usuario que realiza la operación.
+        @type usuario: L{Usuario}
+        """
+        p_item = PropiedadItem.por_id(self.id_propiedad_item)
+        if p_item.estado in [u"Bloqueado", u"Eliminado", u"Revisión-Bloq"]:
+            raise EliminarArchivoAdjuntoError()
+        p_item_mod = PropiedadItem()
+        p_item_mod.version = p_item.version + 1
+        p_item_mod.estado = u"Desaprobado" #?
+        p_item_mod.complejidad = p_item.complejidad
+        p_item_mod.prioridad = p_item.prioridad
+        p_item_mod.incorporar_relaciones(p_item.relaciones)
+        p_item_mod.incorporar_atributos(p_item.atributos)
+        p_item_mod.incorporar_archivos(p_item.archivos, id_ignorado=id_archivo)
+        self.propiedad_item_versiones.append(p_item_mod)
+        hist_items = HistorialItems()
+        hist_items.tipo_modificacion = u"Archivo Adjunto Eliminado"
+        hist_items.usuario = usuario
+        hist_items.item = p_item
+        DBSession.add_all([hist_items, p_item_mod])
+        DBSession.flush()
+        self.id_propiedad_item = p_item_mod.id_propiedad_item
+
         
 
 class PropiedadItem(DeclarativeBase):
@@ -567,7 +596,7 @@ class PropiedadItem(DeclarativeBase):
             self.atributos.append(attr_nuevo)
             DBSession.add(attr_nuevo)
         
-    def incorporar_archivos(self, archivos):
+    def incorporar_archivos(self, archivos, id_ignorado=None):
         """
         Agrega los archivos externos al objecto. Se utiliza cuando 
         se crean nuevas versiones, de manera tal que la nueva versión 
@@ -576,8 +605,12 @@ class PropiedadItem(DeclarativeBase):
         
         @param archivos: lista de objetos L{ArchivosPorItem}
         @type archivos: C{list}
+        @id_ignorado: el identificador del archivo a ignorar
+        @type id_ignorado: C{int}
         """
         for api in archivos:
+            if api.archivo.id_archivo_externo == id_ignorado:
+                continue        
             archivo_nuevo = ArchivosPorItem()
             archivo_nuevo.archivo = api.archivo
             self.archivos.append(archivo_nuevo)

@@ -60,6 +60,7 @@ class AdjuntoTableFiller(CustomTableFiller):
         clase = 'actions_fase'
         id_item = UrlParser.parse_id(request.url, "items")
         item = Item.por_id(id_item)
+        p_item = PropiedadItem.por_id(item.id_propiedad_item)
         id = str(obj.id_archivo_externo)
         if PoseePermiso('modificar item', 
                         id_fase=item.id_fase).is_met(request.environ):
@@ -67,7 +68,9 @@ class AdjuntoTableFiller(CustomTableFiller):
                         '<a href="./descargar/' + id + '" ' +  \
                         'class="' + clase + '">Descargar</a>' + \
                      '</div><br />'
-            if not UrlParser.parse_nombre(request.url, "versiones"):
+            if not UrlParser.parse_nombre(request.url, "versiones") and \
+                   p_item.estado not in [u"Eliminado", u"Bloqueado", 
+                                       u"Revisión-Bloq"]:
                 #No se puede eliminar desde el controlador de versiones.
                 value += '<div><form method="POST" action="' + id + '" class="button-to">'+\
                          '<input type="hidden" name="_method" value="DELETE" />' +\
@@ -232,11 +235,17 @@ class AdjuntoController(CrudRestController):
                     atras='./')
     
     @expose()
-    def post_delete(self, id):
-        """Elimina un archivo de la bd"""
-        archivo = ArchivosExternos.por_id(id)
-        #TODO
-        redirect('./')
+    def post_delete(self, id_archivo):
+        """Elimina un archivo externo"""
+        
+        id_item = UrlParser.parse_id(request.url, "items")
+        item = Item.por_id(id_item)
+        user = Usuario.by_user_name(request.credentials["repoze.what.userid"])
+        try:
+            item.eliminar_archivo_adjunto(int(id_archivo), user)
+        except EliminarArchivoAdjuntoError, err:
+            flash(unicode(err), 'warning')
+        redirect("./")
         
     @expose()
     def post(self, archivo=None, **kw):
