@@ -213,7 +213,7 @@ class TipoItemField(CustomPropertySingleSelectField):
     Dropdown field para el tipo de ítem.
     """
     def _my_update_params(self, d, nullable=False):
-        options = [(None, '----------')]
+        options = []
         id_fase = UrlParser.parse_id(request.url, "fases")
         if id_fase:
             fase = Fase.por_id(id_fase)
@@ -229,8 +229,10 @@ class ComplejidadPrioridadField(CustomPropertySingleSelectField):
     Dropdown field para la complejidad y prioridad del ítem.
     """
     def _my_update_params(self, d, nullable=False):
-        options = [(None, '----------')]
-        for i in xrange(0, 11):
+        options = [(1,5)]
+        for i in xrange(1, 11):
+            if i == 5: 
+                continue
             options.append((i, str(i)))
         d["options"] = options
         return d

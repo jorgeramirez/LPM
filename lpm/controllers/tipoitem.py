@@ -263,8 +263,8 @@ class TipoItemController(CrudRestController):
     title = u"Administrar Tipos de Ítem"
     action = "/tipositems/"
     subaction = "/atributostipoitem/"
-    tmp_from_proyecto_titulo = "Tipos de Ítems de proyecto: %s"
-    tmp_from_fase_titulo = "Tipos de Ítems de fase: %s"
+    tmp_from_proyecto_titulo = u"Tipos de Ítems de proyecto: %s"
+    tmp_from_fase_titulo = u"Tipos de Ítems de fase: %s"
     #subcontroller
     atributostipoitem = AtributosPorTipoItemController(DBSession)
     #{ Plantillas

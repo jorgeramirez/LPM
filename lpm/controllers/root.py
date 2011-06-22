@@ -12,8 +12,8 @@ from lpm.lib.base import BaseController
 from lpm.lib.mail import Gmail
 from lpm.model import DBSession, metadata, Usuario
 from lpm import model
-from lpm.controllers.secure import SecureController
-from lpm.controllers.error import ErrorController
+#from lpm.controllers.secure import SecureController
+#from lpm.controllers.error import ErrorController
 from lpm.controllers.proyecto import ProyectoController
 from lpm.controllers.fase import FaseController
 from lpm.controllers.usuario import UsuarioController
