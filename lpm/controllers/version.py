@@ -46,7 +46,7 @@ class VersionTable(TableBase):
                   }
     __omit_fields__ = ['id_propiedad_item', 'id_item_actual', 'relaciones',
                        'archivos', 'atributos', 'historial_item',
-                       'item_lb_assocs']
+                       'item_lb_assocs', 'descripcion', 'observaciones']
     __default_column_width__ = '15em'
     __column_widths__ = { '__actions__': "50em"}
     __field_order__ = ["version", "complejidad", "prioridad", "estado"]

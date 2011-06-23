@@ -17,7 +17,7 @@ __all__ = [
     'NombreTipoItemError', 'TipoAtributoError', 'CondicionAprobarError',
     'BloquearItemError', 'DesBloquearItemError', 'DesAprobarItemError',
     'ModificarItemError', 'EliminarItemError', 'AdjuntarArchivoError',
-    'EliminarArchivoAdjuntoError'
+    'EliminarArchivoAdjuntoError', 'RevivirItemError'
 ]
 
 
@@ -111,9 +111,23 @@ class ModificarItemError(ModelError):
     Excepcion lanzada cuando se intenta modificar un L{Item}
     con estado igual a "Bloqueado", "Revision-Bloq" o "Eliminado"
     """
+    msg = u"No puede modificar un ítem en estado " + \
+          u"Bloqueado, Revision-Bloq o Eliminado"   
+
+    def __init__(self, msg=u""):
+        """
+        Constructor para la clase
+        
+        @param msg: el mensaje a desplegar
+        @type msg: C{unicode} o C{str}
+        """
+        if isinstance(msg, str):
+            msg = unicode(msg)
+        if msg:
+            self.msg = msg
+        
     def __str__(self):
-        return u"Error: No puede modificar un ítem en estado " + \
-               u"Bloqueado, Revision-Bloq o Eliminado"
+        return u"Error: %s" % self.msg
 
 class RevivirItemError(ModelError):
     """

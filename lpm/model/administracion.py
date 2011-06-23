@@ -111,9 +111,10 @@ class Fase(DeclarativeBase):
                 else:
                     self.estado = u"Desarrollo"
 
-    def crear_item(self, id_tipo, **kw):#todavía no probé
+    def crear_item(self, id_tipo, usuario, **kw):#todavía no probé
         """ Crear un item en esta fase
             @param id_tipo: el identificador del tipo de ítem
+            @param usuario: el usuario que realiza la operación
             @param kw: contiene los datos para inicializar su propiedad
         """
         #crear el item
@@ -132,6 +133,8 @@ class Fase(DeclarativeBase):
         p_item.complejidad = int(kw["complejidad"])
         p_item.prioridad = int(kw["prioridad"])
         p_item.estado = u"Desaprobado"
+        p_item.descripcion = unicode(kw["descripcion"])
+        p_item.observaciones = unicode(kw["observaciones"])
         #los atributos de su tipo
         
         for atr in tipo.atributos:
@@ -149,7 +152,8 @@ class Fase(DeclarativeBase):
         item.propiedad_item_versiones.append(p_item)
         DBSession.add(p_item)
         DBSession.flush()
-        
+        op = u"Creación"
+        HistorialItems.registrar(usuario, p_item, op)        
         item.id_propiedad_item = p_item.id_propiedad_item
         self.items.append(item)
         DBSession.add(item)

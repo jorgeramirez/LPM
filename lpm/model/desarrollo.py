@@ -84,7 +84,7 @@ class Item(DeclarativeBase):
                                       pos=fase.posicion,
                                       proy=tipo.id_proyecto)
     
-    def aprobar(self): #jorge (falta probar)
+    def aprobar(self, usuario): #jorge (falta probar)
         """
         Aprueba un ítem.
         
@@ -92,6 +92,8 @@ class Item(DeclarativeBase):
             - Revisión-Desbloq al de Aprobado
             - Desaprobado al de Aprobado
         
+        @param usuario: el usuario que realiza la operación
+        @type usuario: L{Usuario}
         @raises CondicionAprobarError: No cumple las condiciones de 
             aprobación del ítem
         """
@@ -120,13 +122,17 @@ class Item(DeclarativeBase):
                 item_rel.revisar(self.id_item)
         
         p_item.estado = u"Aprobado"
+        op = u"Aprobación"
+        HistorialItems.registrar(usuario, p_item, op)
         DBSession.add(p_item)
 
-    def desaprobar(self): #carlos
+    def desaprobar(self, usuario): #carlos
         """
         Desaprueba un ítem, implica que cambia su estado de "Aprobado", 
             o de "Revisión-Desbloq” al de “Desaprobado".
         
+        @param usuario: el usuario que realiza la operación
+        @type usuario: L{Usuario}        
         @raises DesAprobarItemError: el estado del L{Item} es distinto al 
             de "Aprobado" o "Revision-Desbloq"
         """
@@ -141,13 +147,17 @@ class Item(DeclarativeBase):
             lb.romper()
         else:
             raise DesAprobarItemError()
+        op = u"Desaprobación"
+        HistorialItems.registrar(usuario, p_item, op)
         DBSession.add(p_item)
     
-    def bloquear(self): #jorge
+    def bloquear(self, usuario): #jorge
         """
         Bloquea un ítem, lo que implica que el mismo no puede
         ser modificado.
         
+        @param usuario: el usuario que realiza la operación
+        @type usuario: L{Usuario}
         @raises BloquearItemError: el estado del L{Item} es distinto al 
             de aprobado
         """
@@ -155,13 +165,17 @@ class Item(DeclarativeBase):
         if p_item.estado != u"Aprobado":
             raise BloquearItemError()
         p_item.estado = u"Bloqueado"
+        op = u"Bloqueo"
+        HistorialItems.registrar(usuario, p_item, op)
         DBSession.add(p_item)
             
-    def desbloquear(self): #carlos
+    def desbloquear(self, usuario): #carlos
         """
         Desbloquea un ítem, implica que el mismo puede ser
         modificado.
         
+        @param usuario: el usuario que realiza la operación
+        @type usuario: L{Usuario}
         @raises DesBloquearItemError: el estado del L{Item} es distinto al 
             de "Bloqueado" o "Revision-Desbloq"
         """
@@ -172,25 +186,34 @@ class Item(DeclarativeBase):
             p_item.estado = u"Revision-Desbloq"
         else:
             raise DesBloquearItemError()
+        op = u"Desbloqueo"
+        HistorialItems.registrar(usuario, p_item, op)        
         DBSession.add(p_item)
     
     def revisar(self, id_origen):#nahuelop
         """id_origen es el id de un Item desde el que se produjo el cambio """
         pass
     
-    def eliminar(self): #jorge
+    def eliminar(self, usuario): #jorge
         """
         Elimina un ítem
+        
+        @param usuario: el usuario que registra la operacion.
+        @type usuario: L{Usuario}
         """
         p_item = PropiedadItem.por_id(self.id_propiedad_item)
         if p_item.estado in [u"Bloqueado", u"Eliminado", u"Revisión-Bloq"]:
             raise EliminarItemError()
         p_item.estado = u"Eliminado"
+        op = u"Eliminación"
+        HistorialItems.registrar(usuario, p_item, op)
     
-    def revivir(self):
+    def revivir(self, usuario):
         """
         Revive un ítem, implica que el mismo reviva con el estado desbloqueado.
         
+        @param usuario: el usuario que realiza la operación
+        @type usuario: L{Usuario}
         @raises RevivirItemError: el estado del L{Item} es distinto al 
             de "Eliminado"
         """
@@ -201,11 +224,15 @@ class Item(DeclarativeBase):
         p_item_revivido.version = p_item.version + 1
         p_item_revivido.complejidad = p_item.complejidad
         p_item_revivido.prioridad = p_item.prioridad
+        p_item_revivido.observaciones = p_item.observaciones
+        p_item_revivido.descripcion = p_item.descripcion
         p_item_revivido.incorporar_atributos(p_item.atributos)
         p_item_revivido.incorporar_archivos(p_item.archivos)
         p_item_revivido.estado = u"Desaprobado"
         self.propiedad_item_versiones.append(p_item_revivido)
         DBSession.add(p_item_revivido)
+        op = u"Revivir"
+        HistorialItems.registrar(usuario, p_item_revivido, op)
         DBSession.flush()
         self.id_propiedad_item = p_item_revivido.id_propiedad_item
     
@@ -225,18 +252,25 @@ class Item(DeclarativeBase):
         p_item = PropiedadItem.por_id(self.id_propiedad_item)
         if p_item.estado in [u"Bloqueado", u"Eliminado", u"Revisión-Bloq"]:
             raise ModificarItemError()
+
+        ch = False   #verifica si cambio algo.
+        for k in ["complejidad", "prioridad", "descripcion", "observaciones"]:
+            val = getattr(p_item, k)
+            if val and kw[k] != val:
+                ch = True
+                break
+        if not ch:
+            raise ModificarItemError(u"No se realizaron cambios")
+
         p_item_mod = PropiedadItem()
         p_item_mod.version = p_item.version + 1
         p_item_mod.estado = u"Desaprobado"
-        for attr in ["prioridad", "complejidad"]:
+        for attr in ["prioridad", "complejidad", "descripcion", "observaciones"]:
             valor = getattr(p_item, attr)
             setattr(p_item_mod, attr, kw[attr])
             if valor != kw[attr]:
-                hist_items = HistorialItems()
-                hist_items.tipo_modificacion = u"Modificado " + attr
-                hist_items.usuario = usuario
-                hist_items.item = p_item
-                DBSession.add(hist_items)
+                op = u"Modificación Atributo General"
+                HistorialItems.registrar(usuario, p_item_mod, op)
         p_item_mod.incorporar_relaciones(p_item.relaciones)
         p_item_mod.incorporar_atributos(p_item.atributos)
         p_item_mod.incorporar_archivos(p_item.archivos)
@@ -263,6 +297,8 @@ class Item(DeclarativeBase):
         
         @param id_version: identificador de la versión a la que se desea volver
         @type id_version: C{Integer}
+        @param usuario: el usuario que realiza la operación
+        @type usuario: L{Usuario}
         """
         p_item_actual = PropiedadItem.por_id(self.id_propiedad_item)
         p_item_version = PropiedadItem.por_id(id_version)
@@ -271,6 +307,8 @@ class Item(DeclarativeBase):
         p_item_nuevo.estado = u"Desaprobado"
         p_item_nuevo.prioridad = p_item_version.prioridad
         p_item_nuevo.complejidad = p_item_version.complejidad
+        p_item_nuevo.observaciones = p_item_version.observaciones
+        p_item_nuevo.descripcion = p_item_version.descripcion
         p_item_nuevo.incorporar_archivos(p_item_version.archivos)
         if len(p_item_version.atributos) < len(p_item_actual.atributos):
             tipo_item = lpm.model.TipoItem.por_id(self.id_tipo_item)
@@ -297,13 +335,12 @@ class Item(DeclarativeBase):
                 rpi_nuevo.relacion = rpi.relacion
                 p_item_nuevo.relaciones.append(rpi_nuevo)
                 DBSession.add(rpi_nuevo)
-        hist_items = HistorialItems()
-        hist_items.tipo_modificacion = u"Reversión De: %d A: %d" % \
-            (p_item_actual.version, p_item_version.version)
-        hist_items.usuario = usuario
-        hist_items.item = p_item_actual
+
+        op = u"Reversión De: %d A: %d" % (p_item_actual.version, 
+                                          p_item_version.version)
+        HistorialItems.registrar(usuario, p_item_nuevo, op)
         self.propiedad_item_versiones.append(p_item_nuevo)
-        DBSession.add_all([p_item_nuevo, hist_items])
+        DBSession.add(p_item_nuevo)
         DBSession.flush()
         self.id_propiedad_item = p_item_nuevo.id_propiedad_item
 
@@ -338,6 +375,8 @@ class Item(DeclarativeBase):
         p_item_mod.estado = u"Desaprobado" #?
         p_item_mod.complejidad = p_item.complejidad
         p_item_mod.prioridad = p_item.prioridad
+        p_item_mod.observaciones = p_item.observaciones
+        p_item_mod.descripcion = p_item.descripcion
         p_item_mod.incorporar_relaciones(p_item.relaciones)
         p_item_mod.incorporar_atributos(p_item.atributos)
         p_item_mod.incorporar_archivos(p_item.archivos)
@@ -347,11 +386,9 @@ class Item(DeclarativeBase):
         api.archivo = new_file
         p_item_mod.archivos.append(api)
         self.propiedad_item_versiones.append(p_item_mod)
-        hist_items = HistorialItems()
-        hist_items.tipo_modificacion = u"Adjuntar Archivo"
-        hist_items.usuario = usuario
-        hist_items.item = p_item
-        DBSession.add_all([new_file, hist_items, api, p_item_mod])
+        op = u"Nuevo Adjunto"
+        HistorialItems.registrar(usuario, p_item_mod, op)
+        DBSession.add_all([new_file, api, p_item_mod])
         DBSession.flush()
         self.id_propiedad_item = p_item_mod.id_propiedad_item
         
@@ -372,15 +409,15 @@ class Item(DeclarativeBase):
         p_item_mod.estado = u"Desaprobado" #?
         p_item_mod.complejidad = p_item.complejidad
         p_item_mod.prioridad = p_item.prioridad
+        p_item_mod.observaciones = p_item.observaciones
+        p_item_mod.descripcion = p_item.descripcion
         p_item_mod.incorporar_relaciones(p_item.relaciones)
         p_item_mod.incorporar_atributos(p_item.atributos)
         p_item_mod.incorporar_archivos(p_item.archivos, id_ignorado=id_archivo)
         self.propiedad_item_versiones.append(p_item_mod)
-        hist_items = HistorialItems()
-        hist_items.tipo_modificacion = u"Archivo Adjunto Eliminado"
-        hist_items.usuario = usuario
-        hist_items.item = p_item
-        DBSession.add_all([hist_items, p_item_mod])
+        op = u"Eliminación de Archivo Adjunto"
+        HistorialItems.registrar(usuario, p_item_mod, op)        
+        DBSession.add(p_item_mod)
         DBSession.flush()
         self.id_propiedad_item = p_item_mod.id_propiedad_item
 
@@ -401,6 +438,8 @@ class PropiedadItem(DeclarativeBase):
     complejidad = Column(Integer, nullable=False)
     prioridad = Column(Integer, nullable=False)
     estado = Column(Unicode(20), nullable=False)
+    descripcion = Column(Unicode(200), nullable=True, default=u"DESC")
+    observaciones = Column(Unicode(200), nullable=True, default=u"OBS")
     id_item_actual = Column(Integer, ForeignKey('tbl_item.id_item',
                                                 onupdate='CASCADE', 
                                                 ondelete='CASCADE'))
@@ -418,29 +457,36 @@ class PropiedadItem(DeclarativeBase):
         """
         if self.estado in [u"Bloqueado", u"Eliminado", u"Revisión-Bloq"]:
             raise ModificarItemError()
+
+        api = AtributosPorItem.por_id(id_atributo)
+
+        if api.atributo.valor == valor:
+            raise ModificarItemError(u"No se realizaron cambios")
+
         p_item_mod = PropiedadItem()
         p_item_mod.version = self.version + 1
         p_item_mod.estado = u"Desaprobado"
         p_item_mod.complejidad = self.complejidad
         p_item_mod.prioridad = self.prioridad
+        p_item_mod.observaciones = self.observaciones
+        p_item_mod.descripcion = self.descripcion
         p_item_mod.incorporar_relaciones(self.relaciones)
         p_item_mod.incorporar_archivos(self.archivos)
         p_item_mod.incorporar_atributos(self.atributos, 
                                         id_ignorado=id_atributo)
-        api = AtributosPorItem.por_id(id_atributo)
         attr_de_item = AtributosDeItems()
         attr_de_item.id_atributos_por_tipo_item = api.atributo.id_atributos_por_tipo_item
         attr_de_item.valor = valor
         api_mod = AtributosPorItem()
         api_mod.atributo = attr_de_item
         p_item_mod.atributos.append(api_mod)
-        hist_items = HistorialItems()
-        hist_items.tipo_modificacion = u"Mod. Atributo Especifico"
-        hist_items.usuario = usuario
-        hist_items.item = self
+        attr_por_ti = lpm.model.AtributosPorTipoItem. \
+                        por_id(api.atributo.id_atributos_por_tipo_item)
+        op = u"Mod. Atributo Específico: %s" % attr_por_ti.nombre
+        HistorialItems.registrar(usuario, p_item_mod, op)
         item = Item.por_id(self.id_item_actual)
         item.propiedad_item_versiones.append(p_item_mod)
-        DBSession.add_all([p_item_mod, hist_items, attr_de_item, api_mod])
+        DBSession.add_all([p_item_mod, attr_de_item, api_mod])
         DBSession.flush()
         item.id_propiedad_item = p_item_mod.id_propiedad_item
 
@@ -913,7 +959,7 @@ class HistorialItems(DeclarativeBase):
     
     #{ Columnas
     id_historial_items = Column(Integer, autoincrement=True, primary_key=True)
-    tipo_modificacion = Column(Unicode(45), nullable=False)
+    tipo_modificacion = Column(Unicode(100), nullable=False)
     fecha_modificacion = Column(DateTime, nullable=False, default=datetime.now)
     id_usuario = Column(Integer, ForeignKey('tg_user.id_usuario',
                                             onupdate='CASCADE', 
@@ -925,4 +971,21 @@ class HistorialItems(DeclarativeBase):
     #{ Relaciones
     usuario = relation("Usuario", backref="historial_item")
     item = relation("PropiedadItem", backref="historial_item")
+
+    #{ Métodos
+    @classmethod
+    def registrar(cls, usuario=None, p_item_mod=None, op=None):
+        """
+        Registra una nueva entrada en el historial de items.
+        
+        @param usuario: el usuario que realiza los cambios.
+        @type usuario: L{Usuario}
+        @param p_item_mod: el ítem con los cambios.
+        @type p_item_mod: L{PropiedadItem}
+        """
+        hist_items = HistorialItems()
+        hist_items.tipo_modificacion = unicode(op)
+        hist_items.usuario = usuario
+        hist_items.item = p_item_mod
+        DBSession.add(hist_items)
     #}  

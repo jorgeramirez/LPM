@@ -31,7 +31,7 @@ from sprox.fillerbase import TableFiller, EditFormFiller
 from sprox.fillerbase import EditFormFiller
 from sprox.formbase import AddRecordForm, EditableForm
 
-from tw.forms.fields import TextField
+from tw.forms.fields import TextField, TextArea
 
 from repoze.what.predicates import not_anonymous
 
@@ -55,7 +55,7 @@ class ItemTable(TableBase):
                       'codigo_fase': None, 'complejidad': None}
     __omit_fields__ = ['id_item', 'numero', 'numero_por_tipo', 'id_tipo_item',
                        'id_propiedad_item', 'propiedad_item_versiones',
-                       'id_fase']
+                       'id_fase', 'descripcion', 'observaciones']
     __default_column_width__ = '15em'
     __column_widths__ = { '__actions__': "50em"}
     __field_order__ = ["codigo", "version_actual", "complejidad", 
@@ -243,12 +243,18 @@ class ItemAddForm(AddRecordForm):
     __omit_fields__ = ['id_item', 'numero', 'numero_por_tipo',
                        'id_propiedad_item', 'propiedad_item_versiones',
                        'codigo','id_fase']
-    __add_fields__ = {"complejidad": None, "prioridad": None}
+    __add_fields__ = {"complejidad": None, "prioridad": None,
+                      "descripcion": None, "observaciones": None}
+    __field_order__ = ['id_tipo_item', 'complejidad', 'prioridad',
+                       'descripcion', 'observaciones']
     id_tipo_item = TipoItemField("id_tipo_item", label_text=u"Tipo de Ítem")
     complejidad = ComplejidadPrioridadField("complejidad", 
                                             label_text="Complejidad")
     prioridad = ComplejidadPrioridadField("prioridad", 
                                             label_text="Prioridad")
+    descripcion = TextArea("descripcion", label_text=u"Descripción")
+    observaciones = TextArea("observaciones", label_text=u"Observaciones")
+
 
 item_add_form = ItemAddForm(DBSession)
 
@@ -258,18 +264,24 @@ class ItemEditForm(EditableForm):
     __hide_fields__ = ['id_item', 'codigo', 'numero', 'numero_por_tipo', 
                        'id_tipo_item', 'id_fase', 'id_propiedad_item', 
                        'propiedad_item_versiones']
-    __add_fields__ = {"complejidad": None, "prioridad": None}
+    __add_fields__ = {"complejidad": None, "prioridad": None,
+                      "descripcion": None, "observaciones": None}
+    __field_order__ = ['complejidad', 'prioridad',
+                       'descripcion', 'observaciones']    
     complejidad = ComplejidadPrioridadField("complejidad", 
                                             label_text="Complejidad")
     prioridad = ComplejidadPrioridadField("prioridad", 
                                             label_text="Prioridad")
+    descripcion = TextArea("descripcion", label_text=u"Descripción")
+    observaciones = TextArea("observaciones", label_text=u"Observaciones")
 
 item_edit_form = ItemEditForm(DBSession)
 
 
 class ItemEditFiller(EditFormFiller):
     __model__ = Item
-    __add_fields__ = {"complejidad": None, "prioridad": None}
+    __add_fields__ = {"complejidad": None, "prioridad": None,
+                      "descripcion": None, "observaciones": None}
 
     def complejidad(self, obj, **kw):
         p_item = PropiedadItem.por_id(obj.id_propiedad_item)
@@ -279,6 +291,14 @@ class ItemEditFiller(EditFormFiller):
         p_item = PropiedadItem.por_id(obj.id_propiedad_item)
         return p_item.prioridad
 
+    def descripcion(self, obj, **kw):
+        p_item = PropiedadItem.por_id(obj.id_propiedad_item)
+        return p_item.descripcion
+
+    def observaciones(self, obj, **kw):
+        p_item = PropiedadItem.por_id(obj.id_propiedad_item)
+        return p_item.observaciones
+        
 item_edit_filler = ItemEditFiller(DBSession)
 
 
@@ -452,8 +472,9 @@ class ItemController(CrudRestController):
     def post_delete(self, id_item):
         """Elimina un item"""
         item = Item.por_id(int(id_item))
+        user = Usuario.by_user_name(request.credentials["repoze.what.userid"])
         try:
-            item.eliminar()
+            item.eliminar(user)
             flash(u"Ítem Eliminado")
         except EliminarItemError, err:
             flash(unicode(err), 'warning')
@@ -466,10 +487,11 @@ class ItemController(CrudRestController):
             del kw["sprox_id"]
         id_fase = UrlParser.parse_id(request.url, "fases")
         id_tipo = int(kw["id_tipo_item"])
+        user = Usuario.by_user_name(request.credentials["repoze.what.userid"])
         del kw["id_tipo_item"]
         if id_fase:
             fase = Fase.por_id(id_fase)
-            fase.crear_item(id_tipo, **kw)
+            fase.crear_item(id_tipo, user, **kw)
         redirect("./")
     
     @expose('lpm.templates.item.edit')
@@ -509,7 +531,10 @@ class ItemController(CrudRestController):
     @validate(item_edit_form, error_handler=edit)
     @expose()
     def put(self, *args, **kw):
-        """Actualiza un item. Especificamente su prioridad o complejidad"""
+        """
+        Actualiza un item. Específicamente su prioridad, complejidad, 
+        observaciones o descripcion.
+        """
         if "sprox_id" in kw:
             del kw["sprox_id"]
         kw["complejidad"] = int(kw["complejidad"])
@@ -524,9 +549,10 @@ class ItemController(CrudRestController):
         try:
             item.modificar(user, **kw)
         except ModificarItemError, err:
-            #manejar excepcion
-            redirect(atras)
+            flash(unicode(err), "warning")
+
         redirect(atras)
+        
     
     @expose('lpm.templates.item.relaciones')
     def relacionar_item(self, *args, **kw):
@@ -561,8 +587,9 @@ class ItemController(CrudRestController):
         Revive un ítem que se encuentra en estado eliminado.
         """
         item = Item.por_id(int(args[0]))
+        user = Usuario.by_user_name(request.credentials["repoze.what.userid"])
         try:
-            item.revivir()
+            item.revivir(user)
             flash(u"Ítem Revivido")
         except RevivirItemError, err:
             flash(unicode(err), 'warning')
@@ -574,8 +601,9 @@ class ItemController(CrudRestController):
         Aprueba un ítem.
         """
         item = Item.por_id(int(args[0]))
+        user = Usuario.by_user_name(request.credentials["repoze.what.userid"])
         try:
-            item.aprobar()
+            item.aprobar(user)
             flash(u"Ítem Aprobado")
         except CondicionAprobarError, err:
             flash(unicode(err), 'warning')
@@ -586,9 +614,10 @@ class ItemController(CrudRestController):
         """
         Desaprueba un ítem.
         """
+        user = Usuario.by_user_name(request.credentials["repoze.what.userid"])
         item = Item.por_id(int(args[0]))
         try:
-            item.desaprobar()
+            item.desaprobar(user)
             flash(u"Ítem Desaprobado")
         except DesAprobarItemError, err:
             flash(unicode(err), 'warning')
