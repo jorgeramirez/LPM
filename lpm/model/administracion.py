@@ -202,6 +202,20 @@ class Fase(DeclarativeBase):
             elif self.estado == "Comprometida":
                 puede = False
         return puede
+
+        
+    def puede_crear_lb(self):
+        """
+        Verifica si se pueden crear líneas bases en la fase.
+        Una LB se genera sobre ítems que se encuentren en estado Aprobado.
+        """
+        query =  DBSession.query(Item) \
+                          .join(Fase.items, Item.propiedad_item_versiones) \
+                          .filter(and_(Item.id_fase == self.id_fase, 
+                                  and_(PropiedadItem.id_propiedad_item ==  \
+                                                     Item.id_propiedad_item,
+                                       PropiedadItem.estado == "Aprobado")))
+        return query.count()
     
     @classmethod
     def por_posicion(cls, id_proyecto, posicion):

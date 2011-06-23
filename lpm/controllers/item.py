@@ -83,6 +83,7 @@ class ItemRelacionTable(ItemTable):
 
 item_relacion = ItemRelacionTable
 
+
 class ItemTableFiller(CustomTableFiller):
     __model__ = Item
     __add_fields__ = {'codigo_tipo': None, #'tipo_item': None, 
@@ -121,8 +122,10 @@ class ItemTableFiller(CustomTableFiller):
         if UrlParser.parse_nombre(request.url, "items"):
             controller =  str(obj.id_item)
             
+        #if PoseePermiso('modificar item', 
+        #                id_fase=obj.id_fase).is_met(request.environ):
         if PoseePermiso('modificar item', 
-                        id_fase=obj.id_fase).is_met(request.environ):
+                        id_tipo_item=obj.id_tipo_item).is_met(request.environ):
             value += '<div>' + \
                         '<a href="./'+ controller +'/edit" ' + \
                         'class="' + clase + '">Modificar</a>' + \
@@ -153,8 +156,10 @@ class ItemTableFiller(CustomTableFiller):
         elif st == "Eliminado":
             revivir = True
 
+        #if PoseePermiso('eliminar-revivir item',
+        #                id_fase=obj.id_fase).is_met(request.environ):
         if PoseePermiso('eliminar-revivir item',
-                        id_fase=obj.id_fase).is_met(request.environ):
+                        id_tipo_item=obj.id_tipo_item).is_met(request.environ):
             if eliminar:
                 value += '<div><form method="POST" action="' + controller + '" class="button-to">'+\
                          '<input type="hidden" name="_method" value="DELETE" />' +\
@@ -168,8 +173,10 @@ class ItemTableFiller(CustomTableFiller):
         else:
             controller = './items/'
             
+        #if PoseePermiso('aprobar-desaprobar item', 
+        #                id_fase=obj.id_fase).is_met(request.environ):
         if PoseePermiso('aprobar-desaprobar item', 
-                        id_fase=obj.id_fase).is_met(request.environ):
+                        id_tipo_item=obj.id_tipo_item).is_met(request.environ):
             if aprobar:
                 value += '<div>' + \
                             '<a href="' + controller + 'aprobar/' +str(obj.id_item) +'" ' + \
@@ -180,15 +187,19 @@ class ItemTableFiller(CustomTableFiller):
                             '<a href="' + controller + 'desaprobar/' +str(obj.id_item) +'" ' + \
                             'class="' + clase + '">Desaprobar</a>' + \
                          '</div><br />'
+        #if PoseePermiso('calcular impacto', 
+        #                id_fase=obj.id_fase).is_met(request.environ):
         if PoseePermiso('calcular impacto', 
-                        id_fase=obj.id_fase).is_met(request.environ):
+                        id_tipo_item=obj.id_tipo_item).is_met(request.environ):
                 value += '<div>' + \
                             '<a href="' + controller + 'calcular_impacto/' +str(obj.id_item) +'" ' + \
                             'class="' + clase + '">Calcular Impacto</a>' + \
                          '</div><br />'
 
+        #if PoseePermiso('eliminar-revivir item', 
+        #                id_fase=obj.id_fase).is_met(request.environ):
         if PoseePermiso('eliminar-revivir item', 
-                        id_fase=obj.id_fase).is_met(request.environ):
+                        id_tipo_item=obj.id_tipo_item).is_met(request.environ):
             if revivir:
                 value += '<div>' + \
                             '<a href="' + controller + 'revivir/' +str(obj.id_item) +'" ' + \
@@ -197,7 +208,37 @@ class ItemTableFiller(CustomTableFiller):
         value += '</div>'
         return value
 
-class ItemTableFiller(CustomTableFiller):#no terminado
+    def _do_get_provider_count_and_objs(self, id_fase=None, **kw):
+        """
+        Recupera los ítems para los cuales tenemos algún permiso.
+        Si el usuario se encuentra en una fase, retorna solo
+        los ítems que pertenecen a dicha fase.
+        """
+        count, lista = super(ItemTableFiller, self).\
+                            _do_get_provider_count_and_objs(**kw)
+        filtrados = []                    
+        if id_fase:
+            id_fase = int(id_fase)
+            ap = AlgunPermiso(tipo='Fase', id_fase=id_fase).is_met(request.environ)
+            if ap:
+                for it in lista:
+                    if it.id_fase == id_fase:
+                        filtrados.append(it)
+                
+            return len(filtrados), filtrados        
+        
+        for it in lista:
+            #if AlgunPermiso(tipo='Fase', id_fase=it.id_fase).is_met(request.environ):
+            if AlgunPermiso(tipo=u'Tipo Ítem', 
+                            id_tipo_item=it.id_tipo_item).is_met(request.environ):
+                filtrados.append(it)
+        
+        return len(filtrados), filtrados
+
+
+
+
+class ItemRelacionTableFiller(CustomTableFiller):#no terminado
     __model__ = Item
     __add_fields__ = { #'tipo_item': None, 
                       'version_actual': None, 'estado': None,
@@ -233,7 +274,6 @@ class ItemTableFiller(CustomTableFiller):#no terminado
         if id_fase:
             id_fase = int(id_fase)
             ap = AlgunPermiso(tipo='Fase', id_fase=id_fase).is_met(request.environ)
-
             if ap:
                 for it in lista:
                     if it.id_fase == id_fase:
@@ -310,7 +350,7 @@ class ItemEditForm(EditableForm):
     __add_fields__ = {"complejidad": None, "prioridad": None,
                       "descripcion": None, "observaciones": None}
     __field_order__ = ['complejidad', 'prioridad',
-                       'descripcion', 'observaciones']    
+                       'descripcion', 'observaciones']
     complejidad = ComplejidadPrioridadField("complejidad", 
                                             label_text="Complejidad")
     prioridad = ComplejidadPrioridadField("prioridad", 
@@ -558,7 +598,7 @@ class ItemController(CrudRestController):
         atributos = self.atributos.table_filler \
                         .get_value(id_version=item.id_propiedad_item)
         
-        tmpl_context.tabla_relaciones = RelacionItemTable(DBSession)
+        tmpl_context.tabla_relaciones = ItemRelacionTable(DBSession)
         rel_table_filler = RelacionItemTableFiller(DBSession)
         relaciones = rel_table_filler.get_value(id_version=item.id_propiedad_item)
         value = self.edit_filler.get_value(values={'id_item': id_item})

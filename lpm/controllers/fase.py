@@ -343,10 +343,28 @@ class FaseController(CrudRestController):
         id_fase = UrlParser.parse_id(request.url, "fases")
 
         fase = Fase.por_id(int(id_fase))
+
         puede_crear_item = PoseePermiso("crear item", 
                                        id_fase=id_fase).is_met(request.environ)
         if puede_crear_item:
             puede_crear_item = fase.puede_crear_item()
+            
+       
+        puede_asignar_rol = PoseePermiso('asignar-desasignar rol', 
+                                         id_fase = id_fase). \
+                                         is_met(request.environ)
+
+        puede_crear_rol = PoseePermiso('crear rol', 
+                                         id_fase = id_fase). \
+                                         is_met(request.environ)
+        
+     
+        puede_crear_lb = PoseePermiso('crear lb', 
+                                      id_fase=id_fase).is_met(request.environ)
+
+        if puede_crear_lb:
+            puede_crear_lb = fase.puede_crear_lb()
+
         
         #pp = PoseePermiso('modificar fase', id_fase=id_fase)
         #if not pp.is_met(request.environ):
@@ -364,10 +382,10 @@ class FaseController(CrudRestController):
         tmpl_context.tabla_lb = self.table
         return dict(value=value,
                     page="Modificar Fase",
-                    puede_asignar_rol=True,
-                    puede_crear_rol=True,
+                    puede_asignar_rol=puede_asignar_rol,
+                    puede_crear_rol=puede_crear_rol,
                     puede_crear_item=puede_crear_item,
-                    puede_crear_lb=True,
+                    puede_crear_lb=puede_crear_lb,
                     id=str(id_fase),
                     items=items,
                     lbs=[])
