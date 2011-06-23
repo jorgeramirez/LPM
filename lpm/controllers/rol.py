@@ -102,7 +102,7 @@ class RolTableFiller(CustomTableFiller):
                     perm_del = PoseePermiso('eliminar rol')
             else:
                 contexto = "ti"
-                if tipo.find("Plantilla") >= 0:
+                if tipo.find("plantilla") >= 0:
                     perm_mod = PoseePermiso('modificar rol')
                     perm_del = PoseePermiso('eliminar rol')
                 else:
@@ -703,6 +703,8 @@ class RolPlantillaController(RolController):
             pp = PoseePermiso('crear rol', id_fase=int(kw["id_fase"]))
         elif kw["id_tipo_item"]:
             pp = PoseePermiso('crear rol', id_tipo_item=int(kw["id_tipo_item"]))
+        else:
+            pp = PoseePermiso('crear rol')
         
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
@@ -717,11 +719,13 @@ class RolPlantillaController(RolController):
         """actualiza un rol"""
         pp = None
         if kw["id_proyecto"]:
-            pp = PoseePermiso('crear rol', id_proyecto=int(kw["id_proyecto"]))
+            pp = PoseePermiso('modificar rol', id_proyecto=int(kw["id_proyecto"]))
         elif kw["id_fase"]:    
-            pp = PoseePermiso('crear rol', id_fase=int(kw["id_fase"]))
+            pp = PoseePermiso('modificar rol', id_fase=int(kw["id_fase"]))
         elif kw["id_tipo_item"]:
-            pp = PoseePermiso('crear rol', id_tipo_item=int(kw["id_tipo_item"]))
+            pp = PoseePermiso('modificar rol', id_tipo_item=int(kw["id_tipo_item"]))
+        else:
+            pp = PoseePermiso('modificar rol')
 
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')

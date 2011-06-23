@@ -303,25 +303,34 @@ class RolTableFiller(TableFiller):
             tipo = obj.tipo.lower()
             if (tipo.find(u"proyecto") >= 0):
                 contexto = "proyecto"
-                perm_mod = PoseePermiso('modificar rol', 
-                                        id_proyecto=obj.id_proyecto)
-                perm_del = PoseePermiso('eliminar rol',
-                                        id_proyecto=obj.id_proyecto)
-
+                if tipo == "proyecto":
+                    perm_mod = PoseePermiso('modificar rol', 
+                                            id_proyecto=obj.id_proyecto)
+                    perm_del = PoseePermiso('eliminar rol',
+                                            id_proyecto=obj.id_proyecto)
+                else:
+                    perm_mod = PoseePermiso('modificar rol')
+                    perm_del = PoseePermiso('eliminar rol')
             elif (tipo.find(u"fase") >= 0):
                 contexto = "fase"
-                perm_mod = PoseePermiso('modificar rol', 
-                                        id_fase=obj.id_fase)
-                perm_del = PoseePermiso('eliminar rol',
-                                        id_fase=obj.id_fase)
-  
+                if tipo == "fase":
+                    perm_mod = PoseePermiso('modificar rol', 
+                                            id_fase=obj.id_fase)
+                    perm_del = PoseePermiso('eliminar rol',
+                                            id_fase=obj.id_fase)
+                else:
+                    perm_mod = PoseePermiso('modificar rol')
+                    perm_del = PoseePermiso('eliminar rol')
             else:
                 contexto = "ti"
-                perm_mod = PoseePermiso('modificar rol', 
-                                        id_tipo_item=obj.id_tipo_item)
-                perm_del = PoseePermiso('eliminar rol',
-                                        id_tipo_item=obj.id_tipo_item)
-
+                if tipo.find("plantilla") >= 0:
+                    perm_mod = PoseePermiso('modificar rol')
+                    perm_del = PoseePermiso('eliminar rol')
+                else:
+                    perm_mod = PoseePermiso('modificar rol', 
+                                            id_tipo_item=obj.id_tipo_item)
+                    perm_del = PoseePermiso('eliminar rol',
+                                            id_tipo_item=obj.id_tipo_item)
 
 
         #if PoseePermiso('modificar rol').is_met(request.environ):
