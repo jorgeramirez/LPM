@@ -312,7 +312,7 @@ class ComplejidadPrioridadField(CustomPropertySingleSelectField):
     Dropdown field para la complejidad y prioridad del ítem.
     """
     def _my_update_params(self, d, nullable=False):
-        options = [(1,5)]
+        options = [(5,5)]
         for i in xrange(1, 11):
             if i == 5: 
                 continue

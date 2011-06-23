@@ -17,6 +17,7 @@ from tg.decorators import (paginate, expose, with_trailing_slash,
 from tg import redirect, request, require, flash, url, validate
 
 from lpm.model import (DBSession, TipoItem, AtributosPorTipoItem)
+from lpm.model.excepciones import *
 from lpm.lib.sproxcustom import CustomTableFiller
 from lpm.lib.sproxcustom import WidgetSelectorDojo, MultipleSelectDojo
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
@@ -76,15 +77,8 @@ class AtributosPorTipoItemTableFiller(CustomTableFiller):
                         'class="' + clase + '">Modificar</a>' + \
                      '</div><br />'
         if obj.puede_eliminarse():
-            #if PoseePermiso('redefinir tipo item').is_met(request.environ):
             if PoseePermiso('redefinir tipo item',
                             id_tipo_item=obj.id_tipo_item).is_met(request.environ):
-                #value += '<div><form method="POST" action="' + id + '" class="button-to">'+\
-                #         '<input type="hidden" name="_method" value="DELETE" />' +\
-                #         '<input onclick="return confirm(\'Está seguro?\');" value="Delete" type="submit" '+\
-                #         'style="background-color: transparent; float:left; border:0; color: #286571;'+\
-                #         'display: inline; margin: 0; padding: 0;" class="' + clase + '"/>'+\
-                #         '</form></div><br />'
                 value += '<div><form method="POST" action="' + url_cont + 'post_delete/' + id + '" class="button-to">'+\
                          '<input onclick="return confirm(\'Está seguro?\');" value="Eliminar" type="submit" '+\
                          'style="background-color: transparent; float:left; border:0; color: #286571;'+\
@@ -101,14 +95,24 @@ class AtributosPorTipoItemTableFiller(CustomTableFiller):
         if AlgunPermiso(tipo="Tipo").is_met(request.environ):
             id_tipo = UrlParser.parse_id(request.url, "tipositems")
             ti = TipoItem.por_id(id_tipo)
-            lista = ti.atributos
-            actual = ti.id_padre
-            while (actual):
-                papa = TipoItem.por_id(actual)
-                lista.extend(papa.atributos)
-                actual = papa.id_padre
+            pks = []
+            actual = ti
+            while actual:
+                for attr in actual.atributos:
+                    pks.append(attr.id_atributos_por_tipo_item)
+                actual = TipoItem.por_id(actual.id_padre)
+            query = DBSession.query(AtributosPorTipoItem) \
+                             .filter(AtributosPorTipoItem \
+                                     .id_atributos_por_tipo_item.in_(pks))
+            return query.count(), query.all()
+            #lista = ti.atributos
+            #actual = ti.id_padre
+            #while (actual):
+            #    papa = TipoItem.por_id(actual)
+            #    lista.extend(papa.atributos)
+            #    actual = papa.id_padre
 
-            return len(lista), lista
+            #return len(lista), lista
         return 0, []
 
 atributos_por_tipo_item_table_filler = AtributosPorTipoItemTableFiller(DBSession)
@@ -118,7 +122,7 @@ class AtributoTipoField(PropertySingleSelectField):
     """Dropdown list para el tipo del atributo"""
     def _my_update_params(self, d, nullable=False):
         options = []
-        options.append((0, "----------"))
+        #options.append((0, "----------"))
         options.extend(AtributosPorTipoItem._tipos_permitidos)
         d['options'] = options
         return d
@@ -143,14 +147,16 @@ class AtributosPorTipoItemEditForm(EditableForm):
     __model__ = AtributosPorTipoItem
     __hide_fields__ = ['id_atributos_por_tipo_item']
     __omit_fields__ = ['id_tipo_item', 'id_atributos_por_tipo_item']
-    __require_fields__ = ['nombre', 'tipo', 'valor_por_defecto']
+    __require_fields__ = ['nombre', 'tipo', 'valor_por_defecto'] 
+    #__require_fields__ = ['valor_por_defecto']
     __check_if_unique__ = True
     __field_order__ = ['nombre', 'tipo', 'valor_por_defecto']
     __field_attrs__ = {'nombre': { 'maxlength' : '32'},
                        'tipo': { 'maxlength' : '32'},
                        'valor_por_defecto': { 'maxlength' : '32'}
                       }
-    tipo = AtributoTipoField("tipo", labeltext="Tipo")
+    tipo = AtributoTipoField("tipo", label_text=u"Tipo")
+    nombre = TextField("nombre", label_text=u"Nombre")
 
 atributos_por_tipo_item_edit_form = AtributosPorTipoItemEditForm(DBSession)
 
@@ -252,7 +258,10 @@ class AtributosPorTipoItemController(CrudRestController):
             del kw["sprox_id"]
 
         tipo = TipoItem.por_id(id_tipo)
-        tipo.agregar_atributo(**kw)
+        try:
+            tipo.agregar_atributo(**kw)
+        except NombreDeAtributoError, err:
+            flash(unicode(err), "warning")
 
         redirect(atras)
         
@@ -277,7 +286,10 @@ class AtributosPorTipoItemController(CrudRestController):
             del kw["sprox_id"]
         transaction.begin()
         tipo = TipoItem.por_id(id_tipo)
-        tipo.modificar_atributo(id_atributo, **kw)
+        try:
+            tipo.modificar_atributo(id_atributo, **kw)
+        except NombreDeAtributoError, err:
+            flash(unicode(err), "warning")
         transaction.commit()
         redirect(atras)
 
