@@ -46,7 +46,7 @@ class VersionTable(TableBase):
                   }
     __omit_fields__ = ['id_propiedad_item', 'id_item_actual', 'relaciones',
                        'archivos', 'atributos', 'historial_item',
-                       'item_lb_assocs']
+                       'item_lb_assocs', 'descripcion', 'observaciones']
     __default_column_width__ = '15em'
     __column_widths__ = { '__actions__': "50em"}
     __field_order__ = ["version", "complejidad", "prioridad", "estado"]
@@ -64,8 +64,10 @@ class VersionTableFiller(CustomTableFiller):
         clase = 'actions_fase'
         item = Item.por_id(obj.id_item_actual)
         id = obj.id_propiedad_item
-        if PoseePermiso('modificar item', 
-                        id_fase=item.id_fase).is_met(request.environ):
+        #if PoseePermiso('modificar item', 
+        #                id_fase=item.id_fase).is_met(request.environ):
+        if PoseePermiso('modificar item',
+                        id_tipo_item=item.id_tipo_item).is_met(request.environ):
             value += '<div>' + \
                         '<a href="./' + str(id) + '/edit" ' +  \
                         'class="' + clase + '">Examinar</a>' + \
@@ -264,6 +266,10 @@ class VersionController(CrudRestController):
         if not id_item:
             redirect("../")
         item = Item.por_id(id_item)
+        pp = PoseePermiso('modificar item', id_tipo_item=item.id_tipo_item)
+        if not pp.is_met(request.environ):
+            flash(pp.message % pp.nombre_permiso, 'warning')
+            redirect("../")
         user = Usuario.by_user_name(request.credentials["repoze.what.userid"])
         item.revertir(id_version, user)
         redirect("../")

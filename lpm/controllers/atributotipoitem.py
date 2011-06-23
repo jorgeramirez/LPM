@@ -68,13 +68,17 @@ class AtributosPorTipoItemTableFiller(CustomTableFiller):
         if id_proyecto:
             url_cont = "/proyectos/%d/tipositems/%d/atributostipoitem/" % \
                                                    (id_proyecto, id_tipo)
-        if PoseePermiso('redefinir tipo item').is_met(request.environ):
+        #if PoseePermiso('redefinir tipo item').is_met(request.environ):
+        if PoseePermiso('redefinir tipo item',
+                        id_tipo_item=obj.id_tipo_item).is_met(request.environ):
             value += '<div>' + \
                         '<a href="' + url_cont + id + '/edit" ' + \
                         'class="' + clase + '">Modificar</a>' + \
                      '</div><br />'
         if obj.puede_eliminarse():
-            if PoseePermiso('redefinir tipo item').is_met(request.environ):
+            #if PoseePermiso('redefinir tipo item').is_met(request.environ):
+            if PoseePermiso('redefinir tipo item',
+                            id_tipo_item=obj.id_tipo_item).is_met(request.environ):
                 #value += '<div><form method="POST" action="' + id + '" class="button-to">'+\
                 #         '<input type="hidden" name="_method" value="DELETE" />' +\
                 #         '<input onclick="return confirm(\'Está seguro?\');" value="Delete" type="submit" '+\
@@ -189,7 +193,10 @@ class AtributosPorTipoItemController(CrudRestController):
         if id_proyecto:
             atras = "/proyectos/" + str(id_proyecto) + atras
             url_action = "/proyectos/" + str(id_proyecto) + url_action
-        pp = PoseePermiso('redefinir tipo item')
+        
+        #pp = PoseePermiso('redefinir tipo item')
+        pp = PoseePermiso('redefinir tipo item',
+                          id_tipo_item=id_tipo)
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect(atras)
@@ -213,7 +220,9 @@ class AtributosPorTipoItemController(CrudRestController):
         if id_proyecto:
             atras = "/proyectos/" + str(id_proyecto) + atras
             url_action = "/proyectos/" + str(id_proyecto) + url_action
-        pp = PoseePermiso('redefinir tipo item')
+        #pp = PoseePermiso('redefinir tipo item')
+        pp = PoseePermiso('redefinir tipo item',
+                          id_tipo_item=id_tipo)
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect(atras)
@@ -233,7 +242,9 @@ class AtributosPorTipoItemController(CrudRestController):
         if id_proyecto:
             atras = "/proyectos/" + str(id_proyecto) + atras
             
-        pp = PoseePermiso('redefinir tipo item')
+        #pp = PoseePermiso('redefinir tipo item')
+        pp = PoseePermiso('redefinir tipo item',
+                          id_tipo_item=id_tipo)
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect(atras)
@@ -255,7 +266,10 @@ class AtributosPorTipoItemController(CrudRestController):
         atras = self.parent_action + str(id_tipo) + '/edit'
         if id_proyecto:
             atras = "/proyectos/" + str(id_proyecto) + atras
-        pp = PoseePermiso('redefinir tipo item')
+        #pp = PoseePermiso('redefinir tipo item')
+        pp = PoseePermiso('redefinir tipo item',
+                          id_tipo_item=id_tipo)
+        
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect(atras)

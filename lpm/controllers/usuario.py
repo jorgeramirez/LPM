@@ -280,24 +280,58 @@ class RolTableFiller(TableFiller):
         contexto = ""
         url_cont = ""
         
+        #if (obj.tipo == "Sistema"):
+        #    url_cont = "/roles/"
+        #else:
+        #    url_cont = "/rolesplantilla/"
+        #    tipo = obj.tipo.lower()
+        #    if (tipo.find(u"proyecto") >= 0):
+        #        contexto = "proyecto"
+        #    elif (tipo.find(u"fase") >= 0):
+        #        contexto = "fase"
+        #    else:
+        #        contexto = "ti"
+
+        perm_mod = None
+        perm_del = None
         if (obj.tipo == "Sistema"):
             url_cont = "/roles/"
+            perm_mod = PoseePermiso('modificar rol')
+            perm_del = PoseePermiso('eliminar rol')
         else:
             url_cont = "/rolesplantilla/"
             tipo = obj.tipo.lower()
             if (tipo.find(u"proyecto") >= 0):
                 contexto = "proyecto"
+                perm_mod = PoseePermiso('modificar rol', 
+                                        id_proyecto=obj.id_proyecto)
+                perm_del = PoseePermiso('eliminar rol',
+                                        id_proyecto=obj.id_proyecto)
+
             elif (tipo.find(u"fase") >= 0):
                 contexto = "fase"
+                perm_mod = PoseePermiso('modificar rol', 
+                                        id_fase=obj.id_fase)
+                perm_del = PoseePermiso('eliminar rol',
+                                        id_fase=obj.id_fase)
+  
             else:
                 contexto = "ti"
+                perm_mod = PoseePermiso('modificar rol', 
+                                        id_tipo_item=obj.id_tipo_item)
+                perm_del = PoseePermiso('eliminar rol',
+                                        id_tipo_item=obj.id_tipo_item)
 
-        if PoseePermiso('modificar rol').is_met(request.environ):
+
+
+        #if PoseePermiso('modificar rol').is_met(request.environ):
+        if perm_mod.is_met(request.environ):
             value += '<div>' + \
                         '<a href="' +  url_cont + str(obj.id_rol) + "/edit?contexto="+  \
                         contexto + '" class="' + clase + '">Modificar</a>' + \
                      '</div><br />'
-        if PoseePermiso('eliminar rol').is_met(request.environ):
+        #if PoseePermiso('eliminar rol').is_met(request.environ):
+        if perm_del.is_met(request.environ):
             value += '<div><form method="POST" action="/roles/' + str(obj.id_rol) + '" class="button-to">'+\
                      '<input type="hidden" name="_method" value="DELETE" />' +\
                      '<input onclick="return confirm(\'Está seguro?\');" value="Delete" type="submit" '+\

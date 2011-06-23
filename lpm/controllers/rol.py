@@ -71,38 +71,54 @@ class RolTableFiller(CustomTableFiller):
         clase = 'actions'
         url_cont = ""
         contexto = ""
-#        if (obj.tipo == "Sistema"):
-#            url_cont = "/roles/"
-#        elif (obj.tipo.find(u"Plantilla") >= 0):
-#            url_cont = "/rolesplantilla/"
-#            if (obj.tipo.find(u"proyecto") > 0):
-#                contexto = "proyecto"
-#            elif (obj.tipo.find(u"fase") > 0):
-#                contexto = "fase"
-#            else:
-#                contexto = "ti"
-#       else:
-#            url_cont = "/rolescontexto/"
-
+        perm_mod = None
+        perm_del = None
         if (obj.tipo == "Sistema"):
             url_cont = "/roles/"
+            perm_mod = PoseePermiso('modificar rol')
+            perm_del = PoseePermiso('eliminar rol')
         else:
             url_cont = "/rolesplantilla/"
             tipo = obj.tipo.lower()
             if (tipo.find(u"proyecto") >= 0):
                 contexto = "proyecto"
+                if tipo == "proyecto":
+                    perm_mod = PoseePermiso('modificar rol', 
+                                            id_proyecto=obj.id_proyecto)
+                    perm_del = PoseePermiso('eliminar rol',
+                                            id_proyecto=obj.id_proyecto)
+                else:
+                    perm_mod = PoseePermiso('modificar rol')
+                    perm_del = PoseePermiso('eliminar rol')
             elif (tipo.find(u"fase") >= 0):
                 contexto = "fase"
+                if tipo == "fase":
+                    perm_mod = PoseePermiso('modificar rol', 
+                                            id_fase=obj.id_fase)
+                    perm_del = PoseePermiso('eliminar rol',
+                                            id_fase=obj.id_fase)
+                else:
+                    perm_mod = PoseePermiso('modificar rol')
+                    perm_del = PoseePermiso('eliminar rol')
             else:
                 contexto = "ti"
+                if tipo.find("Plantilla") >= 0:
+                    perm_mod = PoseePermiso('modificar rol')
+                    perm_del = PoseePermiso('eliminar rol')
+                else:
+                    perm_mod = PoseePermiso('modificar rol', 
+                                            id_tipo_item=obj.id_tipo_item)
+                    perm_del = PoseePermiso('eliminar rol',
+                                            id_tipo_item=obj.id_tipo_item)
+
             
-        if PoseePermiso('modificar rol').is_met(request.environ):
+        if perm_mod.is_met(request.environ):
             value += '<div>' + \
                         '<a href="' +  url_cont + str(obj.id_rol) + "/edit?contexto="+  \
                         contexto + '" class="' + clase + '">Modificar</a>' + \
                      '</div><br />'
-        #falta implementar!
-        if PoseePermiso('eliminar rol').is_met(request.environ):
+
+        if perm_del.is_met(request.environ):
             value += '<div><form method="POST" action="./' + str(obj.id_rol) + '" class="button-to">'+\
                      '<input type="hidden" name="_method" value="DELETE" />' +\
                      '<input onclick="return confirm(\'Está seguro?\');" value="Delete" type="submit" '+\
@@ -328,10 +344,9 @@ class RolPlantillaEditForm(RolEditForm):
         self.__widget_selector_type__ = selector
         super(RolPlantillaEditForm, self).__init__(DBS)
 
-    __hide_fields__ = ['id_rol', 'tipo']
-    __omit_fields__ = ['usuarios',
-                       'codigo', 'creado', 'id_proyecto', 'id_fase',
+    __hide_fields__ = ['id_rol', 'tipo', 'id_proyecto', 'id_fase', 
                        'id_tipo_item']
+    __omit_fields__ = ['usuarios', 'codigo', 'creado']
     __field_order__ = ['id_rol', 'nombre_rol', 'descripcion', 'tipo', 'permisos']
 
     
@@ -680,9 +695,15 @@ class RolPlantillaController(RolController):
     #@validate(rol_plantilla_add_form, error_handler=new)
     @expose()
     def post(self, *args, **kw):
-        """ Crea un nuevo rol plantilla"""
-        print kw
-        pp = PoseePermiso('crear rol')
+        """ Crea un nuevo rol plantilla o con contexto"""
+        pp = None
+        if kw["id_proyecto"]:
+            pp = PoseePermiso('crear rol', id_proyecto=int(kw["id_proyecto"]))
+        elif kw["id_fase"]: 
+            pp = PoseePermiso('crear rol', id_fase=int(kw["id_fase"]))
+        elif kw["id_tipo_item"]:
+            pp = PoseePermiso('crear rol', id_tipo_item=int(kw["id_tipo_item"]))
+        
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect(self.action)
@@ -694,8 +715,14 @@ class RolPlantillaController(RolController):
     @expose()
     def put(self, *args, **kw):
         """actualiza un rol"""
+        pp = None
+        if kw["id_proyecto"]:
+            pp = PoseePermiso('crear rol', id_proyecto=int(kw["id_proyecto"]))
+        elif kw["id_fase"]:    
+            pp = PoseePermiso('crear rol', id_fase=int(kw["id_fase"]))
+        elif kw["id_tipo_item"]:
+            pp = PoseePermiso('crear rol', id_tipo_item=int(kw["id_tipo_item"]))
 
-        pp = PoseePermiso('modificar rol')
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect(self.action)
@@ -704,52 +731,3 @@ class RolPlantillaController(RolController):
         redirect(self.action)
     
     #}
-
-
-#class RolContextoController(RolController):
-#    """Controlador de roles con contexto"""
-#    #{ Variables
-#    title = u"Administrar Roles con Contexto"
-#    action = "/rolescontexto/"
-#    rol_tipo = u"deducir" #indica que el tipo hay que deducir.
-#    
-#    #{ Modificadores
-#    model = Rol
-#    table = rol_table
-#    table_filler = rol_contexto_table_filler
-#    new_form = rol_contexto_add_form
-#    edit_form = rol_contexto_edit_form
-#    edit_filler = rol_edit_filler
-#
-#    #para el form de busqueda
-#    columnas = dict(codigo="texto", nombre_rol="texto")
-#    tipo_opciones = [u'Proyecto', u'Fase', u'Tipo de Ítem']
-#    
-#    #{ Métodos
-#    @expose('lpm.templates.rol.edit')
-#    def edit(self, *args, **kw):
-#        """Despliega una pagina para modificar rol"""
-#        return super(RolContextoController, self).edit(*args, **kw)
-#
-#    @without_trailing_slash
-#    @expose('lpm.templates.rol.new')
-#    def new(self, *args, **kw):
-#        return super(RolContextoController, self).new(*args, **kw)
-#        
-#    @validate(rol_contexto_add_form, error_handler=new)
-#    @expose()
-#    def post(self, *args, **kw):
-#        super(RolContextoController, self).post(*args, **kw)
-#
-#    @validate(rol_contexto_edit_form, error_handler=edit)
-#    @expose()
-#    def put(self, *args, **kw):
-#        super(RolContextoController, self).put(*args, **kw)
-#
-#    @with_trailing_slash
-#    @paginate('lista_elementos', items_per_page=5)
-#    @expose('lpm.templates.rol.get_all')
-#    @expose('json')
-#    def post_buscar(self, *args, **kw):
-#        return super(RolContextoController, self).post_buscar(*args, **kw)
-#    #}
