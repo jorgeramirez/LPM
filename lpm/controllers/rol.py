@@ -685,8 +685,16 @@ class RolPlantillaController(RolController):
         
         page = page.format(contexto=contexto)
         
+        de_proyectos = ""
+        try:
+            de_proyectos = "http://" + request.environ.get('HTTP_HOST',) + "/proyectos/" + kw["id_proyecto"] + "/edit"
+        except Exception: 
+            pass
+
         if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/":
             atras = "/"
+        elif request.environ.get('HTTP_REFERER') == de_proyectos:
+            atras = request.environ.get('HTTP_REFERER')
         else:
             atras = "/rolesplantilla"
         
@@ -709,6 +717,7 @@ class RolPlantillaController(RolController):
             redirect(self.action)
         
         Rol.crear_rol(**kw)
+        print kw
         redirect(self.action)
 
    #@validate(rol_plantilla_edit_form, error_handler=edit)

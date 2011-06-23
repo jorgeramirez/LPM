@@ -399,7 +399,18 @@ class UsuarioController(CrudRestController):
             
         tmpl_context.widget = usuario_table
         
-        atras = '/'
+        de_proyectos = ""
+        try:
+            de_proyectos = "http://" + request.environ.get('HTTP_HOST',) + "/proyectos/" + kw["id_proyecto"] + "/edit"
+        except Exception: 
+            pass
+        print request.environ.get('HTTP_REFERER')
+        print kw
+        
+        if request.environ.get('HTTP_REFERER') == de_proyectos:
+            atras = request.environ.get('HTTP_REFERER')
+        else:
+            atras = '/'
 
         if kw.has_key("id_proyecto") or kw.has_key("id_fase") \
                                      or kw.has_key("id_tipo_item"):
@@ -585,7 +596,12 @@ class UsuarioController(CrudRestController):
         buscar_table_filler = UsuarioTableFiller(DBSession)
         buscar_table_filler.filtros = kw
         usuarios = buscar_table_filler.get_value()
-        atras = '/usuarios'
+                
+        if request.environ.get('HTTP_REFERER') != "http://" + request.environ.get('HTTP_HOST',) + "/usuarios/":
+            atras = request.environ.get('HTTP_REFERER')
+        else:
+            atras = '/usuarios'        
+        
         return dict(lista_elementos=usuarios, 
                     page=self.title, titulo=self.title, 
                     modelo=self.model.__name__, 
