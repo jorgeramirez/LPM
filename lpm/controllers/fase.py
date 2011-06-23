@@ -348,10 +348,10 @@ class FaseController(CrudRestController):
         if puede_crear_item:
             puede_crear_item = fase.puede_crear_item()
         
-        pp = PoseePermiso('modificar fase', id_fase=id_fase)
-        if not pp.is_met(request.environ):
-            flash(pp.message % pp.nombre_permiso, 'warning')
-            redirect("./")
+        #pp = PoseePermiso('modificar fase', id_fase=id_fase)
+        #if not pp.is_met(request.environ):
+        #    flash(pp.message % pp.nombre_permiso, 'warning')
+        #    redirect("./")
             
         tmpl_context.widget = FaseEditForm(DBSession)
         
@@ -378,12 +378,15 @@ class FaseController(CrudRestController):
         """update"""
         if "sprox_id" in kw:
             del kw["sprox_id"]
-        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        id_fase = UrlParser.parse_id(request.url, "fases")
+        id_proyecto = int(kw["id_proyecto"])
+        id_fase = int(kw["id_fase"])
+        del kw["id_fase"]
+        pp = PoseePermiso('modificar fase', id_fase=id_fase)
+        if not pp.is_met(request.environ):
+            flash(pp.message % pp.nombre_permiso, 'warning')
+            redirect("../")
 
-        if id_proyecto:
-            proy = Proyecto.por_id(id_proyecto)
-            proy.modificar_fase(id_fase, **kw)
-
+        proy = Proyecto.por_id(id_proyecto)
+        proy.modificar_fase(id_fase, **kw)
         redirect("../")
     #}

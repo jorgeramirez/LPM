@@ -86,8 +86,10 @@ class AtributoItemTableFiller(CustomTableFiller):
         if UrlParser.parse_nombre(request.url, "atributos"):
             controller = id
 
+        #if PoseePermiso('modificar item', 
+        #                id_fase=item.id_fase).is_met(request.environ):
         if PoseePermiso('modificar item', 
-                        id_fase=item.id_fase).is_met(request.environ):
+                        id_tipo_item=item.id_tipo_item).is_met(request.environ):
             value += '<div>' + \
                         '<a href="./'+ controller +'/edit" ' + \
                         'class="' + clase + '">Modificar</a>' + \

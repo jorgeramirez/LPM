@@ -87,11 +87,22 @@ class PoseePermiso(Predicate):
         self.id_proyecto = 0
         self.id_fase = 0
         self.id_tipo_item = 0
-        for key in ["id_proyecto", "id_fase", "id_tipo_item"]:
-            if kw.has_key(key):
-                setattr(self, key, kw[key])
-                del kw[key]
-                break
+        
+        if not kw.has_key('id_proyecto'):
+            if kw.has_key('id_fase'):
+                self.id_fase = int(kw['id_fase'])
+                self.id_proyecto = Fase.por_id(self.id_fase).id_proyecto
+                del kw['id_fase']
+            if kw.has_key('id_tipo_item'):
+                self.id_tipo_item = int(kw['id_tipo_item'])
+                ti = TipoItem.por_id(self.id_tipo_item)
+                self.id_fase = ti.id_fase
+                self.id_proyecto = ti.id_proyecto
+                del kw['id_tipo_item']
+        else:
+            self.id_proyecto = int(kw['id_proyecto'])
+            del kw['id_proyecto']        
+        
         super(PoseePermiso, self).__init__(**kw)
         
     def evaluate(self, environ, credentials):
@@ -113,16 +124,17 @@ class PoseePermiso(Predicate):
                     return
                 
                 if self.id_proyecto == r.id_proyecto:
-                    if r.id_fase == 0 and r.id_tipo_item == 0:
+                    if r.tipo == u"Proyecto":
                         return
-                    
-                if self.id_fase == r.id_fase:
-                    if r.id_tipo_item == 0:
-                        return
-                    
-                if self.id_tipo_item == r.id_tipo_item:
-                    return
                 
+                if self.id_fase == r.id_fase:
+                    if r.tipo == u"Fase":
+                        return
+
+                ti = TipoItem.por_id(self.id_tipo_item)
+                if ti and ti.es_o_es_hijo(r.id_tipo_item):
+                    return
+                    
         self.unmet(self.message % self.nombre_permiso)
         
 class AlgunPermiso(Predicate):
@@ -192,7 +204,7 @@ class AlgunPermiso(Predicate):
                     return
                 
             ti = TipoItem.por_id(self.id_tipo_item)
-            if (ti.es_o_es_hijo(r.id_tipo_item)):
+            if (ti and ti.es_o_es_hijo(r.id_tipo_item)):
                 return
             
         self.unmet(self.message)

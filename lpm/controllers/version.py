@@ -64,8 +64,10 @@ class VersionTableFiller(CustomTableFiller):
         clase = 'actions_fase'
         item = Item.por_id(obj.id_item_actual)
         id = obj.id_propiedad_item
-        if PoseePermiso('modificar item', 
-                        id_fase=item.id_fase).is_met(request.environ):
+        #if PoseePermiso('modificar item', 
+        #                id_fase=item.id_fase).is_met(request.environ):
+        if PoseePermiso('modificar item',
+                        id_tipo_item=item.id_tipo_item).is_met(request.environ):
             value += '<div>' + \
                         '<a href="./' + str(id) + '/edit" ' +  \
                         'class="' + clase + '">Examinar</a>' + \
@@ -264,6 +266,10 @@ class VersionController(CrudRestController):
         if not id_item:
             redirect("../")
         item = Item.por_id(id_item)
+        pp = PoseePermiso('modificar item', id_tipo_item=item.id_tipo_item)
+        if not pp.is_met(request.environ):
+            flash(pp.message % pp.nombre_permiso, 'warning')
+            redirect("../")
         user = Usuario.by_user_name(request.credentials["repoze.what.userid"])
         item.revertir(id_version, user)
         redirect("../")

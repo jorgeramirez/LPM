@@ -330,7 +330,10 @@ class Rol(DeclarativeBase):
         del kw["permisos"]
         for k in ["id_proyecto", "id_fase", "id_tipo_item"]:
             if kw.has_key(k):
-                kw[k] = int(kw[k])
+                if kw[k]:
+                    kw[k] = int(kw[k])
+                else:
+                    del kw[k]
         rol_mod = Rol.por_id(kw['id_rol'])
         for k in ["id_proyecto", "id_fase", "id_tipo_item", "nombre_rol",
                   "descripcion"]:

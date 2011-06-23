@@ -66,37 +66,40 @@ class TipoItemTableFiller(CustomTableFiller):
         """Links de acciones para un registro dado"""
         value = '<div>'
         clase = 'actions'
-#        url_cont = "/tipositems/"
         url_cont = "./tipositems/" + str(obj.id_tipo_item)
+        
+        #rti_sys = PoseePermiso('redefinir tipo item').is_met(request.environ)
+        #rti_proy = PoseePermiso('redefinir tipo item',
+        #                        id_proyecto=obj.id_proyecto).is_met(request.environ)
+        #rti_fase = PoseePermiso('redefinir tipo item',
+        #                        id_fase=obj.id_fase).is_met(request.environ)
+        #rti_ti = PoseePermiso('redefinir tipo item',
+        #                        id_tipo_item=obj.id_tipo_item).is_met(request.environ)
+        
+        pp = PoseePermiso('redefinir tipo item', 
+                          id_tipo_item=obj.id_tipo_item)
         
         #si está en la tabla que está en edit proyecto necesita esta parte del url
         if (UrlParser.parse_nombre(request.url, "tipositems")):
             url_cont =  str(obj.id_tipo_item)
             
-#        id = str(obj.id_tipo_item)
-#        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-#        if id_proyecto:
-#            url_cont = "/proyectos/%d/tipositems/" % id_proyecto
-        if PoseePermiso('redefinir tipo item').is_met(request.environ):
+        #if PoseePermiso('redefinir tipo item').is_met(request.environ):
+        if pp.is_met(request.environ):
             value += '<div>' + \
                         '<a href="./' + url_cont + '/edit" ' + \
                         'class="' + clase + '">Modificar</a>' + \
                      '</div><br />'
         if obj.puede_eliminarse():
-            if PoseePermiso('redefinir tipo item').is_met(request.environ):
-                #value += '<div><form method="POST" action="' + id + '" class="button-to">'+\
-                #         '<input type="hidden" name="_method" value="DELETE" />' +\
-                #         '<input onclick="return confirm(\'Está seguro?\');" value="Delete" type="submit" '+\
-                #         'style="background-color: transparent; float:left; border:0; color: #286571;'+\
-                #         'display: inline; margin: 0; padding: 0;" class="' + clase + '"/>'+\
-                #         '</form></div><br />'
+            #if PoseePermiso('redefinir tipo item').is_met(request.environ):
+            if pp.is_met(request.environ):
                 value += '<div><form method="POST" action="' + url_cont + '" class="button-to">'+\
                          '<input type="hidden" name="_method" value="DELETE" />' +\
                          '<input onclick="return confirm(\'Está seguro?\');" value="Eliminar" type="submit" '+\
                          'style="background-color: transparent; float:left; border:0; color: #286571;'+\
                          'display: inline; margin: 0; padding: 0;" class="' + clase + '"/>'+\
                          '</form></div><br />'
-        if PoseePermiso('redefinir tipo item').is_met(request.environ):
+        #if PoseePermiso('redefinir tipo item').is_met(request.environ):
+        if pp.is_met(request.environ):
             value += '<div>' + \
                         '<a href="' + url_cont + '/atributostipoitem/new" ' + \
                         'class="' + clase + '">Agregar Atributo</a>' + \
@@ -201,12 +204,7 @@ class TipoImportadoField(PropertySingleSelectField):
                 if (AlgunPermiso(tipo="Tipo", id_tipo_item=ti.id_tipo_item)):
                     options.append((ti.id_tipo_item, '%s (%s)' % (ti.nombre, 
                                                                   ti.codigo)))
-#        if (self.accion == "edit"):
-#            id_tipo = UrlParser.parse_id(request.url, "tipositems")
-#            ti = TipoItem.por_id(id_tipo)
-#            options.append((ti.id_tipo_item, '%s (%s)' % (ti.nombre, 
-#                                                          ti.codigo)))
-            
+
         d['options'] = options
         return d
   
@@ -233,9 +231,8 @@ tipo_item_add_form = TipoItemAddForm(DBSession)
 
 class TipoItemEditForm(EditableForm):
     __model__ = TipoItem
-    __hide_fields__ = ['id_tipo_item']
-    __omit_fields__ = ['id_tipo_item', 'id_proyecto', 'codigo', 'hijos', 
-                       'atributos', 'items', 'roles', 'id_fase']
+    __hide_fields__ = ['id_tipo_item', 'id_proyecto', 'id_fase']
+    __omit_fields__ = ['codigo', 'hijos', 'atributos', 'items', 'roles']
     #__check_if_unique__ = True
     __field_order__ = ['nombre', 'descripcion', 'id_padre' ]
     __field_attrs__ = {'descripcion' : {'row': '1'},
@@ -347,13 +344,24 @@ class TipoItemController(CrudRestController):
         if id_proyecto:
             url_action = '/proyectos/%d/tipositems/' % id_proyecto
             url_subaction = url_action + 'atributostipoitem/'
-        pp = PoseePermiso('redefinir tipo item')
+        
+        value = self.edit_filler.get_value(values={'id_tipo_item': id_tipo})
+        
+        pp = PoseePermiso('redefinir tipo item',
+                          id_tipo_item=value["id_tipo_item"])
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect(url_action)
+
+            
+        #pp = PoseePermiso('redefinir tipo item')
+        #if not pp.is_met(request.environ):
+        #    flash(pp.message % pp.nombre_permiso, 'warning')
+        #    redirect(url_action)
+        
         tmpl_context.widget = self.edit_form
         tmpl_context.atributos_table = self.atributostipoitem.table
-        value = self.edit_filler.get_value(values={'id_tipo_item': id_tipo})
+        #value = self.edit_filler.get_value(values={'id_tipo_item': id_tipo})
         atributos = self.atributostipoitem.table_filler.get_value()
         value['_method'] = 'PUT'
         page = "Tipo Item {nombre}".format(nombre=value["nombre"])
@@ -434,13 +442,20 @@ class TipoItemController(CrudRestController):
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
         if id_proyecto:
             url_action = '/proyectos/%d/tipositems/' % id_proyecto
-        pp = PoseePermiso('redefinir tipo item')
+        
+        pp = PoseePermiso('redefinir tipo item',
+                          id_tipo_item=kw["id_tipo_item"])
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect(url_action)
-        id_tipo = UrlParser.parse_id(request.url, "tipositems")
 
-        tipo = TipoItem.por_id(id_tipo)
+        #pp = PoseePermiso('redefinir tipo item')
+        #if not pp.is_met(request.environ):
+        #    flash(pp.message % pp.nombre_permiso, 'warning')
+        #    redirect(url_action)
+        #id_tipo = UrlParser.parse_id(request.url, "tipositems")
+
+        tipo = TipoItem.por_id(int(kw["id_tipo_item"]))
         if kw["nombre"] != tipo.nombre:
             if TipoItem.por_nombre(kw["nombre"]):
                 flash("Ya existe un tipo en esta fase con ese nombre", "warning")
