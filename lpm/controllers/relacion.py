@@ -40,22 +40,44 @@ import transaction
 class RelacionTable(TableBase):
     __model__ = Relacion
     __headers__ = {'tipo': u'Tipo', 'codigo': u'Código',
-                   'item_relacionado': u"Ítem Relacionado"}
-    __add_fields__ = {'item_relacionado': None}
+                   'item_relacionado': u"Ítem Relacionado",
+                   'estado': 'Estado'}
+    __add_fields__ = {'item_relacionado': None,
+                      'estado': None}
     __omit_fields__ = ['id_relacion', 'id_anterior', 'id_posterior']
     __default_column_width__ = '15em'
     __column_widths__ = { '__actions__': "50em"}
     __field_order__ = ['codigo', 'tipo', 'item_relacionado']
-
+    __xml_fields__ = ['estado']
 relacion_table = RelacionTable(DBSession)
 
 
 class RelacionTableFiller(CustomTableFiller):
     __model__ = Relacion
-    __add_fields__ = {'item_relacionado': None}
+    __add_fields__ = {'item_relacionado': None,
+                      'estado': None}
     
     def item_relacionado(self, obj, **kw):
-        pass
+        id_item = UrlParser.parse_id(request.url, "items")
+        otro = obj.obtener_otro_item(id_item)
+        return otro.codigo
+    
+    def estado(self, obj, **kw):
+        id_item = UrlParser.parse_id(request.url, "items")
+        item = Item.por_id(id_item)
+        rti = DBSession.query(RelacionPorItem).\
+                            filter(and_(RelacionPorItem.id_propiedad_item\
+                            == item.id_propiedad_item,\
+                            RelacionPorItem.id_relacion == obj.id_relacion))\
+                            .first()
+        color = u"inherit; "
+        estado = u"Normal"
+        if(rti.revisar):
+            color = u"#ff0000; "
+            estado = u"Con revisión"
+        value = '<div style="font-color:' + color + '">' + estado + '<div>'
+        
+        return value
     
     def __actions__(self, obj):
         """Links de acciones para un registro dado"""
@@ -93,6 +115,7 @@ class RelacionTableFiller(CustomTableFiller):
         if id_version:
             p_item = PropiedadItem.por_id(id_version)
             item = Item.por_id(p_item.id_item_actual)
+            #ver este permiso
             ap = AlgunPermiso(tipo='Fase',
                               id_fase=item.id_fase).is_met(request.environ)
             if ap:
@@ -242,4 +265,5 @@ class RelacionController(CrudRestController):
         # de alguna de las dos tablas.
         # ./items/1/relacionar/2
         # se debera crear la relacion 1 con 2
+        pass
     #}

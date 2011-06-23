@@ -63,6 +63,25 @@ class ItemTable(TableBase):
     
 item_table = ItemTable(DBSession)
 
+class ItemRelacionTable(ItemTable):
+    __headers__ = { 'codigo': u'Código',
+                'version_actual': u'Versión Actual',
+                'estado': u'Estado',
+                'codigo_fase': 'Fase'
+                    }
+    __add_fields__ = {'codigo_tipo': None,
+                      'version_actual': None, 'estado': None,
+                      'check':None}
+    __omit_fields__ = ['id_item', 'numero', 'numero_por_tipo', 'id_tipo_item',
+                       'id_propiedad_item', 'propiedad_item_versiones',
+                       'id_fase']
+    __xml_fields__ = ['Check']
+    __default_column_width__ = '15em'
+    __column_widths__ = { '__actions__': "50em"}
+    __field_order__ = ["codigo", "version_actual",
+                       "estado", "check"]
+
+item_relacion = ItemRelacionTable
 
 class ItemTableFiller(CustomTableFiller):
     __model__ = Item
@@ -177,10 +196,34 @@ class ItemTableFiller(CustomTableFiller):
                          '</div><br />'
         value += '</div>'
         return value
+
+class ItemTableFiller(CustomTableFiller):#no terminado
+    __model__ = Item
+    __add_fields__ = { #'tipo_item': None, 
+                      'version_actual': None, 'estado': None,
+                      'codigo_fase': None, 'complejidad': None}
     
-    def _do_get_provider_count_and_objs(self, id_fase=None, **kw):
+    
+    def version_actual(self, obj, **kw):
+        p_item = PropiedadItem.por_id(obj.id_propiedad_item)
+        return p_item.version
+    
+    def estado(self, obj, **kw):
+        p_item = PropiedadItem.por_id(obj.id_propiedad_item)
+        return p_item.estado
+
+    def check(self, obj, **kw):
+        #id
+        checkbox = '<input type="checkbox" class="checkbox_tabla" id="' + str(obj.id_rol) + '"/>'
+        return checkbox
+        
+#    def __actions__(self, obj):
+
+       
+    def _do_get_provider_count_and_objs(self, id_fase=None, relacionado=None, **kw):#no terminado
         """
-        Recupera los ítems para los cuales tenemos algún permiso.
+        Recupera los ítems para los cuales tenemos algún permiso. y está o no
+        relacionado al campo realcionado.
         Si el usuario se encuentra en una fase, retorna solo
         los ítems que pertenecen a dicha fase.
         """
@@ -280,13 +323,14 @@ class ItemEditFiller(EditFormFiller):
 item_edit_filler = ItemEditFiller(DBSession)
 
 
-#tabla para relacionar/eliminar relacion de ítem
-class RelacionItemTable(RelacionTable):
-    __headers__ = {'tipo': u'Tipo', 'codigo': u'Código',
-                   'item_relacionado': u"Ítem Relacionado"}
-    __add_fields__ = {'item_relacionado': None, 'check': None}
-    __field_order__ = ['codigo', 'tipo', 'item_relacionado', 'check']
-    __xml_fields__ = ['Check']
+#tabla para eliminar relacion de ítem
+#class RelacionItemTable(RelacionTable):
+#    __add_fields__ = {'item_relacionado': None,
+#                       'check': None}
+#    
+#    __field_order__ = ["codigo", "version_actual", "complejidad", 
+#                     "estado", "check"]
+#    __xml_fields__.append('Check')
 
     
 #filler para relacionar/eliminar relacion de ítem
@@ -297,35 +341,35 @@ class RelacionItemTableFiller(RelacionTableFiller):
         checkbox = '<input type="checkbox" class="checkbox_tabla" id="' + str(obj.id_relacion) + '"/>'
         return checkbox
     
-    def __actions__(self, obj):
-        """Links de acciones para un registro dado"""
-
-        value = '<div>'
-        clase = 'actions_fase'
-        id = str(obj.id_relacion)
-        controller = "./relaciones/" + id
-        id_item = UrlParser.parse_id(request.url, "items")
-        item = Item.por_id(id_item)
-
-        if PoseePermiso('modificar item', 
-                        id_fase=item.id_fase).is_met(request.environ):
-                        
-            if UrlParser.parse_nombre(request.url, "relacionar_item"):
-                #pagina relacionar item XXX
-                value += '<div>' + \
-                            '<a href="./relaciones/relacionar/' + id + '" ' + \
-                            'class="' + clase + '">Relacionar</a>' + \
-                         '</div><br />'
-            else:
-                value += '<div><form method="POST" action="' + controller + '" class="button-to">'+\
-                         '<input type="hidden" name="_method" value="DELETE" />' +\
-                         '<input onclick="return confirm(\'¿Está seguro?\');" value="Eliminar" type="submit" '+\
-                         'style="background-color: transparent; float:left; border:0; color: #286571; display: inline;'+\
-                         'margin: 0; padding: 0;' + clase + '"/>'+\
-                         '</form></div><br />'
-        
-        value += '</div>'
-        return value
+#    def __actions__(self, obj):
+#        """Links de acciones para un registro dado"""
+#
+#        value = '<div>'
+#        clase = 'actions_fase'
+#        id = str(obj.id_relacion)
+#        controller = "./relaciones/" + id
+#        id_item = UrlParser.parse_id(request.url, "items")
+#        item = Item.por_id(id_item)
+#
+#        if PoseePermiso('modificar item', 
+#                        id_fase=item.id_fase).is_met(request.environ):
+#                        
+#            if UrlParser.parse_nombre(request.url, "relacionar_item"):
+#                #pagina relacionar item XXX
+#                value += '<div>' + \
+#                            '<a href="./relaciones/relacionar/' + id + '" ' + \
+#                            'class="' + clase + '">Relacionar</a>' + \
+#                         '</div><br />'
+#            else:
+#                value += '<div><form method="POST" action="' + controller + '" class="button-to">'+\
+#                         '<input type="hidden" name="_method" value="DELETE" />' +\
+#                         '<input onclick="return confirm(\'¿Está seguro?\');" value="Eliminar" type="submit" '+\
+#                         'style="background-color: transparent; float:left; border:0; color: #286571; display: inline;'+\
+#                         'margin: 0; padding: 0;' + clase + '"/>'+\
+#                         '</form></div><br />'
+#        
+#        value += '</div>'
+#        return value
 
 
 class ItemController(CrudRestController):
