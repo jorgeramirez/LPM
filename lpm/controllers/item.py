@@ -14,7 +14,7 @@ from tg.decorators import (paginate, expose, with_trailing_slash,
                            without_trailing_slash)
 from tg import redirect, request, validate, flash
 
-from lpm.model import DBSession, Item, TipoItem, Fase, PropiedadItem, Usuario
+from lpm.model import DBSession, Item, TipoItem, Fase, PropiedadItem, Usuario, Relacion
 from lpm.model.excepciones import *
 from lpm.lib.sproxcustom import (CustomTableFiller,
                                  CustomPropertySingleSelectField)
@@ -436,9 +436,12 @@ item_edit_filler = ItemEditFiller(DBSession)
 class RelacionItemTable(RelacionTable):
     __add_fields__ = {'item_relacionado': None,
                        'check': None, 'estado': None}
+    __omit_fields__ = ['id_relacion', 'id_anterior', 'id_posterior',
+                       '__actions__']
     __headers__ = {'tipo': u'Tipo', 'codigo': u'Código',
                    'item_relacionado': u"Ítem Relacionado",
                    'estado': u'Estado', 'check': u"Check"}
+    
     __field_order__ = ["codigo", 'item_relacionado', 'tipo', "estado", "check"]
     __xml_fields__ = ['Check', 'Estado']
     
@@ -458,7 +461,7 @@ class RelacionItemTableFiller(RelacionTableFiller):
 #        value = '<div>'
 #        clase = 'actions_fase'
 #        id = str(obj.id_relacion)
-#        controller = "./relaciones/" + id
+#        controller = "./eliminar_relaciones/" + id
 #        id_item = UrlParser.parse_id(request.url, "items")
 #        item = Item.por_id(id_item)
 #
@@ -652,6 +655,7 @@ class ItemController(CrudRestController):
         relaciones = rel_table_filler.get_value(id_version=item.id_propiedad_item)
         value = self.edit_filler.get_value(values={'id_item': id_item})
         page = u"Modificar Ítem: %s" % value["codigo"]
+
         return dict(value=value,
                     page=page,
                     id=str(id_item),
@@ -760,18 +764,16 @@ class ItemController(CrudRestController):
                 if not k.isalnum():
                     continue
                 ids.append(int(pk))
-                
-        ids = [2,3]
+        
         retorno, creado = p_item.agregar_relaciones(ids, 'p-h')
         
-                
         if (creado):#si por lo menos se pudo crear una relacion se guarda en el 
                     #historial
             usuario = Usuario.by_user_name(request.identity['repoze.who.userid'])
             item.guardar_historial(u"relacionar-PH", usuario)
         
         if (retorno != u""):
-            kw.setdefault('retorno', retorno)
+            kw.setdefault('retorno', str(DBSession.query(Relacion).count()))
             
         return self.relacionar_item(*args, **kw)
     
@@ -791,12 +793,12 @@ class ItemController(CrudRestController):
                     continue
                 ids.append(int(pk))
         
-        ids = [5,6]
-        p_item.eliminar_relaciones(ids)
+            p_item.eliminar_relaciones(ids)
+            
+            usuario = Usuario.by_user_name(request.identity['repoze.who.userid'])
+            item.guardar_historial(u"eliminar-relaciones", usuario)
         
-        usuario = Usuario.by_user_name(request.identity['repoze.who.userid'])
-        item.guardar_historial(u"eliminar-relaciones", usuario)
-        
+#        redirect('../%s/edit' % id)
         return self.edit(*args, **kw)
     
     @expose('lpm.templates.item.impacto')

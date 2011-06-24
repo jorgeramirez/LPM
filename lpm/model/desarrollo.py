@@ -266,18 +266,13 @@ class Item(DeclarativeBase):
         @param tipo: tipo de relacion que se quiere comprobar
         @return: True si está relacionado con id_item
         """
-
-        
+              
         p_item = PropiedadItem.por_id(self.id_propiedad_item)
-        relaciones_posterior = Relacion.relaciones_como_posterior(id_item)
-        relaciones_anterior = Relacion.relaciones_como_anterior(id_item)
         
-        #TODO mejorar los queries de las funciones de relaciones_como_XXX 
-        #para que traigan las relaciones activas
         for r in p_item.relaciones:
-            if (relaciones_posterior and r in relaciones_posterior):
-                return True
-            if (relaciones_anterior and r in relaciones_anterior):
+            relacion = Relacion.por_id(r.id_relacion)
+            if (relacion.id_anterior == id_item or\
+                relacion.id_posterior == id_item ):
                 return True
             
         return False
@@ -625,7 +620,18 @@ class PropiedadItem(DeclarativeBase):
         DBSession.add_all([p_item_mod, attr_de_item, api_mod])
         DBSession.flush()
         item.id_propiedad_item = p_item_mod.id_propiedad_item
-
+    
+    def tiene_relacion(self, relacion):
+        """Verifica si este propiedad item itene la relacion
+        @param relacion: relacion a verificar
+        @return: True si tiene esa relacion
+        """
+        for r in self.relaciones:
+            if (r.relacion.id_anterior == relacion.id_anterior and\
+                r.relacion.id_posterior == relacion.id_posterior):
+                return True
+            
+        return False
     
     def agregar_relaciones(self, ids, tipo):#nahuel
         """
@@ -647,6 +653,7 @@ class PropiedadItem(DeclarativeBase):
                 i = int(i)
             else:
                 continue
+            print "i:", i
             
             antecesor = Item.por_id(i)
             p_item_ant = PropiedadItem.por_id(antecesor.id_propiedad_item)
@@ -660,6 +667,8 @@ class PropiedadItem(DeclarativeBase):
             
             relacion.tipo = Relacion.tipo_relaciones[tipo]
             
+            if (p_item_nuevo.tiene_relacion(relacion)):#repetido
+                continue
             
             rel_por_item1 = RelacionPorItem()
             rel_por_item2 = RelacionPorItem()
@@ -671,7 +680,7 @@ class PropiedadItem(DeclarativeBase):
             relacion.set_codigo()
             
             if (tipo == 'p-h' and \
-                not PropiedadItem._detectar_bucle(p_item_nuevo)):
+                PropiedadItem._detectar_bucle(p_item_nuevo)):
                 #raise RelacionError(u"Se formó un bucle con la realcion nueva")
                 DBSession.delete(relacion)
                 DBSession.flush()
@@ -707,23 +716,25 @@ class PropiedadItem(DeclarativeBase):
     @classmethod
     def _dfs(cls, inicio, nodo, visitado):
         """ Realiza la búsqueda en profundidad para encontrar bucles """
-        if (visitado and nodo.id_item_actual in visitado):
+        if (visitado.has_key(nodo.id_item_actual) and visitado[nodo.id_item_actual]):
             if (inicio == nodo.id_item_actual):
-                return [nodo.id_item_actual]
+                return nodo.id_item_actual
         
-        visitado.setdefault(nodo.id_item_actual, [True])
+        visitado.setdefault(nodo.id_item_actual, True)
         
         #TODO mejorar el query de la función relaciones_como_anterior
-        r_anterior = Relacion.relaciones_como_anterior(nodo.id_propiedad_item)
+        r_anterior = Relacion.relaciones_como_anterior(nodo.id_item_actual)
+        print r_anterior
         if (r_anterior):
+            
             for arco in r_anterior:
                 if (arco.tipo == Relacion.tipo_relaciones['p-h']):
-                    adyacente = ProiedadItem.por_id(Item.por_id(arco.id_anterior).id_item_actual)
+                    adyacente = PropiedadItem.por_id(Item.por_id(arco.id_anterior).id_propiedad_item)
                     ciclo = PropiedadItem._dfs(inicio, adyacente, visitado)
                     if (ciclo):
                         ciclo.append(adyacente.id_item_actual)
                 
-        visitado[nodo.id_item_actual] = [False]
+        visitado[nodo.id_item_actual] = False
         
         return None
 
@@ -982,7 +993,11 @@ class Relacion(DeclarativeBase):
         @return: las relaciones
         @rtype: L{Relacion}
         """
-        return DBSession.query(cls).filter_by(id_posterior=id_item).all()
+        item = Item.por_id(id_item)
+        
+        return DBSession.query(cls).filter(cls.id_posterior == id_item)\
+                                           .filter(item.id_propiedad_item == RelacionPorItem.id_propiedad_item)\
+                                           .filter(cls.id_relacion == RelacionPorItem.id_relacion).all()
 
     @classmethod
     def relaciones_como_anterior(cls, id_item):
@@ -996,7 +1011,11 @@ class Relacion(DeclarativeBase):
         @return: las relaciones
         @rtype: L{Relacion}
         """
-        DBSession.query(cls).filter_by(id_anterior=id_item).all()
+        item = Item.por_id(id_item)
+        
+        return DBSession.query(cls).filter(cls.id_anterior == id_item)\
+                                           .filter(item.id_propiedad_item == RelacionPorItem.id_propiedad_item)\
+                                           .filter(cls.id_relacion == RelacionPorItem.id_relacion).all()
     
     #{ Métodos de Objeto
     def obtener_otro_item(self, id_item):

@@ -412,7 +412,7 @@ class FaseController(CrudRestController):
                     items=items,
                     lbs=[],
                     atras=atras)
-
+ 
         
     @validate(fase_edit_form, error_handler=edit)
     @expose()
