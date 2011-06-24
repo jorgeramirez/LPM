@@ -5,6 +5,19 @@
 <xi:include href="esquema.html" />
 <head>
 <title>$page</title>
+<link href="${tg.url('/css/jquery-ui.css')}" rel="stylesheet" type="text/css"/>
+<script src="${tg.url('/javascript/jquery-1.5.1.min.js')}"></script>
+<script src="${tg.url('/javascript/jquery-ui-1.8.13.custom.min.js')}"></script>
+<script type="text/javascript">
+$(function(){
+    $("input#nombre").attr("disabled", true);
+    $("select#id_padre").attr("disabled", true).attr("length", 100);
+    $("form").submit(function(){
+        $("input#nombre").attr("disabled", false);
+        $("select#id_padre").attr("disabled", false);
+    });
+});
+</script>
 </head>
 <body class="tundra">
   <div style="height:0px;"> &nbsp; </div>

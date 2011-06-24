@@ -137,17 +137,34 @@ class Fase(DeclarativeBase):
         p_item.observaciones = unicode(kw["observaciones"])
         #los atributos de su tipo
         
-        for atr in tipo.atributos:
-            a_item = AtributosDeItems()
-            a_item.id_atributos_por_tipo_item = atr.\
-            id_atributos_por_tipo_item
-            a_item.valor = atr.valor_por_defecto
-                        
-            a_por_item = AtributosPorItem()
-            a_por_item.atributo = a_item
-            p_item.atributos.append(a_por_item)
-            DBSession.add(a_item)
-            DBSession.add(a_por_item)
+
+        #for atr in tipo.atributos:
+        #    a_item = AtributosDeItems()
+        #    a_item.id_atributos_por_tipo_item = atr.\
+        #    id_atributos_por_tipo_item
+        #    a_item.valor = atr.valor_por_defecto
+        #                
+        #    a_por_item = AtributosPorItem()
+        #    a_por_item.atributo = a_item
+        #    p_item.atributos.append(a_por_item)
+        #    DBSession.add(a_item)
+        #    DBSession.add(a_por_item)
+        
+        #agregar los atributos del tipo, y ademas los atributos que se heredan.
+        actual = tipo
+        while actual:  
+            for atr in actual.atributos:
+                a_item = AtributosDeItems()
+                a_item.id_atributos_por_tipo_item = atr.\
+                id_atributos_por_tipo_item
+                a_item.valor = atr.valor_por_defecto
+                            
+                a_por_item = AtributosPorItem()
+                a_por_item.atributo = a_item
+                p_item.atributos.append(a_por_item)
+                DBSession.add(a_item)
+                DBSession.add(a_por_item)
+            actual = TipoItem.por_id(actual.id_padre)
                       
         item.propiedad_item_versiones.append(p_item)
         DBSession.add(p_item)
@@ -409,15 +426,7 @@ class Proyecto(DeclarativeBase):
                 nuevo_atr.valor_por_defecto = atr.valor_por_defecto
                 tipo.atributos.append(nuevo_atr)
                 DBSession.add(nuevo_atr)
-#        else: #Agregado: copiar estructura del padre si no se importa nada
-#            for atr in papa.atributos:
-#                nuevo_atr = AtributosPorTipoItem()
-#                nuevo_atr.nombre = atr.nombre
-#                nuevo_atr.tipo = atr.tipo
-#                nuevo_atr.valor_por_defecto = atr.valor_por_defecto
-#                tipo.atributos.append(nuevo_atr)
-#                DBSession.add(nuevo_atr)
-        
+       
         self.tipos_de_item.append(tipo)
         DBSession.add(tipo)
         DBSession.flush()
@@ -537,41 +546,81 @@ class TipoItem(DeclarativeBase):
         
         a = AtributosPorTipoItem()
         
-        for atr in self.atributos:
-            if (atr.nombre == kw["nombre"]):
-                raise NombreDeAtributoError()
-            
+        #for atr in self.atributos:
+        #    if (atr.nombre == kw["nombre"]):
+        #        raise NombreDeAtributoError()
+        
+        # verificar que no se tenga ese nombre entre sus atributos y
+        # los que se heredan.
+        actual = self
+        while actual:
+            for atr in actual.atributos:
+                if atr.nombre == kw["nombre"]:
+                    raise NombreDeAtributoError()
+            actual = TipoItem.por_id(actual.id_padre)
+       
         a.nombre = kw["nombre"]
         a.tipo = kw["tipo"]
         a.valor_por_defecto = kw["valor_por_defecto"]
         self.atributos.append(a)
         DBSession.add(a)
         DBSession.flush()
-                   
+        
+        self.incorporar(a)
         #agregar este atributo a los ítems ya creados, no sé si es necesario
+        #for i in self.items:
+        #    a_item = AtributosDeItems()
+        #    a_item.id_atributos_por_tipo_item = a.\
+        #    id_atributos_por_tipo_item
+        #    a_item.valor = a.valor_por_defecto
+        #    
+        #    a_por_item = AtributosPorItem()
+        #    a_por_item.atributo = a_item
+        #   p_item = PropiedadItem.por_id(i.id_propiedad_item)
+        #    p_item.atributos.append(a_por_item)
+        #    DBSession.add(a_item)
+        #    DBSession.add(a_por_item)
+        
+    
+    def incorporar(self, a):
+        """
+        Utilizado para incorporar el atributo pasado como parametro a todas
+        las instancias del tipo de ítem y a las que son de tipos derivados.
+        """
         for i in self.items:
             a_item = AtributosDeItems()
             a_item.id_atributos_por_tipo_item = a.\
             id_atributos_por_tipo_item
             a_item.valor = a.valor_por_defecto
 
-            
             a_por_item = AtributosPorItem()
             a_por_item.atributo = a_item
             p_item = PropiedadItem.por_id(i.id_propiedad_item)
             p_item.atributos.append(a_por_item)
             DBSession.add(a_item)
-            DBSession.add(a_por_item)      
- 
+            DBSession.add(a_por_item)
+
+        for hijo in self.hijos:
+            hijo.incorporar(a)
+
+            
     def modificar_atributo(self, id_atributo, **kw):#todavía no probé
         atributo = AtributosPorTipoItem.por_id(id_atributo)
         
         #comprueba si se cambió algo
         if (atributo.nombre != kw["nombre"]):
             #comprobar si el nuevo nombre no está repetido
-            for atr in self.atributos:
-                if (atr.nombre == kw["nombre"]):
-                    raise NombreDeAtributoError()
+            #for atr in self.atributos:
+            #    if (atr.nombre == kw["nombre"]):
+            #        raise NombreDeAtributoError()
+                    
+            actual = self
+            while actual:
+                for atr in actual.atributos:
+                    if atr.nombre == kw["nombre"]:
+                        raise NombreDeAtributoError()
+                actual = TipoItem.por_id(actual.id_padre)
+            
             atributo.nombre = kw["nombre"]
             
         if (atributo.tipo != kw["tipo"]):
@@ -647,9 +696,8 @@ class AtributosPorTipoItem(DeclarativeBase):
     
     def puede_eliminarse(self):
         """
-        Verifica si el atributo puede eliminarse.
+        Verifica si el atributo puede eliminarse o modificarse.
         """
         tipo = TipoItem.por_id(self.id_tipo_item)
-        return len(tipo.items) == 0
-        return True
+        return tipo.puede_eliminarse()
 

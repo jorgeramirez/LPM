@@ -102,7 +102,7 @@ class RolTableFiller(CustomTableFiller):
                     perm_del = PoseePermiso('eliminar rol')
             else:
                 contexto = "ti"
-                if tipo.find("Plantilla") >= 0:
+                if tipo.find("plantilla") >= 0:
                     perm_mod = PoseePermiso('modificar rol')
                     perm_del = PoseePermiso('eliminar rol')
                 else:
@@ -454,6 +454,42 @@ class RolController(CrudRestController):
         atras = self.action
         return dict(value=value, page=page, atras=atras)
 
+
+    @expose('lpm.templates.rol.get_one')
+    def get_one(self, id_rol):
+        """Despliega una página para visualizar el rol"""
+        class select(MultipleSelectDojo):
+            def _my_update_params(self, d, nullable=False):
+                options = []
+                pks = []
+                for i, v in enumerate(d["value"]):
+                    pks.append(int(v))
+                permisos = DBSession.query(Permiso) \
+                                    .filter(Permiso.id_permiso.in_(pks)).all()
+                for p in permisos:
+                    options.append((p.id_permiso, '%s' % p.nombre_permiso))
+                d['options'] = options
+                return d
+        
+        class selector(WidgetSelectorDojo):
+            default_multiple_select_field_widget_type = select
+    
+        class RolVerEditForm(RolEditForm):
+            __model__ = Rol
+            __hide_fields__ = ['id_rol']
+            __omit_fields__ = [ 'usuarios',
+                               'codigo', 'creado', 'id_proyecto',
+                               'id_fase', 'id_tipo_item']
+            __field_order__ = ['nombre_rol', 'tipo', 'descripcion', 'permisos']
+            __widget_selector_type__ = selector
+            descripcion = TextArea
+        
+        tmpl_context.widget = RolVerEditForm(DBSession)
+        value = self.edit_filler.get_value(values={'id_rol': int(id_rol)})
+        page = "Rol {nombre}".format(nombre=value["nombre_rol"])
+        atras = self.action
+        return dict(value=value, page=page, atras=atras)
+
     @without_trailing_slash
     @expose('lpm.templates.rol.new')
     def new(self, *args, **kw):
@@ -685,8 +721,16 @@ class RolPlantillaController(RolController):
         
         page = page.format(contexto=contexto)
         
+        de_proyectos = ""
+        try:
+            de_proyectos = "http://" + request.environ.get('HTTP_HOST',) + "/proyectos/" + kw["id_proyecto"] + "/edit"
+        except Exception: 
+            pass
+
         if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/":
             atras = "/"
+        elif request.environ.get('HTTP_REFERER') == de_proyectos:
+            atras = request.environ.get('HTTP_REFERER')
         else:
             atras = "/rolesplantilla"
         
@@ -703,13 +747,18 @@ class RolPlantillaController(RolController):
             pp = PoseePermiso('crear rol', id_fase=int(kw["id_fase"]))
         elif kw["id_tipo_item"]:
             pp = PoseePermiso('crear rol', id_tipo_item=int(kw["id_tipo_item"]))
+        else:
+            pp = PoseePermiso('crear rol')
         
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect(self.action)
         
         Rol.crear_rol(**kw)
-        redirect(self.action)
+        if kw["id_proyecto"] == '':
+            redirect(self.action)
+        else:
+            redirect("/proyectos/"+kw["id_proyecto"]+"/edit")
 
    #@validate(rol_plantilla_edit_form, error_handler=edit)
     @expose()
@@ -717,11 +766,13 @@ class RolPlantillaController(RolController):
         """actualiza un rol"""
         pp = None
         if kw["id_proyecto"]:
-            pp = PoseePermiso('crear rol', id_proyecto=int(kw["id_proyecto"]))
+            pp = PoseePermiso('modificar rol', id_proyecto=int(kw["id_proyecto"]))
         elif kw["id_fase"]:    
-            pp = PoseePermiso('crear rol', id_fase=int(kw["id_fase"]))
+            pp = PoseePermiso('modificar rol', id_fase=int(kw["id_fase"]))
         elif kw["id_tipo_item"]:
-            pp = PoseePermiso('crear rol', id_tipo_item=int(kw["id_tipo_item"]))
+            pp = PoseePermiso('modificar rol', id_tipo_item=int(kw["id_tipo_item"]))
+        else:
+            pp = PoseePermiso('modificar rol')
 
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')

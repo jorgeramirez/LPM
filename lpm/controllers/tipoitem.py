@@ -68,14 +68,6 @@ class TipoItemTableFiller(CustomTableFiller):
         clase = 'actions'
         url_cont = "./tipositems/" + str(obj.id_tipo_item)
         
-        #rti_sys = PoseePermiso('redefinir tipo item').is_met(request.environ)
-        #rti_proy = PoseePermiso('redefinir tipo item',
-        #                        id_proyecto=obj.id_proyecto).is_met(request.environ)
-        #rti_fase = PoseePermiso('redefinir tipo item',
-        #                        id_fase=obj.id_fase).is_met(request.environ)
-        #rti_ti = PoseePermiso('redefinir tipo item',
-        #                        id_tipo_item=obj.id_tipo_item).is_met(request.environ)
-        
         pp = PoseePermiso('redefinir tipo item', 
                           id_tipo_item=obj.id_tipo_item)
         
@@ -90,7 +82,6 @@ class TipoItemTableFiller(CustomTableFiller):
                         'class="' + clase + '">Modificar</a>' + \
                      '</div><br />'
         if obj.puede_eliminarse():
-            #if PoseePermiso('redefinir tipo item').is_met(request.environ):
             if pp.is_met(request.environ):
                 value += '<div><form method="POST" action="' + url_cont + '" class="button-to">'+\
                          '<input type="hidden" name="_method" value="DELETE" />' +\
@@ -241,7 +232,6 @@ class TipoItemEditForm(EditableForm):
                       }
     __require_fields__ = ['nombre']
     id_padre = TipoPadreField("id_padre", accion="edit", label_text="Tipo Padre")
-   
     descripcion = TextArea
 
 tipo_item_edit_form = TipoItemEditForm(DBSession)
@@ -453,15 +443,15 @@ class TipoItemController(CrudRestController):
         #if not pp.is_met(request.environ):
         #    flash(pp.message % pp.nombre_permiso, 'warning')
         #    redirect(url_action)
-        #id_tipo = UrlParser.parse_id(request.url, "tipositems")
+        id_tipo = UrlParser.parse_id(request.url, "tipositems")
 
-        tipo = TipoItem.por_id(int(kw["id_tipo_item"]))
-        if kw["nombre"] != tipo.nombre:
-            if TipoItem.por_nombre(kw["nombre"]):
-                flash("Ya existe un tipo en esta fase con ese nombre", "warning")
-                return
+        tipo = TipoItem.por_id(int(kw["id_tipo_item"]))  
+        #if kw["nombre"] != tipo.nombre:    #TODO final
+        #    if TipoItem.por_nombre(kw["nombre"]):
+        #        flash("Ya existe un tipo en esta fase con ese nombre", "warning")
+        #        return
             
-        tipo.nombre = unicode(kw["nombre"])
+        #tipo.nombre = unicode(kw["nombre"])
         tipo.descripcion = unicode(kw["descripcion"])
 
         redirect(url_action)
