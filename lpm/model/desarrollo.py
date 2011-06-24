@@ -252,6 +252,10 @@ class Item(DeclarativeBase):
             raise EliminarItemError()
         p_item.estado = u"Eliminado"
         op = u"Eliminación"
+        proy = DBSession.query(lpm.model.Proyecto) \
+                        .join(lpm.model.Fase) \
+                        .filter(lpm.model.Fase.id_fase == self.id_fase).one()
+        proy.complejidad_total -= p_item.complejidad
         HistorialItems.registrar(usuario, p_item, op)
     
     def esta_relacionado(self, id_item):
@@ -307,6 +311,10 @@ class Item(DeclarativeBase):
         HistorialItems.registrar(usuario, p_item_revivido, op)
         DBSession.flush()
         self.id_propiedad_item = p_item_revivido.id_propiedad_item
+        proy = DBSession.query(lpm.model.Proyecto) \
+                        .join(lpm.model.Fase) \
+                        .filter(lpm.model.Fase.id_fase == self.id_fase).one()
+        proy.complejidad_total += p_item.complejidad
     
     def modificar(self, usuario, **kw): #jorge
         """ 
@@ -350,6 +358,18 @@ class Item(DeclarativeBase):
         DBSession.add(p_item_mod)
         DBSession.flush()
         self.id_propiedad_item = p_item_mod.id_propiedad_item
+        
+        if p_item.complejidad != p_item_mod.complejidad:
+            proy = DBSession.query(lpm.model.Proyecto) \
+                        .join(lpm.model.Fase) \
+                        .filter(lpm.model.Fase.id_fase == self.id_fase).one()
+            c1 = p_item.complejidad
+            c2 = p_item_mod.complejidad
+            diff  = abs(c1 - c2)
+            if c1 > c2:
+                proy.complejidad_total -= diff
+            else:
+                proy.complejidad_total += diff
 
         
     def revertir(self, id_version, usuario): #jorge, falta probar
@@ -412,6 +432,18 @@ class Item(DeclarativeBase):
         DBSession.add(p_item_nuevo)
         DBSession.flush()
         self.id_propiedad_item = p_item_nuevo.id_propiedad_item
+        
+        if p_item_actual.complejidad != p_item_version.complejidad:
+            proy = DBSession.query(lpm.model.Proyecto) \
+                        .join(lpm.model.Fase) \
+                        .filter(lpm.model.Fase.id_fase == self.id_fase).one()
+            c1 = p_item_actual.complejidad
+            c2 = p_item_version.complejidad
+            diff  = abs(c1 - c2)
+            if c1 > c2:
+                proy.complejidad_total -= diff
+            else:
+                proy.complejidad_total += diff
 
     def calcular_impacto(self):
         pass

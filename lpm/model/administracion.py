@@ -173,6 +173,8 @@ class Fase(DeclarativeBase):
         HistorialItems.registrar(usuario, p_item, op)        
         item.id_propiedad_item = p_item.id_propiedad_item
         self.items.append(item)
+        proy = Proyecto.por_id(self.id_proyecto)
+        proy.complejidad_total += p_item.complejidad
         DBSession.add(item)
 
     def crear_lb(self): #jorge

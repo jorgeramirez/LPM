@@ -603,7 +603,7 @@ class RolPlantillaController(RolController):
         Retorna todos los registros
         Retorna una página HTML si no se especifica JSON
         """
-        puede_crear = PoseePermiso("crear rol").is_met(request.environ)
+        #puede_crear = PoseePermiso("crear rol").is_met(request.environ)
         if request.response_type == 'application/json':
             return self.table_filler.get_value(**kw)
         if not getattr(self.table.__class__, '__retrieves_own_value__', False):
@@ -620,7 +620,7 @@ class RolPlantillaController(RolController):
                     opciones=self.opciones,
                     comboboxes=self.comboboxes,
                     url_action=self.action,
-                    puede_crear=puede_crear,
+                    puede_crear=False,
                     atras=atras
                     )
         

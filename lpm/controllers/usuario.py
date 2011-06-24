@@ -671,7 +671,7 @@ class UsuarioController(CrudRestController):
     @expose('lpm.templates.usuario.roles')
     def desasignar_roles(self, *args, **kw):
         """ Desasigna los roles seleccionados a un usuario """
-        flash("hola", "warning")
+
         if kw:
             pks = []
             for k, pk in kw.items():
