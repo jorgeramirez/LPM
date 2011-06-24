@@ -583,8 +583,12 @@ class UsuarioController(CrudRestController):
                                                           asignados=True, **kw)
         desasignados = roles_usuario_filler.get_value(usuario=user,
                                                        asignados=False, **kw)
+        de_proyecto = "http://" + request.environ.get('HTTP_HOST',) + "/usuarios?id_proyecto=" + str(kw["id_proyecto"])
+        
         if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/usuarios/":
             atras = self.action
+        elif request.environ.get('HTTP_REFERER') == de_proyecto:
+            atras = '/proyectos/'+ str(kw["id_proyecto"]) +'/edit'
         else:
             atras = self.action + str(user.id_usuario) + '/edit'
         return dict(asignados=asignados, 

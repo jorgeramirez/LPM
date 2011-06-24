@@ -306,10 +306,12 @@ class FaseController(CrudRestController):
     @expose('lpm.templates.fases.new')
     def new(self, *args, **kw):
         """Display a page to show a new record."""
-        if(not UrlParser.parse_id(request.url, "proyectos")):
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        if(not id_proyecto):
             redirect("./")
         tmpl_context.widget = self.new_form
-        return dict(value=kw, page="Nueva Fase")
+        atras = '/proyectos/'+ str(id_proyecto) +'/edit'
+        return dict(value=kw, page="Nueva Fase", atras=atras)
     
     @expose()
     def post_delete(self, id):

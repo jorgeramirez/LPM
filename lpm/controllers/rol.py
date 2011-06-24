@@ -719,8 +719,10 @@ class RolPlantillaController(RolController):
             redirect(self.action)
         
         Rol.crear_rol(**kw)
-        print kw
-        redirect(self.action)
+        if kw["id_proyecto"] == '':
+            redirect(self.action)
+        else:
+            redirect("/proyectos/"+kw["id_proyecto"]+"/edit")
 
    #@validate(rol_plantilla_edit_form, error_handler=edit)
     @expose()
