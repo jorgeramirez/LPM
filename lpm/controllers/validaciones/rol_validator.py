@@ -1,5 +1,5 @@
 from formencode.validators import String, NotEmpty
-from formencode import Schema, All
+from formencode import Schema, All, FancyValidator
 
 __all__ = ['RolFormValidator']
 
@@ -11,3 +11,10 @@ class RolFormValidator(Schema):
                 'Ingrese un nombre de rol'}))
     descripcion = String(max=100,messages={'tooLong':
             'Descripcion no debe superar 100 caracteres'})
+
+    permisos = NotEmpty(messages={"empty": 
+                                    u"Debe seleccionar al menos un permiso"})
+    permisos_src = NotEmpty(messages={"empty": 
+                                    u"Debe seleccionar al menos un permiso"})
+    #para que no salga el error ese de permisos_src.
+

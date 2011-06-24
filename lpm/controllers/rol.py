@@ -40,6 +40,8 @@ from tg import tmpl_context, request
 
 import transaction
 
+import urllib 
+
 
 class RolTable(TableBase):
     __model__ = Rol
@@ -651,7 +653,7 @@ class RolPlantillaController(RolController):
     @expose('lpm.templates.rol.edit')
     def edit(self, id, *args, **kw):
         """Despliega una pagina para modificar rol"""
-#        a = 1/0 
+        atras = "/rolesplantilla/"
         if (not kw['contexto']):
             redirect('../')
         elif (kw['contexto'] == "proyecto"):
@@ -674,20 +676,15 @@ class RolPlantillaController(RolController):
         #agregado
         if value["tipo"].find("Plantilla") < 0:
             page=u"Editar Rol de {contexto}".format(contexto=kw['contexto'])
+            atras = "/roles/"
             
-#        value['_method'] = 'PUT'#?
-
-        if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/":
-            atras = "../"
-        else:
-            atras = "/rolesplantilla"
-        
         return dict(value=value, page=page, atras=atras)
     
     @without_trailing_slash
     @expose('lpm.templates.rol.new')
     def new(self, contexto=None, *args, **kw):
         page = u"Nuevo Rol Plantilla de {contexto}"
+        atras = "/rolesplantilla/"
         if (not contexto):
             redirect('../')
         elif (contexto == "proyecto"):
@@ -697,7 +694,7 @@ class RolPlantillaController(RolController):
             if kw.has_key("id_proyecto"): #desde edit de proyecto
                 kw["tipo"] = u"Proyecto"
                 page = u"Nuevo Rol de {contexto}"
-
+                atras = "/proyectos/%s/edit" % kw["id_proyecto"]
         elif (contexto == "fase"):
             selector = SelectorPermisosPlantillaFase
             kw['tipo'] = u'Plantilla {contexto}'.format(contexto=contexto)
@@ -705,7 +702,7 @@ class RolPlantillaController(RolController):
             if kw.has_key("id_fase"): #desde edit de fase
                 kw["tipo"] = u"Fase"
                 page = u"Nuevo Rol de {contexto}"
-
+                atras = "/fases/%s/edit" % kw["id_fase"]
         elif (contexto == "ti"):
             selector = SelectorPermisosPlantillaTi
             kw['tipo'] = u'Plantilla tipo ítem'
@@ -713,6 +710,7 @@ class RolPlantillaController(RolController):
             if kw.has_key("id_tipo_item"): #desde edit de tipo de item
                 kw["tipo"] = u"Tipo de Ítem"
                 page = u"Nuevo Rol de {contexto}"
+                atras = "/tipositems/%s/edit" % kw["id_tipo_item"]
 
             
         self.new_form = RolPlantillaAddForm(DBS=DBSession, selector=selector)     
@@ -720,20 +718,7 @@ class RolPlantillaController(RolController):
         rol_plantilla_add_form = self.new_form
         
         page = page.format(contexto=contexto)
-        
-        de_proyectos = ""
-        try:
-            de_proyectos = "http://" + request.environ.get('HTTP_HOST',) + "/proyectos/" + kw["id_proyecto"] + "/edit"
-        except Exception: 
-            pass
 
-        if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/":
-            atras = "/"
-        elif request.environ.get('HTTP_REFERER') == de_proyectos:
-            atras = request.environ.get('HTTP_REFERER')
-        else:
-            atras = "/rolesplantilla"
-        
         return dict(value=kw, page=page, action="../", atras=atras)
 
     #@validate(rol_plantilla_add_form, error_handler=new)
@@ -741,11 +726,15 @@ class RolPlantillaController(RolController):
     def post(self, *args, **kw):
         """ Crea un nuevo rol plantilla o con contexto"""
         pp = None
+        ctx = ""
         if kw["id_proyecto"]:
+            ctx = "id_proyecto"
             pp = PoseePermiso('crear rol', id_proyecto=int(kw["id_proyecto"]))
         elif kw["id_fase"]: 
+            ctx = "id_fase"
             pp = PoseePermiso('crear rol', id_fase=int(kw["id_fase"]))
         elif kw["id_tipo_item"]:
+            ctx = "id_tipo_item"
             pp = PoseePermiso('crear rol', id_tipo_item=int(kw["id_tipo_item"]))
         else:
             pp = PoseePermiso('crear rol')
@@ -753,18 +742,55 @@ class RolPlantillaController(RolController):
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect(self.action)
-        
-        Rol.crear_rol(**kw)
-        if kw["id_proyecto"] == '':
-            redirect(self.action)
+
+        #en caso de exito
+        ok_url = u""
+        #url que redirige al new y rellena los parametros que ya ingreso
+        error_url = u"/rolesplantilla/new/" 
+
+        if ctx == "id_proyecto":
+            ok_url = "/proyectos/%s/edit" % kw[ctx]
+            error_url += "proyecto?{ctx}={val}".format(ctx=ctx, val=kw[ctx])
+        elif ctx == "id_fase":
+            ok_url = "/fases/%s/edit" % kw[ctx]
+            error_url += "fase?{ctx}={val}".format(ctx=ctx, val=kw[ctx]) 
+        elif ctx == "id_tipo_item":
+            ok_url = "/tipositems/%s/edit" % kw[ctx]
+            error_url += "ti?{ctx}={val}".format(ctx=ctx, val=kw[ctx]) 
         else:
-            redirect("/proyectos/"+kw["id_proyecto"]+"/edit")
+            tipo = unicode(kw["tipo"].lower())
+            ok_url = "/rolesplantilla/"
+            if tipo.find(u"proyecto") >= 0:
+                error_url += "proyecto"
+            elif tipo.find(u"fase") >= 0:
+                error_url += "fase?"
+            else:
+                error_url += "ti?"
+        
+        #agregamos los parametros que ya ingreso el usuario.
+        nombre = kw.get("nombre_rol", None).encode("utf-8")
+        nombre_q = urllib.quote(nombre)
+        desc = kw.get("descripcion", None).encode("utf-8")
+        desc_q = urllib.quote(desc)
+        params = "&nombre_rol=" + nombre_q + "&descripcion=" + desc_q
+        error_url += params
+        
+        if not (kw.has_key("permisos") and kw["permisos"]):
+            flash("Debe seleccionar al menos un permiso", 'warning')
+            redirect(error_url)
+        else:    
+            Rol.crear_rol(**kw)
+            flash(u"El Rol se ha creado correctamente")
+            redirect(ok_url)
+        
 
    #@validate(rol_plantilla_edit_form, error_handler=edit)
     @expose()
     def put(self, *args, **kw):
         """actualiza un rol"""
         pp = None
+        atras = "/roles/"
+        msg = u"El Rol se ha actualizado con éxito"
         if kw["id_proyecto"]:
             pp = PoseePermiso('modificar rol', id_proyecto=int(kw["id_proyecto"]))
         elif kw["id_fase"]:    
@@ -773,12 +799,20 @@ class RolPlantillaController(RolController):
             pp = PoseePermiso('modificar rol', id_tipo_item=int(kw["id_tipo_item"]))
         else:
             pp = PoseePermiso('modificar rol')
+            atras = "/rolesplantilla/"
+            msg = u"El de Plantilla se ha actualizado con éxito"
+        
 
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
-            redirect(self.action)
+            redirect(atras)
+
+        if not (kw.has_key("permisos") and kw["permisos"]):
+            flash("Debe seleccionar al menos un permiso", 'warning')
+            redirect("./edit?contexto=%s" % kw["contexto"])
 
         Rol.actualizar_rol(**kw)
-        redirect(self.action)
+        flash(msg)
+        redirect(atras)
     
     #}

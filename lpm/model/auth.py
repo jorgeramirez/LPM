@@ -240,8 +240,9 @@ class Rol(DeclarativeBase):
                     kw[k] = int(kw[k])
                 else:
                     del kw[k]
+
         rol_new = Rol(**kw)
-        
+
         if type(pks).__name__ == 'list':
             for i, pk in enumerate(pks):
                 pks[i] = int(pk)
