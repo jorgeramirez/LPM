@@ -421,19 +421,30 @@ class UsuarioController(CrudRestController):
         else:
             atras = '/'
 
-        if kw.has_key("id_proyecto") or kw.has_key("id_fase") \
-                                     or kw.has_key("id_tipo_item"):
-            titulo = u"Seleccionar Usuario"
-            puede_crear = False
-            
-        return dict(lista_elementos=usuarios, 
+        
+        retorno = dict(lista_elementos=usuarios, 
                     page=titulo, titulo=titulo, 
                     modelo=self.model.__name__, 
                     columnas=self.columnas,
                     opciones=self.opciones,
-                    url_action=self.action, 
+                    url_action=self.action,
                     puede_crear=puede_crear, 
                     atras=atras)
+
+        params_buscar = u""
+        if kw.has_key("id_proyecto"):
+            params_buscar = "id_proyecto=%s" % kw["id_proyecto"]
+        elif kw.has_key("id_fase"):
+            params_buscar = "id_proyecto=%s" % kw["id_fase"]
+        elif kw.has_key("id_tipo_item"):
+            params_buscar = "id_proyecto=%s" % kw["id_tipo_item"]
+        
+        if params_buscar:
+            retorno["titulo"] = u"Seleccionar Usuario"
+            retorno["params_buscar"] = params_buscar
+            retorno["puede_crear"] = False
+        
+        return retorno
 
     @expose('lpm.templates.usuario.edit')
     def edit(self, *args, **kw):
@@ -604,18 +615,41 @@ class UsuarioController(CrudRestController):
     @expose('lpm.templates.usuario.get_all')
     @expose('json')
     def post_buscar(self, *args, **kw):
+
+        params_buscar = u""
+        ctx = ""
+        val_ctx = ""
+        if kw.has_key("id_proyecto"):
+            params_buscar = "id_proyecto=%s" % kw["id_proyecto"]
+            ctx = "id_proyecto"
+        elif kw.has_key("id_fase"):
+            params_buscar = "id_proyecto=%s" % kw["id_fase"]
+            ctx = "id_fase"
+        elif kw.has_key("id_tipo_item"):
+            params_buscar = "id_proyecto=%s" % kw["id_tipo_item"]
+            ctx = "id_tipo_item"
+        
+        if ctx:
+            val_ctx = kw[ctx]
+            del kw[ctx]
+
         puede_crear = PoseePermiso("crear usuario").is_met(request.environ)
         tmpl_context.widget = self.table
         buscar_table_filler = UsuarioTableFiller(DBSession)
         buscar_table_filler.filtros = kw
-        usuarios = buscar_table_filler.get_value()
-                
+        
+        if ctx:
+            kw[ctx] = int(val_ctx)
+            
+        usuarios = buscar_table_filler.get_value(**kw)
+        
         if request.environ.get('HTTP_REFERER') != "http://" + request.environ.get('HTTP_HOST',) + "/usuarios/":
             atras = request.environ.get('HTTP_REFERER')
         else:
-            atras = '/usuarios'        
+            atras = '/usuarios'  
+
         
-        return dict(lista_elementos=usuarios, 
+        retorno = dict(lista_elementos=usuarios, 
                     page=self.title, titulo=self.title, 
                     modelo=self.model.__name__, 
                     columnas=self.columnas,
@@ -623,6 +657,14 @@ class UsuarioController(CrudRestController):
                     url_action=self.action, 
                     puede_crear=puede_crear, 
                     atras=atras)
+
+        if params_buscar:
+            retorno["titulo"] = u"Seleccionar Usuario"
+            retorno["params_buscar"] = params_buscar
+            retorno["puede_crear"] = False
+        
+        return retorno
+            
     
     @expose('lpm.templates.usuario.roles')
     def desasignar_roles(self, *args, **kw):

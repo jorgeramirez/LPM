@@ -17,11 +17,11 @@
 <script type="text/javascript">
 
 $(document).ready(function () {
-	
+    
     $('#form :button[name=add-filter]').live('click', function () {
-    	$('#form :input[name=cualquiera]').attr('disabled', true);
-    	$('#form :input[name=cualquiera]').val('');
-   	
+        $('#form :input[name=cualquiera]').attr('disabled', true);
+        $('#form :input[name=cualquiera]').val('');
+    
         count = $('#form .filters').data('count');
         $('#form .filters').data('count', count + 1);
         
@@ -36,9 +36,9 @@ $(document).ready(function () {
         $('#form .filters').data('count', count - 1);
         
         if(count - 1 == 0) {
-        	$('#form :input[name=cualquiera]').attr('disabled', false);
+            $('#form :input[name=cualquiera]').attr('disabled', false);
         }
-        	
+            
     });
     
     $('#form select[name^=filter-type]').live('change', function () {
@@ -49,12 +49,12 @@ $(document).ready(function () {
             if(template == "fecha"){
                 $('#templates .rango_fechas.' + $(this).val() ).children().clone().appendTo(destination)
                     .find('[name]').andSelf().datepicker({dateFormat: 'yy-mm-dd'});
-            	/*$('.calendario').datepicker({dateFormat: 'yy-mm-dd'});*/
+                /*$('.calendario').datepicker({dateFormat: 'yy-mm-dd'});*/
 
             } else if(template == "nada") {
-            	//saca el input que quedo colgado
-            	$(this).next().remove();
-           	
+                //saca el input que quedo colgado
+                $(this).next().remove();
+            
             } else {
                 $('#templates .' + template + '.' + $(this).val() ).children().clone().appendTo(destination)
                     .find('[name]').andSelf();
@@ -73,19 +73,19 @@ $(document).ready(function () {
     
     //validación para campos con solamente numeros enteros
     $('.solo_entero').live('keyup', function () {
-		$(this).val($(this).val().replace(/[^0-9]/g, ''));
-	});
+        $(this).val($(this).val().replace(/[^0-9]/g, ''));
+    });
 });
 
 </script>
 <div>
-	<div class="buscar">
-	<div id="templates">
-   		<div class="header_filtro">
-	        <!--<span style="margin-top:5px; margin-left:40px; font-size:15;">En ${modelo}s</span>-->
-	        <input id="buscar_cualquiera" type="text" name="cualquiera" />
-	        <input id="buscar_boton" class="boton" type="submit" value="Buscar"/>    
-    	</div>
+    <div class="buscar">
+    <div id="templates">
+        <div class="header_filtro">
+            <!--<span style="margin-top:5px; margin-left:40px; font-size:15;">En ${modelo}s</span>-->
+            <input id="buscar_cualquiera" type="text" name="cualquiera" />
+            <input id="buscar_boton" class="boton" type="submit" value="Buscar"/>    
+        </div>
     
         <div class="form template">
             <div class="filters">
@@ -109,42 +109,44 @@ $(document).ready(function () {
             </div>
         </div>
         
-	    <py:for each="col in columnas">
-	    	<py:choose test="columnas[col]">
-	    		<py:when test="'texto'">
-		    		<div class="${'texto ' + col}">
-		    			<input type="text" name="${col}" style="width:47%;" />
-		    		</div>
-		    	</py:when>
-		    	<py:when test="'entero'">
-		    		<div class="${'entero ' + col}">
-		    			<input class="solo_entero" type="text" name="${col}" style="width:47%;" />
-		    		</div>
-		    	</py:when>
-		    	<py:when test="'fecha'">
-		    		<div class="${'rango_fechas ' + col}">
-				            <label class="rango_fechas">De</label><input type="text" class="calendario" name="${col}" style="width:20%;"/>
-				            <label class="rango_fechas"> A</label><input type="text" class="calendario" name="${col}" style="width:20%;"/>
+        <py:for each="col in columnas">
+            <py:choose test="columnas[col]">
+                <py:when test="'texto'">
+                    <div class="${'texto ' + col}">
+                        <input type="text" name="${col}" style="width:47%;" />
+                    </div>
+                </py:when>
+                <py:when test="'entero'">
+                    <div class="${'entero ' + col}">
+                        <input class="solo_entero" type="text" name="${col}" style="width:47%;" />
+                    </div>
+                </py:when>
+                <py:when test="'fecha'">
+                    <div class="${'rango_fechas ' + col}">
+                            <label class="rango_fechas">De</label><input type="text" class="calendario" name="${col}" style="width:20%;"/>
+                            <label class="rango_fechas"> A</label><input type="text" class="calendario" name="${col}" style="width:20%;"/>
 
-			        </div>
-		    	</py:when>
-		    	<py:when test="'combobox'">
-		    		<div class="${'combobox ' + col}">
-			            <select name="${col}" style="width:47%;">
-			                <option value="" selected="selected">--- Seleccionar Tipo ---</option>
-			                	<py:for each="opt in comboboxes[col]">
-			                    	<option value="${opt}">${opt}</option>
-			                	</py:for>       
-			            </select>
-			        </div>
-		    	</py:when>
-		    </py:choose>
-		 </py:for>
-		    
+                    </div>
+                </py:when>
+                <py:when test="'combobox'">
+                    <div class="${'combobox ' + col}">
+                        <select name="${col}" style="width:47%;">
+                            <option value="" selected="selected">--- Seleccionar Tipo ---</option>
+                                <py:for each="opt in comboboxes[col]">
+                                    <option value="${opt}">${opt}</option>
+                                </py:for>       
+                        </select>
+                    </div>
+                </py:when>
+            </py:choose>
+         </py:for>
+            
 
     </div>
     
-    <form id="form" method="post" action="${url_action}post_buscar/">
+    <form py:if="defined('params_buscar')" id="form" method="post" action="${url_action}post_buscar/?${params_buscar}">
+    </form>
+    <form py:if="not defined('params_buscar')" id="form" method="post" action="${url_action}post_buscar/">
     </form>
     </div>
 </div>
