@@ -451,12 +451,6 @@ class UsuarioController(CrudRestController):
     @expose('lpm.templates.usuario.edit')
     def edit(self, *args, **kw):
         """Despliega una pagina para modificar usuario"""
-        '''
-        pp = PoseePermiso('modificar usuario', id_usuario=args[0])
-        if not pp.is_met(request.environ):
-            flash(pp.message % pp.nombre_permiso, 'warning')
-            redirect("/usuarios")
-        '''
         
         puede_asignar_rol = PoseePermiso("asignar-desasignar rol").is_met(request.environ)
         class mis_roles_tf(RolRolTableFiller):
@@ -481,7 +475,12 @@ class UsuarioController(CrudRestController):
                 if PoseePermiso('modificar rol').is_met(request.environ):
                     value = '<div>' + \
                                 '<a href="' +  url_cont + str(obj.id_rol) + "/edit?contexto="+  \
-                                contexto + '" class="' + clase + '">Ver</a>' + \
+                                contexto + '" class="' + clase + '">Modificar</a>' + \
+                             '</div>'
+                else:
+                    value = '<div>' + \
+                                '<a href="/roles/'+ str(obj.id_rol) + "/"+  \
+                                '" class="' + clase + '">Ver</a>' + \
                              '</div>'
                 return value
 
@@ -596,14 +595,16 @@ class UsuarioController(CrudRestController):
                                                           asignados=True, **kw)
         desasignados = roles_usuario_filler.get_value(usuario=user,
                                                        asignados=False, **kw)
-        de_proyecto = "http://" + request.environ.get('HTTP_HOST',) + "/usuarios?id_proyecto=" + str(kw["id_proyecto"])
+
+        #de_proyecto = "http://" + request.environ.get('HTTP_HOST',) + "/usuarios?id_proyecto=" + str(kw["id_proyecto"])
         
-        if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/usuarios/":
-            atras = self.action
-        elif request.environ.get('HTTP_REFERER') == de_proyecto:
-            atras = '/proyectos/'+ str(kw["id_proyecto"]) +'/edit'
-        else:
-            atras = self.action + str(user.id_usuario) + '/edit'
+        #if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/usuarios/":
+        #    atras = self.action
+        #elif request.environ.get('HTTP_REFERER') == de_proyecto:
+        #    atras = '/proyectos/'+ str(kw["id_proyecto"]) +'/edit'
+        #else:
+        #    atras = self.action + str(user.id_usuario) + '/edit'
+        atras = "../"
         return dict(asignados=asignados, 
                     desasignados=desasignados,
                     page=page, 

@@ -454,6 +454,42 @@ class RolController(CrudRestController):
         atras = self.action
         return dict(value=value, page=page, atras=atras)
 
+
+    @expose('lpm.templates.rol.get_one')
+    def get_one(self, id_rol):
+        """Despliega una página para visualizar el rol"""
+        class select(MultipleSelectDojo):
+            def _my_update_params(self, d, nullable=False):
+                options = []
+                pks = []
+                for i, v in enumerate(d["value"]):
+                    pks.append(int(v))
+                permisos = DBSession.query(Permiso) \
+                                    .filter(Permiso.id_permiso.in_(pks)).all()
+                for p in permisos:
+                    options.append((p.id_permiso, '%s' % p.nombre_permiso))
+                d['options'] = options
+                return d
+        
+        class selector(WidgetSelectorDojo):
+            default_multiple_select_field_widget_type = select
+    
+        class RolVerEditForm(RolEditForm):
+            __model__ = Rol
+            __hide_fields__ = ['id_rol']
+            __omit_fields__ = [ 'usuarios',
+                               'codigo', 'creado', 'id_proyecto',
+                               'id_fase', 'id_tipo_item']
+            __field_order__ = ['nombre_rol', 'tipo', 'descripcion', 'permisos']
+            __widget_selector_type__ = selector
+            descripcion = TextArea
+        
+        tmpl_context.widget = RolVerEditForm(DBSession)
+        value = self.edit_filler.get_value(values={'id_rol': int(id_rol)})
+        page = "Rol {nombre}".format(nombre=value["nombre_rol"])
+        atras = self.action
+        return dict(value=value, page=page, atras=atras)
+
     @without_trailing_slash
     @expose('lpm.templates.rol.new')
     def new(self, *args, **kw):

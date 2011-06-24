@@ -4,7 +4,7 @@
     <tr>
         <td>
             <div style="float:left;">
-                Disponibles<br/>
+                <div id="disp">Disponibles<br/></div>
                 <select class="shuttle" id="${name}_src" multiple="true" name="" size="$size">
                         <option py:for="value, description in options"
                                 py:content="description"
@@ -22,8 +22,7 @@
         </td>
         <td>
             <div style="float:left">
-                    Seleccionados<br/>
-
+                    <div id="disp">Seleccionados<br/></div>
                     <select class="shuttle" id="${name}" multiple="true" name="${name}" size="$size">
                         <option py:for="value, description in selected_options"
                                 py:content="description"
