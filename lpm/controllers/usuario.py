@@ -598,6 +598,10 @@ class UsuarioController(CrudRestController):
             atras = self.action
         if kw.has_key("id_proyecto"):
             atras = "/proyectos/%s/edit" % kw["id_proyecto"]
+        if kw.has_key("id_fase"):
+            atras = "/fases/%s/edit" % kw["id_fase"]
+        if kw.has_key("id_proyecto") and kw.has_key("id_fase"):
+            atras = "/proyectos/%s/fases/%s/edit" % (kw["id_proyecto"], kw["id_fase"])
         else:
             atras = self.action + str(user.id_usuario) + '/edit'
         return dict(asignados=asignados, 

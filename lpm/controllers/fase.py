@@ -322,7 +322,8 @@ class FaseController(CrudRestController):
         #TODO arreglar que se direccione a /fases si se estaba en /fases
         #o a /proyecto/id/fases si se estaba ahí
         if (UrlParser.parse_id(request.url, "proyectos")):
-            redirect("/proyectos/%d/fases" % proy.id_proyecto)
+            #redirect("/proyectos/%d/fases" % proy.id_proyecto)
+            redirect("/proyectos/%d/edit" % proy.id_proyecto)
         else:
             redirect("/fases")
         
@@ -335,8 +336,12 @@ class FaseController(CrudRestController):
         if (id_proyecto):
             proy = Proyecto.por_id(id_proyecto)
             proy.crear_fase(**kw)
-
-        redirect("./")
+        
+        if (UrlParser.parse_id(request.url, "proyectos")):
+            redirect("/proyectos/%d/edit" % proy.id_proyecto)
+        else:
+            redirect("./")
+        
     
     @expose('lpm.templates.fases.edit')
     def edit(self, *args, **kw):
@@ -382,6 +387,14 @@ class FaseController(CrudRestController):
         tmpl_context.tabla_items = self.items.table
         items = self.items.table_filler.get_value(id_fase=id_fase)
         tmpl_context.tabla_lb = self.table
+        
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        
+        if (id_proyecto):
+            atras = "/proyectos/%d/edit" % id_proyecto
+        else:
+            atras = "/fases"
+        
         return dict(value=value,
                     page="Modificar Fase",
                     puede_asignar_rol=puede_asignar_rol,
@@ -390,7 +403,7 @@ class FaseController(CrudRestController):
                     puede_crear_lb=puede_crear_lb,
                     id=str(id_fase),
                     items=items,
-                    lbs=[])
+                    lbs=[], atras=atras)
         
     @validate(fase_edit_form, error_handler=edit)
     @expose()
@@ -408,5 +421,9 @@ class FaseController(CrudRestController):
 
         proy = Proyecto.por_id(id_proyecto)
         proy.modificar_fase(id_fase, **kw)
-        redirect("../")
+        
+        if (UrlParser.parse_id(request.url, "proyectos")):
+            redirect("/proyectos/%d/edit" % proy.id_proyecto)
+        else:
+            redirect("../")        
     #}
