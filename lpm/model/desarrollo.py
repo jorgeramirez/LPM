@@ -35,12 +35,51 @@ from lpm.model.excepciones import *
 
 import transaction
 
+import thread
+import threading
 
 __all__ = ['Item', 'PropiedadItem', 'RelacionPorItem',
            'Relacion', 'AtributosDeItems', 'ArchivosExternos',
             'ArchivosPorItem', 'HistorialItems', 'AtributosPorItem']
 
+class HiloContador(threading.Thread):
+    def __init__(self, p_item, lock_v, lock_h, lock_s, v, sum, lh):
+        self.p_item = p_item
+        self.lock_v = lock_v
+        self.lock_s = lock_s
+        self.lock_h = lock_h
+        self.visitados = v
+        self.sum = sum
+        self.lh = lh   
+                
+        threading.Thread.__init__(self)
+        
+    def run(self):
+        
+        for ri in self.p_item.relaciones:
+            relacion = Relacion.por_id(ri.id_relacion)
+            otro = relacion.obtener_otro_item(self.p_item.id_item_actual)
+            p_otro = PropiedadItem.por_id(otro.id_propiedad_item)
+            
+            self.lock_v.acquire()
+            if (not self.visitados.has_key(p_otro.id_item_actual)):
+                self.visitados.setdefault(p_otro.id_item_actual, True)
+                self.lock_v.release()
+                
+                self.lock_s.acquire()
+                self.sum += p_otro.complejidad
+                self.lock_s.release()
+                
+                hilo = HiloContador(p_otro, self.lock_v, self.lock_h, self.lock_s, self.visitados, self.sum, self.lh)
+                self.lock_h.acquire()
+                self.lh.append(hilo)
+                hilo.start()
+                self.lock_h.release()
 
+            else:
+                self.lock_v.release()
+                
+                            
 class Item(DeclarativeBase):
     """
     Clase que representa al Item en su versión
@@ -441,8 +480,74 @@ class Item(DeclarativeBase):
                 proy.complejidad_total += diff
 
     def calcular_impacto(self):
-        pass
-    
+        """ Calcula el impacto de cambiar un item
+        @return: lista de strings con las lineas representando un grafo
+        """
+        p_item = PropiedadItem.por_id(self.id_propiedad_item)
+        lock_visitados = threading.Lock()
+        lock_sumatoria = threading.Lock()
+        lock_hilos = threading.Lock()
+        visitados = {}
+        lista_hilos = []
+        sumatoria = 0
+        
+        hilo = HiloContador(p_item, lock_visitados, lock_hilos, lock_sumatoria, visitados, sumatoria, lista_hilos)
+        
+        hilo.start()
+        hilo.join()
+        
+        i = 0
+        while (True):
+            lock_hilos.acquire()
+            if (len(lista_hilos) > i):
+                
+                if (not lista_hilos[i].is_alive()):
+                    lista_hilos.pop(i)
+                    lock_hilos.release()
+                else:   
+                    lock_hilos.release()
+                    lista_hilos[i].join()
+            else:
+                lock_hilos.release()
+            
+            i += 1
+            lock_hilos.acquire()
+            if (len(lista_hilos) < i):
+                lock_hilos.release()
+                i = 0
+            elif (len(lista_hilos) == 0):
+                lock_hilos.release()
+                break  
+
+        return sumatoria
+
+
+        
+#    def _sumar(self, v, sum, lh):
+#        
+#        for ri in self.p_item.relaciones:
+#            relacion = Relacion.por_id(ri.id_relacion)
+#            otro = relacion.obtener_otro_item(self.p_item.id_item_actual)
+#            p_otro = PropiedadItem.por_id(otro.id_propiedad_item)
+#            
+#            self.lock_v.acquire()
+#            if (not self.visitados.has_key(p_otro.id_item_actual)):
+#                self.visitados.setdefault(p_otro.id_item_actual, True)
+#                self.lock_v.release()
+#                
+#                self.lock_s.acquire()
+#                self.sum += p_otro.complejidad
+#                self.lock_s.release()
+#                
+#                hilo = HilosContador(self.p_otro, self.lock_v, self.lock_h, self.lock_s, self.visitados, self.sum, self.lh)
+#                self.lock_hilos.adquire()
+#                self.li.append(hilo)
+#                self.lock_hilos.release()
+#                hilo.star()
+#                
+#            else:
+#                self.lock_v.release()            
+            
     def crear_siguiente_propiedad_item(self):
         """Crea y asigna al item una nueva propiedad en la que se deben realizar
         las modificaciones antes de guardar en el historial

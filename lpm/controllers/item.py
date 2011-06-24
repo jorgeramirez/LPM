@@ -803,7 +803,17 @@ class ItemController(CrudRestController):
     
     @expose('lpm.templates.item.impacto')
     def calcular_impacto(self, *args, **kw):
-        pass
+        """Calcula el impacto"""
+        id = args[0]
+        id_item = int(id)
+        item = Item.por_id(id_item)
+        atras = "../"
+        if UrlParser.parse_nombre(request.url, "fases"):
+            atras = "../%s/edit" % id
+            
+        item = Item.por_id(id_item)
+        sumatoria = item.calcular_impacto()
+        1/0
     
     @expose()
     def revivir(self, *args, **kw):
