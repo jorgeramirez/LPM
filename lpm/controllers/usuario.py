@@ -19,8 +19,10 @@ from lpm.controllers.validaciones import UsuarioAddFormValidator, UsuarioEditFor
 from lpm.model import DBSession, Usuario, Rol, TipoItem, Proyecto, Fase
 from lpm.lib.sproxcustom import CustomTableFiller
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
+from lpm.lib.util import UrlParser
 from lpm.controllers.rol import (RolTable as RolRolTable,
                                      RolTableFiller as RolRolTableFiller)
+from lpm.controllers.proyecto import (ProyectoTableFiller, ProyectoController)
 
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller
@@ -711,4 +713,64 @@ class UsuarioController(CrudRestController):
                     r.usuarios.append(user)
             transaction.commit()
         return self.roles(*args, **kw)
+    
+    @without_trailing_slash
+    @paginate('lista_elementos', items_per_page=5)
+    @expose('lpm.templates.proyecto.get_all')
+    @expose('json')
+    def proyectos(self, *args, **kw):
+        id_usuario = args[0]
+
+
+        class user_proy_filler(ProyectoTableFiller):
+            """
+            TableFiller temporal utilizado para recuperar los proyectos del
+            usuario
+            """
+            def _do_get_provider_count_and_objs(self, id_usuario=None, **kw):
+                count, proys = super(user_proy_filler, 
+                                     self)._do_get_provider_count_and_objs(**kw)
+                filtrados = []
+                for p in proys:
+                    if p.obtener_lider().id_usuario == int(id_usuario):
+                        filtrados.append(p)
+                return len(filtrados), filtrados
+
+            def __actions__(self, obj):
+                """Links de acciones para un registro dado"""
+                value = '<div>'
+                clase = 'actions'
+                if PoseePermiso('modificar proyecto',
+                                id_proyecto=obj.id_proyecto).is_met(request.environ):
+                    value += '<div>' + \
+                                '<a href="/proyectos/'+ str(obj.id_proyecto) + '/edit" ' + \
+                                'class="' + clase + '">Examinar</a>' + \
+                             '</div><br />'
+                value += '</div>'
+                return value
+
+        
+        upf = user_proy_filler(DBSession)
+        if kw.keys():
+            upf.filtros = kw
+        proyectos = upf.get_value(id_usuario=id_usuario)
+        tmpl_context.widget = ProyectoController.table
+        atras = '../%s/edit' % id_usuario
+        titulo = u"Proyectos del Usuario"
+        url_action = "./%s/" % id_usuario
+        if UrlParser.parse_nombre(request.url, "post_buscar"):
+            url_action = "../"
+            atras = "../"
+            
+        return dict(lista_elementos=proyectos, 
+                    page=titulo,
+                    titulo=titulo, 
+                    modelo="Proyecto", 
+                    columnas=ProyectoController.columnas,
+                    opciones=ProyectoController.opciones,
+                    url_action=url_action,
+                    puede_crear=False,
+                    comboboxes=ProyectoController.comboboxes,
+                    atras=atras
+                    )
     #}

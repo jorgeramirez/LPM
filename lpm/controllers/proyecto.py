@@ -336,26 +336,6 @@ class ProyectoController(CrudRestController):
                     atras=atras
                     )
     
-    
-#    @expose('lpm.templates.proyecto.edit')
-#    def edit(self, *args, **kw):
-#        """Despliega una pagina para realizar modificaciones"""
-#        '''
-#        pp = PoseePermiso('modificar proyecto', id_proyecto=args[0])
-#        if not pp.is_met(request.environ):
-#            flash(pp.message % pp.nombre_permiso, 'warning')
-#            redirect("/proyectos")
-#        '''
-#        tmpl_context.widget = self.edit_form
-#        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-#        value = self.edit_filler.get_value(values={'id_proyecto': id_proyecto})
-#        #value['_method'] = 'PUT'#?
-#        if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/":
-#            atras = "../"
-#        else:
-#            atras = "/proyectos"
-#        return dict(value=value, page="Modificar Proyecto", atras=atras)
-        
     @without_trailing_slash
     @expose('lpm.templates.proyecto.new')
     def new(self, *args, **kw):
@@ -479,15 +459,11 @@ class ProyectoController(CrudRestController):
         redirect("../")
     
     
-    @without_trailing_slash
+    @with_trailing_slash
     @paginate('lista_elementos', items_per_page=5)
     @expose('lpm.templates.proyecto.get_all')
     @expose('json')
     def mis_proyectos(self, *args, **kw):
-#        ia = is_anonymous()
-#        if ia.is_met(request.environ):
-#            flash(ia.message, 'warning')
-#            redirect("/")
         tmpl_context.widget = self.table
         
         class mp_filler(ProyectoTableFiller):
@@ -504,19 +480,67 @@ class ProyectoController(CrudRestController):
                        request.credentials["repoze.what.userid"]:
                         filtrados.append(p)
                 return len(filtrados), filtrados
+
+            def __actions__(self, obj):
+                """Links de acciones para un registro dado"""
+                value = '<div>'
+                clase = 'actions'
+
+                if PoseePermiso('modificar proyecto',
+                                id_proyecto=obj.id_proyecto).is_met(request.environ):
+                    value += '<div>' + \
+                                '<a href="/proyectos/'+ str(obj.id_proyecto) + '/edit" ' + \
+                                'class="' + clase + '">Modificar</a>' + \
+                             '</div><br />'
+
+                if PoseePermiso('eliminar proyecto',
+                                id_proyecto=obj.id_proyecto).is_met(request.environ):
+                    value += '<div><form method="POST" action="/proyectos/post_delete/' + str(obj.id_proyecto) + '" class="button-to">'+\
+                             '<input onclick="return confirm(\'¿Está seguro?\');" value="Delete" type="submit" '+\
+                             'style="background-color: transparent; float:left; border:0; color: #286571;'+\
+                             'display: inline; margin: 0; padding: 0;" class="' + clase + '"/>'+\
+                             '</form></div><br />'
+
+                if obj.estado == u"No Iniciado":
+                    if PoseePermiso('iniciar proyecto', 
+                                id_proyecto=obj.id_proyecto).is_met(request.environ):
+                        value += '<div>' + \
+                                    '<a href="./iniciar/' + str(obj.id_proyecto) + '" ' +\
+                                    'class="' + clase + '">Iniciar</a>' + \
+                                 '</div><br />'
+                value += '</div>'
+                return value
+
                 
-        proyectos = mp_filler().get_value(**kw)
-        retorno = self.retorno_base()
-        retorno["lista_elementos"] = proyectos
-        retorno["page"] =  "Mis Proyectos"
-        return dict(value=value,
-                    page="Administrar Proyecto %s" % proyecto.nombre,
-                    fases=fases,
-                    tipo_items=tipo_items,
-                    puede_crear_fase=puede_crear_fases,
-                    puede_crear_ti=puede_crear_ti,
-                    iniciado=iniciado
+        mpf = mp_filler(DBSession)
+        if kw.keys():
+            mpf.filtros = kw
+        proyectos = mpf.get_value()
+        atras = "/"
+        titulo = u"Mis Proyectos"
+        url_action = "./"
+        if UrlParser.parse_nombre(request.url, "post_buscar"):
+            url_action = "../"
+            atras = "../"
+            
+        return dict(lista_elementos=proyectos, 
+                    page=titulo,
+                    titulo=titulo, 
+                    modelo=self.model.__name__, 
+                    columnas=self.columnas,
+                    opciones=self.opciones,
+                    url_action=url_action,
+                    puede_crear=False,
+                    comboboxes=self.comboboxes,
+                    atras=atras
                     )
+                    
+    @expose()
+    def post_delete(self, id_proyecto):
+        proy = Proyecto.por_id(int(id_proyecto))
+        DBSession.delete(proy)
+        flash("Proyecto Eliminado")
+        redirect("/proyectos/")
         
     @expose('lpm.templates.index')
     def _default(self, *args, **kw):
