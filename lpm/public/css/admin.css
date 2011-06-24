@@ -101,3 +101,12 @@ font-weight: bold;
 width:200px;
 
 }
+
+/*actions*/
+.actions_fase {
+background-color: transparent;
+border: 0 none;
+color: #286571;
+display: inline;
+
+}

@@ -10,7 +10,7 @@
 <script src="${tg.url('/javascript/jquery-ui-1.8.13.custom.min.js')}"></script>
 <script src="${tg.url('/javascript/item_relaciones.js')}"></script>
 </head>
-<body class="tundra">
+<body>
   <div style="height:0px;"> &nbsp; </div>
   <h2 style="margin-top:1px; padding-left: 60px;">$page</h2>
   <div style="float:left; padding-left: 95px;" class="crud_edit">
@@ -18,14 +18,15 @@
     <tbody>
         <tr>
             <td>
-                <form id="form_fase_anterior" method="POST" action="${tg.url('../relacionar_seleccionados/' + id)}">
+            	<h2 class="color-sobra" style="font-size: 1.5em; margin-top: 5px;">Items de Fase anterior</h2>
+                <form id="form_fase_anterior" method="POST" action="${tg.url('../relacionar_as/' + id)}">
                 <input class="boton" type="submit" value="Relacionar Seleccionados" style="margin-top: 10px; width: 160px;"/>
                 </form>
             </td>
         </tr>
         <tr>
             <td>
-                <h3>Items de Fase Anterior</h3>
+                
                 <div id="tabla_item_fase_anterior" class="crud_table" style="height:65%; width:700px; margin-top: 10px;">
                     ${XML(tmpl_context.tabla_item_fase_anterior(value=anteriores))}
                 </div>
@@ -39,14 +40,21 @@
         </tr>
         <tr>
             <td>
-                <form id="form_fase_actual" method="POST" action="${tg.url('../relacionar_seleccionados/' + id)}">
+            	<h2 class="color-sobra" style="font-size: 1.5em; margin-top: 5px;">Items de Fase Actual</h2>
+                <form id="form_fase_actual" method="POST" action="${tg.url('../relacionar_ph/' + id)}">
                 <input class="boton" type="submit" value="Relacionar Seleccionados" style="margin-top: 10px; width: 160px;"/>
                 </form>
             </td>
         </tr>
         <tr>
             <td>
-                <h3>Items de Fase Actual</h3>
+                <div py:if="bucle">
+                ${(mensaje)} 
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
                 <div id="tabla_item_fase_actual" class="crud_table" style="height:65%; width:700px; margin-top: 10px;">
                     ${XML(tmpl_context.tabla_item_fase_actual(value=actuales))} 
                 </div>

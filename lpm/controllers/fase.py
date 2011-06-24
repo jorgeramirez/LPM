@@ -232,17 +232,20 @@ class FaseController(CrudRestController):
         puede_crear = False
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
         titulo = self.title
-      
+        atras = "../"
+        
         if(id_proyecto):#significa que se está en el controlador que está en proyectos
             puede_crear = PoseePermiso("crear fase").is_met(request.environ)
             proy = Proyecto.por_id(id_proyecto)
             titulo = self.tmp_from_proyecto_titulo % proy.nombre
+            atras = "../edit"
         fases = self.table_filler.get_value(id_proyecto=id_proyecto, **kw)
 
             
         tmpl_context.widget = self.table
   
-        atras = "/"
+        
+        
         return dict(lista_elementos=fases, 
                     page=titulo,
                     titulo=self.title, 
@@ -343,7 +346,11 @@ class FaseController(CrudRestController):
         id_fase = UrlParser.parse_id(request.url, "fases")
 
         fase = Fase.por_id(int(id_fase))
-
+        
+        atras = "../fases"
+        if (UrlParser.parse_id(request.url, "proyectos")):
+            atras = "../../fases"
+            
         puede_crear_item = PoseePermiso("crear item", 
                                        id_fase=id_fase).is_met(request.environ)
         if puede_crear_item:
@@ -388,7 +395,8 @@ class FaseController(CrudRestController):
                     puede_crear_lb=puede_crear_lb,
                     id=str(id_fase),
                     items=items,
-                    lbs=[])
+                    lbs=[],
+                    atras=atras)
         
     @validate(fase_edit_form, error_handler=edit)
     @expose()

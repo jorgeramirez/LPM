@@ -31,6 +31,8 @@ from tw.forms.fields import TextField
 
 from repoze.what.predicates import not_anonymous
 
+from sqlalchemy import and_, or_
+
 import pylons
 from pylons import tmpl_context
 
@@ -48,7 +50,7 @@ class RelacionTable(TableBase):
     __default_column_width__ = '15em'
     __column_widths__ = { '__actions__': "50em"}
     __field_order__ = ['codigo', 'tipo', 'item_relacionado']
-    __xml_fields__ = ['estado']
+    __xml_fields__ = ['Estado']
 relacion_table = RelacionTable(DBSession)
 
 
@@ -70,12 +72,14 @@ class RelacionTableFiller(CustomTableFiller):
                             == item.id_propiedad_item,\
                             RelacionPorItem.id_relacion == obj.id_relacion))\
                             .first()
-        color = u"inherit; "
+        color = u"inherit;"
         estado = u"Normal"
+        
         if(rti.revisar):
-            color = u"#ff0000; "
+            color = u"#ff0000;"
             estado = u"Con revisión"
-        value = '<div style="font-color:' + color + '">' + estado + '<div>'
+            
+        value = '<div style="font-color:' + color + '">' + estado + '</div>'
         
         return value
     

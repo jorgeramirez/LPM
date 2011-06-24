@@ -199,7 +199,7 @@ class RolTable(TableBase):
     __headers__ = {'nombre_rol' : u'Nombre de Rol',
                    'codigo' : u"Código", 'tipo' : u'Tipo',
                    'proyecto': u'Proyecto', 'fase': u"Fase", 
-                   'tipo_item': u"Tipo de Ítem", 'check' : u'Check',
+                   'tipo_item': u"Tipo de Ítem", 'check' : u'Check'
                   }
     __omit_fields__ = ['id_rol', 'permisos', 'usuarios',
                        'id_proyecto', 'id_fase', 'id_tipo_item',
@@ -548,7 +548,7 @@ class UsuarioController(CrudRestController):
         tmpl_context.tabla_asignados = rol_user_table
         tmpl_context.tabla_desasignados = rol_user_table
         user = Usuario.por_id(args[0])
-        page = "Roles de Usuario {nombre}".format(nombre=user.nombre_usuario)
+        page = u"Roles de Usuario {nombre}".format(nombre=user.nombre_usuario)
 
         contexto=""
         valor = None
@@ -598,13 +598,14 @@ class UsuarioController(CrudRestController):
     @expose('lpm.templates.usuario.roles')
     def desasignar_roles(self, *args, **kw):
         """ Desasigna los roles seleccionados a un usuario """
+        flash("hola", "warning")
         if kw:
             pks = []
             for k, pk in kw.items():
                 if not k.isalnum():
                     continue
                 pks.append(int(pk))
-            transaction.begin()
+#            transaction.begin()
             user = Usuario.por_id(int(args[0]))
             c = 0
             while c < len(user.roles):
@@ -612,12 +613,14 @@ class UsuarioController(CrudRestController):
                     del user.roles[c]
                 else:
                     c += 1
-            transaction.commit()
+#            transaction.commit()
+
         return self.roles(*args, **kw)
 
     @expose('lpm.templates.usuario.roles')
     def asignar_roles(self, *args, **kw):
         """ Asigna los roles seleccionados a un usuario """
+
         if kw:
             pks = []
             for k, pk in kw.items():

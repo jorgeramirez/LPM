@@ -13,29 +13,33 @@
     <table cellspacing="0" cellpadding="2" border="0">
     <tbody>
         <tr>
-            <td>
+            <td colspan="2">
                 ${XML(tmpl_context.widget(value=value, action='./'))}
                 
             </td>
         </tr>
         <tr>
-            <td  colspan="2">
+            <td colspan="2">
+            	<h2 class="color-sobra" style="font-size: 1.5em; margin-top: 5px;">Atributos Específicos</h2>
                 <div id="tabla_atributos" class="crud_table" style="height:65%; width:700px; margin-top: 10px;">
                     ${XML(tmpl_context.tabla_atributos(value=atributos))}
                 </div>
             </td>
         </tr>
         <tr>
-            <div style="clear:both;"></div>
+        	<td colspan="2">
+           		<h2 class="color-sobra" style="font-size: 1.5em; margin-top: 5px;">Relaciones</h2>
+            </td>
         </tr>
         <py:if test="puede_relacionar">
         <tr>
-            <td  colspan="2">
+            <td>
+            	
                 <a class="link_boton" href="${tg.url('../relacionar_item/' + id)}">
                     <input id="relacionar_item" style="margin-top:0; " class="boton" type="button" value="Relacionar"/>
-                </a>          
-            </td>
-            <td colspan="2">
+                </a>
+             </td>
+             <td>             
                 <form id="form_eliminar_relaciones" method="POST" action="${tg.url('../eliminar_relaciones/' + id)}">
                 <input id="eliminar_relacion" class="boton" type="submit" value="Eliminar Seleccionados" style="margin-top: 0px; width: 160px; margin-left:-600px;"/>
                 </form>            

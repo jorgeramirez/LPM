@@ -35,6 +35,7 @@ from tw.forms.fields import TextField, TextArea
 
 from repoze.what.predicates import not_anonymous
 
+from sqlalchemy import and_, or_
 import pylons
 from pylons import tmpl_context
 
@@ -44,7 +45,7 @@ import transaction
 class ItemTable(TableBase):
     __model__ = Item
     __headers__ = { 'codigo': u'Código',
-                    'complejidad': 'Complejidad',
+                    'complejidad': u'Complejidad',
                     'codigo_tipo': u'Tipo de Ítem',
                     'version_actual': u'Versión Actual',
                     'estado': u'Estado',
@@ -67,7 +68,7 @@ class ItemRelacionTable(ItemTable):
     __headers__ = { 'codigo': u'Código',
                 'version_actual': u'Versión Actual',
                 'estado': u'Estado',
-                'codigo_fase': 'Fase'
+                'codigo_fase': u'Fase'
                     }
     __add_fields__ = {'codigo_tipo': None,
                       'version_actual': None, 'estado': None,
@@ -81,7 +82,7 @@ class ItemRelacionTable(ItemTable):
     __field_order__ = ["codigo", "version_actual",
                        "estado", "check"]
 
-item_relacion = ItemRelacionTable
+ # item_relacion = ItemRelacionTable(DBSession)
 
 
 class ItemTableFiller(CustomTableFiller):
@@ -235,15 +236,41 @@ class ItemTableFiller(CustomTableFiller):
         
         return len(filtrados), filtrados
 
+item_table_filler = ItemTableFiller(DBSession)
 
-
-
-class ItemRelacionTableFiller(CustomTableFiller):#no terminado
+class ItemRelacionTable(TableBase):
     __model__ = Item
-    __add_fields__ = { #'tipo_item': None, 
+    __headers__ = { 'codigo': u'Código',
+                    'complejidad': 'Complejidad',
+                    'codigo_tipo': u'Tipo de Ítem',
+                    'version_actual': u'Versión Actual',
+                    'estado': u'Estado',
+                    'check': u'Check'
+                  }
+    __omit_fields__ = ['__actions__', 'id_item', 'numero', 'numero_por_tipo',
+                       'id_tipo_item',
+                       'id_propiedad_item', 'propiedad_item_versiones',
+                       'id_fase', 'descripcion', 'observaciones']
+    __add_fields__ = {'codigo_tipo': None,
                       'version_actual': None, 'estado': None,
-                      'codigo_fase': None, 'complejidad': None}
+                      'complejidad': None,
+                      'check': None}
+    __xml_fields__ = ['Check']
     
+    __default_column_width__ = '15em'
+    __column_widths__ = { '__actions__': "50em"}
+    __field_order__ = ["codigo", "version_actual", "complejidad", 
+                       "codigo_tipo", "estado", "check"]
+    
+item_relacion_table = ItemRelacionTable(DBSession)
+
+    
+class ItemRelacionTableFiller(CustomTableFiller):
+    __model__ = Item
+    __add_fields__ = {'codigo_tipo': None,
+                      'version_actual': None, 'estado': None,
+                      'complejidad': None,
+                      'check': None}
     
     def version_actual(self, obj, **kw):
         p_item = PropiedadItem.por_id(obj.id_propiedad_item)
@@ -252,43 +279,63 @@ class ItemRelacionTableFiller(CustomTableFiller):#no terminado
     def estado(self, obj, **kw):
         p_item = PropiedadItem.por_id(obj.id_propiedad_item)
         return p_item.estado
-
+    
+    def codigo_tipo(self, obj, **kw):
+        ti = TipoItem.por_id(obj.id_tipo_item)
+        return ti.codigo
+    
+    def complejidad(self, obj, **kw):
+        p_item = PropiedadItem.por_id(obj.id_propiedad_item)
+        return p_item.complejidad
+    
     def check(self, obj, **kw):
         #id
-        checkbox = '<input type="checkbox" class="checkbox_tabla" id="' + str(obj.id_rol) + '"/>'
+        checkbox = '<input type="checkbox" class="checkbox_tabla" id="' + str(obj.id_item) + '"/>'
         return checkbox
         
 #    def __actions__(self, obj):
-
+        
        
-    def _do_get_provider_count_and_objs(self, id_fase=None, relacionado=None, **kw):#no terminado
+    def _do_get_provider_count_and_objs(self, id_item=None, tipo=None, **kw):
         """
         Recupera los ítems para los cuales tenemos algún permiso. y está o no
         relacionado al campo realcionado.
         Si el usuario se encuentra en una fase, retorna solo
         los ítems que pertenecen a dicha fase.
         """
-        count, lista = super(ItemTableFiller, self).\
-                            _do_get_provider_count_and_objs(**kw)
+#        count, lista = super(ItemTableFiller, self).\
+#                            _do_get_provider_count_and_objs(**kw)
         filtrados = []                    
-        if id_fase:
-            id_fase = int(id_fase)
-            ap = AlgunPermiso(tipo='Fase', id_fase=id_fase).is_met(request.environ)
-            if ap:
-                for it in lista:
-                    if it.id_fase == id_fase:
-                        filtrados.append(it)
+        if id_item:
+            item = Item.por_id(int(id_item))
+            
+            if (tipo == 'p-h'):
                 
-            return len(filtrados), filtrados        
-        
-        for it in lista:
-            if AlgunPermiso(tipo='Fase', id_fase=it.id_fase).is_met(request.environ):
-                filtrados.append(it)
-        
+                items_fase_actual = DBSession.query(Item)\
+                .filter(and_(Item.id_propiedad_item == PropiedadItem.id_propiedad_item,\
+                Item.id_item != item.id_item, Item.id_fase == item.id_fase,
+                PropiedadItem.estado != u"Eliminado"))\
+                .all()
+                
+                for it in items_fase_actual:
+                    if (not it.esta_relacionado(id_item)):
+                        filtrados.append(it)           
+               
+            if (tipo == 'a-s'):
+                
+                items_fase_anterior = DBSession.query(Item)\
+                .filter(and_(Item.id_propiedad_item == PropiedadItem.id_propiedad_item,\
+                PropiedadItem.estado == u"Bloqueado", Item.id_fase == item.id_fase))\
+                .all()
+                
+                for it in items_fase_anterior:
+                    if (not it.esta_relacionado(id_item)):
+                        filtrados.append(it)
+                        
+                
         return len(filtrados), filtrados
 
-
-item_table_filler = ItemTableFiller(DBSession)
+item_relacion_table_filler = ItemRelacionTableFiller(DBSession)
 
 
 class TipoItemField(CustomPropertySingleSelectField):
@@ -386,18 +433,20 @@ item_edit_filler = ItemEditFiller(DBSession)
 
 
 #tabla para eliminar relacion de ítem
-#class RelacionItemTable(RelacionTable):
-#    __add_fields__ = {'item_relacionado': None,
-#                       'check': None}
-#    
-#    __field_order__ = ["codigo", "version_actual", "complejidad", 
-#                     "estado", "check"]
-#    __xml_fields__.append('Check')
-
+class RelacionItemTable(RelacionTable):
+    __add_fields__ = {'item_relacionado': None,
+                       'check': None, 'estado': None}
+    __headers__ = {'tipo': u'Tipo', 'codigo': u'Código',
+                   'item_relacionado': u"Ítem Relacionado",
+                   'estado': u'Estado', 'check': u"Check"}
+    __field_order__ = ["codigo", 'item_relacionado', 'tipo', "estado", "check"]
+    __xml_fields__ = ['Check', 'Estado']
+    
     
 #filler para relacionar/eliminar relacion de ítem
 class RelacionItemTableFiller(RelacionTableFiller):
-    __add_fields__ = {'item_relacionado': None, 'check': None}
+    __add_fields__ = {'item_relacionado': None, 'check': None,
+                      'estado': None}
     
     def check(self, obj, **kw):
         checkbox = '<input type="checkbox" class="checkbox_tabla" id="' + str(obj.id_relacion) + '"/>'
@@ -598,7 +647,7 @@ class ItemController(CrudRestController):
         atributos = self.atributos.table_filler \
                         .get_value(id_version=item.id_propiedad_item)
         
-        tmpl_context.tabla_relaciones = ItemRelacionTable(DBSession)
+        tmpl_context.tabla_relaciones = RelacionItemTable(DBSession)
         rel_table_filler = RelacionItemTableFiller(DBSession)
         relaciones = rel_table_filler.get_value(id_version=item.id_propiedad_item)
         value = self.edit_filler.get_value(values={'id_item': id_item})
@@ -642,24 +691,113 @@ class ItemController(CrudRestController):
     def relacionar_item(self, *args, **kw):
         #se lo llama desde la pagina edit del item, al hacer click en el
         #boton Relacionar
-        tabla_item_fase_actual = None
-        tabla_item_fase_anterior = None
-        anteriores = {}
-        actuales = {}
-        pass
+        id = args[0]
+        id_item = int(id)
+        item = Item.por_id(id_item)
+        page = u"Relacionar con ítem: {codigo}".format(codigo=item.codigo)
+        tmpl_context.tabla_item_fase_actual = item_relacion_table
+        tmpl_context.tabla_item_fase_anterior = item_relacion_table
+        anteriores = item_relacion_table_filler.get_value(id_item=id_item,\
+                                                          tipo='a-s', **kw)
+                                                        
+        actuales = item_relacion_table_filler.get_value(id_item=id_item,\
+                                                          tipo='p-h', **kw)
+        atras = "../%d/edit" % id_item
+        
+        #TODO no se imprime este mensaje!!!!
+        mensaje = ""
+        bucle = False
+        if (kw.has_key('retorno')):
+            mensaje = u"No se pudo crear la relación con %s" % kw['retorno']
+#            flash(retorno, "warning")
+            bucle = True
+
+            
+        return dict(anteriores=anteriores, 
+                    actuales=actuales,
+                    page=page, 
+                    id=id, 
+                    atras=atras,
+                    bucle=bucle,
+                    mensaje=mensaje
+                    )
     
     @expose('lpm.templates.item.relaciones')
-    def relacionar_seleccionados(self, *args, **kw):
+    def relacionar_as(self, *args, **kw):
         #recibe los elementos seleccionados en relacionar_item
         #relaciona, y retorna. Ajax
-        pass
+        id = args[0]
+        id_item = int(id)
+        item = Item.por_id(id_item)
+        p_item = PropiedadItem.por_id(item.id_propiedad_item)
+        
+        if kw:
+            ids = []
+            for k, pk in kw.items():
+                if not k.isalnum():
+                    continue
+                ids.append(int(pk))
+        
+        p_item.asignar_relaciones(ids, 'a-s')
+        
+        usuario = Usuario.by_user_name(request.identity['repoze.who.userid'])
+        item.guardar_historial(u"relacionar-AS", usuario)
+        
+        return self.relacionar_item(*args, **kw)
 
+    @expose('lpm.templates.item.relaciones')
+    def relacionar_ph(self, *args, **kw):
+        #recibe los elementos seleccionados en relacionar_item
+        #relaciona, y retorna. Ajax
+        id = args[0]
+        id_item = int(id)
+        item = Item.por_id(id_item)
+        p_item = PropiedadItem.por_id(item.id_propiedad_item)
+        
+        if kw:
+            ids = []
+            for k, pk in kw.items():
+                if not k.isalnum():
+                    continue
+                ids.append(int(pk))
+                
+        ids = [2,3]
+        retorno, creado = p_item.agregar_relaciones(ids, 'p-h')
+        
+                
+        if (creado):#si por lo menos se pudo crear una relacion se guarda en el 
+                    #historial
+            usuario = Usuario.by_user_name(request.identity['repoze.who.userid'])
+            item.guardar_historial(u"relacionar-PH", usuario)
+        
+        if (retorno != u""):
+            kw.setdefault('retorno', retorno)
+            
+        return self.relacionar_item(*args, **kw)
     
     @expose('lpm.templates.item.edit')
     def eliminar_relaciones(self, *args, **kw):
         #se lo llama desde la pagina de edit, al marcar las relaciones
         #y luego seleccionar Eliminar. Ajax.
-        pass
+        id = args[0]
+        id_item = int(id)
+        item = Item.por_id(id_item)
+        p_item = PropiedadItem.por_id(item.id_propiedad_item)
+        
+        if kw:
+            ids = []
+            for k, pk in kw.items():
+                if not k.isalnum():
+                    continue
+                ids.append(int(pk))
+        
+        ids = [5,6]
+        p_item.eliminar_relaciones(ids)
+        
+        usuario = Usuario.by_user_name(request.identity['repoze.who.userid'])
+        item.guardar_historial(u"eliminar-relaciones", usuario)
+        
+        return self.edit(*args, **kw)
     
     @expose('lpm.templates.item.impacto')
     def calcular_impacto(self, *args, **kw):

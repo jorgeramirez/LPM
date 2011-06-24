@@ -254,6 +254,32 @@ class Item(DeclarativeBase):
         op = u"Eliminación"
         HistorialItems.registrar(usuario, p_item, op)
     
+    def esta_relacionado(self, id_item):
+        """ 
+        Verifica si este ítem está relacionado con el item de id_item
+        
+        @param id_item: id del item con el que se quiere comprobar la relación
+        @param tipo: tipo de relacion que se quiere comprobar
+        @return: True si está relacionado con id_item
+        """
+
+        
+        p_item = PropiedadItem.por_id(self.id_propiedad_item)
+        relaciones_posterior = Relacion.relaciones_como_posterior(id_item)
+        relaciones_anterior = Relacion.relaciones_como_anterior(id_item)
+        
+        #TODO mejorar los queries de las funciones de relaciones_como_XXX 
+        #para que traigan las relaciones activas
+        for r in p_item.relaciones:
+            if (relaciones_posterior and r in relaciones_posterior):
+                return True
+            if (relaciones_anterior and r in relaciones_anterior):
+                return True
+            
+        return False
+
+            
+        
     def revivir(self, usuario):
         """
         Revive un ítem, implica que el mismo reviva con el estado desbloqueado.
@@ -399,12 +425,18 @@ class Item(DeclarativeBase):
         p_item_nuevo = PropiedadItem()
         p_item_nuevo.version = p_item_viejo.version + 1
         p_item_nuevo.estado = p_item_viejo.estado
+        p_item_nuevo.complejidad = p_item_viejo.complejidad
+        p_item_nuevo.prioridad = p_item_viejo.prioridad
+        p_item_nuevo.descripcion = p_item_viejo.descripcion
+        p_item_nuevo.observaciones = p_item_viejo.observaciones
         p_item_nuevo.id_item_actual = self.id_item
         p_item_nuevo.incorporar_archivos(p_item_viejo.archivos)
         p_item_nuevo.incorporar_atributos(p_item_viejo.atributos)
         p_item_nuevo.incorporar_relaciones(p_item_viejo.relaciones)
-        self.id_propiedad_item = p_item_nuevo.id_propiedad_item
         DBSession.add(p_item_nuevo)
+        DBSession.flush()
+        self.id_propiedad_item = p_item_nuevo.id_propiedad_item
+        DBSession.flush()
         
         return p_item_nuevo
     
@@ -417,7 +449,8 @@ class Item(DeclarativeBase):
         hist_items = HistorialItems()
         hist_items.tipo_modificacion = operacion
         hist_items.usuario = usuario
-        hist_items.item = self.id_propiedad_item
+        hist_items.id_item = self.id_propiedad_item
+        DBSession.add(hist_items)
         
     @classmethod
     def por_id(cls, id):
@@ -571,10 +604,11 @@ class PropiedadItem(DeclarativeBase):
         @return: un string conteniendo los códigos de los ítems con los que no se puedo relacionar
         por formaciones de ciclos, cadena vacía en caso de que todos se relacionen.
         """
-        retorno = ""
+        retorno = u""
+        creado = False
         
         item = Item.por_id(self.id_item_actual)
-        p_item_nuevo = item._crear_propiedad_item()
+        p_item_nuevo = item.crear_siguiente_propiedad_item()
         
         for i in ids:
             if (i):
@@ -585,42 +619,53 @@ class PropiedadItem(DeclarativeBase):
             antecesor = Item.por_id(i)
             p_item_ant = PropiedadItem.por_id(antecesor.id_propiedad_item)
             
-            if (tipo == 'a-s' and self.estado != u"Bloqueado"):
+            if (tipo == 'a-s' and p_item_ant.estado != u"Bloqueado"):
                 raise RelacionError(u"El item con el que se relaciona debe estar en una LB")
             
             relacion = Relacion()
             relacion.id_anterior = antecesor.id_item
-            relacion.id_posterior = self.id_item_actual
+            relacion.id_posterior = item.id_item
             
             relacion.tipo = Relacion.tipo_relaciones[tipo]
-            relacion.set_codigo()
-            rel_por_item = RelacionPorItem()
+            
+            
+            rel_por_item1 = RelacionPorItem()
+            rel_por_item2 = RelacionPorItem()
             #rel_por_item.relaciones.append(relacion)
-            rel_por_item.relacion = relacion
+            rel_por_item1.relacion = relacion
+            rel_por_item2.relacion = relacion
             DBSession.add(relacion)
             DBSession.flush()
+            relacion.set_codigo()
             
             if (tipo == 'p-h' and \
-                not PropiedadItem._detectar_bucle(self)):
+                not PropiedadItem._detectar_bucle(p_item_nuevo)):
                 #raise RelacionError(u"Se formó un bucle con la realcion nueva")
                 DBSession.delete(relacion)
                 DBSession.flush()
-                retorno =+ antecesor.codigo + " "
+                retorno += (u"  :  " + antecesor.codigo)
                 continue
-                      
-            p_item_nuevo.relaciones.append(rel_por_item)
-            p_item_ant.relaciones.append(rel_por_item)
-            DBSession.add(rel_por_item)
+            elif (not creado):
+                creado = True
+                          
+            p_item_nuevo.relaciones.append(rel_por_item1)
+            p_item_ant.relaciones.append(rel_por_item2)
+            DBSession.add_all([rel_por_item1, rel_por_item2])
             #no hace falta agregar p_item_ant verdad?
         
-        return retorno  
+        if (not creado):
+            item.id_propiedad_item = self.id_propiedad_item
+            DBSession.delete(p_item_nuevo)
+            
+        return retorno, creado  
     
     @classmethod        
     def _detectar_bucle(cls, item_prop):   
         """ 
-        funciona con el método dfs()
-         retorna una lista con id_item_actual de los que forman el ciclo
-         None si no se encontró ciclo
+        Funciona con el método dfs()
+        @param item_prop: propiedad de item en al cual se quiere buscar un ciclo
+        @return: retorna una lista con id_item_actual de los que forman el ciclo
+                 None si no se encontró ciclo
         """
         inicio = item_prop.id_item_actual
         visitado = {}
@@ -629,21 +674,24 @@ class PropiedadItem(DeclarativeBase):
         
     @classmethod
     def _dfs(cls, inicio, nodo, visitado):
-        """ realiza la búsqueda en profundidad para encontrar bucles """
-        if (nodo.item_actual in visitado):
-            if (inicio == nodo.item_actual):
-                return [nodo.item_actual]
+        """ Realiza la búsqueda en profundidad para encontrar bucles """
+        if (visitado and nodo.id_item_actual in visitado):
+            if (inicio == nodo.id_item_actual):
+                return [nodo.id_item_actual]
         
-        visitado.setdefault(nodo.item_actual, [True])
+        visitado.setdefault(nodo.id_item_actual, [True])
         
-        for arco in Relacion.relaciones_como_anterior(nodo.id_propiedad_item):
-            if (arco.tipo == Relacion.tipo_relaciones['p-h']):
-                adyacente = ProiedadItem.por_id(Item.por_id(arco.id_anterior).id_item_actual)
-                ciclo = PropiedadItem._dfs(inicio, adyacente, visitado)
-                if (ciclo):
-                    ciclo.append(adyacente.id_item_actual)
+        #TODO mejorar el query de la función relaciones_como_anterior
+        r_anterior = Relacion.relaciones_como_anterior(nodo.id_propiedad_item)
+        if (r_anterior):
+            for arco in r_anterior:
+                if (arco.tipo == Relacion.tipo_relaciones['p-h']):
+                    adyacente = ProiedadItem.por_id(Item.por_id(arco.id_anterior).id_item_actual)
+                    ciclo = PropiedadItem._dfs(inicio, adyacente, visitado)
+                    if (ciclo):
+                        ciclo.append(adyacente.id_item_actual)
                 
-        visitado[nodo.item_actual] = [False]
+        visitado[nodo.id_item_actual] = [False]
         
         return None
 
@@ -654,7 +702,7 @@ class PropiedadItem(DeclarativeBase):
         """
         
         item = Item.por_id(self.id_item_actual)
-        p_item_nuevo = item._crear_propiedad_item()
+        p_item_nuevo = item.crear_siguiente_propiedad_item()
         
         for i in ids:
             if (i):
@@ -667,7 +715,7 @@ class PropiedadItem(DeclarativeBase):
 #                otro = Item.por_id(relacion.id_posterior)
 #            else:
 #                otro = Item.por_id(relacion.id_anterior)
-            otro = relacion.obtener_otro_item()
+            otro = relacion.obtener_otro_item(item.id_item)
                 
 #            p_item_otro = PropiedadItem.por_id(otro.id_propiedad_item)
 #            
@@ -678,33 +726,9 @@ class PropiedadItem(DeclarativeBase):
                                                         == otro.id_propiedad_item,\
                                                         RelacionPorItem.id_propiedad_item\
                                                         == p_item_nuevo.id_propiedad_item),\
-                                                        RelacionPorItem.id_relacion == i)).\
-                                                        all().delete()
+                                                        RelacionPorItem.id_relacion == i))\
+                                                        .delete()
 
-            
-            relacion.tipo = Relacion.tipo_relaciones[tipo]
-            relacion.set_codigo()
-            rel_por_item = RelacionPorItem()
-            #rel_por_item.relaciones.append(relacion)
-            rel_por_item.relacion = relacion
-            DBSession.add(relacion)
-            DBSession.flush()
-            
-            if (tipo == 'p-h' and \
-                not PropiedadItem._detectar_bucle(self)):
-                #raise RelacionError(u"Se formó un bucle con la realcion nueva")
-                DBSession.delete(relacion)
-                DBSession.flush()
-                retorno =+ antecesor.codigo + " "
-                continue
-                
-            
-            p_item_nuevo.relaciones.append(rel_por_item)
-            p_item_ant.relaciones.append(rel_por_item)
-            DBSession.add(rel_por_item)
-            #no hace falta agregar p_item_ant verdad?
-        
-        return retorno  
 
         
     
@@ -904,7 +928,7 @@ class Relacion(DeclarativeBase):
         """
         Genera el código para el elemento pasado como parametro
         """
-        if (rel.tipo == tipo_relaciones['a-s']):
+        if (rel.tipo == cls.tipo_relaciones['a-s']):
             t = "as"
         else:
             t = "ph"
