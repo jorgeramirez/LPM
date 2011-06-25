@@ -97,7 +97,10 @@ class LineaBaseTableFiller(CustomTableFiller):
                             '<a href="'+ controller +'partir/' + id + '" ' + \
                             'class="' + clase + '">Partir</a>' + \
                          '</div><br />'
-        
+        value += '<div>' + \
+                    '<a href="'+ controller +'examinar/' + id + '" ' + \
+                    'class="' + clase + '">Examinar</a>' + \
+                 '</div><br />'        
         value += "</div>"
         return value
         
@@ -236,6 +239,65 @@ class ItemInhabilitadosTableFiller(CustomTableFiller):
     def _do_get_provider_count_and_objs(self, id_fase=None, **kw):
         pass
 
+
+class ItemLBTable(TableBase):
+    __model__ = ItemsPorLB
+    __headers__ = { 'version': u'Versión',
+                    'complejidad': u'Complejidad',
+                    'codigo_item': u'Código',
+                    'estado': u'Estado'
+                  }
+    __omit_fields__ = ['id_item_por_lb', 'id_item', 'id_lb', 'propiedad_item',
+                       "__actions__", "lb"]
+    __add_fields__ = {'version': None, 'complejidad': None,
+                      'codigo_item': None, 'estado': None
+                     }
+    __default_column_width__ = '15em'
+    __column_widths__ = { '__actions__': "50em"}
+    __field_order__ = ["codigo_item", "version", "estado", "complejidad"]
+    
+item_lb_table = ItemLBTable(DBSession)
+
+
+class ItemLBTableFiller(CustomTableFiller):
+    __model__ = ItemsPorLB
+    __add_fields__ = {'version': None, 'complejidad': None,
+                      'codigo_item': None, 'estado': None
+                     }
+                     
+    def version(self, obj, **kw):
+        return obj.propiedad_item.version
+
+    def complejidad(self, obj, **kw):
+        return obj.propiedad_item.complejidad
+
+    def estado(self, obj, **kw):
+        return obj.propiedad_item.estado
+
+    def codigo_item(self, obj, **kw):
+        return Item.por_id(obj.propiedad_item.id_item_actual).codigo
+        
+    def __actions__(self, obj):
+        """Links de acciones para un registro dado"""
+        return "<div></div>"
+    
+    def _do_get_provider_count_and_objs(self, id_lb=None, **kw):
+        """
+        Recupera las versiones del ítem en cuestión.
+        """
+        count, lista = super(ItemLBTableFiller, self).\
+                            _do_get_provider_count_and_objs(**kw)
+        filtrados = []                    
+        if id_lb:
+            id_lb = int(id_lb)
+            lb = LB.por_id(id_lb)
+            for iplb in lb.items:
+                if iplb in lista:
+                    filtrados.append(iplb)
+        return len(filtrados), filtrados
+
+
+item_lb_table_filler = ItemLBTableFiller(DBSession)
 
 
 class LineaBaseController(CrudRestController):
@@ -432,8 +494,30 @@ class LineaBaseController(CrudRestController):
     def edit(self, *args, **kw):
         pass
     
-    @expose("lpm.templates.lb.get_one")
+    @expose()
     def get_one(self, *args, **kw):
-        ##muestra lb con sus items.
         pass
+
+    @with_trailing_slash
+    @paginate('lista_elementos', items_per_page=5)
+    @expose('lpm.templates.lb.examinar')
+    @expose('json')
+    def examinar(self, *args, **kw):
+        """ 
+        Muestra los elementos que forman parte de la LB
+        """
+        id_lb = int(args[0])
+        lb = LB.por_id(id_lb)
+        titulo = u"Ítems de Línea Base: %s" % lb.codigo
+        iplbs = item_lb_table_filler.get_value(id_lb=id_lb, **kw)
+        tmpl_context.widget = item_lb_table
+        atras = "../../"
+        if UrlParser.parse_nombre(request.url, "fases"):
+            atras = "../../../edit" 
+        return dict(lista_elementos=iplbs, 
+                    page=titulo,
+                    titulo=titulo, 
+                    modelo="ItemsPorLB",
+                    atras=atras
+                    )
     #}
