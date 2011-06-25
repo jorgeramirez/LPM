@@ -22,6 +22,7 @@ from lpm.lib.util import UrlParser
 from lpm.controllers.tipoitem import TipoItemController, TipoItemTableFiller
 from lpm.controllers.item import ItemController
 from lpm.controllers.lineabase import LineaBaseController
+from lpm.controllers.validaciones.fase_validator import FaseFormValidator
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, EditFormFiller
 from sprox.fillerbase import EditFormFiller
@@ -159,6 +160,7 @@ class FaseAddForm(AddRecordForm):
     __omit_fields__ = ['id_fase', 'numero_items', 'numero_lb',
                        'estado', 'id_proyecto', 'codigo', 'items',
                        'roles', 'tipos_de_item']
+    __base_validator__ = FaseFormValidator
     posicion = PosicionField("posicion", accion="new")
 
 fase_add_form = FaseAddForm(DBSession)
@@ -169,6 +171,7 @@ class FaseEditForm(EditableForm):
     __hide_fields__ = ['id_fase', 'numero_items', 'numero_lb',
                        'estado', 'codigo', 'id_proyecto', 'items',
                        'roles', 'tipos_de_item']
+    __base_validator__ = FaseFormValidator
     posicion = PosicionField("posicion", accion="edit")
 
 fase_edit_form = FaseEditForm(DBSession)
