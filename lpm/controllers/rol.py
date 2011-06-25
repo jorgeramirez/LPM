@@ -761,7 +761,7 @@ class RolPlantillaController(RolController):
             tipo = unicode(kw["tipo"].lower())
             ok_url = "/rolesplantilla/"
             if tipo.find(u"proyecto") >= 0:
-                error_url += "proyecto"
+                error_url += "proyecto?"
             elif tipo.find(u"fase") >= 0:
                 error_url += "fase?"
             else:
