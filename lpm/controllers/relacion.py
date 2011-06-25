@@ -61,17 +61,30 @@ class RelacionTableFiller(CustomTableFiller):
     
     def item_relacionado(self, obj, **kw):
         id_item = UrlParser.parse_id(request.url, "items")
+        id_version = UrlParser.parse_id(request.url, "versiones")
+        if not id_item:
+            id_item = id_version        
         otro = obj.obtener_otro_item(id_item)
         return otro.codigo
     
     def estado(self, obj, **kw):
         id_item = UrlParser.parse_id(request.url, "items")
-        item = Item.por_id(id_item)
-        rti = DBSession.query(RelacionPorItem).\
-                            filter(and_(RelacionPorItem.id_propiedad_item\
-                            == item.id_propiedad_item,\
-                            RelacionPorItem.id_relacion == obj.id_relacion))\
-                            .first()
+        id_version = UrlParser.parse_id(request.url, "versiones")
+        if not id_version:
+            item = Item.por_id(id_item)
+            rti = DBSession.query(RelacionPorItem).\
+                                filter(and_(RelacionPorItem.id_propiedad_item\
+                                == item.id_propiedad_item,\
+                                RelacionPorItem.id_relacion == obj.id_relacion))\
+                                .first()
+        else:
+            p_item = PropiedadItem.por_id(id_version)
+            rti = DBSession.query(RelacionPorItem).\
+                                filter(and_(RelacionPorItem.id_propiedad_item\
+                                == p_item.id_propiedad_item,\
+                                RelacionPorItem.id_relacion == obj.id_relacion))\
+                                .first()
+            
         color = u"inherit;"
         estado = u"Normal"
         

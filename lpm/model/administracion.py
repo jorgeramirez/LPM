@@ -179,9 +179,31 @@ class Fase(DeclarativeBase):
 
     def crear_lb(self): #jorge
         """Crea una nueva Línea Base en esta fase"""
-        lb_new = LB(numero=self.numero_lb)
         self.numero_lb += 1
+        lb_new = LB(numero=self.numero_lb)
         DBSession.add(lb_new)
+        return lb_new
+    
+    def generar_lb(self, pks, usuario):
+        """
+        Genera una nueva linea base.
+        """
+        lb_new = self.crear_lb()
+        items = DBSession.query(Item).filter(Item.id_item.in_(pks))
+        pi_pks = []
+        for it in items:
+            it.bloquear(usuario)
+            pi_pks.append(it.id_propiedad_item)
+        p_items = DBSession.query(PropiedadItem) \
+                           .filter(PropiedadItem.id_propiedad_item.in_(pi_pks)) \
+                           .all()
+        for pi in p_items:
+            lb_new.agregar_item(pi)
+        DBSession.flush()
+        lb_new.codigo = LB.generar_codigo(lb_new)
+        op = u"Creación"
+        self.cambiar_estado()
+        HistorialLB.registrar(usuario, lb_new, op)
 
     @classmethod
     def por_id(cls, id):
@@ -216,7 +238,7 @@ class Fase(DeclarativeBase):
         elif self.posicion > 1:
             fase_ant = Fase.por_posicion(self.id_proyecto, self.posicion - 1)
             if self.estado == "Inicial":
-                if fase_ant.estado not in [u"Desarollo", u"Completa"]:
+                if fase_ant.estado in ["Comprometida", "Inicial"]:
                     puede = False
             elif self.estado == "Comprometida":
                 puede = False
@@ -402,6 +424,8 @@ class Proyecto(DeclarativeBase):
         tipo.descripcion = kw["descripcion"]
         fase.tipos_de_item.append(tipo)
         papa.hijos.append(tipo)
+        
+        continuar = False
         
         if (id_importado):
             importado = TipoItem.por_id(id_importado)

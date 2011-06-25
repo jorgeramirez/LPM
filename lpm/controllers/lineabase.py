@@ -79,25 +79,28 @@ class LineaBaseTableFiller(CustomTableFiller):
         else:
             id_fase = UrlParser.parse_id(request.url, "fases")
         
-        id = obj.id_lb
+        id = str(obj.id_lb)
         if PoseePermiso('abrir-cerrar lb', 
                          id_fase=id_fase).is_met(request.environ):
 
             value += '<div>' + \
-                        '<a href="'+ controller +'abrir/' + id + '"' + \
+                        '<a href="'+ controller +'abrir/' + id + '" ' + \
                         'class="' + clase + '">Abrir</a>' + \
                      '</div><br />'
 
             value += '<div>' + \
-                        '<a href="'+ controller +'post_cerrar/' + id + '"' + \
+                        '<a href="'+ controller +'post_cerrar/' + id + '" ' + \
                         'class="' + clase + '">Cerrar</a>' + \
                      '</div><br />'
 
 
             value += '<div>' + \
-                        '<a href="'+ controller +'partir/' + id + '"' + \
+                        '<a href="'+ controller +'partir/' + id + '" ' + \
                         'class="' + clase + '">Partir</a>' + \
                      '</div><br />'
+        
+        value += "</div>"
+        return value
         
 
     def _do_get_provider_count_and_objs(self, id_fase=None, **kw):
@@ -145,6 +148,7 @@ class ItemGenerarTable(TableBase):
     __column_widths__ = { '__actions__': "50em"}
     __field_order__ = ["codigo", "version","tipo", "check"]
 
+item_generar_table = ItemGenerarTable(DBSession)
 
 class ItemGenerarTableFiller(CustomTableFiller):
     __model__ = Item
@@ -167,19 +171,20 @@ class ItemGenerarTableFiller(CustomTableFiller):
 
         value = '<div>'
         clase = 'actions_fase'
-        controller = "./lbs/" 
+        controller = "../items/%d/" % obj.id_item
         
-        #si no está en la tabla que se encuentra en edit fase necesita 
-        #solamente esta parte de la url
-        if UrlParser.parse_nombre(request.url, "lbs"):
-            controller = u""
-            id_item = obj.items[0].propiedad_item.id_item_actual
-            id_fase = Item.por_id(id_item).id_fase
-        else:
-            id_fase = UrlParser.parse_id(request.url, "fases")
+        #id_fase = UrlParser.parse_id(request.url, "fases")
+        
+        #si está en la tabla que se encuentra en edit fase necesita 
+        #if UrlParser.parse_nombre(request.url, "fases"):
+        #    controller = u""
+            #id_item = obj.items[0].propiedad_item.id_item_actual
+        #    id_fase = Item.por_id(id_item).id_fase
+        #else:
+        #    id_fase = UrlParser.parse_id(request.url, "fases")
             
         value += '<div>' + \
-                 '<a href="./'+ controller +'/edit" ' + \
+                 '<a href="'+ controller +'" ' + \
                  'class="' + clase + '">Examinar</a>' + \
                  '</div><br />'
 
@@ -198,6 +203,7 @@ class ItemGenerarTableFiller(CustomTableFiller):
                                            PropiedadItem.estado == u"Aprobado")))
         return query.count(), query.all()
 
+item_generar_table_filler = ItemGenerarTableFiller(DBSession)
 
 ##listado de items inhabilitados
 class ItemInhabilitadosTable(TableBase):
@@ -274,6 +280,8 @@ class LineaBaseController(CrudRestController):
             # desde el controlador de fases
             puede_crear = PoseePermiso("crear lb", id_fase=id_fase).is_met(request.environ)
             fase = Fase.por_id(id_fase)
+            if puede_crear:
+                puede_crear = fase.puede_crear_lb()
             titulo = u"Líneas Base de Fase: %s" % fase.nombre
         lbs = self.table_filler.get_value(id_fase=id_fase, **kw)
         tmpl_context.widget = self.table
@@ -327,7 +335,7 @@ class LineaBaseController(CrudRestController):
         pass
 
     @without_trailing_slash
-    @expose('lpm.templates.lb.generar')
+    @expose('lpm.templates.lb.new')
     def new(self, *args, **kw):
         """Pagina para generar una nueva linea base"""
         id_fase = UrlParser.parse_id(request.url, "fases")
@@ -341,7 +349,9 @@ class LineaBaseController(CrudRestController):
         fase = Fase.por_id(id_fase)
         titulo = u"Generar LB para Fase: %s" % fase.nombre
         #TODO tabla de items aprobados de fase XXXX
-        return dict(value=kw,
+        tmpl_context.tabla_items = item_generar_table
+        items = item_generar_table_filler.get_value(id_fase=fase.id_fase)
+        return dict(items=items,
                     page=titulo, 
                     atras='./')
     
@@ -351,8 +361,22 @@ class LineaBaseController(CrudRestController):
         
     @expose()
     def post(self, *args, **kw):
-        if "sprox_id" in kw:
-            del kw["sprox_id"]
+        """
+        Generamos la línea base.
+        """
+        id_fase = UrlParser.parse_id(request.url, "fases")
+        pks = []
+        for k, v in kw.items():
+            if v.isalnum():
+                pks.append(int(v))
+        fase = Fase.por_id(id_fase)
+        user = Usuario.by_user_name(request.credentials["repoze.what.userid"])
+        fase.generar_lb(pks, user)
+        transaction.commit()
+        flash(u"Se ha generado la línea base")
+        redirect("../edit")
+        
+        
     
     @expose()
     def abrir(self, *args, **kw):
@@ -379,5 +403,10 @@ class LineaBaseController(CrudRestController):
     
     @expose("lpm.templates.lb.edit")
     def edit(self, *args, **kw):
+        pass
+    
+    @expose("lpm.templates.lb.get_one")
+    def get_one(self, *args, **kw):
+        ##muestra lb con sus items.
         pass
     #}
