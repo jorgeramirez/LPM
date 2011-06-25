@@ -212,16 +212,16 @@ item_generar_table_filler = ItemGenerarTableFiller(DBSession)
 
 ##listado de items inhabilitados
 class ItemInhabilitadosTable(TableBase):
-    __model__ = Item
+    __model__ = PropiedadItem
     __headers__ = { 'codigo': u'Código',
                     'version': u'Versión',
                     'tipo': u'Tipo',
                     
                   }
-    __add_fields__ = {'version': None, 'tipo': None}
-    __omit_fields__ = ['id_item', 'numero', 'numero_por_tipo', 'id_tipo_item',
-                       'id_propiedad_item', 'propiedad_item_versiones',
-                       'id_fase', '__actions__']
+    __add_fields__ = {'tipo': None}
+    
+   __omit_fields__ = ['id_propiedad_item', 'prioridad', 'descripcion', 'observaciones',
+                       'id_item_actual', '__actions__']
     __default_column_width__ = '15em'
 
     __field_order__ = ["codigo", "version","tipo", "check"]
@@ -503,6 +503,7 @@ class LineaBaseController(CrudRestController):
                     inhabilitados=inhabilitados
                     )
 
+    @expose("lpm.templates.lb.cerrar_habilitados")
     def post_cerrar(self, *args, **kw):
         """
         Cierra una LB. En caso de no poder cerrar, despliega la página
@@ -512,9 +513,9 @@ class LineaBaseController(CrudRestController):
         lb = LB.por_id(id)
         
         habilitados = []
-        deshabilitados = []
+        inhabilitados = []
         for ilb in lb.items:
-            p_item = ilb.id_item
+            p_item = ilb.propiedad_item
             item = Item.por_id(p_item.id_item_actual)
             if (item.id_propiedad_item == p_item.id_propiedad_item and
                 p_item.estado == u"Aprobado"):#no cambio o se aprobo
@@ -525,10 +526,29 @@ class LineaBaseController(CrudRestController):
         if (inhabilitados == []):
             lb.estado = u"Cerrado"
             flash("Linea base cerrada correctamente")
-        else:
-            redirect('../post_cerrar/%d' % id, inh=inhabilitados, hab=habilitados)
+            redirect('../')
+
+        page = u"Generar LB parcial a partir de : {codigo}".format(codigo=lb.codigo)
+        tmpl_context.tabla_items_habilitados = ItemGenerarTable(DBSession)
+        tmpl_context.tabla_items = ItemInhabilitadosTable(DBSession)
+        inhabilitados = ItemInhabilitadosTableFiller(DBSession).get_value(items=inhabilitados)
+                                                       
+        habilitados = item_generar_table_filler.get_value(items=habilitados, **kw)
+        
+        atras = "../"
             
-        redirect('../')        
+        return dict(anteriores=anteriores, 
+                    actuales=actuales,
+                    page=page, 
+                    id=id, 
+                    atras=atras,
+                    habilitados=habilitados,
+                    inhabilitados=inhabilitados
+                    )
+
+
+
+
                 
 
     @expose()
