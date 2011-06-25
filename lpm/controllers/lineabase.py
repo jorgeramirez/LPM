@@ -15,7 +15,7 @@ from tg.decorators import (paginate, expose, with_trailing_slash,
 from tg import redirect, request, validate, flash
 
 from lpm.model import (DBSession, Item, TipoItem, Fase, PropiedadItem, Usuario,
-                       Relacion, LB, ItemsPorLB)
+                       Relacion, LB, ItemsPorLB, HistorialItems, HistorialLB)
 from lpm.model.excepciones import *
 from lpm.lib.sproxcustom import (CustomTableFiller,
                                  CustomPropertySingleSelectField)
@@ -82,23 +82,25 @@ class LineaBaseTableFiller(CustomTableFiller):
         id = str(obj.id_lb)
         if PoseePermiso('abrir-cerrar lb', 
                          id_fase=id_fase).is_met(request.environ):
-
-            value += '<div>' + \
-                        '<a href="'+ controller +'abrir/' + id + '" ' + \
-                        'class="' + clase + '">Abrir</a>' + \
-                     '</div><br />'
-
-            value += '<div>' + \
-                        '<a href="'+ controller +'post_cerrar/' + id + '" ' + \
-                        'class="' + clase + '">Cerrar</a>' + \
-                     '</div><br />'
-
-
-            value += '<div>' + \
-                        '<a href="'+ controller +'partir/' + id + '" ' + \
-                        'class="' + clase + '">Partir</a>' + \
-                     '</div><br />'
-        
+            if obj.estado in [u"Cerrada", u"Para-Revisión"]:
+                value += '<div>' + \
+                            '<a href="'+ controller +'abrir/' + id + '" ' + \
+                            'class="' + clase + '">Abrir</a>' + \
+                         '</div><br />'
+            elif obj.estado == u"Abierta":
+                value += '<div>' + \
+                            '<a href="'+ controller +'post_cerrar/' + id + '" ' + \
+                            'class="' + clase + '">Cerrar</a>' + \
+                         '</div><br />'
+            elif obj.estado == u"Cerrada":
+                value += '<div>' + \
+                            '<a href="'+ controller +'partir/' + id + '" ' + \
+                            'class="' + clase + '">Partir</a>' + \
+                         '</div><br />'
+        value += '<div>' + \
+                    '<a href="'+ controller +'examinar/' + id + '" ' + \
+                    'class="' + clase + '">Examinar</a>' + \
+                 '</div><br />'        
         value += "</div>"
         return value
         
@@ -242,6 +244,65 @@ class ItemInhabilitadosTableFiller(CustomTableFiller):
         return len(items), items
 
 
+class ItemLBTable(TableBase):
+    __model__ = ItemsPorLB
+    __headers__ = { 'version': u'Versión',
+                    'complejidad': u'Complejidad',
+                    'codigo_item': u'Código',
+                    'estado': u'Estado'
+                  }
+    __omit_fields__ = ['id_item_por_lb', 'id_item', 'id_lb', 'propiedad_item',
+                       "__actions__", "lb"]
+    __add_fields__ = {'version': None, 'complejidad': None,
+                      'codigo_item': None, 'estado': None
+                     }
+    __default_column_width__ = '15em'
+    __column_widths__ = { '__actions__': "50em"}
+    __field_order__ = ["codigo_item", "version", "estado", "complejidad"]
+    
+item_lb_table = ItemLBTable(DBSession)
+
+
+class ItemLBTableFiller(CustomTableFiller):
+    __model__ = ItemsPorLB
+    __add_fields__ = {'version': None, 'complejidad': None,
+                      'codigo_item': None, 'estado': None
+                     }
+                     
+    def version(self, obj, **kw):
+        return obj.propiedad_item.version
+
+    def complejidad(self, obj, **kw):
+        return obj.propiedad_item.complejidad
+
+    def estado(self, obj, **kw):
+        return obj.propiedad_item.estado
+
+    def codigo_item(self, obj, **kw):
+        return Item.por_id(obj.propiedad_item.id_item_actual).codigo
+        
+    def __actions__(self, obj):
+        """Links de acciones para un registro dado"""
+        return "<div></div>"
+    
+    def _do_get_provider_count_and_objs(self, id_lb=None, **kw):
+        """
+        Recupera las versiones del ítem en cuestión.
+        """
+        count, lista = super(ItemLBTableFiller, self).\
+                            _do_get_provider_count_and_objs(**kw)
+        filtrados = []                    
+        if id_lb:
+            id_lb = int(id_lb)
+            lb = LB.por_id(id_lb)
+            for iplb in lb.items:
+                if iplb in lista:
+                    filtrados.append(iplb)
+        return len(filtrados), filtrados
+
+
+item_lb_table_filler = ItemLBTableFiller(DBSession)
+
 
 class LineaBaseController(CrudRestController):
     """Controlador de LineaBases"""
@@ -384,7 +445,35 @@ class LineaBaseController(CrudRestController):
     
     @expose()
     def abrir(self, *args, **kw):
-        pass
+        """
+        Abre una LB
+        """
+        lb = LB.por_id(int(args[0]))
+        user = Usuario.by_user_name(request.credentials["repoze.what.userid"])
+        op = u"Desbloqueo"
+        for iplb in lb.items:
+            p_item = iplb.propiedad_item
+            if p_item.estado == u"Bloqueado":
+                p_item.estado = u"Aprobado"
+            elif p_item.estado == u"Revisión-Bloq":
+                p_item.estado = u"Revisión-Desbloq"
+            HistorialItems.registrar(user, p_item, op)
+        HistorialLB.registrar(user, lb, u"Apertura")
+        id_fase = UrlParser.parse_id(request.url, "fases")
+        url = "/lbs/"
+
+        if not id_fase:
+            id_item = lb.items[0].propiedad_item.id_item_actual
+            id_fase = Item.por_id(id_item).id_fase
+        else:
+            url = "../"
+        
+        fase = Fase.por_id(id_fase)
+        lb.estado = u"Abierta"
+        fase.cambiar_estado()
+        flash("Se ha abierto la LB")
+        redirect(url)
+        
 
     @expose("lpm.templates.lb.cerrar_habilitados")
     def cerrar_habilitados(self, id, hab=None, inh=None, *args, **kw):
@@ -450,8 +539,30 @@ class LineaBaseController(CrudRestController):
     def edit(self, *args, **kw):
         pass
     
-    @expose("lpm.templates.lb.get_one")
+    @expose()
     def get_one(self, *args, **kw):
-        ##muestra lb con sus items.
         pass
+
+    @with_trailing_slash
+    @paginate('lista_elementos', items_per_page=5)
+    @expose('lpm.templates.lb.examinar')
+    @expose('json')
+    def examinar(self, *args, **kw):
+        """ 
+        Muestra los elementos que forman parte de la LB
+        """
+        id_lb = int(args[0])
+        lb = LB.por_id(id_lb)
+        titulo = u"Ítems de Línea Base: %s" % lb.codigo
+        iplbs = item_lb_table_filler.get_value(id_lb=id_lb, **kw)
+        tmpl_context.widget = item_lb_table
+        atras = "../../"
+        if UrlParser.parse_nombre(request.url, "fases"):
+            atras = "../../../edit" 
+        return dict(lista_elementos=iplbs, 
+                    page=titulo,
+                    titulo=titulo, 
+                    modelo="ItemsPorLB",
+                    atras=atras
+                    )
     #}
