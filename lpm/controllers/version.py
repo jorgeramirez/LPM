@@ -64,19 +64,20 @@ class VersionTableFiller(CustomTableFiller):
         clase = 'actions_fase'
         item = Item.por_id(obj.id_item_actual)
         id = obj.id_propiedad_item
-        #if PoseePermiso('modificar item', 
-        #                id_fase=item.id_fase).is_met(request.environ):
+
+
         if PoseePermiso('modificar item',
                         id_tipo_item=item.id_tipo_item).is_met(request.environ):
             value += '<div>' + \
                         '<a href="./' + str(id) + '/edit" ' +  \
                         'class="' + clase + '">Examinar</a>' + \
                      '</div><br />'
-
-            value += '<div>' + \
-                        '<a href="./revertir/'+ str(id) + '" ' + \
-                        'class="' + clase + '">Volver a versión</a>' + \
-                     '</div><br />'
+            
+            if obj.estado not in [u"Bloqueado", u"Eliminado", u"Revisión-Bloq"]:
+                value += '<div>' + \
+                            '<a href="./revertir/'+ str(id) + '" ' + \
+                            'class="' + clase + '">Volver a versión</a>' + \
+                         '</div><br />'
                      
             value += '<div>' + \
                 '<a href="./'+ str(id) +'/adjuntos" ' + \

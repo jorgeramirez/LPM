@@ -15,7 +15,7 @@ from tg.decorators import (paginate, expose, with_trailing_slash,
 from tg import redirect, request, validate, flash
 
 from lpm.model import (DBSession, Item, TipoItem, Fase, PropiedadItem, Usuario,
-                       Relacion, LB, ItemsPorLB)
+                       Relacion, LB, ItemsPorLB, HistorialItems, HistorialLB)
 from lpm.model.excepciones import *
 from lpm.lib.sproxcustom import (CustomTableFiller,
                                  CustomPropertySingleSelectField)
@@ -82,22 +82,21 @@ class LineaBaseTableFiller(CustomTableFiller):
         id = str(obj.id_lb)
         if PoseePermiso('abrir-cerrar lb', 
                          id_fase=id_fase).is_met(request.environ):
-
-            value += '<div>' + \
-                        '<a href="'+ controller +'abrir/' + id + '" ' + \
-                        'class="' + clase + '">Abrir</a>' + \
-                     '</div><br />'
-
-            value += '<div>' + \
-                        '<a href="'+ controller +'post_cerrar/' + id + '" ' + \
-                        'class="' + clase + '">Cerrar</a>' + \
-                     '</div><br />'
-
-
-            value += '<div>' + \
-                        '<a href="'+ controller +'partir/' + id + '" ' + \
-                        'class="' + clase + '">Partir</a>' + \
-                     '</div><br />'
+            if obj.estado in [u"Cerrada", u"Para-Revisión"]:
+                value += '<div>' + \
+                            '<a href="'+ controller +'abrir/' + id + '" ' + \
+                            'class="' + clase + '">Abrir</a>' + \
+                         '</div><br />'
+            elif obj.estado == u"Abierta":
+                value += '<div>' + \
+                            '<a href="'+ controller +'post_cerrar/' + id + '" ' + \
+                            'class="' + clase + '">Cerrar</a>' + \
+                         '</div><br />'
+            elif obj.estado == u"Cerrada":
+                value += '<div>' + \
+                            '<a href="'+ controller +'partir/' + id + '" ' + \
+                            'class="' + clase + '">Partir</a>' + \
+                         '</div><br />'
         
         value += "</div>"
         return value
@@ -380,7 +379,35 @@ class LineaBaseController(CrudRestController):
     
     @expose()
     def abrir(self, *args, **kw):
-        pass
+        """
+        Abre una LB
+        """
+        lb = LB.por_id(int(args[0]))
+        user = Usuario.by_user_name(request.credentials["repoze.what.userid"])
+        op = u"Desbloqueo"
+        for iplb in lb.items:
+            p_item = iplb.propiedad_item
+            if p_item.estado == u"Bloqueado":
+                p_item.estado = u"Aprobado"
+            elif p_item.estado == u"Revisión-Bloq":
+                p_item.estado = u"Revisión-Desbloq"
+            HistorialItems.registrar(user, p_item, op)
+        HistorialLB.registrar(user, lb, u"Apertura")
+        id_fase = UrlParser.parse_id(request.url, "fases")
+        url = "/lbs/"
+
+        if not id_fase:
+            id_item = lb.items[0].propiedad_item.id_item_actual
+            id_fase = Item.por_id(id_item).id_fase
+        else:
+            url = "../"
+        
+        fase = Fase.por_id(id_fase)
+        lb.estado = u"Abierta"
+        fase.cambiar_estado()
+        flash("Se ha abierto la LB")
+        redirect(url)
+        
 
     @expose("lpm.templates.lb.cerrar_habilitados")
     def cerrar_habilitados(self, *args, **kw):
