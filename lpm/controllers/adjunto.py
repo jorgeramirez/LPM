@@ -154,10 +154,16 @@ class AdjuntoController(CrudRestController):
         elif id_item:
             #desde controller de items
             item = Item.por_id(id_item)
-            #puede_crear = PoseePermiso("crear item", 
-            #                    id_fase=item.id_fase).is_met(request.environ)
+
             puede_crear = PoseePermiso("modificar item", 
                                 id_tipo_item=item.id_tipo_item).is_met(request.environ)
+            
+            if puede_crear:
+                p_item = PropiedadItem.por_id(item.id_propiedad_item)
+                if p_item.estado not in [u"Bloqueado", u"Revisión-Bloq", 
+                                         u"Eliminado"]:
+                    puede_crear = False
+            
             titulo = u"Archivos Adjuntos de Ítem: %s" % item.codigo
             archivos = self.table_filler. \
                         get_value(id_version=item.id_propiedad_item, **kw)
@@ -199,10 +205,16 @@ class AdjuntoController(CrudRestController):
         elif id_item:
             #desde controller de items.
             item = Item.por_id(id_item)
-            #puede_crear = PoseePermiso("crear item", 
-            #                    id_fase=item.id_fase).is_met(request.environ)            
+
             puede_crear = PoseePermiso("modificar item", 
-                                id_tipo_item=item.id_tipo_item).is_met(request.environ)            
+                                id_tipo_item=item.id_tipo_item).is_met(request.environ)
+
+            if puede_crear:
+                p_item = PropiedadItem.por_id(item.id_propiedad_item)
+                if p_item.estado not in [u"Bloqueado", u"Revisión-Bloq", 
+                                         u"Eliminado"]:
+                    puede_crear = False
+
             titulo = u"Archivos Adjuntos de Ítem: %s" % item.codigo
             archivos = buscar_table_filler. \
                         get_value(id_version=item.id_propiedad_item)

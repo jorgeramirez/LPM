@@ -122,15 +122,17 @@ class ItemTableFiller(CustomTableFiller):
         #solamente esta parte de la url
         if UrlParser.parse_nombre(request.url, "items"):
             controller =  str(obj.id_item)
-            
-        #if PoseePermiso('modificar item', 
-        #                id_fase=obj.id_fase).is_met(request.environ):
+        
+        
+        p_item = PropiedadItem.por_id(obj.id_propiedad_item) #version actual.    
+        
         if PoseePermiso('modificar item', 
                         id_tipo_item=obj.id_tipo_item).is_met(request.environ):
-            value += '<div>' + \
-                        '<a href="./'+ controller +'/edit" ' + \
-                        'class="' + clase + '">Modificar</a>' + \
-                     '</div><br />'
+            if p_item.estado not in [u"Bloqueado", u"Revisión-Bloq", "Eliminado"]:
+                value += '<div>' + \
+                            '<a href="./'+ controller +'/edit" ' + \
+                            'class="' + clase + '">Modificar</a>' + \
+                         '</div><br />'
             #adjuntos es el controlador de archivos adjuntos al item.
             value += '<div>' + \
                         '<a href="./'+ controller +'/adjuntos" ' + \
@@ -142,7 +144,7 @@ class ItemTableFiller(CustomTableFiller):
                         'class="' + clase + '">Versiones</a>' + \
                      '</div><br />'
         
-        p_item = PropiedadItem.por_id(obj.id_propiedad_item) #version actual.
+        
         eliminar = False
         revivir = False
         aprobar = False
@@ -322,11 +324,13 @@ class ItemRelacionTableFiller(CustomTableFiller):
                         filtrados.append(it)           
                
             if (tipo == 'a-s'):
-                
+                fase = Fase.por_id(item.id_fase)
                 items_fase_anterior = DBSession.query(Item)\
                 .filter(and_(Item.id_propiedad_item == PropiedadItem.id_propiedad_item,\
-                PropiedadItem.estado == u"Bloqueado", Item.id_fase == item.id_fase))\
+                Item.id_fase == Fase.id_fase, Fase.id_proyecto == fase.id_proyecto, PropiedadItem.estado == u"Bloqueado", \
+                    Fase.posicion == fase.posicion - 1, fase.posicion != 1))\
                 .all()
+                
                 
                 for it in items_fase_anterior:
                     if (not it.esta_relacionado(id_item)):
@@ -531,10 +535,11 @@ class ItemController(CrudRestController):
         puede_crear = False
         id_fase = UrlParser.parse_id(request.url, "fases")
         titulo = self.title
-      
+        atras = "/items/"
         if id_fase: 
             # desde el controlador de fases
             puede_crear = PoseePermiso("crear item", id_fase=id_fase).is_met(request.environ)
+            atras = "/fases/%d/edit/" % id_fase
             fase = Fase.por_id(id_fase)
             if puede_crear:
                 puede_crear = fase.puede_crear_item()
@@ -543,6 +548,7 @@ class ItemController(CrudRestController):
         tmpl_context.widget = self.table
         return dict(lista_elementos=items, 
                     page=titulo,
+                    atras=atras,
                     titulo=titulo, 
                     modelo=self.model.__name__, 
                     columnas=self.columnas,
@@ -589,9 +595,38 @@ class ItemController(CrudRestController):
                     atras='../'
                     )
     
-    @expose()
+    @expose("lpm.templates.item.get_one")
     def get_one(self, *args, **kw):
-        pass
+        #id_fase = UrlParser.parse_id(request.url, "fases")
+        id_item = UrlParser.parse_id(request.url, "items")
+        atras = "./"
+        #if UrlParser.parse_nombre(request.url, "fases"):
+        #    atras = "../../edit"
+        item = Item.por_id(id_item)
+        
+        class get_one_edit_form(ItemEditForm):
+            prioridad = TextField("prioridad")
+            complejidad = TextField("complejidad")
+        
+        
+        tmpl_context.widget = get_one_edit_form(DBSession)
+        tmpl_context.tabla_atributos = self.atributos.table
+        atributos = self.atributos.table_filler \
+                        .get_value(id_version=item.id_propiedad_item)
+        
+        tmpl_context.tabla_relaciones = RelacionItemTable(DBSession)
+        rel_table_filler = RelacionItemTableFiller(DBSession)
+        relaciones = rel_table_filler.get_value(id_version=item.id_propiedad_item)
+        value = self.edit_filler.get_value(values={'id_item': id_item})
+        page = u"Ítem: %s" % value["codigo"]
+
+        return dict(value=value,
+                    page=page,
+                    id=str(id_item),
+                    atributos=atributos,
+                    relaciones=relaciones,
+                    atras=atras
+                    )
 
     @without_trailing_slash
     @expose('lpm.templates.item.new')
@@ -742,7 +777,7 @@ class ItemController(CrudRestController):
                     continue
                 ids.append(int(pk))
         
-        p_item.asignar_relaciones(ids, 'a-s')
+        p_item.agregar_relaciones(ids, 'a-s')
         
         usuario = Usuario.by_user_name(request.identity['repoze.who.userid'])
         item.guardar_historial(u"relacionar-AS", usuario)

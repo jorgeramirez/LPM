@@ -59,9 +59,9 @@
         </tr>
         <tr>
             <td  colspan="2">
-          
-                <input py:if="puede_crear_lb" class="boton" type="submit" value="Generar LB" style="margin-top: 10px;"/>
-                
+                <a py:if="puede_crear_lb" class="link_boton" href="${tg.url('./lbs/new')}">
+                    <input class="boton" type="submit" value="Generar LB" style="margin-top: 10px;"/>
+                </a>
             </td>
         </tr>
         <tr>

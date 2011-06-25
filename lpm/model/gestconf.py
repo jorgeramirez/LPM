@@ -60,7 +60,7 @@ class LB(DeclarativeBase):
         """
         return cls.tmpl_codigo.format(id_lb=lb.id_lb)
 
-    def agregar_item(self, item): #jorge
+    def agregar_item(self, p_item): #jorge
         """
         Agrega un ítem al conjunto de ítems de la Línea Base
         
@@ -68,9 +68,10 @@ class LB(DeclarativeBase):
         @type item: L{Item}
         @raises BloquearItemError: si no se ejecuta con exito L{bloquear}
         """
-        item.bloquear()
+        #item.bloquear()
         iplb = ItemsPorLB()
-        iplb.propiedad_item = PropiedadItem.por_id(item.id_propiedad_item)
+        #iplb.propiedad_item = PropiedadItem.por_id(item.id_propiedad_item)
+        iplb.propiedad_item = p_item
         self.items.append(iplb)
     
     def romper(self):
@@ -114,6 +115,20 @@ class HistorialLB(DeclarativeBase):
     #{ Relaciones
     usuario = relation("Usuario", backref="historial_lb")
     lb = relation("LB", backref="historial_lb")
+
+    @classmethod
+    def registrar(cls, usuario=None, lb=None, op=None):
+        """
+        Registra una nueva entrada en el historial de lbs.
+        
+        @param usuario: el usuario que realiza los cambios.
+        @type usuario: L{Usuario}
+        """
+        hist_lb = HistorialLB()
+        hist_lb.tipo_operacion = unicode(op)
+        hist_lb.usuario = usuario
+        hist_lb.lb = lb
+        DBSession.add(hist_lb)
     #}
     
     
