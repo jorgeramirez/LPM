@@ -43,23 +43,28 @@ class HistorialItemTable(TableBase):
     __headers__ = { 'tipo_modificacion': u'Tipo de Modificacion',
                     'fecha_modificacion': u'Fecha de Mofificacion',
                     'nombre_usuario': u'Nombre de Usuario',
+                    'codigo': u'Código de Item'
                   }
     __omit_fields__ = ['id_historial_items', 'id_usuario', 'id_item', 'usuario',
                        'item']
     __default_column_width__ = '15em'
     __column_widths__ = { '__actions__': "50em"}
-    __add_fields__ = {'nombre_usuario': None}
-    __field_order__ = ["tipo_modificacion", "nombre_usuario", "fecha_modificacion"]
+    __add_fields__ = {'nombre_usuario': None, 'codigo' : None}
+    __field_order__ = ["codigo", "tipo_modificacion", "nombre_usuario", "fecha_modificacion"]
     
 historial_item_table = HistorialItemTable(DBSession)
 
 
 class HistorialItemTableFiller(CustomTableFiller):
     __model__ = HistorialItems
-    __add_fields__ = {'nombre_usuario': None}
+    __add_fields__ = {'nombre_usuario': None, 'codigo': u'Código de Item'}
     
     def nombre_usuario(self, obj, **kw):
         return obj.usuario.nombre_usuario
+    
+    def codigo(self, obj, **kw):
+        item = Item.por_id(obj.item.id_item_actual)
+        return item.codigo
     
     def __actions__(self, obj):
         """Links de acciones para un registro dado"""
@@ -67,10 +72,10 @@ class HistorialItemTableFiller(CustomTableFiller):
         value = '<div>'
         clase = 'actions_fase'
         id = obj.id_historial_items
-        #if PoseePermiso('modificar item',
-        #                id_tipo_item=item.id_tipo_item).is_met(request.environ):
-        value += '<div>' + \
-                        '<a href="./' + str(id) + '/edit" ' +  \
+        item = Item.por_id(obj.item.id_item_actual)
+        if PoseePermiso('consultar item',
+                        id_tipo_item=item.id_tipo_item).is_met(request.environ):
+            value += '<div>' + '<a href="./' + str(id) + '/edit" ' +  \
                         'class="' + clase + '">Examinar</a>' + \
                      '</div><br />'                
         value += '</div>'

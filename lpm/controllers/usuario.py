@@ -410,7 +410,6 @@ class UsuarioController(CrudRestController):
             usuarios = []
             
         tmpl_context.widget = usuario_table
-        
         de_proyectos = ""
         try:
             de_proyectos = "http://" + request.environ.get('HTTP_HOST',) + "/proyectos/" + kw["id_proyecto"] + "/edit"
@@ -418,6 +417,12 @@ class UsuarioController(CrudRestController):
             pass
         if request.environ.get('HTTP_REFERER') == de_proyectos:
             atras = request.environ.get('HTTP_REFERER')
+        elif kw.has_key("id_fase"):
+            #atras = request.environ.get('HTTP_REFERER')
+            atras = "/fases/%s/edit" % kw["id_fase"]
+        elif kw.has_key("id_tipo_item"):
+            #atras = request.environ.get('HTTP_REFERER')
+            atras = "/tipositems/%s/edit" % kw["id_tipo_item"]
         else:
             atras = '/'
 
@@ -597,12 +602,12 @@ class UsuarioController(CrudRestController):
         
         if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/usuarios/":
             atras = self.action
-        if kw.has_key("id_proyecto"):
+        elif kw.has_key("id_proyecto"):
             atras = "/proyectos/%s/edit" % kw["id_proyecto"]
-        if kw.has_key("id_fase"):
+        elif kw.has_key("id_fase"):
             atras = "/fases/%s/edit" % kw["id_fase"]
-        if kw.has_key("id_proyecto") and kw.has_key("id_fase"):
-            atras = "/proyectos/%s/fases/%s/edit" % (kw["id_proyecto"], kw["id_fase"])
+        elif kw.has_key("id_tipo_item"):
+            atras = "/tipositems/%s/edit" % kw["id_tipo_item"]
         else:
             atras = self.action + str(user.id_usuario) + '/edit'
         return dict(asignados=asignados, 
