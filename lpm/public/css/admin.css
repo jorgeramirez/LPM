@@ -108,5 +108,17 @@ background-color: transparent;
 border: 0 none;
 color: #286571;
 display: inline;
+}
 
+/*impacto*/
+.grafo{
+font-size: 12px;
+}
+
+.impacto{
+font-weight:bold;
+font-size: 13px;
+}
+.fila{
+font-size:11px;
 }

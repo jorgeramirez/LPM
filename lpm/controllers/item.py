@@ -14,7 +14,7 @@ from tg.decorators import (paginate, expose, with_trailing_slash,
                            without_trailing_slash)
 from tg import redirect, request, validate, flash
 
-from lpm.model import DBSession, Item, TipoItem, Fase, PropiedadItem, Usuario, Relacion
+from lpm.model import DBSession, Item, TipoItem, Fase, PropiedadItem, Usuario, Relacion, Proyecto
 from lpm.model.excepciones import *
 from lpm.lib.sproxcustom import (CustomTableFiller,
                                  CustomPropertySingleSelectField)
@@ -807,13 +807,33 @@ class ItemController(CrudRestController):
         id = args[0]
         id_item = int(id)
         item = Item.por_id(id_item)
+        page = "Calculo de impacto de item: %s" % item.codigo
         atras = "../"
         if UrlParser.parse_nombre(request.url, "fases"):
             atras = "../%s/edit" % id
             
         item = Item.por_id(id_item)
-        sumatoria = item.calcular_impacto()
-        1/0
+        sumatoria, f = item.calcular_impacto()
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        
+        fase = Fase.por_id(item.id_fase)
+        proy = Proyecto.por_id(fase.id_proyecto)
+        impacto = (float(sumatoria[0])/float(proy.complejidad_total)) * 100
+
+        filas = []
+        
+        for v in f.values():
+            #if (not dl.has_key(v['padre'])):
+            #  dl.setdefault(v['padre'], [])
+            filas.append(v[0])
+
+        return dict(atras=atras,
+                    impacto=str(impacto),
+                    page=page,
+                    filas=filas,
+                    ct=str(proy.complejidad_total),
+                    suma=str(sumatoria[0])
+                    )
     
     @expose()
     def revivir(self, *args, **kw):
