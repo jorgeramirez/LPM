@@ -22,8 +22,10 @@ $(function(){
             cache: false,
             data: gen_kw,
             complete: function(jqXHR, textStatus){
-                /*var responseText = jqXHR.responseText;
-                var tbl_html = jQuery("<div>")
+                
+                var responseText = jqXHR.responseText;
+                window.location.href = responseText;
+                /*var tbl_html = jQuery("<div>")
                                .append(responseText.replace(rscript, ""))
                                .find("#tabla_items");
                 $("#tabla_items").html(tbl_html);*/

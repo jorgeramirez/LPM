@@ -74,6 +74,9 @@ class LineaBaseTableFiller(CustomTableFiller):
         if UrlParser.parse_nombre(request.url, "lbs"):
             #controller =  str(obj.id_lb)
             controller = u""
+            if not obj.items:  #lb rota
+                obj.estado = u'Rota'
+                return '<div></div>'
             id_item = obj.items[0].propiedad_item.id_item_actual
             id_fase = Item.por_id(id_item).id_fase
         else:
@@ -121,10 +124,8 @@ class LineaBaseTableFiller(CustomTableFiller):
                 return len(lbs), lbs
         
         for lb in lista:
-            id_item = lb.items[0].propiedad_item.id_item_actual
-            id_fase = Item.por_id(id_item).id_fase
-            if AlgunPermiso(tipo=u'Fase', 
-                            id_fase=id_fase).is_met(request.environ):
+
+            if AlgunPermiso(tipo=u'Fase').is_met(request.environ):
                 filtrados.append(lb)
         
         return len(filtrados), filtrados
@@ -430,6 +431,7 @@ class LineaBaseController(CrudRestController):
         """
         Generamos la línea base.
         """
+        #transaction.begin()
         id_fase = UrlParser.parse_id(request.url, "fases")
         pks = []
         for k, v in kw.items():
@@ -438,11 +440,15 @@ class LineaBaseController(CrudRestController):
         fase = Fase.por_id(id_fase)
         user = Usuario.by_user_name(request.credentials["repoze.what.userid"])
         fase.generar_lb(pks, user)
+        if pks:
+            flash(u"Se ha generado la línea base")
+        else:
+            flash(u"No existen ele")
         transaction.commit()
-        flash(u"Se ha generado la línea base")
-        redirect("/fases/%d/edit" % id_fase)
-        
-    
+        #redirect("/fases/%d/edit" % id_fase)
+        url = '/fases/%d/edit' % id_fase
+        return url
+
     @expose()
     def abrir(self, *args, **kw):
         """
@@ -532,16 +538,24 @@ class LineaBaseController(CrudRestController):
         tmpl_context.tabla_items_habilitados = ItemGenerarTable(DBSession)
         tmpl_context.tabla_items = ItemInhabilitadosTable(DBSession)
         inhabilitados = ItemInhabilitadosTableFiller(DBSession).get_value(items=inhabilitados)
-                                                       
-        habilitados = item_generar_table_filler.get_value(items=habilitados, **kw)
+        
+        lista = []
+        for i in habilitados:
+            lista.append(Item.por_id(i.id_item_actual))
+        habilitados = item_generar_table_filler.get_value(items=lista, **kw)
         
         atras = "../"
-            
+        
+        existen_habilitados = False
+        if habilitados:
+            existen_habilitados = True
+        
         return dict(page=page, 
                     id=id, 
                     atras=atras,
                     habilitados=habilitados,
-                    inhabilitados=inhabilitados
+                    inhabilitados=inhabilitados,
+                    existen_habilitados=existen_habilitados
                     )
 
 

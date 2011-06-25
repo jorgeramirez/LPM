@@ -21,7 +21,7 @@
             <h2 class="color-sobra" style="font-size: 1.5em; margin-top: 5px;">Items Habilitados (LB Parcial)</h2>
 
                 <form id="form_seleccionados" method="POST" action="${tg.url('../')}">
-                <input id="generar" class="boton" type="submit" value="Generar LB Parcial" style="margin-top: 10px; width: 160px;"/>
+                <input py:if='existen_habilitados' id="generar" class="boton" type="submit" value="Generar LB Parcial" style="margin-top: 10px; width: 160px;"/>
                 </form>
             </td>
         </tr>
