@@ -746,7 +746,7 @@ class ItemController(CrudRestController):
         
         usuario = Usuario.by_user_name(request.identity['repoze.who.userid'])
         item.guardar_historial(u"relacionar-AS", usuario)
-        
+        transaction.commit()
         return self.relacionar_item(*args, **kw)
 
     @expose('lpm.templates.item.relaciones')
@@ -774,7 +774,7 @@ class ItemController(CrudRestController):
         
         if (retorno != u""):
             kw.setdefault('retorno', str(DBSession.query(Relacion).count()))
-            
+        transaction.commit()    
         return self.relacionar_item(*args, **kw)
     
     @expose('lpm.templates.item.edit')
@@ -785,21 +785,21 @@ class ItemController(CrudRestController):
         id_item = int(id)
         item = Item.por_id(id_item)
         p_item = PropiedadItem.por_id(item.id_propiedad_item)
-        
+        print kw
         if kw:
             ids = []
             for k, pk in kw.items():
                 if not k.isalnum():
                     continue
                 ids.append(int(pk))
-        
+
             p_item.eliminar_relaciones(ids)
             
             usuario = Usuario.by_user_name(request.identity['repoze.who.userid'])
             item.guardar_historial(u"eliminar-relaciones", usuario)
-        
-#        redirect('../%s/edit' % id)
-        return self.edit(*args, **kw)
+        transaction.commit()
+        redirect('../%s/edit' % id)
+
     
     @expose('lpm.templates.item.impacto')
     def calcular_impacto(self, *args, **kw):

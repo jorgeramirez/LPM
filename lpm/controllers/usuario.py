@@ -678,7 +678,7 @@ class UsuarioController(CrudRestController):
                 if not k.isalnum():
                     continue
                 pks.append(int(pk))
-#            transaction.begin()
+            transaction.begin()
             user = Usuario.por_id(int(args[0]))
             c = 0
             while c < len(user.roles):
@@ -686,7 +686,7 @@ class UsuarioController(CrudRestController):
                     del user.roles[c]
                 else:
                     c += 1
-#            transaction.commit()
+            transaction.commit()
 
         return self.roles(*args, **kw)
 
