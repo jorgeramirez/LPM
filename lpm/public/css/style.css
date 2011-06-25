@@ -344,7 +344,7 @@ padding-right:10px;
 
 /*filtros*/
 .buscar {
-width:55%;
+width:60%;
 margin-bottom: 25px;
 }
 
@@ -371,7 +371,8 @@ margin-left:40px;
 margin-top: 6px;
 margin-left: 40px;
 padding: 3px 10px;
-width:66%;
+width:69%;
+height: 26px;
 }
 
 #x_boton {
@@ -427,7 +428,7 @@ font-family:sans-serif; font-size:12;
 
 /*rango de fechas para los datepickers */
 .rango_fechas {
-font-size:70%;
+font-size:74%;
 }
 
 .filter {

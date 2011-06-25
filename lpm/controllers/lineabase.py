@@ -191,10 +191,13 @@ class ItemGenerarTableFiller(CustomTableFiller):
         value += '</div>'
         return value
 
-    def _do_get_provider_count_and_objs(self, id_fase=None, **kw):
+    def _do_get_provider_count_and_objs(self, id_fase=None, items=None, **kw):
         """
         Recupera los items aprobados de la fase en cuestión
         """
+        if items:
+            return len(items), items
+            
         id_fase = int(id_fase)             #falta probar.
         query = DBSession.query(Item).join(PropiedadItem) \
                          .filter(and_(Item.id_propiedad_item == \
@@ -211,13 +214,14 @@ class ItemInhabilitadosTable(TableBase):
     __headers__ = { 'codigo': u'Código',
                     'version': u'Versión',
                     'tipo': u'Tipo',
+                    
                   }
     __add_fields__ = {'version': None, 'tipo': None}
     __omit_fields__ = ['id_item', 'numero', 'numero_por_tipo', 'id_tipo_item',
                        'id_propiedad_item', 'propiedad_item_versiones',
-                       'id_fase']
+                       'id_fase', '__actions__']
     __default_column_width__ = '15em'
-    __column_widths__ = { '__actions__': "50em"}
+
     __field_order__ = ["codigo", "version","tipo", "check"]
     
 
@@ -234,8 +238,8 @@ class ItemInhabilitadosTableFiller(CustomTableFiller):
         return p_item.version
     
 
-    def _do_get_provider_count_and_objs(self, id_fase=None, **kw):
-        pass
+    def _do_get_provider_count_and_objs(self, items=None, **kw):
+        return len(items), items
 
 
 
@@ -383,19 +387,60 @@ class LineaBaseController(CrudRestController):
         pass
 
     @expose("lpm.templates.lb.cerrar_habilitados")
-    def cerrar_habilitados(self, *args, **kw):
+    def cerrar_habilitados(self, id, hab=None, inh=None, *args, **kw):
         """
         No se pudo cerrar la linea base, por lo tanto se despliega la página
         donde se puede generar lb parcial.
         """
-        pass
+        id = id
+        id_lb = int(id)
+        lb = LB.por_id(id)
+        page = u"Generar LB parcial a partir de : {codigo}".format(codigo=lb.codigo)
+        tmpl_context.tabla_items_habilitados = ItemGenerarTable
+        tmpl_context.tabla_items = ItemInhabilitadosTable(DBSession)
+        inhabilitados = ItemInhabilitadosTable(DBSession).get_value(items=inh,\
+                                                          **kw)
+                                                       
+        habilitados = item_generar_table_filler.get_value(items=hab, **kw)
+        
+        atras = "../"
+            
+        return dict(anteriores=anteriores, 
+                    actuales=actuales,
+                    page=page, 
+                    id=id, 
+                    atras=atras,
+                    habilitados=habilitados,
+                    inhabilitados=inhabilitados
+                    )
 
     def post_cerrar(self, *args, **kw):
         """
         Cierra una LB. En caso de no poder cerrar, despliega la página
         de cerrar.
         """
-        pass
+        id = int(args[0])
+        lb = LB.por_id(id)
+        
+        habilitados = []
+        deshabilitados = []
+        for ilb in lb.items:
+            p_item = ilb.id_item
+            item = Item.por_id(p_item.id_item_actual)
+            if (item.id_propiedad_item == p_item.id_propiedad_item and
+                p_item.estado == u"Aprobado"):#no cambio o se aprobo
+                habilitados.append(p_item)
+            else:
+                inhabilitados.append(p_item)
+                
+        if (inhabilitados == []):
+            lb.estado = u"Cerrado"
+            flash("Linea base cerrada correctamente")
+        else:
+            redirect('../post_cerrar/%d' % id, inh=inhabilitados, hab=habilitados)
+            
+        redirect('../')        
+                
 
     @expose()
     def partir(self, *args, **kw):

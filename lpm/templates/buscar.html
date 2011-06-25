@@ -113,12 +113,12 @@ $(document).ready(function () {
             <py:choose test="columnas[col]">
                 <py:when test="'texto'">
                     <div class="${'texto ' + col}">
-                        <input type="text" name="${col}" style="width:47%;" />
+                        <input type="text" name="${col}" style="width:47%; float:right;" />
                     </div>
                 </py:when>
                 <py:when test="'entero'">
                     <div class="${'entero ' + col}">
-                        <input class="solo_entero" type="text" name="${col}" style="width:47%;" />
+                        <input class="solo_entero" type="text" name="${col}" style="width:47%; float:right;" />
                     </div>
                 </py:when>
                 <py:when test="'fecha'">
@@ -130,7 +130,7 @@ $(document).ready(function () {
                 </py:when>
                 <py:when test="'combobox'">
                     <div class="${'combobox ' + col}">
-                        <select name="${col}" style="width:47%;">
+                        <select name="${col}" style="width:47%;  float:right;">
                             <option value="" selected="selected">--- Seleccionar Tipo ---</option>
                                 <py:for each="opt in comboboxes[col]">
                                     <option value="${opt}">${opt}</option>
