@@ -23,6 +23,7 @@ from lpm.lib.util import UrlParser
 from lpm.controllers.rol import (RolTable as RolRolTable,
                                      RolTableFiller as RolRolTableFiller)
 from lpm.controllers.proyecto import (ProyectoTableFiller, ProyectoController)
+from lpm.controllers.historialitem import HistorialItemController
 
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller
@@ -364,7 +365,7 @@ class UsuarioController(CrudRestController):
 
     # No permitir usuarios anonimos (?)
     allow_only = not_anonymous(u"El usuario debe haber iniciado sesión")
-    
+    historialitems = HistorialItemController(DBSession)
     #{ Modificadores
     model = Usuario
     table = usuario_table
