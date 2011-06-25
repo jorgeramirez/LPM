@@ -507,7 +507,7 @@ class RolController(CrudRestController):
             atras = "/roles"
         return dict(value=kw, page="Nuevo Rol", action=self.action, atras=atras)
     
-    @validate(rol_add_form, error_handler=new)
+    #@validate(rol_add_form, error_handler=new)
     @expose()
     def post(self, *args, **kw):
         """create a new record"""
@@ -515,14 +515,14 @@ class RolController(CrudRestController):
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect(self.action)
-        transaction.begin()
+        #transaction.begin()
         if (not kw.has_key('tipo')):
             kw["tipo"] = self.rol_tipo
         Rol.crear_rol(**kw)
-        transaction.commit()
+        #transaction.commit()
         redirect(self.action)
         
-    @validate(rol_edit_form, error_handler=edit)
+    #@validate(rol_edit_form, error_handler=edit)
     @expose()
     def put(self, *args, **kw):
         """update a record"""
@@ -533,9 +533,9 @@ class RolController(CrudRestController):
         id_rol = int(args[0][0])
         if kw.has_key("id_rol"):
             del kw["id_rol"]
-        transaction.begin()
+        #transaction.begin()
         Rol.actualizar_rol(id_rol, **kw)
-        transaction.commit()
+        #transaction.commit()
         redirect(self.action)
 
     @with_trailing_slash
