@@ -21,6 +21,7 @@ from lpm.lib.authorization import PoseePermiso, AlgunPermiso
 from lpm.lib.util import UrlParser
 from lpm.controllers.tipoitem import TipoItemController, TipoItemTableFiller
 from lpm.controllers.item import ItemController
+from lpm.controllers.lineabase import LineaBaseController
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, EditFormFiller
 from sprox.fillerbase import EditFormFiller
@@ -195,6 +196,7 @@ class FaseController(CrudRestController):
     #Subcontrolador
     tipositems = TipoItemController(DBSession)
     items = ItemController(DBSession)
+    lbs = LineaBaseController(DBSession)
     #{ Modificadores
 
                      
@@ -363,6 +365,7 @@ class FaseController(CrudRestController):
         if puede_crear_item:
             puede_crear_item = fase.puede_crear_item()
             
+            
        
         puede_asignar_rol = PoseePermiso('asignar-desasignar rol', 
                                          id_fase = id_fase). \
@@ -393,7 +396,8 @@ class FaseController(CrudRestController):
         
         tmpl_context.tabla_items = self.items.table
         items = self.items.table_filler.get_value(id_fase=id_fase)
-        tmpl_context.tabla_lb = self.table
+        tmpl_context.tabla_lb = self.lbs.table
+        lbs = self.lbs.table_filler.get_value(id_fase=id_fase)
         
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
         
@@ -410,7 +414,7 @@ class FaseController(CrudRestController):
                     puede_crear_lb=puede_crear_lb,
                     id=str(id_fase),
                     items=items,
-                    lbs=[],
+                    lbs=lbs,
                     atras=atras)
  
         

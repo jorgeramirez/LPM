@@ -14,7 +14,6 @@ $(function(){
         });
 
         
-        
         $.ajax({
             type: "POST",
             dataType: "html",

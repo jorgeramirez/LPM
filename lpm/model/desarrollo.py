@@ -1345,4 +1345,16 @@ class HistorialItems(DeclarativeBase):
         hist_items.usuario = usuario
         hist_items.item = p_item_mod
         DBSession.add(hist_items)
+        
+    @classmethod
+    def por_id(cls, id):
+        """
+        Método de clase que realiza las búsquedas por identificador.
+        
+        @param id: identificador del elemento a recuperar
+        @type id: C{Integer}
+        @return: el elemento recuperado
+        @rtype: L{ArchivosExternos}
+        """
+        return DBSession.query(cls).filter_by(id_historial_items=id).one()
     #}  

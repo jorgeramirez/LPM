@@ -10,9 +10,10 @@
 <script src="${tg.url('/javascript/jquery-ui-1.8.13.custom.min.js')}"></script>
 <script type="text/javascript">
 $(function(){
-    $("input[id!='boton_atras']").attr("disabled", true)
+    /*$("input[id!='boton_atras']").attr("disabled", true)
                                  .filter("[type=submit]").hide();
-    $("textarea").attr("disabled", true);
+    $("textarea").attr("disabled", true);*/
+    $("input[type=submit]").hide();
 });
 </script>
 </head>
@@ -30,7 +31,7 @@ $(function(){
         </tr>
         <tr>
             <td  colspan="2">
-                <h3 style="margin-top:5px;">Atributos</h3>
+                <h2 class="color-sobra" style="font-size: 1.5em; margin-top: 5px;">Atributos</h2>
                 <div id="tabla_atributos" class="crud_table" style="height:65%; width:700px; margin-top: 10px;">
                     ${XML(tmpl_context.tabla_atributos(value=atributos))}
                 </div>
@@ -41,7 +42,7 @@ $(function(){
         </tr>
         <tr>
             <td colspan="2">
-                <h3 style="margin-top:5px;">Relaciones</h3>
+                <h2 class="color-sobra" style="font-size: 1.5em; margin-top: 5px;">Relaciones</h2>
                 <div id="tabla_relaciones" class="crud_table" style="height:65%; width:700px; margin-top: 10px;">
                     ${XML(tmpl_context.tabla_relaciones(value=relaciones))} 
                 </div>

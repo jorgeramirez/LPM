@@ -23,6 +23,7 @@ from lpm.lib.util import UrlParser
 from lpm.controllers.rol import (RolTable as RolRolTable,
                                      RolTableFiller as RolRolTableFiller)
 from lpm.controllers.proyecto import (ProyectoTableFiller, ProyectoController)
+from lpm.controllers.historialitem import HistorialItemController
 
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller
@@ -364,7 +365,7 @@ class UsuarioController(CrudRestController):
 
     # No permitir usuarios anonimos (?)
     allow_only = not_anonymous(u"El usuario debe haber iniciado sesión")
-    
+    historialitems = HistorialItemController(DBSession)
     #{ Modificadores
     model = Usuario
     table = usuario_table
@@ -409,7 +410,6 @@ class UsuarioController(CrudRestController):
             usuarios = []
             
         tmpl_context.widget = usuario_table
-        
         de_proyectos = ""
         try:
             de_proyectos = "http://" + request.environ.get('HTTP_HOST',) + "/proyectos/" + kw["id_proyecto"] + "/edit"
@@ -417,6 +417,12 @@ class UsuarioController(CrudRestController):
             pass
         if request.environ.get('HTTP_REFERER') == de_proyectos:
             atras = request.environ.get('HTTP_REFERER')
+        elif kw.has_key("id_fase"):
+            #atras = request.environ.get('HTTP_REFERER')
+            atras = "/fases/%s/edit" % kw["id_fase"]
+        elif kw.has_key("id_tipo_item"):
+            #atras = request.environ.get('HTTP_REFERER')
+            atras = "/tipositems/%s/edit" % kw["id_tipo_item"]
         else:
             atras = '/'
 
@@ -596,12 +602,12 @@ class UsuarioController(CrudRestController):
         
         if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/usuarios/":
             atras = self.action
-        if kw.has_key("id_proyecto"):
+        elif kw.has_key("id_proyecto"):
             atras = "/proyectos/%s/edit" % kw["id_proyecto"]
-        if kw.has_key("id_fase"):
+        elif kw.has_key("id_fase"):
             atras = "/fases/%s/edit" % kw["id_fase"]
-        if kw.has_key("id_proyecto") and kw.has_key("id_fase"):
-            atras = "/proyectos/%s/fases/%s/edit" % (kw["id_proyecto"], kw["id_fase"])
+        elif kw.has_key("id_tipo_item"):
+            atras = "/tipositems/%s/edit" % kw["id_tipo_item"]
         else:
             atras = self.action + str(user.id_usuario) + '/edit'
         return dict(asignados=asignados, 
@@ -678,7 +684,7 @@ class UsuarioController(CrudRestController):
                 if not k.isalnum():
                     continue
                 pks.append(int(pk))
-#            transaction.begin()
+            transaction.begin()
             user = Usuario.por_id(int(args[0]))
             c = 0
             while c < len(user.roles):
@@ -686,7 +692,7 @@ class UsuarioController(CrudRestController):
                     del user.roles[c]
                 else:
                     c += 1
-#            transaction.commit()
+            transaction.commit()
 
         return self.roles(*args, **kw)
 
