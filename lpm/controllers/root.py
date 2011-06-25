@@ -19,6 +19,7 @@ from lpm.controllers.fase import FaseController
 from lpm.controllers.usuario import UsuarioController
 from lpm.controllers.rol import (RolController, RolPlantillaController)
 #                                 RolContextoController)
+from lpm.controllers.lineabase import LineaBaseController
 from lpm.controllers.item import ItemController
 from lpm.controllers.tipoitem import TipoItemController
 
@@ -49,7 +50,7 @@ class RootController(BaseController):
     fases = FaseController(DBSession)
     tipositems = TipoItemController(DBSession)
     items = ItemController(DBSession)
-
+    lbs = LineaBaseController(DBSession)
 
     @expose('lpm.templates.index')
     def index(self):
