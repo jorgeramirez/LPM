@@ -713,26 +713,15 @@ class ItemController(CrudRestController):
         actuales = item_relacion_table_filler.get_value(id_item=id_item,\
                                                           tipo='p-h', **kw)
         atras = "../%d/edit" % id_item
-        
-        #TODO no se imprime este mensaje!!!!
-        mensaje = ""
-        bucle = False
-        if (kw.has_key('retorno')):
-            mensaje = u"No se pudo crear la relación con %s" % kw['retorno']
-            flash(retorno, "warning")
-            bucle = True
-
             
         return dict(anteriores=anteriores, 
                     actuales=actuales,
                     page=page, 
                     id=id, 
                     atras=atras,
-                    bucle=bucle,
-                    mensaje=mensaje
                     )
     
-    @expose('lpm.templates.item.relaciones')
+    @expose()
     def relacionar_as(self, *args, **kw):
         #recibe los elementos seleccionados en relacionar_item
         #relaciona, y retorna. Ajax
@@ -752,10 +741,11 @@ class ItemController(CrudRestController):
         
         usuario = Usuario.by_user_name(request.identity['repoze.who.userid'])
         item.guardar_historial(u"relacionar-AS", usuario)
-        transaction.commit()
-        return self.relacionar_item(*args, **kw)
-
-    @expose('lpm.templates.item.relaciones')
+        transaction.commit()    
+        #return "/items/%d/edit" % id_item
+        return '../'
+        
+    @expose()
     def relacionar_ph(self, *args, **kw):
         #recibe los elementos seleccionados en relacionar_item
         #relaciona, y retorna. Ajax
@@ -771,19 +761,25 @@ class ItemController(CrudRestController):
                     continue
                 ids.append(int(pk))
         
-        retorno, creado = p_item.agregar_relaciones(ids, 'p-h')
+            retorno, creado = p_item.agregar_relaciones(ids, 'p-h')
         
-        if (creado):#si por lo menos se pudo crear una relacion se guarda en el 
-                    #historial
-            usuario = Usuario.by_user_name(request.identity['repoze.who.userid'])
-            item.guardar_historial(u"relacionar-PH", usuario)
+            if (creado):#si por lo menos se pudo crear una relacion se guarda en el 
+                        #historial
+                usuario = Usuario.by_user_name(request.identity['repoze.who.userid'])
+                item.guardar_historial(u"relacionar-PH", usuario)
         
-        if (retorno != u""):
-            kw.setdefault('retorno', str(DBSession.query(Relacion).count()))
-        transaction.commit()    
-        return self.relacionar_item(*args, **kw)
+            
+            if (retorno == u"" and creado):
+                flash("Relacionado exiosamente") 
+            elif (retorno != u""):
+                mensaje = u"No se pudo crear la relación con %s" % retorno
+                flash(retorno, "warning")
+
+            transaction.commit()    
+            #return "/items/%d/edit" % id_item
+        return '../'
     
-    @expose('lpm.templates.item.edit')
+    @expose()
     def eliminar_relaciones(self, *args, **kw):
         #se lo llama desde la pagina de edit, al marcar las relaciones
         #y luego seleccionar Eliminar. Ajax.
@@ -804,7 +800,7 @@ class ItemController(CrudRestController):
             usuario = Usuario.by_user_name(request.identity['repoze.who.userid'])
             item.guardar_historial(u"eliminar-relaciones", usuario)
         transaction.commit()
-        redirect('../%s/edit' % id)
+        return '../%s/edit' % id
 
     
     @expose('lpm.templates.item.impacto')

@@ -21,11 +21,15 @@ $(function(){
             cache: false,
             data: desa_kw,
             complete: function(jqXHR, textStatus){
+
                 var responseText = jqXHR.responseText;
+                window.location.href = responseText;
+                /*
                 var tbl_html = jQuery("<div>")
                                .append(responseText.replace(rscript, ""))
                                .find("#tabla_relaciones");
                 $("#tabla_relaciones").html(tbl_html);
+                */
             }
         });
         return false;

@@ -23,10 +23,11 @@ $(function(){
             data: desa_kw,
             complete: function(jqXHR, textStatus){
                 var responseText = jqXHR.responseText;
-                var tbl_html = jQuery("<div>")
+                window.location.href = responseText;
+                /*var tbl_html = jQuery("<div>")
                                .append(responseText.replace(rscript, ""))
                                .find("#tabla_item_fase_anterior");
-                $("#tabla_item_fase_anterior").html(tbl_html);
+                $("#tabla_item_fase_anterior").html(tbl_html);*/
             }
         });
         return false;
@@ -48,10 +49,11 @@ $(function(){
             data: asig_kw,
             complete: function(jqXHR, textStatus){
                 var responseText = jqXHR.responseText;
-                var tbl_html = jQuery("<div>")
+                window.location.href = responseText;
+                /*var tbl_html = jQuery("<div>")
                                .append(responseText.replace(rscript, ""))
                                .find("#tabla_item_fase_actual");
-                $("#tabla_item_fase_actual").html(tbl_html);
+                $("#tabla_item_fase_actual").html(tbl_html);*/
             }
         });
         return false;

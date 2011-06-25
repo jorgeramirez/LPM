@@ -95,11 +95,13 @@ class LineaBaseTableFiller(CustomTableFiller):
                             '<a href="'+ controller +'post_cerrar/' + id + '" ' + \
                             'class="' + clase + '">Cerrar</a>' + \
                          '</div><br />'
+            '''
             elif obj.estado == u"Cerrada":
                 value += '<div>' + \
                             '<a href="'+ controller +'partir/' + id + '" ' + \
                             'class="' + clase + '">Partir</a>' + \
                          '</div><br />'
+            '''
         value += '<div>' + \
                     '<a href="'+ controller +'examinar/' + id + '" ' + \
                     'class="' + clase + '">Examinar</a>' + \
@@ -530,7 +532,7 @@ class LineaBaseController(CrudRestController):
                 inhabilitados.append(p_item)
                 
         if (inhabilitados == []):
-            lb.estado = u"Cerrado"
+            lb.estado = u"Cerrada"
             flash("Linea base cerrada correctamente")
             redirect('../')
 

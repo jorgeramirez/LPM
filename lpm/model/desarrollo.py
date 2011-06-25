@@ -49,7 +49,7 @@ class HiloContador(threading.Thread):
         self.lock_s = lock_s
         self.lock_h = lock_h
         self.visitados = v
-        self.suma = suma
+        self.suma = sumaa
         self.lh = []
                 
         threading.Thread.__init__(self)
@@ -848,7 +848,7 @@ class PropiedadItem(DeclarativeBase):
         """ Realiza la búsqueda en profundidad para encontrar bucles """
         if (visitado.has_key(nodo.id_item_actual) and visitado[nodo.id_item_actual]):
             if (inicio == nodo.id_item_actual):
-                return nodo.id_item_actual
+                return [nodo.id_item_actual]
         
         visitado.setdefault(nodo.id_item_actual, True)
         
