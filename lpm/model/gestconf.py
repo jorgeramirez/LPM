@@ -46,7 +46,7 @@ class LB(DeclarativeBase):
     numero = Column(Integer, nullable=False)
     estado = Column(Unicode(20), nullable=True, default=u"Cerrada")
     codigo = Column(Unicode(50), unique=True)
-    
+    estados_posibles = [u"Abierta", u"Cerrada", u"Rota", u"Para-Revisión"]
     # template para codificacion
     tmpl_codigo = u"LB-{id_lb}"
     #{ Relaciones

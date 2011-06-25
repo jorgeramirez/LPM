@@ -543,7 +543,7 @@ class ItemController(CrudRestController):
         tmpl_context.widget = self.table
         return dict(lista_elementos=items, 
                     page=titulo,
-                    titulo=self.title, 
+                    titulo=titulo, 
                     modelo=self.model.__name__, 
                     columnas=self.columnas,
                     opciones=self.opciones,
@@ -578,8 +578,8 @@ class ItemController(CrudRestController):
         buscar_table_filler.filtros = kw
         items = buscar_table_filler.get_value(id_fase=id_fase)
         return dict(lista_elementos=items, 
-                    page=self.title, 
-                    titulo=self.title, 
+                    page=titulo, 
+                    titulo=titulo, 
                     modelo=self.model.__name__,
                     columnas=self.columnas,
                     url_action='../',
