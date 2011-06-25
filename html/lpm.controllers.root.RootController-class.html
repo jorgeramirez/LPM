@@ -1,0 +1,683 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>lpm.controllers.root.RootController</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="lpm-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="lpm-module.html">Package&nbsp;lpm</a> ::
+        <a href="lpm.controllers-module.html">Package&nbsp;controllers</a> ::
+        <a href="lpm.controllers.root-module.html">Module&nbsp;root</a> ::
+        Class&nbsp;RootController
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="lpm.controllers.root.RootController-class.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS DESCRIPTION ==================== -->
+<h1 class="epydoc">Class RootController</h1><p class="nomargin-top"><span class="codelink"><a href="lpm.controllers.root-pysrc.html#RootController">source&nbsp;code</a></span></p>
+<pre class="base-tree">
+                                            object --+            
+                                                     |            
+tg.controllers.decoratedcontroller.DecoratedController --+        
+                                                         |        
+                                    object --+           |        
+                                             |           |        
+        pylons.controllers.core.WSGIController --+       |        
+                                                 |       |        
+              tg.controllers.dispatcher.Dispatcher --+   |        
+                                                     |   |        
+            tg.controllers.dispatcher.ObjectDispatcher --+        
+                                                         |        
+                  tg.controllers.tgcontroller.TGController --+    
+                                                             |    
+                                       <a href="lpm.lib.base.BaseController-class.html">lib.base.BaseController</a> --+
+                                                                 |
+                                                                <strong class="uidshort">RootController</strong>
+</pre>
+
+<hr />
+<p>The root controller for the LPM application.</p>
+  <p>All the other controllers and WSGI applications should be mounted on 
+  this controller. For example:</p>
+<pre class="literalblock">
+   panel = ControlPanelController()
+   another_app = AnotherWSGIApplication()
+</pre>
+  <p>Keep in mind that WSGI applications shouldn't be mounted directly: 
+  They must be wrapped around with 
+  :class:`tg.controllers.WSGIAppController`.</p>
+
+<!-- ==================== INSTANCE METHODS ==================== -->
+<a name="section-InstanceMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="lpm.controllers.root.RootController-class.html#index" class="summary-sig-name">index</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Handle the front-page.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="lpm.controllers.root-pysrc.html#RootController.index">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="lpm.controllers.root.RootController-class.html#data" class="summary-sig-name">data</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">**kw</span>)</span><br />
+      This method showcases how you can use the same controller for a data 
+      page and a display page</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="lpm.controllers.root-pysrc.html#RootController.data">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="lpm.controllers.root.RootController-class.html#login" class="summary-sig-name">login</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">came_from</span>=<span class="summary-sig-default">url('/')</span>)</span><br />
+      Start the user login.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="lpm.controllers.root-pysrc.html#RootController.login">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="lpm.controllers.root.RootController-class.html#recuperar_pass" class="summary-sig-name">recuperar_pass</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Recupera el pass enviado por mail uno nuevo.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="lpm.controllers.root-pysrc.html#RootController.recuperar_pass">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="lpm.controllers.root.RootController-class.html#enviar_pass" class="summary-sig-name">enviar_pass</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">**kw</span>)</span><br />
+      Recupera el pass enviado por mail uno nuevo.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="lpm.controllers.root-pysrc.html#RootController.enviar_pass">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="lpm.controllers.root.RootController-class.html#post_login" class="summary-sig-name">post_login</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">came_from</span>=<span class="summary-sig-default">'/'</span>)</span><br />
+      Redirect the user to the initially requested page on successful 
+      authentication or redirect her back to the login page if login 
+      failed.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="lpm.controllers.root-pysrc.html#RootController.post_login">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="lpm.controllers.root.RootController-class.html#post_logout" class="summary-sig-name">post_logout</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">came_from</span>=<span class="summary-sig-default">url('/')</span>)</span><br />
+      Redirect the user to the initially requested page on logout and say 
+      goodbye as well.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="lpm.controllers.root-pysrc.html#RootController.post_logout">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="lpm.controllers.root.RootController-class.html#_default" class="summary-sig-name" onclick="show_private();">_default</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">*args</span>,
+        <span class="summary-sig-arg">**kw</span>)</span><br />
+      Maneja las urls no encontradas</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="lpm.controllers.root-pysrc.html#RootController._default">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="lpm.lib.base.BaseController-class.html">lib.base.BaseController</a></code></b>:
+      <code><a href="lpm.lib.base.BaseController-class.html#__call__">__call__</a></code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code>tg.controllers.decoratedcontroller.DecoratedController</code></b>:
+      <code>__init__</code>
+      </p>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code>tg.controllers.decoratedcontroller.DecoratedController</code></b> (private):
+      <code>_call</code>,
+      <code>_check_security</code>,
+      <code>_handle_validation_errors</code>,
+      <code>_initialize_validation_context</code>,
+      <code>_is_exposed</code>,
+      <code>_perform_validate</code>,
+      <code>_render_response</code>
+      </p></div>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code>tg.controllers.dispatcher.ObjectDispatcher</code></b> (private):
+      <code>_dispatch</code>,
+      <code>_dispatch_controller</code>,
+      <code>_dispatch_first_found_default_or_lookup</code>,
+      <code>_enter_controller</code>,
+      <code>_find_first_exposed</code>,
+      <code>_is_controller</code>,
+      <code>_method_matches_args</code>,
+      <code>_setup_wsgiorg_routing_args</code>
+      </p></div>
+    <p class="indent-wrapped-lines"><b>Inherited from <code>tg.controllers.dispatcher.Dispatcher</code></b>:
+      <code>routes_placeholder</code>
+      </p>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code>tg.controllers.dispatcher.Dispatcher</code></b> (private):
+      <code>_get_argspec</code>,
+      <code>_get_dispatchable</code>,
+      <code>_get_params_with_argspec</code>,
+      <code>_perform_call</code>,
+      <code>_remove_argspec_params_from_params</code>,
+      <code>_setup_wsgi_script_name</code>
+      </p></div>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code>pylons.controllers.core.WSGIController</code></b> (private):
+      <code>_dispatch_call</code>,
+      <code>_get_method_args</code>,
+      <code>_inspect_call</code>
+      </p></div>
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__delattr__</code>,
+      <code>__format__</code>,
+      <code>__getattribute__</code>,
+      <code>__hash__</code>,
+      <code>__new__</code>,
+      <code>__reduce__</code>,
+      <code>__reduce_ex__</code>,
+      <code>__repr__</code>,
+      <code>__setattr__</code>,
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS VARIABLES ==================== -->
+<a name="section-ClassVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="usuarios"></a><span class="summary-name">usuarios</span> = <code title="UsuarioController(DBSession)">UsuarioController(DBSession)</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="roles"></a><span class="summary-name">roles</span> = <code title="RolController(DBSession)">RolController(DBSession)</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="rolesplantilla"></a><span class="summary-name">rolesplantilla</span> = <code title="RolPlantillaController(DBSession)">RolPlantillaController(DBSession)</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="proyectos"></a><span class="summary-name">proyectos</span> = <code title="ProyectoController(DBSession)">ProyectoController(DBSession)</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="fases"></a><span class="summary-name">fases</span> = <code title="FaseController(DBSession)">FaseController(DBSession)</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="tipositems"></a><span class="summary-name">tipositems</span> = <code title="TipoItemController(DBSession)">TipoItemController(DBSession)</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="items"></a><span class="summary-name">items</span> = <code title="ItemController(DBSession)">ItemController(DBSession)</code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="lbs"></a><span class="summary-name">lbs</span> = <code title="LineaBaseController(DBSession)">LineaBaseController(DBSession)</code>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code>pylons.controllers.core.WSGIController</code></b> (private):
+      <code>_pylons_log_debug</code>
+      </p></div>
+    </td>
+  </tr>
+</table>
+<!-- ==================== PROPERTIES ==================== -->
+<a name="section-Properties"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Properties</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Properties"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__class__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== METHOD DETAILS ==================== -->
+<a name="section-MethodDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Method Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-MethodDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="index"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">index</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="lpm.controllers.root-pysrc.html#RootController.index">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Handle the front-page.</p>
+  <dl class="fields">
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@expose('lpm.templates.index')</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="data"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">data</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">**kw</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="lpm.controllers.root-pysrc.html#RootController.data">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>This method showcases how you can use the same controller for a data 
+  page and a display page</p>
+  <dl class="fields">
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@expose('lpm.templates.data')</code></li>
+        <li><code>@expose('json')</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="login"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">login</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">came_from</span>=<span class="sig-default">url('/')</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="lpm.controllers.root-pysrc.html#RootController.login">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Start the user login.</p>
+  <dl class="fields">
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@expose('lpm.templates.login.login')</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="recuperar_pass"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">recuperar_pass</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="lpm.controllers.root-pysrc.html#RootController.recuperar_pass">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Recupera el pass enviado por mail uno nuevo.</p>
+  <dl class="fields">
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@expose('lpm.templates.login.recuperar_pass')</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="enviar_pass"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">enviar_pass</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">**kw</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="lpm.controllers.root-pysrc.html#RootController.enviar_pass">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Recupera el pass enviado por mail uno nuevo.</p>
+  <dl class="fields">
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@expose()</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="post_login"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">post_login</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">came_from</span>=<span class="sig-default">'/'</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="lpm.controllers.root-pysrc.html#RootController.post_login">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Redirect the user to the initially requested page on successful 
+  authentication or redirect her back to the login page if login 
+  failed.</p>
+  <dl class="fields">
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@expose()</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="post_logout"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">post_logout</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">came_from</span>=<span class="sig-default">url('/')</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="lpm.controllers.root-pysrc.html#RootController.post_logout">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Redirect the user to the initially requested page on logout and say 
+  goodbye as well.</p>
+  <dl class="fields">
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@expose()</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="_default"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_default</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">*args</span>,
+        <span class="sig-arg">**kw</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="lpm.controllers.root-pysrc.html#RootController._default">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Maneja las urls no encontradas</p>
+  <dl class="fields">
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@expose('lpm.templates.index')</code></li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="lpm-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Sat Jun 25 12:33:12 2011
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

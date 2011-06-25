@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>lpm.tests</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="lpm-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="lpm-module.html">Package&nbsp;lpm</a> ::
+        Package&nbsp;tests
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="lpm.tests-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="lpm.tests-module.html">Package lpm.tests</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno"> 1</tt>  <tt class="py-line"><tt class="py-comment"># -*- coding: utf-8 -*-</tt> </tt>
+<a name="L2"></a><tt class="py-lineno"> 2</tt>  <tt class="py-line"><tt class="py-docstring">"""Unit and functional test suite for LPM."""</tt> </tt>
+<a name="L3"></a><tt class="py-lineno"> 3</tt>  <tt class="py-line"> </tt>
+<a name="L4"></a><tt class="py-lineno"> 4</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">os</tt> <tt class="py-keyword">import</tt> <tt class="py-name">path</tt> </tt>
+<a name="L5"></a><tt class="py-lineno"> 5</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">sys</tt> </tt>
+<a name="L6"></a><tt class="py-lineno"> 6</tt>  <tt class="py-line"> </tt>
+<a name="L7"></a><tt class="py-lineno"> 7</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">tg</tt> <tt class="py-keyword">import</tt> <tt id="link-0" class="py-name" targets="Package lpm.config=lpm.config-module.html"><a title="lpm.config" class="py-name" href="#" onclick="return doclink('link-0', 'config', 'link-0');">config</a></tt> </tt>
+<a name="L8"></a><tt class="py-lineno"> 8</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">paste</tt><tt class="py-op">.</tt><tt class="py-name">deploy</tt> <tt class="py-keyword">import</tt> <tt class="py-name">loadapp</tt> </tt>
+<a name="L9"></a><tt class="py-lineno"> 9</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">paste</tt><tt class="py-op">.</tt><tt class="py-name">script</tt><tt class="py-op">.</tt><tt class="py-name">appinstall</tt> <tt class="py-keyword">import</tt> <tt class="py-name">SetupCommand</tt> </tt>
+<a name="L10"></a><tt class="py-lineno">10</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">routes</tt> <tt class="py-keyword">import</tt> <tt class="py-name">url_for</tt> </tt>
+<a name="L11"></a><tt class="py-lineno">11</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">webtest</tt> <tt class="py-keyword">import</tt> <tt class="py-name">TestApp</tt> </tt>
+<a name="L12"></a><tt class="py-lineno">12</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">nose</tt><tt class="py-op">.</tt><tt class="py-name">tools</tt> <tt class="py-keyword">import</tt> <tt class="py-name">eq_</tt> </tt>
+<a name="L13"></a><tt class="py-lineno">13</tt>  <tt class="py-line"> </tt>
+<a name="L14"></a><tt class="py-lineno">14</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt id="link-1" class="py-name" targets="Package lpm=lpm-module.html"><a title="lpm" class="py-name" href="#" onclick="return doclink('link-1', 'lpm', 'link-1');">lpm</a></tt> <tt class="py-keyword">import</tt> <tt id="link-2" class="py-name" targets="Variable lpm.controllers.proyecto.ProyectoController.model=lpm.controllers.proyecto.ProyectoController-class.html#model,Variable lpm.controllers.rol.RolPlantillaController.model=lpm.controllers.rol.RolPlantillaController-class.html#model,Variable lpm.controllers.usuario.UsuarioController.model=lpm.controllers.usuario.UsuarioController-class.html#model,Package lpm.model=lpm.model-module.html"><a title="lpm.controllers.proyecto.ProyectoController.model
+lpm.controllers.rol.RolPlantillaController.model
+lpm.controllers.usuario.UsuarioController.model
+lpm.model" class="py-name" href="#" onclick="return doclink('link-2', 'model', 'link-2');">model</a></tt> </tt>
+<a name="L15"></a><tt class="py-lineno">15</tt>  <tt class="py-line"> </tt>
+<a name="L16"></a><tt class="py-lineno">16</tt>  <tt class="py-line"><tt class="py-name">__all__</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-string">'setup_db'</tt><tt class="py-op">,</tt> <tt class="py-string">'teardown_db'</tt><tt class="py-op">,</tt> <tt class="py-string">'TestController'</tt><tt class="py-op">,</tt> <tt class="py-string">'url_for'</tt><tt class="py-op">]</tt> </tt>
+<a name="L17"></a><tt class="py-lineno">17</tt>  <tt class="py-line"> </tt>
+<a name="setup_db"></a><div id="setup_db-def"><a name="L18"></a><tt class="py-lineno">18</tt> <a class="py-toggle" href="#" id="setup_db-toggle" onclick="return toggle('setup_db');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.tests-module.html#setup_db">setup_db</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="setup_db-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="setup_db-expanded"><a name="L19"></a><tt class="py-lineno">19</tt>  <tt class="py-line">    <tt class="py-docstring">"""Method used to build a database"""</tt> </tt>
+<a name="L20"></a><tt class="py-lineno">20</tt>  <tt class="py-line">    <tt class="py-name">engine</tt> <tt class="py-op">=</tt> <tt id="link-3" class="py-name"><a title="lpm.config" class="py-name" href="#" onclick="return doclink('link-3', 'config', 'link-0');">config</a></tt><tt class="py-op">[</tt><tt class="py-string">'pylons.app_globals'</tt><tt class="py-op">]</tt><tt class="py-op">.</tt><tt class="py-name">sa_engine</tt>  </tt>
+<a name="L21"></a><tt class="py-lineno">21</tt>  <tt class="py-line">    <tt id="link-4" class="py-name"><a title="lpm.controllers.proyecto.ProyectoController.model
+lpm.controllers.rol.RolPlantillaController.model
+lpm.controllers.usuario.UsuarioController.model
+lpm.model" class="py-name" href="#" onclick="return doclink('link-4', 'model', 'link-2');">model</a></tt><tt class="py-op">.</tt><tt class="py-name">init_model</tt><tt class="py-op">(</tt><tt class="py-name">engine</tt><tt class="py-op">)</tt> </tt>
+<a name="L22"></a><tt class="py-lineno">22</tt>  <tt class="py-line">    <tt id="link-5" class="py-name"><a title="lpm.controllers.proyecto.ProyectoController.model
+lpm.controllers.rol.RolPlantillaController.model
+lpm.controllers.usuario.UsuarioController.model
+lpm.model" class="py-name" href="#" onclick="return doclink('link-5', 'model', 'link-2');">model</a></tt><tt class="py-op">.</tt><tt id="link-6" class="py-name" targets="Variable lpm.model.metadata=lpm.model-module.html#metadata"><a title="lpm.model.metadata" class="py-name" href="#" onclick="return doclink('link-6', 'metadata', 'link-6');">metadata</a></tt><tt class="py-op">.</tt><tt class="py-name">create_all</tt><tt class="py-op">(</tt><tt class="py-name">engine</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L23"></a><tt class="py-lineno">23</tt>  <tt class="py-line"> </tt>
+<a name="teardown_db"></a><div id="teardown_db-def"><a name="L24"></a><tt class="py-lineno">24</tt> <a class="py-toggle" href="#" id="teardown_db-toggle" onclick="return toggle('teardown_db');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.tests-module.html#teardown_db">teardown_db</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="teardown_db-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="teardown_db-expanded"><a name="L25"></a><tt class="py-lineno">25</tt>  <tt class="py-line">    <tt class="py-docstring">"""Method used to destroy a database"""</tt> </tt>
+<a name="L26"></a><tt class="py-lineno">26</tt>  <tt class="py-line">    <tt class="py-name">engine</tt> <tt class="py-op">=</tt> <tt id="link-7" class="py-name"><a title="lpm.config" class="py-name" href="#" onclick="return doclink('link-7', 'config', 'link-0');">config</a></tt><tt class="py-op">[</tt><tt class="py-string">'pylons.app_globals'</tt><tt class="py-op">]</tt><tt class="py-op">.</tt><tt class="py-name">sa_engine</tt> </tt>
+<a name="L27"></a><tt class="py-lineno">27</tt>  <tt class="py-line">    <tt id="link-8" class="py-name"><a title="lpm.controllers.proyecto.ProyectoController.model
+lpm.controllers.rol.RolPlantillaController.model
+lpm.controllers.usuario.UsuarioController.model
+lpm.model" class="py-name" href="#" onclick="return doclink('link-8', 'model', 'link-2');">model</a></tt><tt class="py-op">.</tt><tt id="link-9" class="py-name"><a title="lpm.model.metadata" class="py-name" href="#" onclick="return doclink('link-9', 'metadata', 'link-6');">metadata</a></tt><tt class="py-op">.</tt><tt class="py-name">drop_all</tt><tt class="py-op">(</tt><tt class="py-name">engine</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L28"></a><tt class="py-lineno">28</tt>  <tt class="py-line"> </tt>
+<a name="L29"></a><tt class="py-lineno">29</tt>  <tt class="py-line"> </tt>
+<a name="TestController"></a><div id="TestController-def"><a name="L30"></a><tt class="py-lineno">30</tt> <a class="py-toggle" href="#" id="TestController-toggle" onclick="return toggle('TestController');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.tests.TestController-class.html">TestController</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TestController-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="TestController-expanded"><a name="L31"></a><tt class="py-lineno">31</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L32"></a><tt class="py-lineno">32</tt>  <tt class="py-line"><tt class="py-docstring">    Base functional test case for the controllers.</tt> </tt>
+<a name="L33"></a><tt class="py-lineno">33</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L34"></a><tt class="py-lineno">34</tt>  <tt class="py-line"><tt class="py-docstring">    The LPM application instance (``self.app``) set up in this test </tt> </tt>
+<a name="L35"></a><tt class="py-lineno">35</tt>  <tt class="py-line"><tt class="py-docstring">    case (and descendants) has authentication disabled, so that developers can</tt> </tt>
+<a name="L36"></a><tt class="py-lineno">36</tt>  <tt class="py-line"><tt class="py-docstring">    test the protected areas independently of the :mod:`repoze.who` plugins</tt> </tt>
+<a name="L37"></a><tt class="py-lineno">37</tt>  <tt class="py-line"><tt class="py-docstring">    used initially. This way, authentication can be tested once and separately.</tt> </tt>
+<a name="L38"></a><tt class="py-lineno">38</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L39"></a><tt class="py-lineno">39</tt>  <tt class="py-line"><tt class="py-docstring">    Check lpm.tests.functional.test_authentication for the repoze.who</tt> </tt>
+<a name="L40"></a><tt class="py-lineno">40</tt>  <tt class="py-line"><tt class="py-docstring">    integration tests.</tt> </tt>
+<a name="L41"></a><tt class="py-lineno">41</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L42"></a><tt class="py-lineno">42</tt>  <tt class="py-line"><tt class="py-docstring">    This is the officially supported way to test protected areas with</tt> </tt>
+<a name="L43"></a><tt class="py-lineno">43</tt>  <tt class="py-line"><tt class="py-docstring">    repoze.who-testutil (http://code.gustavonarea.net/repoze.who-testutil/).</tt> </tt>
+<a name="L44"></a><tt class="py-lineno">44</tt>  <tt class="py-line"><tt class="py-docstring">    </tt> </tt>
+<a name="L45"></a><tt class="py-lineno">45</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L46"></a><tt class="py-lineno">46</tt>  <tt class="py-line">     </tt>
+<a name="L47"></a><tt class="py-lineno">47</tt>  <tt class="py-line">    <tt id="link-10" class="py-name" targets="Variable lpm.tests.TestController.application_under_test=lpm.tests.TestController-class.html#application_under_test,Variable lpm.tests.functional.test_authentication.TestAuthentication.application_under_test=lpm.tests.functional.test_authentication.TestAuthentication-class.html#application_under_test"><a title="lpm.tests.TestController.application_under_test
+lpm.tests.functional.test_authentication.TestAuthentication.application_under_test" class="py-name" href="#" onclick="return doclink('link-10', 'application_under_test', 'link-10');">application_under_test</a></tt> <tt class="py-op">=</tt> <tt class="py-string">'main_without_authn'</tt> </tt>
+<a name="L48"></a><tt class="py-lineno">48</tt>  <tt class="py-line">     </tt>
+<a name="TestController.setUp"></a><div id="TestController.setUp-def"><a name="L49"></a><tt class="py-lineno">49</tt> <a class="py-toggle" href="#" id="TestController.setUp-toggle" onclick="return toggle('TestController.setUp');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.tests.TestController-class.html#setUp">setUp</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TestController.setUp-collapsed" style="display:none;" pad="++" indent="++++++++"></div><div id="TestController.setUp-expanded"><a name="L50"></a><tt class="py-lineno">50</tt>  <tt class="py-line">        <tt class="py-docstring">"""Method called by nose before running each test"""</tt> </tt>
+<a name="L51"></a><tt class="py-lineno">51</tt>  <tt class="py-line">        <tt class="py-comment"># Loading the application:</tt> </tt>
+<a name="L52"></a><tt class="py-lineno">52</tt>  <tt class="py-line">        <tt class="py-name">conf_dir</tt> <tt class="py-op">=</tt> <tt id="link-11" class="py-name"><a title="lpm.config" class="py-name" href="#" onclick="return doclink('link-11', 'config', 'link-0');">config</a></tt><tt class="py-op">.</tt><tt class="py-name">here</tt> </tt>
+<a name="L53"></a><tt class="py-lineno">53</tt>  <tt class="py-line">        <tt class="py-name">wsgiapp</tt> <tt class="py-op">=</tt> <tt class="py-name">loadapp</tt><tt class="py-op">(</tt><tt class="py-string">'config:test.ini#%s'</tt> <tt class="py-op">%</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-12" class="py-name"><a title="lpm.tests.TestController.application_under_test
+lpm.tests.functional.test_authentication.TestAuthentication.application_under_test" class="py-name" href="#" onclick="return doclink('link-12', 'application_under_test', 'link-10');">application_under_test</a></tt><tt class="py-op">,</tt> </tt>
+<a name="L54"></a><tt class="py-lineno">54</tt>  <tt class="py-line">                          <tt class="py-name">relative_to</tt><tt class="py-op">=</tt><tt class="py-name">conf_dir</tt><tt class="py-op">)</tt> </tt>
+<a name="L55"></a><tt class="py-lineno">55</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">app</tt> <tt class="py-op">=</tt> <tt class="py-name">TestApp</tt><tt class="py-op">(</tt><tt class="py-name">wsgiapp</tt><tt class="py-op">)</tt> </tt>
+<a name="L56"></a><tt class="py-lineno">56</tt>  <tt class="py-line">        <tt class="py-comment"># Setting it up:</tt> </tt>
+<a name="L57"></a><tt class="py-lineno">57</tt>  <tt class="py-line">        <tt class="py-name">test_file</tt> <tt class="py-op">=</tt> <tt class="py-name">path</tt><tt class="py-op">.</tt><tt class="py-name">join</tt><tt class="py-op">(</tt><tt class="py-name">conf_dir</tt><tt class="py-op">,</tt> <tt class="py-string">'test.ini'</tt><tt class="py-op">)</tt> </tt>
+<a name="L58"></a><tt class="py-lineno">58</tt>  <tt class="py-line">        <tt class="py-name">cmd</tt> <tt class="py-op">=</tt> <tt class="py-name">SetupCommand</tt><tt class="py-op">(</tt><tt class="py-string">'setup-app'</tt><tt class="py-op">)</tt> </tt>
+<a name="L59"></a><tt class="py-lineno">59</tt>  <tt class="py-line">        <tt class="py-name">cmd</tt><tt class="py-op">.</tt><tt id="link-13" class="py-name" targets="Method lpm.model.desarrollo.HiloContador.run()=lpm.model.desarrollo.HiloContador-class.html#run"><a title="lpm.model.desarrollo.HiloContador.run" class="py-name" href="#" onclick="return doclink('link-13', 'run', 'link-13');">run</a></tt><tt class="py-op">(</tt><tt class="py-op">[</tt><tt class="py-name">test_file</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L60"></a><tt class="py-lineno">60</tt>  <tt class="py-line">     </tt>
+<a name="TestController.tearDown"></a><div id="TestController.tearDown-def"><a name="L61"></a><tt class="py-lineno">61</tt> <a class="py-toggle" href="#" id="TestController.tearDown-toggle" onclick="return toggle('TestController.tearDown');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.tests.TestController-class.html#tearDown">tearDown</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TestController.tearDown-collapsed" style="display:none;" pad="++" indent="++++++++"></div><div id="TestController.tearDown-expanded"><a name="L62"></a><tt class="py-lineno">62</tt>  <tt class="py-line">        <tt class="py-docstring">"""Method called by nose after running each test"""</tt> </tt>
+<a name="L63"></a><tt class="py-lineno">63</tt>  <tt class="py-line">        <tt class="py-comment"># Cleaning up the database:</tt> </tt>
+<a name="L64"></a><tt class="py-lineno">64</tt>  <tt class="py-line">        <tt id="link-14" class="py-name" targets="Function lpm.tests.teardown_db()=lpm.tests-module.html#teardown_db"><a title="lpm.tests.teardown_db" class="py-name" href="#" onclick="return doclink('link-14', 'teardown_db', 'link-14');">teardown_db</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L65"></a><tt class="py-lineno">65</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="lpm-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Sat Jun 25 12:33:34 2011
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

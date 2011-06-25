@@ -6,6 +6,12 @@
       py:strip="">
       
 <head py:match="head" py:attrs="select('@*')">
+<script src="${tg.url('/javascript/jquery-1.5.1.min.js')}"></script>
+<script type='text/javascript'>
+    $(function(){
+        $('input[value=Submit]').attr('value', 'Guardar');
+    });
+</script>
 <meta content="text/html; charset=UTF-8" http-equiv="content-type" py:replace="''"/>
 <meta content="text/css" http-equiv="Content-Style-Type" py:replace="''"/>
 <title py:replace="''">Your title goes here</title>

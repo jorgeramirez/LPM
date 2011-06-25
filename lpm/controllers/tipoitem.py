@@ -179,17 +179,20 @@ class TipoImportadoField(PropertySingleSelectField):
         id_fase = UrlParser.parse_id(request.url, "fases")
         if (self.accion == "new"):
             if id_proyecto:
-                #importa de otras fases tambien
-                if (id_fase):
-                    tipos_items = DBSession.query(TipoItem) \
-                                       .filter(or_(TipoItem.id_proyecto != id_proyecto,
-                                                   and_(TipoItem.id_proyecto == id_proyecto,
-                                                        TipoItem.id_fase != id_fase))) \
-                                       .all()
-                else:
-                    tipos_items = DBSession.query(TipoItem) \
+                tipos_items = DBSession.query(TipoItem) \
                                        .filter(TipoItem.id_proyecto != id_proyecto) \
                                        .all()
+                #importa de otras fases tambien
+            elif (id_fase):
+                fase = Fase.por_id(id_fase)
+                id_proyecto = fase.id_proyecto
+                tipos_items = DBSession.query(TipoItem) \
+                            .filter(or_(TipoItem.id_proyecto != id_proyecto,
+                            and_(TipoItem.id_proyecto == id_proyecto,
+                            TipoItem.id_fase != id_fase))) \
+                                       .all()
+
+
             for ti in tipos_items:
                 #solo si posee algun permiso sobre el tipo de item
                 if (AlgunPermiso(tipo="Tipo", id_tipo_item=ti.id_tipo_item)):
@@ -298,9 +301,11 @@ class TipoItemController(CrudRestController):
             
             puede_crear = PoseePermiso("crear tipo item").is_met(request.environ)
             proy = Proyecto.por_id(id_proyecto)
-            if (id_fase):
-                fase = Fase.por_id(id_fase)
-                titulo = self.tmp_from_fase_titulo % fase.nombre
+        elif (id_fase):
+            puede_crear = PoseePermiso("crear tipo item").is_met(request.environ)
+            fase = Fase.por_id(id_fase)
+            proy = Proyecto.por_id(fase.id_proyecto)              
+            titulo = self.tmp_from_fase_titulo % fase.nombre
         
             
         tipo_items = self.table_filler.get_value(id_proyecto=id_proyecto, id_fase=id_fase, **kw)
@@ -371,10 +376,10 @@ class TipoItemController(CrudRestController):
     def new(self, *args, **kw):
         """Despliega una pagina para crear un tipo_item"""
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        id_fase = UrlParser.parse_id(request.url, "proyectos")
+        id_fase = UrlParser.parse_id(request.url, "fases")
         if(not id_proyecto):
-            redirect("./")
-            
+            fase = Fase.por_id(id_fase)
+            id_proyecto = fase.id_proyecto
         url_action = self.action
         
         if id_proyecto:

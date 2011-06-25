@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>lpm.tests.models.test_auth</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="lpm-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="lpm-module.html">Package&nbsp;lpm</a> ::
+        <a href="lpm.tests-module.html">Package&nbsp;tests</a> ::
+        <a href="lpm.tests.models-module.html">Package&nbsp;models</a> ::
+        Module&nbsp;test_auth
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="lpm.tests.models.test_auth-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="lpm.tests.models.test_auth-module.html">Module lpm.tests.models.test_auth</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno"> 1</tt>  <tt class="py-line"><tt class="py-comment"># -*- coding: utf-8 -*-</tt> </tt>
+<a name="L2"></a><tt class="py-lineno"> 2</tt>  <tt class="py-line"><tt class="py-docstring">"""Test suite for the TG app's models"""</tt> </tt>
+<a name="L3"></a><tt class="py-lineno"> 3</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">nose</tt><tt class="py-op">.</tt><tt class="py-name">tools</tt> <tt class="py-keyword">import</tt> <tt class="py-name">eq_</tt> </tt>
+<a name="L4"></a><tt class="py-lineno"> 4</tt>  <tt class="py-line"> </tt>
+<a name="L5"></a><tt class="py-lineno"> 5</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt id="link-0" class="py-name" targets="Package lpm=lpm-module.html"><a title="lpm" class="py-name" href="#" onclick="return doclink('link-0', 'lpm', 'link-0');">lpm</a></tt> <tt class="py-keyword">import</tt> <tt id="link-1" class="py-name" targets="Variable lpm.controllers.proyecto.ProyectoController.model=lpm.controllers.proyecto.ProyectoController-class.html#model,Variable lpm.controllers.rol.RolPlantillaController.model=lpm.controllers.rol.RolPlantillaController-class.html#model,Variable lpm.controllers.usuario.UsuarioController.model=lpm.controllers.usuario.UsuarioController-class.html#model,Package lpm.model=lpm.model-module.html"><a title="lpm.controllers.proyecto.ProyectoController.model
+lpm.controllers.rol.RolPlantillaController.model
+lpm.controllers.usuario.UsuarioController.model
+lpm.model" class="py-name" href="#" onclick="return doclink('link-1', 'model', 'link-1');">model</a></tt> </tt>
+<a name="L6"></a><tt class="py-lineno"> 6</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt id="link-2" class="py-name"><a title="lpm" class="py-name" href="#" onclick="return doclink('link-2', 'lpm', 'link-0');">lpm</a></tt><tt class="py-op">.</tt><tt id="link-3" class="py-name" targets="Package lpm.tests=lpm.tests-module.html"><a title="lpm.tests" class="py-name" href="#" onclick="return doclink('link-3', 'tests', 'link-3');">tests</a></tt><tt class="py-op">.</tt><tt id="link-4" class="py-name" targets="Package lpm.tests.models=lpm.tests.models-module.html"><a title="lpm.tests.models" class="py-name" href="#" onclick="return doclink('link-4', 'models', 'link-4');">models</a></tt> <tt class="py-keyword">import</tt> <tt id="link-5" class="py-name" targets="Class lpm.tests.models.ModelTest=lpm.tests.models.ModelTest-class.html"><a title="lpm.tests.models.ModelTest" class="py-name" href="#" onclick="return doclink('link-5', 'ModelTest', 'link-5');">ModelTest</a></tt> </tt>
+<a name="L7"></a><tt class="py-lineno"> 7</tt>  <tt class="py-line"> </tt>
+<a name="TestRol"></a><div id="TestRol-def"><a name="L8"></a><tt class="py-lineno"> 8</tt> <a class="py-toggle" href="#" id="TestRol-toggle" onclick="return toggle('TestRol');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.tests.models.test_auth.TestRol-class.html">TestRol</a><tt class="py-op">(</tt><tt class="py-base-class">ModelTest</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TestRol-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="TestRol-expanded"><a name="L9"></a><tt class="py-lineno"> 9</tt>  <tt class="py-line">    <tt class="py-docstring">"""Unit test case for the ``Rol`` model."""</tt> </tt>
+<a name="L10"></a><tt class="py-lineno">10</tt>  <tt class="py-line">    <tt id="link-6" class="py-name" targets="Variable lpm.tests.models.ModelTest.klass=lpm.tests.models.ModelTest-class.html#klass"><a title="lpm.tests.models.ModelTest.klass" class="py-name" href="#" onclick="return doclink('link-6', 'klass', 'link-6');">klass</a></tt> <tt class="py-op">=</tt> <tt id="link-7" class="py-name"><a title="lpm.controllers.proyecto.ProyectoController.model
+lpm.controllers.rol.RolPlantillaController.model
+lpm.controllers.usuario.UsuarioController.model
+lpm.model" class="py-name" href="#" onclick="return doclink('link-7', 'model', 'link-1');">model</a></tt><tt class="py-op">.</tt><tt id="link-8" class="py-name" targets="Class lpm.model.auth.Rol=lpm.model.auth.Rol-class.html"><a title="lpm.model.auth.Rol" class="py-name" href="#" onclick="return doclink('link-8', 'Rol', 'link-8');">Rol</a></tt> </tt>
+<a name="L11"></a><tt class="py-lineno">11</tt>  <tt class="py-line">    <tt id="link-9" class="py-name" targets="Variable lpm.tests.models.ModelTest.attrs=lpm.tests.models.ModelTest-class.html#attrs,Variable lpm.tests.models.test_administracion.TestProyecto.attrs=lpm.tests.models.test_administracion.TestProyecto-class.html#attrs,Variable lpm.tests.models.test_auth.TestPermiso.attrs=lpm.tests.models.test_auth.TestPermiso-class.html#attrs,Variable lpm.tests.models.test_auth.TestRol.attrs=lpm.tests.models.test_auth.TestRol-class.html#attrs,Variable lpm.tests.models.test_auth.TestUser.attrs=lpm.tests.models.test_auth.TestUser-class.html#attrs,Variable lpm.tests.models.test_gestconf.TestLb.attrs=lpm.tests.models.test_gestconf.TestLb-class.html#attrs"><a title="lpm.tests.models.ModelTest.attrs
+lpm.tests.models.test_administracion.TestProyecto.attrs
+lpm.tests.models.test_auth.TestPermiso.attrs
+lpm.tests.models.test_auth.TestRol.attrs
+lpm.tests.models.test_auth.TestUser.attrs
+lpm.tests.models.test_gestconf.TestLb.attrs" class="py-name" href="#" onclick="return doclink('link-9', 'attrs', 'link-9');">attrs</a></tt> <tt class="py-op">=</tt> <tt class="py-name">dict</tt><tt class="py-op">(</tt> </tt>
+<a name="L12"></a><tt class="py-lineno">12</tt>  <tt class="py-line">        <tt id="link-10" class="py-name" targets="Variable lpm.controllers.validaciones.rol_validator.RolFormValidator.nombre_rol=lpm.controllers.validaciones.rol_validator.RolFormValidator-class.html#nombre_rol,Variable lpm.model.auth.Rol.nombre_rol=lpm.model.auth.Rol-class.html#nombre_rol"><a title="lpm.controllers.validaciones.rol_validator.RolFormValidator.nombre_rol
+lpm.model.auth.Rol.nombre_rol" class="py-name" href="#" onclick="return doclink('link-10', 'nombre_rol', 'link-10');">nombre_rol</a></tt> <tt class="py-op">=</tt> <tt class="py-string">u"test_group"</tt><tt class="py-op">,</tt> </tt>
+<a name="L13"></a><tt class="py-lineno">13</tt>  <tt class="py-line">        <tt id="link-11" class="py-name" targets="Variable lpm.controllers.item.ItemAddForm.descripcion=lpm.controllers.item.ItemAddForm-class.html#descripcion,Method lpm.controllers.item.ItemEditFiller.descripcion()=lpm.controllers.item.ItemEditFiller-class.html#descripcion,Variable lpm.controllers.item.ItemEditForm.descripcion=lpm.controllers.item.ItemEditForm-class.html#descripcion,Variable lpm.controllers.rol.RolContextoAddForm.descripcion=lpm.controllers.rol.RolContextoAddForm-class.html#descripcion,Variable lpm.controllers.rol.RolContextoEditForm.descripcion=lpm.controllers.rol.RolContextoEditForm-class.html#descripcion,Variable lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion=lpm.controllers.validaciones.fase_validator.FaseFormValidator-class.html#descripcion,Variable lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion=lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator-class.html#descripcion,Variable lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion=lpm.controllers.validaciones.rol_validator.RolFormValidator-class.html#descripcion,Variable lpm.model.administracion.Fase.descripcion=lpm.model.administracion.Fase-class.html#descripcion,Variable lpm.model.administracion.Proyecto.descripcion=lpm.model.administracion.Proyecto-class.html#descripcion,Variable lpm.model.administracion.TipoItem.descripcion=lpm.model.administracion.TipoItem-class.html#descripcion,Variable lpm.model.auth.Permiso.descripcion=lpm.model.auth.Permiso-class.html#descripcion,Variable lpm.model.auth.Rol.descripcion=lpm.model.auth.Rol-class.html#descripcion,Variable lpm.model.desarrollo.PropiedadItem.descripcion=lpm.model.desarrollo.PropiedadItem-class.html#descripcion"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-11', 'descripcion', 'link-11');">descripcion</a></tt> <tt class="py-op">=</tt> <tt class="py-string">u"Test Group"</tt><tt class="py-op">,</tt> </tt>
+<a name="L14"></a><tt class="py-lineno">14</tt>  <tt class="py-line">        <tt id="link-12" class="py-name" targets="Method lpm.controllers.atributoitem.AtributoItemEditFiller.tipo()=lpm.controllers.atributoitem.AtributoItemEditFiller-class.html#tipo,Variable lpm.controllers.atributoitem.AtributoItemEditForm.tipo=lpm.controllers.atributoitem.AtributoItemEditForm-class.html#tipo,Method lpm.controllers.atributoitem.AtributoItemTableFiller.tipo()=lpm.controllers.atributoitem.AtributoItemTableFiller-class.html#tipo,Variable lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo=lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm-class.html#tipo,Variable lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo=lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm-class.html#tipo,Method lpm.controllers.lineabase.ItemGenerarTableFiller.tipo()=lpm.controllers.lineabase.ItemGenerarTableFiller-class.html#tipo,Method lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo()=lpm.controllers.lineabase.ItemInhabilitadosTableFiller-class.html#tipo,Variable lpm.model.administracion.AtributosPorTipoItem.tipo=lpm.model.administracion.AtributosPorTipoItem-class.html#tipo,Variable lpm.model.auth.Permiso.tipo=lpm.model.auth.Permiso-class.html#tipo,Variable lpm.model.auth.Rol.tipo=lpm.model.auth.Rol-class.html#tipo,Variable lpm.model.desarrollo.Relacion.tipo=lpm.model.desarrollo.Relacion-class.html#tipo"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-12', 'tipo', 'link-12');">tipo</a></tt><tt class="py-op">=</tt><tt class="py-string">u"Proyecto"</tt> </tt>
+<a name="L15"></a><tt class="py-lineno">15</tt>  <tt class="py-line">        <tt class="py-op">)</tt> </tt>
+</div><a name="L16"></a><tt class="py-lineno">16</tt>  <tt class="py-line"> </tt>
+<a name="L17"></a><tt class="py-lineno">17</tt>  <tt class="py-line"> </tt>
+<a name="TestUser"></a><div id="TestUser-def"><a name="L18"></a><tt class="py-lineno">18</tt> <a class="py-toggle" href="#" id="TestUser-toggle" onclick="return toggle('TestUser');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.tests.models.test_auth.TestUser-class.html">TestUser</a><tt class="py-op">(</tt><tt class="py-base-class">ModelTest</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TestUser-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="TestUser-expanded"><a name="L19"></a><tt class="py-lineno">19</tt>  <tt class="py-line">    <tt class="py-docstring">"""Unit test case for the ``Usuario`` model."""</tt> </tt>
+<a name="L20"></a><tt class="py-lineno">20</tt>  <tt class="py-line">     </tt>
+<a name="L21"></a><tt class="py-lineno">21</tt>  <tt class="py-line">    <tt id="link-13" class="py-name"><a title="lpm.tests.models.ModelTest.klass" class="py-name" href="#" onclick="return doclink('link-13', 'klass', 'link-6');">klass</a></tt> <tt class="py-op">=</tt> <tt id="link-14" class="py-name"><a title="lpm.controllers.proyecto.ProyectoController.model
+lpm.controllers.rol.RolPlantillaController.model
+lpm.controllers.usuario.UsuarioController.model
+lpm.model" class="py-name" href="#" onclick="return doclink('link-14', 'model', 'link-1');">model</a></tt><tt class="py-op">.</tt><tt id="link-15" class="py-name" targets="Class lpm.model.auth.Usuario=lpm.model.auth.Usuario-class.html"><a title="lpm.model.auth.Usuario" class="py-name" href="#" onclick="return doclink('link-15', 'Usuario', 'link-15');">Usuario</a></tt> </tt>
+<a name="L22"></a><tt class="py-lineno">22</tt>  <tt class="py-line">    <tt id="link-16" class="py-name"><a title="lpm.tests.models.ModelTest.attrs
+lpm.tests.models.test_administracion.TestProyecto.attrs
+lpm.tests.models.test_auth.TestPermiso.attrs
+lpm.tests.models.test_auth.TestRol.attrs
+lpm.tests.models.test_auth.TestUser.attrs
+lpm.tests.models.test_gestconf.TestLb.attrs" class="py-name" href="#" onclick="return doclink('link-16', 'attrs', 'link-9');">attrs</a></tt> <tt class="py-op">=</tt> <tt class="py-name">dict</tt><tt class="py-op">(</tt> </tt>
+<a name="L23"></a><tt class="py-lineno">23</tt>  <tt class="py-line">        <tt id="link-17" class="py-name" targets="Method lpm.controllers.historialitem.HistorialItemTableFiller.nombre_usuario()=lpm.controllers.historialitem.HistorialItemTableFiller-class.html#nombre_usuario,Variable lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre_usuario=lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator-class.html#nombre_usuario,Variable lpm.controllers.validaciones.usuario_validator.UsuarioEditFormValidator.nombre_usuario=lpm.controllers.validaciones.usuario_validator.UsuarioEditFormValidator-class.html#nombre_usuario,Variable lpm.model.auth.Usuario.nombre_usuario=lpm.model.auth.Usuario-class.html#nombre_usuario"><a title="lpm.controllers.historialitem.HistorialItemTableFiller.nombre_usuario
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre_usuario
+lpm.controllers.validaciones.usuario_validator.UsuarioEditFormValidator.nombre_usuario
+lpm.model.auth.Usuario.nombre_usuario" class="py-name" href="#" onclick="return doclink('link-17', 'nombre_usuario', 'link-17');">nombre_usuario</a></tt> <tt class="py-op">=</tt> <tt class="py-string">u"ignucius"</tt><tt class="py-op">,</tt> </tt>
+<a name="L24"></a><tt class="py-lineno">24</tt>  <tt class="py-line">        <tt id="link-18" class="py-name" targets="Variable lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.email=lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator-class.html#email,Variable lpm.controllers.validaciones.usuario_validator.UsuarioEditFormValidator.email=lpm.controllers.validaciones.usuario_validator.UsuarioEditFormValidator-class.html#email,Variable lpm.model.auth.Usuario.email=lpm.model.auth.Usuario-class.html#email"><a title="lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.email
+lpm.controllers.validaciones.usuario_validator.UsuarioEditFormValidator.email
+lpm.model.auth.Usuario.email" class="py-name" href="#" onclick="return doclink('link-18', 'email', 'link-18');">email</a></tt> <tt class="py-op">=</tt> <tt class="py-string">u"ignucius@example.org"</tt> </tt>
+<a name="L25"></a><tt class="py-lineno">25</tt>  <tt class="py-line">        <tt class="py-op">)</tt> </tt>
+<a name="L26"></a><tt class="py-lineno">26</tt>  <tt class="py-line"> </tt>
+<a name="TestUser.test_obj_creation_username"></a><div id="TestUser.test_obj_creation_username-def"><a name="L27"></a><tt class="py-lineno">27</tt> <a class="py-toggle" href="#" id="TestUser.test_obj_creation_username-toggle" onclick="return toggle('TestUser.test_obj_creation_username');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.tests.models.test_auth.TestUser-class.html#test_obj_creation_username">test_obj_creation_username</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TestUser.test_obj_creation_username-collapsed" style="display:none;" pad="++" indent="++++++++"></div><div id="TestUser.test_obj_creation_username-expanded"><a name="L28"></a><tt class="py-lineno">28</tt>  <tt class="py-line">        <tt class="py-docstring">"""The obj constructor must set the user name right"""</tt> </tt>
+<a name="L29"></a><tt class="py-lineno">29</tt>  <tt class="py-line">        <tt class="py-name">eq_</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">obj</tt><tt class="py-op">.</tt><tt id="link-19" class="py-name"><a title="lpm.controllers.historialitem.HistorialItemTableFiller.nombre_usuario
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre_usuario
+lpm.controllers.validaciones.usuario_validator.UsuarioEditFormValidator.nombre_usuario
+lpm.model.auth.Usuario.nombre_usuario" class="py-name" href="#" onclick="return doclink('link-19', 'nombre_usuario', 'link-17');">nombre_usuario</a></tt><tt class="py-op">,</tt> <tt class="py-string">u"ignucius"</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L30"></a><tt class="py-lineno">30</tt>  <tt class="py-line"> </tt>
+<a name="TestUser.test_obj_creation_email"></a><div id="TestUser.test_obj_creation_email-def"><a name="L31"></a><tt class="py-lineno">31</tt> <a class="py-toggle" href="#" id="TestUser.test_obj_creation_email-toggle" onclick="return toggle('TestUser.test_obj_creation_email');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.tests.models.test_auth.TestUser-class.html#test_obj_creation_email">test_obj_creation_email</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TestUser.test_obj_creation_email-collapsed" style="display:none;" pad="++" indent="++++++++"></div><div id="TestUser.test_obj_creation_email-expanded"><a name="L32"></a><tt class="py-lineno">32</tt>  <tt class="py-line">        <tt class="py-docstring">"""The obj constructor must set the email right"""</tt> </tt>
+<a name="L33"></a><tt class="py-lineno">33</tt>  <tt class="py-line">        <tt class="py-name">eq_</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">obj</tt><tt class="py-op">.</tt><tt id="link-20" class="py-name"><a title="lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.email
+lpm.controllers.validaciones.usuario_validator.UsuarioEditFormValidator.email
+lpm.model.auth.Usuario.email" class="py-name" href="#" onclick="return doclink('link-20', 'email', 'link-18');">email</a></tt><tt class="py-op">,</tt> <tt class="py-string">u"ignucius@example.org"</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L34"></a><tt class="py-lineno">34</tt>  <tt class="py-line"> </tt>
+<a name="TestUser.test_no_permissions_by_default"></a><div id="TestUser.test_no_permissions_by_default-def"><a name="L35"></a><tt class="py-lineno">35</tt> <a class="py-toggle" href="#" id="TestUser.test_no_permissions_by_default-toggle" onclick="return toggle('TestUser.test_no_permissions_by_default');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.tests.models.test_auth.TestUser-class.html#test_no_permissions_by_default">test_no_permissions_by_default</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TestUser.test_no_permissions_by_default-collapsed" style="display:none;" pad="++" indent="++++++++"></div><div id="TestUser.test_no_permissions_by_default-expanded"><a name="L36"></a><tt class="py-lineno">36</tt>  <tt class="py-line">        <tt class="py-docstring">"""User objects should have no permission by default."""</tt> </tt>
+<a name="L37"></a><tt class="py-lineno">37</tt>  <tt class="py-line">        <tt class="py-name">eq_</tt><tt class="py-op">(</tt><tt class="py-name">len</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">obj</tt><tt class="py-op">.</tt><tt id="link-21" class="py-name" targets="Variable lpm.controllers.validaciones.rol_validator.RolFormValidator.permisos=lpm.controllers.validaciones.rol_validator.RolFormValidator-class.html#permisos,Variable lpm.model.auth.Usuario.permisos=lpm.model.auth.Usuario-class.html#permisos"><a title="lpm.controllers.validaciones.rol_validator.RolFormValidator.permisos
+lpm.model.auth.Usuario.permisos" class="py-name" href="#" onclick="return doclink('link-21', 'permisos', 'link-21');">permisos</a></tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-number">0</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L38"></a><tt class="py-lineno">38</tt>  <tt class="py-line"> </tt>
+<a name="TestUser.test_getting_by_email"></a><div id="TestUser.test_getting_by_email-def"><a name="L39"></a><tt class="py-lineno">39</tt> <a class="py-toggle" href="#" id="TestUser.test_getting_by_email-toggle" onclick="return toggle('TestUser.test_getting_by_email');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.tests.models.test_auth.TestUser-class.html#test_getting_by_email">test_getting_by_email</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TestUser.test_getting_by_email-collapsed" style="display:none;" pad="++" indent="++++++++"></div><div id="TestUser.test_getting_by_email-expanded"><a name="L40"></a><tt class="py-lineno">40</tt>  <tt class="py-line">        <tt class="py-docstring">"""Users should be fetcheable by their email addresses"""</tt> </tt>
+<a name="L41"></a><tt class="py-lineno">41</tt>  <tt class="py-line">        <tt class="py-name">him</tt> <tt class="py-op">=</tt> <tt id="link-22" class="py-name"><a title="lpm.controllers.proyecto.ProyectoController.model
+lpm.controllers.rol.RolPlantillaController.model
+lpm.controllers.usuario.UsuarioController.model
+lpm.model" class="py-name" href="#" onclick="return doclink('link-22', 'model', 'link-1');">model</a></tt><tt class="py-op">.</tt><tt id="link-23" class="py-name"><a title="lpm.model.auth.Usuario" class="py-name" href="#" onclick="return doclink('link-23', 'Usuario', 'link-15');">Usuario</a></tt><tt class="py-op">.</tt><tt id="link-24" class="py-name" targets="Class Method lpm.model.auth.Usuario.by_email_address()=lpm.model.auth.Usuario-class.html#by_email_address"><a title="lpm.model.auth.Usuario.by_email_address" class="py-name" href="#" onclick="return doclink('link-24', 'by_email_address', 'link-24');">by_email_address</a></tt><tt class="py-op">(</tt><tt class="py-string">u"ignucius@example.org"</tt><tt class="py-op">)</tt> </tt>
+<a name="L42"></a><tt class="py-lineno">42</tt>  <tt class="py-line">        <tt class="py-name">eq_</tt><tt class="py-op">(</tt><tt class="py-name">him</tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">obj</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L43"></a><tt class="py-lineno">43</tt>  <tt class="py-line"> </tt>
+<a name="L44"></a><tt class="py-lineno">44</tt>  <tt class="py-line"> </tt>
+<a name="TestPermiso"></a><div id="TestPermiso-def"><a name="L45"></a><tt class="py-lineno">45</tt> <a class="py-toggle" href="#" id="TestPermiso-toggle" onclick="return toggle('TestPermiso');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.tests.models.test_auth.TestPermiso-class.html">TestPermiso</a><tt class="py-op">(</tt><tt class="py-base-class">ModelTest</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TestPermiso-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="TestPermiso-expanded"><a name="L46"></a><tt class="py-lineno">46</tt>  <tt class="py-line">    <tt class="py-docstring">"""Unit test case for the ``Permiso`` model."""</tt> </tt>
+<a name="L47"></a><tt class="py-lineno">47</tt>  <tt class="py-line">     </tt>
+<a name="L48"></a><tt class="py-lineno">48</tt>  <tt class="py-line">    <tt id="link-25" class="py-name"><a title="lpm.tests.models.ModelTest.klass" class="py-name" href="#" onclick="return doclink('link-25', 'klass', 'link-6');">klass</a></tt> <tt class="py-op">=</tt> <tt id="link-26" class="py-name"><a title="lpm.controllers.proyecto.ProyectoController.model
+lpm.controllers.rol.RolPlantillaController.model
+lpm.controllers.usuario.UsuarioController.model
+lpm.model" class="py-name" href="#" onclick="return doclink('link-26', 'model', 'link-1');">model</a></tt><tt class="py-op">.</tt><tt id="link-27" class="py-name" targets="Class lpm.model.auth.Permiso=lpm.model.auth.Permiso-class.html"><a title="lpm.model.auth.Permiso" class="py-name" href="#" onclick="return doclink('link-27', 'Permiso', 'link-27');">Permiso</a></tt> </tt>
+<a name="L49"></a><tt class="py-lineno">49</tt>  <tt class="py-line">    <tt id="link-28" class="py-name"><a title="lpm.tests.models.ModelTest.attrs
+lpm.tests.models.test_administracion.TestProyecto.attrs
+lpm.tests.models.test_auth.TestPermiso.attrs
+lpm.tests.models.test_auth.TestRol.attrs
+lpm.tests.models.test_auth.TestUser.attrs
+lpm.tests.models.test_gestconf.TestLb.attrs" class="py-name" href="#" onclick="return doclink('link-28', 'attrs', 'link-9');">attrs</a></tt> <tt class="py-op">=</tt> <tt class="py-name">dict</tt><tt class="py-op">(</tt> </tt>
+<a name="L50"></a><tt class="py-lineno">50</tt>  <tt class="py-line">        <tt id="link-29" class="py-name" targets="Variable lpm.model.auth.Permiso.nombre_permiso=lpm.model.auth.Permiso-class.html#nombre_permiso"><a title="lpm.model.auth.Permiso.nombre_permiso" class="py-name" href="#" onclick="return doclink('link-29', 'nombre_permiso', 'link-29');">nombre_permiso</a></tt> <tt class="py-op">=</tt> <tt class="py-string">u"test_permission"</tt><tt class="py-op">,</tt> </tt>
+<a name="L51"></a><tt class="py-lineno">51</tt>  <tt class="py-line">        <tt id="link-30" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-30', 'descripcion', 'link-11');">descripcion</a></tt> <tt class="py-op">=</tt> <tt class="py-string">u"This is a test Description"</tt> </tt>
+<a name="L52"></a><tt class="py-lineno">52</tt>  <tt class="py-line">        <tt class="py-op">)</tt> </tt>
+</div><a name="L53"></a><tt class="py-lineno">53</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="lpm-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Sat Jun 25 12:33:37 2011
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

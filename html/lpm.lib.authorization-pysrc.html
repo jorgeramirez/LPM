@@ -1,0 +1,1859 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>lpm.lib.authorization</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="lpm-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="lpm-module.html">Package&nbsp;lpm</a> ::
+        <a href="lpm.lib-module.html">Package&nbsp;lib</a> ::
+        Module&nbsp;authorization
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="lpm.lib.authorization-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="lpm.lib.authorization-module.html">Module lpm.lib.authorization</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno">  1</tt>  <tt class="py-line"><tt class="py-comment"># -*- coding: utf-8 -*-</tt> </tt>
+<a name="L2"></a><tt class="py-lineno">  2</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"><tt class="py-docstring">M&#243;dulo que contiene clases y objetos que guardan relacion</tt> </tt>
+<a name="L4"></a><tt class="py-lineno">  4</tt>  <tt class="py-line"><tt class="py-docstring">con los m&#243;dulos de autorizaci&#243;n y autenticaci&#243;n</tt> </tt>
+<a name="L5"></a><tt class="py-lineno">  5</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L6"></a><tt class="py-lineno">  6</tt>  <tt class="py-line"><tt class="py-docstring">@authors:</tt> </tt>
+<a name="L7"></a><tt class="py-lineno">  7</tt>  <tt class="py-line"><tt class="py-docstring">    - U{Carlos Bellino&lt;mailto:carlosbellino@gmail.com&gt;}</tt> </tt>
+<a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line"><tt class="py-docstring">    - U{Nahuel Hern&#225;ndez&lt;mailto:nahuel.11990@gmail.com&gt;}</tt> </tt>
+<a name="L9"></a><tt class="py-lineno">  9</tt>  <tt class="py-line"><tt class="py-docstring">    - U{Jorge Ram&#237;rez&lt;mailto:jorgeramirez1990@gmail.com&gt;}</tt> </tt>
+<a name="L10"></a><tt class="py-lineno"> 10</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L11"></a><tt class="py-lineno"> 11</tt>  <tt class="py-line"><tt class="py-docstring">@since: 1.0</tt> </tt>
+<a name="L12"></a><tt class="py-lineno"> 12</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">repoze</tt><tt class="py-op">.</tt><tt class="py-name">what</tt><tt class="py-op">.</tt><tt class="py-name">predicates</tt> <tt class="py-keyword">import</tt> <tt class="py-name">Predicate</tt><tt class="py-op">,</tt> <tt class="py-name">is_anonymous</tt><tt class="py-op">,</tt> <tt class="py-name">has_permission</tt> </tt>
+<a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt id="link-0" class="py-name" targets="Package lpm=lpm-module.html"><a title="lpm" class="py-name" href="#" onclick="return doclink('link-0', 'lpm', 'link-0');">lpm</a></tt><tt class="py-op">.</tt><tt id="link-1" class="py-name" targets="Variable lpm.controllers.proyecto.ProyectoController.model=lpm.controllers.proyecto.ProyectoController-class.html#model,Variable lpm.controllers.rol.RolPlantillaController.model=lpm.controllers.rol.RolPlantillaController-class.html#model,Variable lpm.controllers.usuario.UsuarioController.model=lpm.controllers.usuario.UsuarioController-class.html#model,Package lpm.model=lpm.model-module.html"><a title="lpm.controllers.proyecto.ProyectoController.model
+lpm.controllers.rol.RolPlantillaController.model
+lpm.controllers.usuario.UsuarioController.model
+lpm.model" class="py-name" href="#" onclick="return doclink('link-1', 'model', 'link-1');">model</a></tt> <tt class="py-keyword">import</tt> <tt id="link-2" class="py-name" targets="Class lpm.model.auth.Usuario=lpm.model.auth.Usuario-class.html"><a title="lpm.model.auth.Usuario" class="py-name" href="#" onclick="return doclink('link-2', 'Usuario', 'link-2');">Usuario</a></tt><tt class="py-op">,</tt> <tt id="link-3" class="py-name" targets="Class lpm.model.administracion.Fase=lpm.model.administracion.Fase-class.html"><a title="lpm.model.administracion.Fase" class="py-name" href="#" onclick="return doclink('link-3', 'Fase', 'link-3');">Fase</a></tt><tt class="py-op">,</tt> <tt id="link-4" class="py-name" targets="Class lpm.model.administracion.TipoItem=lpm.model.administracion.TipoItem-class.html"><a title="lpm.model.administracion.TipoItem" class="py-name" href="#" onclick="return doclink('link-4', 'TipoItem', 'link-4');">TipoItem</a></tt> </tt>
+<a name="L15"></a><tt class="py-lineno"> 15</tt>  <tt class="py-line"> </tt>
+<a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line"><tt class="py-name">__all__</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-string">'Permisos'</tt><tt class="py-op">,</tt> <tt class="py-string">'PoseePermiso'</tt><tt class="py-op">,</tt> <tt class="py-string">'AlgunPermiso'</tt><tt class="py-op">]</tt> </tt>
+<a name="L17"></a><tt class="py-lineno"> 17</tt>  <tt class="py-line"> </tt>
+<a name="L18"></a><tt class="py-lineno"> 18</tt>  <tt class="py-line"> </tt>
+<a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line"><tt class="py-comment"># Diccionario que define los permisos del sistema</tt> </tt>
+<a name="L20"></a><tt class="py-lineno"> 20</tt>  <tt class="py-line"><tt class="py-comment"># clave: nombre del permiso</tt> </tt>
+<a name="L21"></a><tt class="py-lineno"> 21</tt>  <tt class="py-line"><tt class="py-comment"># valor: descripcion del permiso</tt> </tt>
+<a name="L22"></a><tt class="py-lineno"> 22</tt>  <tt class="py-line"><tt id="link-5" class="py-name" targets="Variable lpm.lib.authorization.Permisos=lpm.lib.authorization-module.html#Permisos"><a title="lpm.lib.authorization.Permisos" class="py-name" href="#" onclick="return doclink('link-5', 'Permisos', 'link-5');">Permisos</a></tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt> </tt>
+<a name="L23"></a><tt class="py-lineno"> 23</tt>  <tt class="py-line"><tt class="py-comment">#usuario</tt> </tt>
+<a name="L24"></a><tt class="py-lineno"> 24</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-6" class="py-name" targets="Method lpm.controllers.atributoitem.AtributoItemEditFiller.nombre()=lpm.controllers.atributoitem.AtributoItemEditFiller-class.html#nombre,Variable lpm.controllers.atributoitem.AtributoItemEditForm.nombre=lpm.controllers.atributoitem.AtributoItemEditForm-class.html#nombre,Method lpm.controllers.atributoitem.AtributoItemTableFiller.nombre()=lpm.controllers.atributoitem.AtributoItemTableFiller-class.html#nombre,Variable lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre=lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm-class.html#nombre,Variable lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre=lpm.controllers.validaciones.fase_validator.FaseFormValidator-class.html#nombre,Variable lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre=lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator-class.html#nombre,Variable lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre=lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator-class.html#nombre,Variable lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre=lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator-class.html#nombre,Variable lpm.model.administracion.AtributosPorTipoItem.nombre=lpm.model.administracion.AtributosPorTipoItem-class.html#nombre,Variable lpm.model.administracion.Fase.nombre=lpm.model.administracion.Fase-class.html#nombre,Variable lpm.model.administracion.Proyecto.nombre=lpm.model.administracion.Proyecto-class.html#nombre,Variable lpm.model.administracion.TipoItem.nombre=lpm.model.administracion.TipoItem-class.html#nombre,Variable lpm.model.auth.Usuario.nombre=lpm.model.auth.Usuario-class.html#nombre"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-6', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"crear usuario"</tt><tt class="py-op">,</tt> <tt id="link-7" class="py-name" targets="Variable lpm.controllers.item.ItemAddForm.descripcion=lpm.controllers.item.ItemAddForm-class.html#descripcion,Method lpm.controllers.item.ItemEditFiller.descripcion()=lpm.controllers.item.ItemEditFiller-class.html#descripcion,Variable lpm.controllers.item.ItemEditForm.descripcion=lpm.controllers.item.ItemEditForm-class.html#descripcion,Variable lpm.controllers.rol.RolContextoAddForm.descripcion=lpm.controllers.rol.RolContextoAddForm-class.html#descripcion,Variable lpm.controllers.rol.RolContextoEditForm.descripcion=lpm.controllers.rol.RolContextoEditForm-class.html#descripcion,Variable lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion=lpm.controllers.validaciones.fase_validator.FaseFormValidator-class.html#descripcion,Variable lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion=lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator-class.html#descripcion,Variable lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion=lpm.controllers.validaciones.rol_validator.RolFormValidator-class.html#descripcion,Variable lpm.model.administracion.Fase.descripcion=lpm.model.administracion.Fase-class.html#descripcion,Variable lpm.model.administracion.Proyecto.descripcion=lpm.model.administracion.Proyecto-class.html#descripcion,Variable lpm.model.administracion.TipoItem.descripcion=lpm.model.administracion.TipoItem-class.html#descripcion,Variable lpm.model.auth.Permiso.descripcion=lpm.model.auth.Permiso-class.html#descripcion,Variable lpm.model.auth.Rol.descripcion=lpm.model.auth.Rol-class.html#descripcion,Variable lpm.model.desarrollo.PropiedadItem.descripcion=lpm.model.desarrollo.PropiedadItem-class.html#descripcion"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-7', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Permite crear usuarios"</tt><tt class="py-op">,</tt> <tt id="link-8" class="py-name" targets="Method lpm.controllers.atributoitem.AtributoItemEditFiller.tipo()=lpm.controllers.atributoitem.AtributoItemEditFiller-class.html#tipo,Variable lpm.controllers.atributoitem.AtributoItemEditForm.tipo=lpm.controllers.atributoitem.AtributoItemEditForm-class.html#tipo,Method lpm.controllers.atributoitem.AtributoItemTableFiller.tipo()=lpm.controllers.atributoitem.AtributoItemTableFiller-class.html#tipo,Variable lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo=lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm-class.html#tipo,Variable lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo=lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm-class.html#tipo,Method lpm.controllers.lineabase.ItemGenerarTableFiller.tipo()=lpm.controllers.lineabase.ItemGenerarTableFiller-class.html#tipo,Method lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo()=lpm.controllers.lineabase.ItemInhabilitadosTableFiller-class.html#tipo,Variable lpm.model.administracion.AtributosPorTipoItem.tipo=lpm.model.administracion.AtributosPorTipoItem-class.html#tipo,Variable lpm.model.auth.Permiso.tipo=lpm.model.auth.Permiso-class.html#tipo,Variable lpm.model.auth.Rol.tipo=lpm.model.auth.Rol-class.html#tipo,Variable lpm.model.desarrollo.Relacion.tipo=lpm.model.desarrollo.Relacion-class.html#tipo"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-8', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Sistema, Usuario"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L25"></a><tt class="py-lineno"> 25</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-9" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-9', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"eliminar usuario"</tt><tt class="py-op">,</tt> <tt id="link-10" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-10', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Permite eliminar usuarios"</tt><tt class="py-op">,</tt> <tt id="link-11" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-11', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Sistema, Usuario"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L26"></a><tt class="py-lineno"> 26</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-12" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-12', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"modificar usuario"</tt><tt class="py-op">,</tt> <tt id="link-13" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-13', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Permite modificar valores de atributos de usuarios"</tt><tt class="py-op">,</tt> <tt id="link-14" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-14', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Sistema, Usuario"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L27"></a><tt class="py-lineno"> 27</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-15" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-15', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"consultar usuario"</tt><tt class="py-op">,</tt> <tt id="link-16" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-16', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Permite consultar valores de atributos de usuarios"</tt><tt class="py-op">,</tt> <tt id="link-17" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-17', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Sistema, Usuario"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L28"></a><tt class="py-lineno"> 28</tt>  <tt class="py-line"><tt class="py-comment">#roles</tt> </tt>
+<a name="L29"></a><tt class="py-lineno"> 29</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-18" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-18', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"crear rol"</tt><tt class="py-op">,</tt> <tt id="link-19" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-19', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Permite realizar la operaci&#243;n de crear un rol"</tt><tt class="py-op">,</tt> <tt id="link-20" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-20', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Proyecto, Fase, Tipo &#205;tem, Rol"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L30"></a><tt class="py-lineno"> 30</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-21" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-21', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"eliminar rol"</tt><tt class="py-op">,</tt> <tt id="link-22" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-22', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Permite realizar la operaci&#243;n de eliminar un rol"</tt><tt class="py-op">,</tt> <tt id="link-23" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-23', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Proyecto, Fase, Tipo &#205;tem, Rol"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L31"></a><tt class="py-lineno"> 31</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-24" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-24', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"modificar rol"</tt><tt class="py-op">,</tt> <tt id="link-25" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-25', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Permite modificar un rol"</tt><tt class="py-op">,</tt> <tt id="link-26" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-26', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Proyecto, Fase, Tipo &#205;tem, Rol"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L32"></a><tt class="py-lineno"> 32</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-27" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-27', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"asignar-desasignar rol"</tt><tt class="py-op">,</tt> <tt id="link-28" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-28', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Permite realizar la operaci&#243;n de asignar un rol"</tt><tt class="py-op">,</tt> <tt id="link-29" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-29', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Proyecto, Fase, Tipo &#205;tem, Rol"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-30" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-30', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"consultar rol"</tt><tt class="py-op">,</tt> <tt id="link-31" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-31', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Permite consultar atributos de un rol"</tt><tt class="py-op">,</tt> <tt id="link-32" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-32', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Proyecto, Fase, Tipo &#205;tem, Rol"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L34"></a><tt class="py-lineno"> 34</tt>  <tt class="py-line"><tt class="py-comment">#proyecto</tt> </tt>
+<a name="L35"></a><tt class="py-lineno"> 35</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-33" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-33', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"consultar proyecto"</tt><tt class="py-op">,</tt> <tt id="link-34" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-34', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-op">(</tt><tt class="py-string">u"Permite consultar valores de atributos de "</tt> <tt class="py-op">+</tt> </tt>
+<a name="L36"></a><tt class="py-lineno"> 36</tt>  <tt class="py-line">                           <tt class="py-string">u"proyecto"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt id="link-35" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-35', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Proyecto"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L37"></a><tt class="py-lineno"> 37</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-36" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-36', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"modificar proyecto"</tt><tt class="py-op">,</tt> <tt id="link-37" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-37', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-op">(</tt><tt class="py-string">u"Permite modificar valores de atributos de "</tt> <tt class="py-op">+</tt> </tt>
+<a name="L38"></a><tt class="py-lineno"> 38</tt>  <tt class="py-line">                           <tt class="py-string">u"proyecto"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt id="link-38" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-38', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Proyecto"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L39"></a><tt class="py-lineno"> 39</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-39" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-39', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"iniciar proyecto"</tt><tt class="py-op">,</tt> <tt id="link-40" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-40', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-op">(</tt><tt class="py-string">u"Permite realizar la operaci&#243;n de iniciar un "</tt> <tt class="py-op">+</tt> </tt>
+<a name="L40"></a><tt class="py-lineno"> 40</tt>  <tt class="py-line">                         <tt class="py-string">u"proyecto"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt id="link-41" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-41', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Proyecto"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L41"></a><tt class="py-lineno"> 41</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-42" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-42', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"crear proyecto"</tt><tt class="py-op">,</tt> <tt id="link-43" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-43', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Permite crear proyectos"</tt><tt class="py-op">,</tt> <tt id="link-44" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-44', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Sistema"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L42"></a><tt class="py-lineno"> 42</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-45" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-45', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"eliminar proyecto"</tt><tt class="py-op">,</tt> <tt id="link-46" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-46', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Permite eliminar proyectos"</tt><tt class="py-op">,</tt> <tt id="link-47" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-47', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Sistema"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L43"></a><tt class="py-lineno"> 43</tt>  <tt class="py-line">     </tt>
+<a name="L44"></a><tt class="py-lineno"> 44</tt>  <tt class="py-line"><tt class="py-comment">#fases</tt> </tt>
+<a name="L45"></a><tt class="py-lineno"> 45</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-48" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-48', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"crear fase"</tt><tt class="py-op">,</tt> <tt id="link-49" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-49', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Permite crear fases"</tt><tt class="py-op">,</tt> <tt id="link-50" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-50', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Proyecto"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L46"></a><tt class="py-lineno"> 46</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-51" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-51', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"modificar fase"</tt><tt class="py-op">,</tt> <tt id="link-52" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-52', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Permite modificar valores de atributos de una fase"</tt><tt class="py-op">,</tt> <tt id="link-53" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-53', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Proyecto, Fase"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L47"></a><tt class="py-lineno"> 47</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-54" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-54', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"eliminar fase"</tt><tt class="py-op">,</tt> <tt id="link-55" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-55', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Permite eliminar una fase"</tt><tt class="py-op">,</tt> <tt id="link-56" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-56', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Proyecto, Fase"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L48"></a><tt class="py-lineno"> 48</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-57" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-57', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"consultar fase"</tt><tt class="py-op">,</tt> <tt id="link-58" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-58', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Permite consultar valores de atributos de fase"</tt><tt class="py-op">,</tt> <tt id="link-59" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-59', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Proyecto, Fase"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L49"></a><tt class="py-lineno"> 49</tt>  <tt class="py-line">     </tt>
+<a name="L50"></a><tt class="py-lineno"> 50</tt>  <tt class="py-line"><tt class="py-comment">#tipo de item</tt> </tt>
+<a name="L51"></a><tt class="py-lineno"> 51</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-60" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-60', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"crear tipo item"</tt> <tt class="py-op">,</tt> <tt id="link-61" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-61', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Permite la definici&#243;n de un nuevo tipo de &#237;tem"</tt><tt class="py-op">,</tt> <tt id="link-62" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-62', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Proyecto, Fase"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L52"></a><tt class="py-lineno"> 52</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-63" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-63', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"redefinir tipo item"</tt><tt class="py-op">,</tt> <tt id="link-64" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-64', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Permite agregar caracter&#237;sticas al tipo de &#237;tem"</tt><tt class="py-op">,</tt> <tt id="link-65" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-65', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Proyecto, Fase, Tipo &#205;tem"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L53"></a><tt class="py-lineno"> 53</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-66" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-66', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"consultar tipo item"</tt><tt class="py-op">,</tt> <tt id="link-67" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-67', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Permite consultar los atributos de "</tt> <tt class="py-op">+</tt>  </tt>
+<a name="L54"></a><tt class="py-lineno"> 54</tt>  <tt class="py-line">                            <tt class="py-string">u"un tipo de &#237;tem"</tt><tt class="py-op">,</tt> <tt id="link-68" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-68', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Proyecto, Fase, Tipo &#205;tem"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L55"></a><tt class="py-lineno"> 55</tt>  <tt class="py-line">                                 </tt>
+<a name="L56"></a><tt class="py-lineno"> 56</tt>  <tt class="py-line"><tt class="py-comment">#item</tt> </tt>
+<a name="L57"></a><tt class="py-lineno"> 57</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-69" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-69', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"crear item"</tt><tt class="py-op">,</tt> <tt id="link-70" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-70', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Permite crear &#237;tems de un tipo dado"</tt><tt class="py-op">,</tt> <tt id="link-71" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-71', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Proyecto, Fase, Tipo &#205;tem"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L58"></a><tt class="py-lineno"> 58</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-72" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-72', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"modificar item"</tt><tt class="py-op">,</tt> <tt id="link-73" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-73', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Permite modificar valores de atributos del &#237;tem"</tt><tt class="py-op">,</tt> <tt id="link-74" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-74', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Proyecto, Fase, Tipo &#205;tem"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L59"></a><tt class="py-lineno"> 59</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-75" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-75', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"consultar item"</tt><tt class="py-op">,</tt> <tt id="link-76" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-76', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Permite consultar valores de atributos de &#237;tem"</tt><tt class="py-op">,</tt> <tt id="link-77" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-77', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Proyecto, Fase, Tipo &#205;tem"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L60"></a><tt class="py-lineno"> 60</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-78" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-78', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"aprobar-desaprobar item"</tt><tt class="py-op">,</tt> <tt id="link-79" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-79', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Permite realizar la operaci&#243;n de aprobar un &#237;tem"</tt><tt class="py-op">,</tt> <tt id="link-80" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-80', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Proyecto, Fase, Tipo &#205;tem"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L61"></a><tt class="py-lineno"> 61</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-81" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-81', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"eliminar-revivir item"</tt><tt class="py-op">,</tt> <tt id="link-82" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-82', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Permite realizar la operaci&#243;n de eliminar un &#237;tem"</tt><tt class="py-op">,</tt> <tt id="link-83" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-83', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Proyecto, Fase, Tipo &#205;tem"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L62"></a><tt class="py-lineno"> 62</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-84" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-84', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"calcular impacto"</tt><tt class="py-op">,</tt> <tt id="link-85" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-85', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Permite realizar la operaci&#243;n calcular impacto"</tt><tt class="py-op">,</tt> <tt id="link-86" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-86', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Proyecto, Fase, Tipo &#205;tem"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L63"></a><tt class="py-lineno"> 63</tt>  <tt class="py-line">     </tt>
+<a name="L64"></a><tt class="py-lineno"> 64</tt>  <tt class="py-line"><tt class="py-comment">#lb</tt> </tt>
+<a name="L65"></a><tt class="py-lineno"> 65</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-87" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-87', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"crear lb"</tt><tt class="py-op">,</tt> <tt id="link-88" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-88', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Permite crear una L&#237;nea Base"</tt><tt class="py-op">,</tt> <tt id="link-89" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-89', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Proyecto, Fase"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L66"></a><tt class="py-lineno"> 66</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-90" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-90', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"abrir-cerrar lb"</tt><tt class="py-op">,</tt> <tt id="link-91" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-91', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Permite realizar la operaci&#243;n de abrir o cerrar una l&#237;nea base"</tt><tt class="py-op">,</tt> <tt id="link-92" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-92', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Proyecto, Fase"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L67"></a><tt class="py-lineno"> 67</tt>  <tt class="py-line">    <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt id="link-93" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-93', 'nombre', 'link-6');">nombre</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"consultar lb"</tt><tt class="py-op">,</tt> <tt id="link-94" class="py-name"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-94', 'descripcion', 'link-7');">descripcion</a></tt><tt class="py-op">=</tt> <tt class="py-op">(</tt><tt class="py-string">u"Permite consultar la informaci&#243;n almacenada en una "</tt> <tt class="py-op">+</tt> </tt>
+<a name="L68"></a><tt class="py-lineno"> 68</tt>  <tt class="py-line">                      <tt class="py-string">u"l&#237;nea base"</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt id="link-95" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-95', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">=</tt> <tt class="py-string">u"Proyecto, Fase"</tt><tt class="py-op">)</tt> </tt>
+<a name="L69"></a><tt class="py-lineno"> 69</tt>  <tt class="py-line">         </tt>
+<a name="L70"></a><tt class="py-lineno"> 70</tt>  <tt class="py-line"><tt class="py-op">]</tt> </tt>
+<a name="L71"></a><tt class="py-lineno"> 71</tt>  <tt class="py-line"> </tt>
+<a name="PoseePermiso"></a><div id="PoseePermiso-def"><a name="L72"></a><tt class="py-lineno"> 72</tt> <a class="py-toggle" href="#" id="PoseePermiso-toggle" onclick="return toggle('PoseePermiso');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.lib.authorization.PoseePermiso-class.html">PoseePermiso</a><tt class="py-op">(</tt><tt class="py-base-class">Predicate</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="PoseePermiso-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="PoseePermiso-expanded"><a name="L73"></a><tt class="py-lineno"> 73</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L74"></a><tt class="py-lineno"> 74</tt>  <tt class="py-line"><tt class="py-docstring">    Clase que evalua si el usuario actual posee</tt> </tt>
+<a name="L75"></a><tt class="py-lineno"> 75</tt>  <tt class="py-line"><tt class="py-docstring">    el permiso especificado</tt> </tt>
+<a name="L76"></a><tt class="py-lineno"> 76</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L77"></a><tt class="py-lineno"> 77</tt>  <tt class="py-line">    <tt id="link-96" class="py-name" targets="Variable lpm.lib.authorization.AlgunPermiso.message=lpm.lib.authorization.AlgunPermiso-class.html#message,Variable lpm.lib.authorization.PoseePermiso.message=lpm.lib.authorization.PoseePermiso-class.html#message"><a title="lpm.lib.authorization.AlgunPermiso.message
+lpm.lib.authorization.PoseePermiso.message" class="py-name" href="#" onclick="return doclink('link-96', 'message', 'link-96');">message</a></tt> <tt class="py-op">=</tt> <tt class="py-string">"El usuario debe poseer el permiso: %s"</tt> </tt>
+<a name="L78"></a><tt class="py-lineno"> 78</tt>  <tt class="py-line">     </tt>
+<a name="PoseePermiso.__init__"></a><div id="PoseePermiso.__init__-def"><a name="L79"></a><tt class="py-lineno"> 79</tt> <a class="py-toggle" href="#" id="PoseePermiso.__init__-toggle" onclick="return toggle('PoseePermiso.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.lib.authorization.PoseePermiso-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">nombre_permiso</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">kw</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="PoseePermiso.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="PoseePermiso.__init__-expanded"><a name="L80"></a><tt class="py-lineno"> 80</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L81"></a><tt class="py-lineno"> 81</tt>  <tt class="py-line"><tt class="py-docstring">        M&#233;todo inicializador.</tt> </tt>
+<a name="L82"></a><tt class="py-lineno"> 82</tt>  <tt class="py-line"><tt class="py-docstring">        </tt> </tt>
+<a name="L83"></a><tt class="py-lineno"> 83</tt>  <tt class="py-line"><tt class="py-docstring">        @param nombre_permiso: el nombre del permiso a evaluar</tt> </tt>
+<a name="L84"></a><tt class="py-lineno"> 84</tt>  <tt class="py-line"><tt class="py-docstring">        @type nombre_permiso: C{unicode}</tt> </tt>
+<a name="L85"></a><tt class="py-lineno"> 85</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L86"></a><tt class="py-lineno"> 86</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-97" class="py-name" targets="Variable lpm.model.auth.Permiso.nombre_permiso=lpm.model.auth.Permiso-class.html#nombre_permiso"><a title="lpm.model.auth.Permiso.nombre_permiso" class="py-name" href="#" onclick="return doclink('link-97', 'nombre_permiso', 'link-97');">nombre_permiso</a></tt> <tt class="py-op">=</tt> <tt class="py-name">unicode</tt><tt class="py-op">(</tt><tt id="link-98" class="py-name"><a title="lpm.model.auth.Permiso.nombre_permiso" class="py-name" href="#" onclick="return doclink('link-98', 'nombre_permiso', 'link-97');">nombre_permiso</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L87"></a><tt class="py-lineno"> 87</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-99" class="py-name" targets="Variable lpm.controllers.rol.RolContextoAddForm.id_proyecto=lpm.controllers.rol.RolContextoAddForm-class.html#id_proyecto,Variable lpm.controllers.rol.RolContextoEditForm.id_proyecto=lpm.controllers.rol.RolContextoEditForm-class.html#id_proyecto,Variable lpm.model.administracion.Fase.id_proyecto=lpm.model.administracion.Fase-class.html#id_proyecto,Variable lpm.model.administracion.Proyecto.id_proyecto=lpm.model.administracion.Proyecto-class.html#id_proyecto,Variable lpm.model.administracion.TipoItem.id_proyecto=lpm.model.administracion.TipoItem-class.html#id_proyecto,Variable lpm.model.auth.Rol.id_proyecto=lpm.model.auth.Rol-class.html#id_proyecto"><a title="lpm.controllers.rol.RolContextoAddForm.id_proyecto
+lpm.controllers.rol.RolContextoEditForm.id_proyecto
+lpm.model.administracion.Fase.id_proyecto
+lpm.model.administracion.Proyecto.id_proyecto
+lpm.model.administracion.TipoItem.id_proyecto
+lpm.model.auth.Rol.id_proyecto" class="py-name" href="#" onclick="return doclink('link-99', 'id_proyecto', 'link-99');">id_proyecto</a></tt> <tt class="py-op">=</tt> <tt class="py-number">0</tt> </tt>
+<a name="L88"></a><tt class="py-lineno"> 88</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-100" class="py-name" targets="Variable lpm.controllers.rol.RolContextoAddForm.id_fase=lpm.controllers.rol.RolContextoAddForm-class.html#id_fase,Variable lpm.controllers.rol.RolContextoEditForm.id_fase=lpm.controllers.rol.RolContextoEditForm-class.html#id_fase,Variable lpm.model.administracion.Fase.id_fase=lpm.model.administracion.Fase-class.html#id_fase,Variable lpm.model.administracion.TipoItem.id_fase=lpm.model.administracion.TipoItem-class.html#id_fase,Variable lpm.model.auth.Rol.id_fase=lpm.model.auth.Rol-class.html#id_fase,Variable lpm.model.desarrollo.Item.id_fase=lpm.model.desarrollo.Item-class.html#id_fase"><a title="lpm.controllers.rol.RolContextoAddForm.id_fase
+lpm.controllers.rol.RolContextoEditForm.id_fase
+lpm.model.administracion.Fase.id_fase
+lpm.model.administracion.TipoItem.id_fase
+lpm.model.auth.Rol.id_fase
+lpm.model.desarrollo.Item.id_fase" class="py-name" href="#" onclick="return doclink('link-100', 'id_fase', 'link-100');">id_fase</a></tt> <tt class="py-op">=</tt> <tt class="py-number">0</tt> </tt>
+<a name="L89"></a><tt class="py-lineno"> 89</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-101" class="py-name" targets="Variable lpm.controllers.item.ItemAddForm.id_tipo_item=lpm.controllers.item.ItemAddForm-class.html#id_tipo_item,Variable lpm.controllers.rol.RolContextoAddForm.id_tipo_item=lpm.controllers.rol.RolContextoAddForm-class.html#id_tipo_item,Variable lpm.controllers.rol.RolContextoEditForm.id_tipo_item=lpm.controllers.rol.RolContextoEditForm-class.html#id_tipo_item,Variable lpm.model.administracion.AtributosPorTipoItem.id_tipo_item=lpm.model.administracion.AtributosPorTipoItem-class.html#id_tipo_item,Variable lpm.model.administracion.TipoItem.id_tipo_item=lpm.model.administracion.TipoItem-class.html#id_tipo_item,Variable lpm.model.auth.Rol.id_tipo_item=lpm.model.auth.Rol-class.html#id_tipo_item,Variable lpm.model.desarrollo.Item.id_tipo_item=lpm.model.desarrollo.Item-class.html#id_tipo_item"><a title="lpm.controllers.item.ItemAddForm.id_tipo_item
+lpm.controllers.rol.RolContextoAddForm.id_tipo_item
+lpm.controllers.rol.RolContextoEditForm.id_tipo_item
+lpm.model.administracion.AtributosPorTipoItem.id_tipo_item
+lpm.model.administracion.TipoItem.id_tipo_item
+lpm.model.auth.Rol.id_tipo_item
+lpm.model.desarrollo.Item.id_tipo_item" class="py-name" href="#" onclick="return doclink('link-101', 'id_tipo_item', 'link-101');">id_tipo_item</a></tt> <tt class="py-op">=</tt> <tt class="py-number">0</tt> </tt>
+<a name="L90"></a><tt class="py-lineno"> 90</tt>  <tt class="py-line">         </tt>
+<a name="L91"></a><tt class="py-lineno"> 91</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-keyword">not</tt> <tt class="py-name">kw</tt><tt class="py-op">.</tt><tt class="py-name">has_key</tt><tt class="py-op">(</tt><tt class="py-string">'id_proyecto'</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L92"></a><tt class="py-lineno"> 92</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">kw</tt><tt class="py-op">.</tt><tt class="py-name">has_key</tt><tt class="py-op">(</tt><tt class="py-string">'id_fase'</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L93"></a><tt class="py-lineno"> 93</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-102" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_fase
+lpm.controllers.rol.RolContextoEditForm.id_fase
+lpm.model.administracion.Fase.id_fase
+lpm.model.administracion.TipoItem.id_fase
+lpm.model.auth.Rol.id_fase
+lpm.model.desarrollo.Item.id_fase" class="py-name" href="#" onclick="return doclink('link-102', 'id_fase', 'link-100');">id_fase</a></tt> <tt class="py-op">=</tt> <tt class="py-name">int</tt><tt class="py-op">(</tt><tt class="py-name">kw</tt><tt class="py-op">[</tt><tt class="py-string">'id_fase'</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L94"></a><tt class="py-lineno"> 94</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-103" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_proyecto
+lpm.controllers.rol.RolContextoEditForm.id_proyecto
+lpm.model.administracion.Fase.id_proyecto
+lpm.model.administracion.Proyecto.id_proyecto
+lpm.model.administracion.TipoItem.id_proyecto
+lpm.model.auth.Rol.id_proyecto" class="py-name" href="#" onclick="return doclink('link-103', 'id_proyecto', 'link-99');">id_proyecto</a></tt> <tt class="py-op">=</tt> <tt id="link-104" class="py-name"><a title="lpm.model.administracion.Fase" class="py-name" href="#" onclick="return doclink('link-104', 'Fase', 'link-3');">Fase</a></tt><tt class="py-op">.</tt><tt id="link-105" class="py-name" targets="Class Method lpm.model.administracion.AtributosPorTipoItem.por_id()=lpm.model.administracion.AtributosPorTipoItem-class.html#por_id,Class Method lpm.model.administracion.Fase.por_id()=lpm.model.administracion.Fase-class.html#por_id,Class Method lpm.model.administracion.Proyecto.por_id()=lpm.model.administracion.Proyecto-class.html#por_id,Class Method lpm.model.administracion.TipoItem.por_id()=lpm.model.administracion.TipoItem-class.html#por_id,Class Method lpm.model.auth.Permiso.por_id()=lpm.model.auth.Permiso-class.html#por_id,Class Method lpm.model.auth.Rol.por_id()=lpm.model.auth.Rol-class.html#por_id,Class Method lpm.model.auth.Usuario.por_id()=lpm.model.auth.Usuario-class.html#por_id,Class Method lpm.model.desarrollo.ArchivosExternos.por_id()=lpm.model.desarrollo.ArchivosExternos-class.html#por_id,Class Method lpm.model.desarrollo.ArchivosPorItem.por_id()=lpm.model.desarrollo.ArchivosPorItem-class.html#por_id,Class Method lpm.model.desarrollo.AtributosPorItem.por_id()=lpm.model.desarrollo.AtributosPorItem-class.html#por_id,Class Method lpm.model.desarrollo.HistorialItems.por_id()=lpm.model.desarrollo.HistorialItems-class.html#por_id,Class Method lpm.model.desarrollo.Item.por_id()=lpm.model.desarrollo.Item-class.html#por_id,Class Method lpm.model.desarrollo.PropiedadItem.por_id()=lpm.model.desarrollo.PropiedadItem-class.html#por_id,Class Method lpm.model.desarrollo.Relacion.por_id()=lpm.model.desarrollo.Relacion-class.html#por_id,Class Method lpm.model.desarrollo.RelacionPorItem.por_id()=lpm.model.desarrollo.RelacionPorItem-class.html#por_id,Class Method lpm.model.gestconf.LB.por_id()=lpm.model.gestconf.LB-class.html#por_id"><a title="lpm.model.administracion.AtributosPorTipoItem.por_id
+lpm.model.administracion.Fase.por_id
+lpm.model.administracion.Proyecto.por_id
+lpm.model.administracion.TipoItem.por_id
+lpm.model.auth.Permiso.por_id
+lpm.model.auth.Rol.por_id
+lpm.model.auth.Usuario.por_id
+lpm.model.desarrollo.ArchivosExternos.por_id
+lpm.model.desarrollo.ArchivosPorItem.por_id
+lpm.model.desarrollo.AtributosPorItem.por_id
+lpm.model.desarrollo.HistorialItems.por_id
+lpm.model.desarrollo.Item.por_id
+lpm.model.desarrollo.PropiedadItem.por_id
+lpm.model.desarrollo.Relacion.por_id
+lpm.model.desarrollo.RelacionPorItem.por_id
+lpm.model.gestconf.LB.por_id" class="py-name" href="#" onclick="return doclink('link-105', 'por_id', 'link-105');">por_id</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-106" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_fase
+lpm.controllers.rol.RolContextoEditForm.id_fase
+lpm.model.administracion.Fase.id_fase
+lpm.model.administracion.TipoItem.id_fase
+lpm.model.auth.Rol.id_fase
+lpm.model.desarrollo.Item.id_fase" class="py-name" href="#" onclick="return doclink('link-106', 'id_fase', 'link-100');">id_fase</a></tt><tt class="py-op">)</tt><tt class="py-op">.</tt><tt id="link-107" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_proyecto
+lpm.controllers.rol.RolContextoEditForm.id_proyecto
+lpm.model.administracion.Fase.id_proyecto
+lpm.model.administracion.Proyecto.id_proyecto
+lpm.model.administracion.TipoItem.id_proyecto
+lpm.model.auth.Rol.id_proyecto" class="py-name" href="#" onclick="return doclink('link-107', 'id_proyecto', 'link-99');">id_proyecto</a></tt> </tt>
+<a name="L95"></a><tt class="py-lineno"> 95</tt>  <tt class="py-line">                <tt class="py-keyword">del</tt> <tt class="py-name">kw</tt><tt class="py-op">[</tt><tt class="py-string">'id_fase'</tt><tt class="py-op">]</tt> </tt>
+<a name="L96"></a><tt class="py-lineno"> 96</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">kw</tt><tt class="py-op">.</tt><tt class="py-name">has_key</tt><tt class="py-op">(</tt><tt class="py-string">'id_tipo_item'</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L97"></a><tt class="py-lineno"> 97</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-108" class="py-name"><a title="lpm.controllers.item.ItemAddForm.id_tipo_item
+lpm.controllers.rol.RolContextoAddForm.id_tipo_item
+lpm.controllers.rol.RolContextoEditForm.id_tipo_item
+lpm.model.administracion.AtributosPorTipoItem.id_tipo_item
+lpm.model.administracion.TipoItem.id_tipo_item
+lpm.model.auth.Rol.id_tipo_item
+lpm.model.desarrollo.Item.id_tipo_item" class="py-name" href="#" onclick="return doclink('link-108', 'id_tipo_item', 'link-101');">id_tipo_item</a></tt> <tt class="py-op">=</tt> <tt class="py-name">int</tt><tt class="py-op">(</tt><tt class="py-name">kw</tt><tt class="py-op">[</tt><tt class="py-string">'id_tipo_item'</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L98"></a><tt class="py-lineno"> 98</tt>  <tt class="py-line">                <tt class="py-name">ti</tt> <tt class="py-op">=</tt> <tt id="link-109" class="py-name"><a title="lpm.model.administracion.TipoItem" class="py-name" href="#" onclick="return doclink('link-109', 'TipoItem', 'link-4');">TipoItem</a></tt><tt class="py-op">.</tt><tt id="link-110" class="py-name"><a title="lpm.model.administracion.AtributosPorTipoItem.por_id
+lpm.model.administracion.Fase.por_id
+lpm.model.administracion.Proyecto.por_id
+lpm.model.administracion.TipoItem.por_id
+lpm.model.auth.Permiso.por_id
+lpm.model.auth.Rol.por_id
+lpm.model.auth.Usuario.por_id
+lpm.model.desarrollo.ArchivosExternos.por_id
+lpm.model.desarrollo.ArchivosPorItem.por_id
+lpm.model.desarrollo.AtributosPorItem.por_id
+lpm.model.desarrollo.HistorialItems.por_id
+lpm.model.desarrollo.Item.por_id
+lpm.model.desarrollo.PropiedadItem.por_id
+lpm.model.desarrollo.Relacion.por_id
+lpm.model.desarrollo.RelacionPorItem.por_id
+lpm.model.gestconf.LB.por_id" class="py-name" href="#" onclick="return doclink('link-110', 'por_id', 'link-105');">por_id</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-111" class="py-name"><a title="lpm.controllers.item.ItemAddForm.id_tipo_item
+lpm.controllers.rol.RolContextoAddForm.id_tipo_item
+lpm.controllers.rol.RolContextoEditForm.id_tipo_item
+lpm.model.administracion.AtributosPorTipoItem.id_tipo_item
+lpm.model.administracion.TipoItem.id_tipo_item
+lpm.model.auth.Rol.id_tipo_item
+lpm.model.desarrollo.Item.id_tipo_item" class="py-name" href="#" onclick="return doclink('link-111', 'id_tipo_item', 'link-101');">id_tipo_item</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L99"></a><tt class="py-lineno"> 99</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-112" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_fase
+lpm.controllers.rol.RolContextoEditForm.id_fase
+lpm.model.administracion.Fase.id_fase
+lpm.model.administracion.TipoItem.id_fase
+lpm.model.auth.Rol.id_fase
+lpm.model.desarrollo.Item.id_fase" class="py-name" href="#" onclick="return doclink('link-112', 'id_fase', 'link-100');">id_fase</a></tt> <tt class="py-op">=</tt> <tt class="py-name">ti</tt><tt class="py-op">.</tt><tt id="link-113" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_fase
+lpm.controllers.rol.RolContextoEditForm.id_fase
+lpm.model.administracion.Fase.id_fase
+lpm.model.administracion.TipoItem.id_fase
+lpm.model.auth.Rol.id_fase
+lpm.model.desarrollo.Item.id_fase" class="py-name" href="#" onclick="return doclink('link-113', 'id_fase', 'link-100');">id_fase</a></tt> </tt>
+<a name="L100"></a><tt class="py-lineno">100</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-114" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_proyecto
+lpm.controllers.rol.RolContextoEditForm.id_proyecto
+lpm.model.administracion.Fase.id_proyecto
+lpm.model.administracion.Proyecto.id_proyecto
+lpm.model.administracion.TipoItem.id_proyecto
+lpm.model.auth.Rol.id_proyecto" class="py-name" href="#" onclick="return doclink('link-114', 'id_proyecto', 'link-99');">id_proyecto</a></tt> <tt class="py-op">=</tt> <tt class="py-name">ti</tt><tt class="py-op">.</tt><tt id="link-115" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_proyecto
+lpm.controllers.rol.RolContextoEditForm.id_proyecto
+lpm.model.administracion.Fase.id_proyecto
+lpm.model.administracion.Proyecto.id_proyecto
+lpm.model.administracion.TipoItem.id_proyecto
+lpm.model.auth.Rol.id_proyecto" class="py-name" href="#" onclick="return doclink('link-115', 'id_proyecto', 'link-99');">id_proyecto</a></tt> </tt>
+<a name="L101"></a><tt class="py-lineno">101</tt>  <tt class="py-line">                <tt class="py-keyword">del</tt> <tt class="py-name">kw</tt><tt class="py-op">[</tt><tt class="py-string">'id_tipo_item'</tt><tt class="py-op">]</tt> </tt>
+<a name="L102"></a><tt class="py-lineno">102</tt>  <tt class="py-line">        <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L103"></a><tt class="py-lineno">103</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-116" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_proyecto
+lpm.controllers.rol.RolContextoEditForm.id_proyecto
+lpm.model.administracion.Fase.id_proyecto
+lpm.model.administracion.Proyecto.id_proyecto
+lpm.model.administracion.TipoItem.id_proyecto
+lpm.model.auth.Rol.id_proyecto" class="py-name" href="#" onclick="return doclink('link-116', 'id_proyecto', 'link-99');">id_proyecto</a></tt> <tt class="py-op">=</tt> <tt class="py-name">int</tt><tt class="py-op">(</tt><tt class="py-name">kw</tt><tt class="py-op">[</tt><tt class="py-string">'id_proyecto'</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L104"></a><tt class="py-lineno">104</tt>  <tt class="py-line">            <tt class="py-keyword">del</tt> <tt class="py-name">kw</tt><tt class="py-op">[</tt><tt class="py-string">'id_proyecto'</tt><tt class="py-op">]</tt>         </tt>
+<a name="L105"></a><tt class="py-lineno">105</tt>  <tt class="py-line">         </tt>
+<a name="L106"></a><tt class="py-lineno">106</tt>  <tt class="py-line">        <tt class="py-name">super</tt><tt class="py-op">(</tt><tt id="link-117" class="py-name" targets="Class lpm.lib.authorization.PoseePermiso=lpm.lib.authorization.PoseePermiso-class.html"><a title="lpm.lib.authorization.PoseePermiso" class="py-name" href="#" onclick="return doclink('link-117', 'PoseePermiso', 'link-117');">PoseePermiso</a></tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">)</tt><tt class="py-op">.</tt><tt id="link-118" class="py-name" targets="Method lpm.controllers.rol.RolPlantillaAddForm.__init__()=lpm.controllers.rol.RolPlantillaAddForm-class.html#__init__,Method lpm.controllers.rol.RolPlantillaEditForm.__init__()=lpm.controllers.rol.RolPlantillaEditForm-class.html#__init__,Method lpm.lib.app_globals.Globals.__init__()=lpm.lib.app_globals.Globals-class.html#__init__,Method lpm.lib.authorization.AlgunPermiso.__init__()=lpm.lib.authorization.AlgunPermiso-class.html#__init__,Method lpm.lib.authorization.PoseePermiso.__init__()=lpm.lib.authorization.PoseePermiso-class.html#__init__,Method lpm.lib.mail.Gmail.__init__()=lpm.lib.mail.Gmail-class.html#__init__,Method lpm.lib.sproxcustom.CustomPropertySingleSelectField.__init__()=lpm.lib.sproxcustom.CustomPropertySingleSelectField-class.html#__init__,Method lpm.model.administracion.AtributosPorTipoItem.__init__()=lpm.model.administracion.AtributosPorTipoItem-class.html#__init__,Method lpm.model.administracion.Fase.__init__()=lpm.model.administracion.Fase-class.html#__init__,Method lpm.model.administracion.Proyecto.__init__()=lpm.model.administracion.Proyecto-class.html#__init__,Method lpm.model.administracion.TipoItem.__init__()=lpm.model.administracion.TipoItem-class.html#__init__,Method lpm.model.auth.Permiso.__init__()=lpm.model.auth.Permiso-class.html#__init__,Method lpm.model.auth.Rol.__init__()=lpm.model.auth.Rol-class.html#__init__,Method lpm.model.auth.Usuario.__init__()=lpm.model.auth.Usuario-class.html#__init__,Method lpm.model.desarrollo.ArchivosExternos.__init__()=lpm.model.desarrollo.ArchivosExternos-class.html#__init__,Method lpm.model.desarrollo.ArchivosPorItem.__init__()=lpm.model.desarrollo.ArchivosPorItem-class.html#__init__,Method lpm.model.desarrollo.AtributosDeItems.__init__()=lpm.model.desarrollo.AtributosDeItems-class.html#__init__,Method lpm.model.desarrollo.AtributosPorItem.__init__()=lpm.model.desarrollo.AtributosPorItem-class.html#__init__,Method lpm.model.desarrollo.HiloContador.__init__()=lpm.model.desarrollo.HiloContador-class.html#__init__,Method lpm.model.desarrollo.HistorialItems.__init__()=lpm.model.desarrollo.HistorialItems-class.html#__init__,Method lpm.model.desarrollo.Item.__init__()=lpm.model.desarrollo.Item-class.html#__init__,Method lpm.model.desarrollo.PropiedadItem.__init__()=lpm.model.desarrollo.PropiedadItem-class.html#__init__,Method lpm.model.desarrollo.Relacion.__init__()=lpm.model.desarrollo.Relacion-class.html#__init__,Method lpm.model.desarrollo.RelacionPorItem.__init__()=lpm.model.desarrollo.RelacionPorItem-class.html#__init__,Method lpm.model.excepciones.CondicionAprobarError.__init__()=lpm.model.excepciones.CondicionAprobarError-class.html#__init__,Method lpm.model.excepciones.ModificarItemError.__init__()=lpm.model.excepciones.ModificarItemError-class.html#__init__,Method lpm.model.excepciones.RelacionError.__init__()=lpm.model.excepciones.RelacionError-class.html#__init__,Method lpm.model.gestconf.HistorialLB.__init__()=lpm.model.gestconf.HistorialLB-class.html#__init__,Method lpm.model.gestconf.ItemsPorLB.__init__()=lpm.model.gestconf.ItemsPorLB-class.html#__init__,Method lpm.model.gestconf.LB.__init__()=lpm.model.gestconf.LB-class.html#__init__"><a title="lpm.controllers.rol.RolPlantillaAddForm.__init__
+lpm.controllers.rol.RolPlantillaEditForm.__init__
+lpm.lib.app_globals.Globals.__init__
+lpm.lib.authorization.AlgunPermiso.__init__
+lpm.lib.authorization.PoseePermiso.__init__
+lpm.lib.mail.Gmail.__init__
+lpm.lib.sproxcustom.CustomPropertySingleSelectField.__init__
+lpm.model.administracion.AtributosPorTipoItem.__init__
+lpm.model.administracion.Fase.__init__
+lpm.model.administracion.Proyecto.__init__
+lpm.model.administracion.TipoItem.__init__
+lpm.model.auth.Permiso.__init__
+lpm.model.auth.Rol.__init__
+lpm.model.auth.Usuario.__init__
+lpm.model.desarrollo.ArchivosExternos.__init__
+lpm.model.desarrollo.ArchivosPorItem.__init__
+lpm.model.desarrollo.AtributosDeItems.__init__
+lpm.model.desarrollo.AtributosPorItem.__init__
+lpm.model.desarrollo.HiloContador.__init__
+lpm.model.desarrollo.HistorialItems.__init__
+lpm.model.desarrollo.Item.__init__
+lpm.model.desarrollo.PropiedadItem.__init__
+lpm.model.desarrollo.Relacion.__init__
+lpm.model.desarrollo.RelacionPorItem.__init__
+lpm.model.excepciones.CondicionAprobarError.__init__
+lpm.model.excepciones.ModificarItemError.__init__
+lpm.model.excepciones.RelacionError.__init__
+lpm.model.gestconf.HistorialLB.__init__
+lpm.model.gestconf.ItemsPorLB.__init__
+lpm.model.gestconf.LB.__init__" class="py-name" href="#" onclick="return doclink('link-118', '__init__', 'link-118');">__init__</a></tt><tt class="py-op">(</tt><tt class="py-op">**</tt><tt class="py-name">kw</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L107"></a><tt class="py-lineno">107</tt>  <tt class="py-line">         </tt>
+<a name="PoseePermiso.evaluate"></a><div id="PoseePermiso.evaluate-def"><a name="L108"></a><tt class="py-lineno">108</tt> <a class="py-toggle" href="#" id="PoseePermiso.evaluate-toggle" onclick="return toggle('PoseePermiso.evaluate');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.lib.authorization.PoseePermiso-class.html#evaluate">evaluate</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">environ</tt><tt class="py-op">,</tt> <tt class="py-param">credentials</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="PoseePermiso.evaluate-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="PoseePermiso.evaluate-expanded"><a name="L109"></a><tt class="py-lineno">109</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">is_anonymous</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">.</tt><tt class="py-name">is_met</tt><tt class="py-op">(</tt><tt class="py-name">environ</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L110"></a><tt class="py-lineno">110</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">unmet</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L111"></a><tt class="py-lineno">111</tt>  <tt class="py-line">        <tt id="link-119" class="py-name" targets="Method lpm.controllers.historialitem.HistorialItemTableFiller.nombre_usuario()=lpm.controllers.historialitem.HistorialItemTableFiller-class.html#nombre_usuario,Variable lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre_usuario=lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator-class.html#nombre_usuario,Variable lpm.controllers.validaciones.usuario_validator.UsuarioEditFormValidator.nombre_usuario=lpm.controllers.validaciones.usuario_validator.UsuarioEditFormValidator-class.html#nombre_usuario,Variable lpm.model.auth.Usuario.nombre_usuario=lpm.model.auth.Usuario-class.html#nombre_usuario"><a title="lpm.controllers.historialitem.HistorialItemTableFiller.nombre_usuario
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre_usuario
+lpm.controllers.validaciones.usuario_validator.UsuarioEditFormValidator.nombre_usuario
+lpm.model.auth.Usuario.nombre_usuario" class="py-name" href="#" onclick="return doclink('link-119', 'nombre_usuario', 'link-119');">nombre_usuario</a></tt> <tt class="py-op">=</tt> <tt class="py-name">credentials</tt><tt class="py-op">[</tt><tt class="py-string">'repoze.what.userid'</tt><tt class="py-op">]</tt> </tt>
+<a name="L112"></a><tt class="py-lineno">112</tt>  <tt class="py-line">        <tt id="link-120" class="py-name" targets="Module lpm.controllers.usuario=lpm.controllers.usuario-module.html,Variable lpm.model.desarrollo.HistorialItems.usuario=lpm.model.desarrollo.HistorialItems-class.html#usuario,Variable lpm.model.gestconf.HistorialLB.usuario=lpm.model.gestconf.HistorialLB-class.html#usuario,Package lpm.templates.usuario=lpm.templates.usuario-module.html"><a title="lpm.controllers.usuario
+lpm.model.desarrollo.HistorialItems.usuario
+lpm.model.gestconf.HistorialLB.usuario
+lpm.templates.usuario" class="py-name" href="#" onclick="return doclink('link-120', 'usuario', 'link-120');">usuario</a></tt> <tt class="py-op">=</tt> <tt id="link-121" class="py-name"><a title="lpm.model.auth.Usuario" class="py-name" href="#" onclick="return doclink('link-121', 'Usuario', 'link-2');">Usuario</a></tt><tt class="py-op">.</tt><tt id="link-122" class="py-name" targets="Class Method lpm.model.auth.Usuario.by_user_name()=lpm.model.auth.Usuario-class.html#by_user_name"><a title="lpm.model.auth.Usuario.by_user_name" class="py-name" href="#" onclick="return doclink('link-122', 'by_user_name', 'link-122');">by_user_name</a></tt><tt class="py-op">(</tt><tt id="link-123" class="py-name"><a title="lpm.controllers.historialitem.HistorialItemTableFiller.nombre_usuario
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre_usuario
+lpm.controllers.validaciones.usuario_validator.UsuarioEditFormValidator.nombre_usuario
+lpm.model.auth.Usuario.nombre_usuario" class="py-name" href="#" onclick="return doclink('link-123', 'nombre_usuario', 'link-119');">nombre_usuario</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L113"></a><tt class="py-lineno">113</tt>  <tt class="py-line">         </tt>
+<a name="L114"></a><tt class="py-lineno">114</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-name">r</tt> <tt class="py-keyword">in</tt> <tt id="link-124" class="py-name"><a title="lpm.controllers.usuario
+lpm.model.desarrollo.HistorialItems.usuario
+lpm.model.gestconf.HistorialLB.usuario
+lpm.templates.usuario" class="py-name" href="#" onclick="return doclink('link-124', 'usuario', 'link-120');">usuario</a></tt><tt class="py-op">.</tt><tt id="link-125" class="py-name" targets="Variable lpm.controllers.root.RootController.roles=lpm.controllers.root.RootController-class.html#roles,Method lpm.controllers.usuario.UsuarioController.roles()=lpm.controllers.usuario.UsuarioController-class.html#roles,Variable lpm.model.administracion.Fase.roles=lpm.model.administracion.Fase-class.html#roles,Variable lpm.model.administracion.Proyecto.roles=lpm.model.administracion.Proyecto-class.html#roles,Variable lpm.model.administracion.TipoItem.roles=lpm.model.administracion.TipoItem-class.html#roles,Variable lpm.model.auth.Permiso.roles=lpm.model.auth.Permiso-class.html#roles"><a title="lpm.controllers.root.RootController.roles
+lpm.controllers.usuario.UsuarioController.roles
+lpm.model.administracion.Fase.roles
+lpm.model.administracion.Proyecto.roles
+lpm.model.administracion.TipoItem.roles
+lpm.model.auth.Permiso.roles" class="py-name" href="#" onclick="return doclink('link-125', 'roles', 'link-125');">roles</a></tt><tt class="py-op">:</tt> </tt>
+<a name="L115"></a><tt class="py-lineno">115</tt>  <tt class="py-line">                <tt class="py-name">tiene</tt> <tt class="py-op">=</tt> <tt class="py-name">False</tt> </tt>
+<a name="L116"></a><tt class="py-lineno">116</tt>  <tt class="py-line">                <tt class="py-keyword">for</tt> <tt class="py-name">p</tt> <tt class="py-keyword">in</tt> <tt class="py-name">r</tt><tt class="py-op">.</tt><tt id="link-126" class="py-name" targets="Variable lpm.controllers.validaciones.rol_validator.RolFormValidator.permisos=lpm.controllers.validaciones.rol_validator.RolFormValidator-class.html#permisos,Variable lpm.model.auth.Usuario.permisos=lpm.model.auth.Usuario-class.html#permisos"><a title="lpm.controllers.validaciones.rol_validator.RolFormValidator.permisos
+lpm.model.auth.Usuario.permisos" class="py-name" href="#" onclick="return doclink('link-126', 'permisos', 'link-126');">permisos</a></tt><tt class="py-op">:</tt> </tt>
+<a name="L117"></a><tt class="py-lineno">117</tt>  <tt class="py-line">                    <tt class="py-keyword">if</tt> <tt class="py-name">p</tt><tt class="py-op">.</tt><tt id="link-127" class="py-name"><a title="lpm.model.auth.Permiso.nombre_permiso" class="py-name" href="#" onclick="return doclink('link-127', 'nombre_permiso', 'link-97');">nombre_permiso</a></tt> <tt class="py-op">==</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-128" class="py-name"><a title="lpm.model.auth.Permiso.nombre_permiso" class="py-name" href="#" onclick="return doclink('link-128', 'nombre_permiso', 'link-97');">nombre_permiso</a></tt><tt class="py-op">:</tt> </tt>
+<a name="L118"></a><tt class="py-lineno">118</tt>  <tt class="py-line">                        <tt class="py-name">tiene</tt> <tt class="py-op">=</tt> <tt class="py-name">True</tt> </tt>
+<a name="L119"></a><tt class="py-lineno">119</tt>  <tt class="py-line">                         </tt>
+<a name="L120"></a><tt class="py-lineno">120</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-keyword">not</tt> <tt class="py-name">tiene</tt><tt class="py-op">:</tt>  </tt>
+<a name="L121"></a><tt class="py-lineno">121</tt>  <tt class="py-line">                    <tt class="py-keyword">continue</tt> </tt>
+<a name="L122"></a><tt class="py-lineno">122</tt>  <tt class="py-line">                 </tt>
+<a name="L123"></a><tt class="py-lineno">123</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">r</tt><tt class="py-op">.</tt><tt id="link-129" class="py-name" targets="Method lpm.model.auth.Rol.es_rol_sistema()=lpm.model.auth.Rol-class.html#es_rol_sistema"><a title="lpm.model.auth.Rol.es_rol_sistema" class="py-name" href="#" onclick="return doclink('link-129', 'es_rol_sistema', 'link-129');">es_rol_sistema</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L124"></a><tt class="py-lineno">124</tt>  <tt class="py-line">                    <tt class="py-keyword">return</tt> </tt>
+<a name="L125"></a><tt class="py-lineno">125</tt>  <tt class="py-line">                 </tt>
+<a name="L126"></a><tt class="py-lineno">126</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-130" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_proyecto
+lpm.controllers.rol.RolContextoEditForm.id_proyecto
+lpm.model.administracion.Fase.id_proyecto
+lpm.model.administracion.Proyecto.id_proyecto
+lpm.model.administracion.TipoItem.id_proyecto
+lpm.model.auth.Rol.id_proyecto" class="py-name" href="#" onclick="return doclink('link-130', 'id_proyecto', 'link-99');">id_proyecto</a></tt> <tt class="py-op">==</tt> <tt class="py-name">r</tt><tt class="py-op">.</tt><tt id="link-131" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_proyecto
+lpm.controllers.rol.RolContextoEditForm.id_proyecto
+lpm.model.administracion.Fase.id_proyecto
+lpm.model.administracion.Proyecto.id_proyecto
+lpm.model.administracion.TipoItem.id_proyecto
+lpm.model.auth.Rol.id_proyecto" class="py-name" href="#" onclick="return doclink('link-131', 'id_proyecto', 'link-99');">id_proyecto</a></tt><tt class="py-op">:</tt> </tt>
+<a name="L127"></a><tt class="py-lineno">127</tt>  <tt class="py-line">                    <tt class="py-keyword">if</tt> <tt class="py-name">r</tt><tt class="py-op">.</tt><tt id="link-132" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-132', 'tipo', 'link-8');">tipo</a></tt> <tt class="py-op">==</tt> <tt class="py-string">u"Proyecto"</tt><tt class="py-op">:</tt> </tt>
+<a name="L128"></a><tt class="py-lineno">128</tt>  <tt class="py-line">                        <tt class="py-keyword">return</tt> </tt>
+<a name="L129"></a><tt class="py-lineno">129</tt>  <tt class="py-line">                 </tt>
+<a name="L130"></a><tt class="py-lineno">130</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-133" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_fase
+lpm.controllers.rol.RolContextoEditForm.id_fase
+lpm.model.administracion.Fase.id_fase
+lpm.model.administracion.TipoItem.id_fase
+lpm.model.auth.Rol.id_fase
+lpm.model.desarrollo.Item.id_fase" class="py-name" href="#" onclick="return doclink('link-133', 'id_fase', 'link-100');">id_fase</a></tt> <tt class="py-op">==</tt> <tt class="py-name">r</tt><tt class="py-op">.</tt><tt id="link-134" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_fase
+lpm.controllers.rol.RolContextoEditForm.id_fase
+lpm.model.administracion.Fase.id_fase
+lpm.model.administracion.TipoItem.id_fase
+lpm.model.auth.Rol.id_fase
+lpm.model.desarrollo.Item.id_fase" class="py-name" href="#" onclick="return doclink('link-134', 'id_fase', 'link-100');">id_fase</a></tt><tt class="py-op">:</tt> </tt>
+<a name="L131"></a><tt class="py-lineno">131</tt>  <tt class="py-line">                    <tt class="py-keyword">if</tt> <tt class="py-name">r</tt><tt class="py-op">.</tt><tt id="link-135" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-135', 'tipo', 'link-8');">tipo</a></tt> <tt class="py-op">==</tt> <tt class="py-string">u"Fase"</tt><tt class="py-op">:</tt> </tt>
+<a name="L132"></a><tt class="py-lineno">132</tt>  <tt class="py-line">                        <tt class="py-keyword">return</tt> </tt>
+<a name="L133"></a><tt class="py-lineno">133</tt>  <tt class="py-line"> </tt>
+<a name="L134"></a><tt class="py-lineno">134</tt>  <tt class="py-line">                <tt class="py-name">ti</tt> <tt class="py-op">=</tt> <tt id="link-136" class="py-name"><a title="lpm.model.administracion.TipoItem" class="py-name" href="#" onclick="return doclink('link-136', 'TipoItem', 'link-4');">TipoItem</a></tt><tt class="py-op">.</tt><tt id="link-137" class="py-name"><a title="lpm.model.administracion.AtributosPorTipoItem.por_id
+lpm.model.administracion.Fase.por_id
+lpm.model.administracion.Proyecto.por_id
+lpm.model.administracion.TipoItem.por_id
+lpm.model.auth.Permiso.por_id
+lpm.model.auth.Rol.por_id
+lpm.model.auth.Usuario.por_id
+lpm.model.desarrollo.ArchivosExternos.por_id
+lpm.model.desarrollo.ArchivosPorItem.por_id
+lpm.model.desarrollo.AtributosPorItem.por_id
+lpm.model.desarrollo.HistorialItems.por_id
+lpm.model.desarrollo.Item.por_id
+lpm.model.desarrollo.PropiedadItem.por_id
+lpm.model.desarrollo.Relacion.por_id
+lpm.model.desarrollo.RelacionPorItem.por_id
+lpm.model.gestconf.LB.por_id" class="py-name" href="#" onclick="return doclink('link-137', 'por_id', 'link-105');">por_id</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-138" class="py-name"><a title="lpm.controllers.item.ItemAddForm.id_tipo_item
+lpm.controllers.rol.RolContextoAddForm.id_tipo_item
+lpm.controllers.rol.RolContextoEditForm.id_tipo_item
+lpm.model.administracion.AtributosPorTipoItem.id_tipo_item
+lpm.model.administracion.TipoItem.id_tipo_item
+lpm.model.auth.Rol.id_tipo_item
+lpm.model.desarrollo.Item.id_tipo_item" class="py-name" href="#" onclick="return doclink('link-138', 'id_tipo_item', 'link-101');">id_tipo_item</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L135"></a><tt class="py-lineno">135</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">ti</tt> <tt class="py-keyword">and</tt> <tt class="py-name">ti</tt><tt class="py-op">.</tt><tt id="link-139" class="py-name" targets="Method lpm.model.administracion.TipoItem.es_o_es_hijo()=lpm.model.administracion.TipoItem-class.html#es_o_es_hijo"><a title="lpm.model.administracion.TipoItem.es_o_es_hijo" class="py-name" href="#" onclick="return doclink('link-139', 'es_o_es_hijo', 'link-139');">es_o_es_hijo</a></tt><tt class="py-op">(</tt><tt class="py-name">r</tt><tt class="py-op">.</tt><tt id="link-140" class="py-name"><a title="lpm.controllers.item.ItemAddForm.id_tipo_item
+lpm.controllers.rol.RolContextoAddForm.id_tipo_item
+lpm.controllers.rol.RolContextoEditForm.id_tipo_item
+lpm.model.administracion.AtributosPorTipoItem.id_tipo_item
+lpm.model.administracion.TipoItem.id_tipo_item
+lpm.model.auth.Rol.id_tipo_item
+lpm.model.desarrollo.Item.id_tipo_item" class="py-name" href="#" onclick="return doclink('link-140', 'id_tipo_item', 'link-101');">id_tipo_item</a></tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L136"></a><tt class="py-lineno">136</tt>  <tt class="py-line">                    <tt class="py-keyword">return</tt> </tt>
+<a name="L137"></a><tt class="py-lineno">137</tt>  <tt class="py-line">                     </tt>
+<a name="L138"></a><tt class="py-lineno">138</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">unmet</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-141" class="py-name"><a title="lpm.lib.authorization.AlgunPermiso.message
+lpm.lib.authorization.PoseePermiso.message" class="py-name" href="#" onclick="return doclink('link-141', 'message', 'link-96');">message</a></tt> <tt class="py-op">%</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-142" class="py-name"><a title="lpm.model.auth.Permiso.nombre_permiso" class="py-name" href="#" onclick="return doclink('link-142', 'nombre_permiso', 'link-97');">nombre_permiso</a></tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L139"></a><tt class="py-lineno">139</tt>  <tt class="py-line">         </tt>
+<a name="AlgunPermiso"></a><div id="AlgunPermiso-def"><a name="L140"></a><tt class="py-lineno">140</tt> <a class="py-toggle" href="#" id="AlgunPermiso-toggle" onclick="return toggle('AlgunPermiso');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.lib.authorization.AlgunPermiso-class.html">AlgunPermiso</a><tt class="py-op">(</tt><tt class="py-base-class">Predicate</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="AlgunPermiso-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="AlgunPermiso-expanded"><a name="L141"></a><tt class="py-lineno">141</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L142"></a><tt class="py-lineno">142</tt>  <tt class="py-line"><tt class="py-docstring">    Evalua si el usuario tiene alg&#250;n permiso para un</tt> </tt>
+<a name="L143"></a><tt class="py-lineno">143</tt>  <tt class="py-line"><tt class="py-docstring">    contexto dado.</tt> </tt>
+<a name="L144"></a><tt class="py-lineno">144</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L145"></a><tt class="py-lineno">145</tt>  <tt class="py-line">    <tt id="link-143" class="py-name"><a title="lpm.lib.authorization.AlgunPermiso.message
+lpm.lib.authorization.PoseePermiso.message" class="py-name" href="#" onclick="return doclink('link-143', 'message', 'link-96');">message</a></tt> <tt class="py-op">=</tt> <tt class="py-string">u"No tiene algun permiso para dicho contexto"</tt> </tt>
+<a name="AlgunPermiso.__init__"></a><div id="AlgunPermiso.__init__-def"><a name="L146"></a><tt class="py-lineno">146</tt> <a class="py-toggle" href="#" id="AlgunPermiso.__init__-toggle" onclick="return toggle('AlgunPermiso.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.lib.authorization.AlgunPermiso-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">kw</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="AlgunPermiso.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="AlgunPermiso.__init__-expanded"><a name="L147"></a><tt class="py-lineno">147</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L148"></a><tt class="py-lineno">148</tt>  <tt class="py-line"><tt class="py-docstring">        M&#233;todo inicializador</tt> </tt>
+<a name="L149"></a><tt class="py-lineno">149</tt>  <tt class="py-line"><tt class="py-docstring">        </tt> </tt>
+<a name="L150"></a><tt class="py-lineno">150</tt>  <tt class="py-line"><tt class="py-docstring">        @param kw: Parametros para inicializar</tt> </tt>
+<a name="L151"></a><tt class="py-lineno">151</tt>  <tt class="py-line"><tt class="py-docstring">        @keyword tipo: El tipo de permiso (Rol, Usuario, Proyecto, Fase, Tipo &#205;tem).</tt> </tt>
+<a name="L152"></a><tt class="py-lineno">152</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L153"></a><tt class="py-lineno">153</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-144" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_proyecto
+lpm.controllers.rol.RolContextoEditForm.id_proyecto
+lpm.model.administracion.Fase.id_proyecto
+lpm.model.administracion.Proyecto.id_proyecto
+lpm.model.administracion.TipoItem.id_proyecto
+lpm.model.auth.Rol.id_proyecto" class="py-name" href="#" onclick="return doclink('link-144', 'id_proyecto', 'link-99');">id_proyecto</a></tt> <tt class="py-op">=</tt> <tt class="py-number">0</tt> </tt>
+<a name="L154"></a><tt class="py-lineno">154</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-145" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_fase
+lpm.controllers.rol.RolContextoEditForm.id_fase
+lpm.model.administracion.Fase.id_fase
+lpm.model.administracion.TipoItem.id_fase
+lpm.model.auth.Rol.id_fase
+lpm.model.desarrollo.Item.id_fase" class="py-name" href="#" onclick="return doclink('link-145', 'id_fase', 'link-100');">id_fase</a></tt> <tt class="py-op">=</tt> <tt class="py-number">0</tt> </tt>
+<a name="L155"></a><tt class="py-lineno">155</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-146" class="py-name"><a title="lpm.controllers.item.ItemAddForm.id_tipo_item
+lpm.controllers.rol.RolContextoAddForm.id_tipo_item
+lpm.controllers.rol.RolContextoEditForm.id_tipo_item
+lpm.model.administracion.AtributosPorTipoItem.id_tipo_item
+lpm.model.administracion.TipoItem.id_tipo_item
+lpm.model.auth.Rol.id_tipo_item
+lpm.model.desarrollo.Item.id_tipo_item" class="py-name" href="#" onclick="return doclink('link-146', 'id_tipo_item', 'link-101');">id_tipo_item</a></tt> <tt class="py-op">=</tt> <tt class="py-number">0</tt> </tt>
+<a name="L156"></a><tt class="py-lineno">156</tt>  <tt class="py-line">         </tt>
+<a name="L157"></a><tt class="py-lineno">157</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-147" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-147', 'tipo', 'link-8');">tipo</a></tt> <tt class="py-op">=</tt> <tt class="py-name">unicode</tt><tt class="py-op">(</tt><tt class="py-name">kw</tt><tt class="py-op">[</tt><tt class="py-string">"tipo"</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L158"></a><tt class="py-lineno">158</tt>  <tt class="py-line">        <tt class="py-keyword">del</tt> <tt class="py-name">kw</tt><tt class="py-op">[</tt><tt class="py-string">"tipo"</tt><tt class="py-op">]</tt> </tt>
+<a name="L159"></a><tt class="py-lineno">159</tt>  <tt class="py-line">         </tt>
+<a name="L160"></a><tt class="py-lineno">160</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-op">(</tt><tt class="py-keyword">not</tt> <tt class="py-name">kw</tt><tt class="py-op">.</tt><tt class="py-name">has_key</tt><tt class="py-op">(</tt><tt class="py-string">'id_proyecto'</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L161"></a><tt class="py-lineno">161</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-op">(</tt><tt class="py-name">kw</tt><tt class="py-op">.</tt><tt class="py-name">has_key</tt><tt class="py-op">(</tt><tt class="py-string">'id_fase'</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L162"></a><tt class="py-lineno">162</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-148" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_fase
+lpm.controllers.rol.RolContextoEditForm.id_fase
+lpm.model.administracion.Fase.id_fase
+lpm.model.administracion.TipoItem.id_fase
+lpm.model.auth.Rol.id_fase
+lpm.model.desarrollo.Item.id_fase" class="py-name" href="#" onclick="return doclink('link-148', 'id_fase', 'link-100');">id_fase</a></tt> <tt class="py-op">=</tt> <tt class="py-name">int</tt><tt class="py-op">(</tt><tt class="py-name">kw</tt><tt class="py-op">[</tt><tt class="py-string">'id_fase'</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L163"></a><tt class="py-lineno">163</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-149" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_proyecto
+lpm.controllers.rol.RolContextoEditForm.id_proyecto
+lpm.model.administracion.Fase.id_proyecto
+lpm.model.administracion.Proyecto.id_proyecto
+lpm.model.administracion.TipoItem.id_proyecto
+lpm.model.auth.Rol.id_proyecto" class="py-name" href="#" onclick="return doclink('link-149', 'id_proyecto', 'link-99');">id_proyecto</a></tt> <tt class="py-op">=</tt> <tt id="link-150" class="py-name"><a title="lpm.model.administracion.Fase" class="py-name" href="#" onclick="return doclink('link-150', 'Fase', 'link-3');">Fase</a></tt><tt class="py-op">.</tt><tt id="link-151" class="py-name"><a title="lpm.model.administracion.AtributosPorTipoItem.por_id
+lpm.model.administracion.Fase.por_id
+lpm.model.administracion.Proyecto.por_id
+lpm.model.administracion.TipoItem.por_id
+lpm.model.auth.Permiso.por_id
+lpm.model.auth.Rol.por_id
+lpm.model.auth.Usuario.por_id
+lpm.model.desarrollo.ArchivosExternos.por_id
+lpm.model.desarrollo.ArchivosPorItem.por_id
+lpm.model.desarrollo.AtributosPorItem.por_id
+lpm.model.desarrollo.HistorialItems.por_id
+lpm.model.desarrollo.Item.por_id
+lpm.model.desarrollo.PropiedadItem.por_id
+lpm.model.desarrollo.Relacion.por_id
+lpm.model.desarrollo.RelacionPorItem.por_id
+lpm.model.gestconf.LB.por_id" class="py-name" href="#" onclick="return doclink('link-151', 'por_id', 'link-105');">por_id</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-152" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_fase
+lpm.controllers.rol.RolContextoEditForm.id_fase
+lpm.model.administracion.Fase.id_fase
+lpm.model.administracion.TipoItem.id_fase
+lpm.model.auth.Rol.id_fase
+lpm.model.desarrollo.Item.id_fase" class="py-name" href="#" onclick="return doclink('link-152', 'id_fase', 'link-100');">id_fase</a></tt><tt class="py-op">)</tt><tt class="py-op">.</tt><tt id="link-153" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_proyecto
+lpm.controllers.rol.RolContextoEditForm.id_proyecto
+lpm.model.administracion.Fase.id_proyecto
+lpm.model.administracion.Proyecto.id_proyecto
+lpm.model.administracion.TipoItem.id_proyecto
+lpm.model.auth.Rol.id_proyecto" class="py-name" href="#" onclick="return doclink('link-153', 'id_proyecto', 'link-99');">id_proyecto</a></tt> </tt>
+<a name="L164"></a><tt class="py-lineno">164</tt>  <tt class="py-line">                <tt class="py-keyword">del</tt> <tt class="py-name">kw</tt><tt class="py-op">[</tt><tt class="py-string">'id_fase'</tt><tt class="py-op">]</tt> </tt>
+<a name="L165"></a><tt class="py-lineno">165</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-op">(</tt><tt class="py-name">kw</tt><tt class="py-op">.</tt><tt class="py-name">has_key</tt><tt class="py-op">(</tt><tt class="py-string">'id_tipo_item'</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L166"></a><tt class="py-lineno">166</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-154" class="py-name"><a title="lpm.controllers.item.ItemAddForm.id_tipo_item
+lpm.controllers.rol.RolContextoAddForm.id_tipo_item
+lpm.controllers.rol.RolContextoEditForm.id_tipo_item
+lpm.model.administracion.AtributosPorTipoItem.id_tipo_item
+lpm.model.administracion.TipoItem.id_tipo_item
+lpm.model.auth.Rol.id_tipo_item
+lpm.model.desarrollo.Item.id_tipo_item" class="py-name" href="#" onclick="return doclink('link-154', 'id_tipo_item', 'link-101');">id_tipo_item</a></tt> <tt class="py-op">=</tt> <tt class="py-name">int</tt><tt class="py-op">(</tt><tt class="py-name">kw</tt><tt class="py-op">[</tt><tt class="py-string">'id_tipo_item'</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L167"></a><tt class="py-lineno">167</tt>  <tt class="py-line">                <tt class="py-name">ti</tt> <tt class="py-op">=</tt> <tt id="link-155" class="py-name"><a title="lpm.model.administracion.TipoItem" class="py-name" href="#" onclick="return doclink('link-155', 'TipoItem', 'link-4');">TipoItem</a></tt><tt class="py-op">.</tt><tt id="link-156" class="py-name"><a title="lpm.model.administracion.AtributosPorTipoItem.por_id
+lpm.model.administracion.Fase.por_id
+lpm.model.administracion.Proyecto.por_id
+lpm.model.administracion.TipoItem.por_id
+lpm.model.auth.Permiso.por_id
+lpm.model.auth.Rol.por_id
+lpm.model.auth.Usuario.por_id
+lpm.model.desarrollo.ArchivosExternos.por_id
+lpm.model.desarrollo.ArchivosPorItem.por_id
+lpm.model.desarrollo.AtributosPorItem.por_id
+lpm.model.desarrollo.HistorialItems.por_id
+lpm.model.desarrollo.Item.por_id
+lpm.model.desarrollo.PropiedadItem.por_id
+lpm.model.desarrollo.Relacion.por_id
+lpm.model.desarrollo.RelacionPorItem.por_id
+lpm.model.gestconf.LB.por_id" class="py-name" href="#" onclick="return doclink('link-156', 'por_id', 'link-105');">por_id</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-157" class="py-name"><a title="lpm.controllers.item.ItemAddForm.id_tipo_item
+lpm.controllers.rol.RolContextoAddForm.id_tipo_item
+lpm.controllers.rol.RolContextoEditForm.id_tipo_item
+lpm.model.administracion.AtributosPorTipoItem.id_tipo_item
+lpm.model.administracion.TipoItem.id_tipo_item
+lpm.model.auth.Rol.id_tipo_item
+lpm.model.desarrollo.Item.id_tipo_item" class="py-name" href="#" onclick="return doclink('link-157', 'id_tipo_item', 'link-101');">id_tipo_item</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L168"></a><tt class="py-lineno">168</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-158" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_fase
+lpm.controllers.rol.RolContextoEditForm.id_fase
+lpm.model.administracion.Fase.id_fase
+lpm.model.administracion.TipoItem.id_fase
+lpm.model.auth.Rol.id_fase
+lpm.model.desarrollo.Item.id_fase" class="py-name" href="#" onclick="return doclink('link-158', 'id_fase', 'link-100');">id_fase</a></tt> <tt class="py-op">=</tt> <tt class="py-name">ti</tt><tt class="py-op">.</tt><tt id="link-159" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_fase
+lpm.controllers.rol.RolContextoEditForm.id_fase
+lpm.model.administracion.Fase.id_fase
+lpm.model.administracion.TipoItem.id_fase
+lpm.model.auth.Rol.id_fase
+lpm.model.desarrollo.Item.id_fase" class="py-name" href="#" onclick="return doclink('link-159', 'id_fase', 'link-100');">id_fase</a></tt> </tt>
+<a name="L169"></a><tt class="py-lineno">169</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-160" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_proyecto
+lpm.controllers.rol.RolContextoEditForm.id_proyecto
+lpm.model.administracion.Fase.id_proyecto
+lpm.model.administracion.Proyecto.id_proyecto
+lpm.model.administracion.TipoItem.id_proyecto
+lpm.model.auth.Rol.id_proyecto" class="py-name" href="#" onclick="return doclink('link-160', 'id_proyecto', 'link-99');">id_proyecto</a></tt> <tt class="py-op">=</tt> <tt class="py-name">ti</tt><tt class="py-op">.</tt><tt id="link-161" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_proyecto
+lpm.controllers.rol.RolContextoEditForm.id_proyecto
+lpm.model.administracion.Fase.id_proyecto
+lpm.model.administracion.Proyecto.id_proyecto
+lpm.model.administracion.TipoItem.id_proyecto
+lpm.model.auth.Rol.id_proyecto" class="py-name" href="#" onclick="return doclink('link-161', 'id_proyecto', 'link-99');">id_proyecto</a></tt> </tt>
+<a name="L170"></a><tt class="py-lineno">170</tt>  <tt class="py-line">                <tt class="py-keyword">del</tt> <tt class="py-name">kw</tt><tt class="py-op">[</tt><tt class="py-string">'id_tipo_item'</tt><tt class="py-op">]</tt> </tt>
+<a name="L171"></a><tt class="py-lineno">171</tt>  <tt class="py-line">        <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L172"></a><tt class="py-lineno">172</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-162" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_proyecto
+lpm.controllers.rol.RolContextoEditForm.id_proyecto
+lpm.model.administracion.Fase.id_proyecto
+lpm.model.administracion.Proyecto.id_proyecto
+lpm.model.administracion.TipoItem.id_proyecto
+lpm.model.auth.Rol.id_proyecto" class="py-name" href="#" onclick="return doclink('link-162', 'id_proyecto', 'link-99');">id_proyecto</a></tt> <tt class="py-op">=</tt> <tt class="py-name">int</tt><tt class="py-op">(</tt><tt class="py-name">kw</tt><tt class="py-op">[</tt><tt class="py-string">'id_proyecto'</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L173"></a><tt class="py-lineno">173</tt>  <tt class="py-line">            <tt class="py-keyword">del</tt> <tt class="py-name">kw</tt><tt class="py-op">[</tt><tt class="py-string">'id_proyecto'</tt><tt class="py-op">]</tt> </tt>
+<a name="L174"></a><tt class="py-lineno">174</tt>  <tt class="py-line">             </tt>
+<a name="L175"></a><tt class="py-lineno">175</tt>  <tt class="py-line">        <tt class="py-name">super</tt><tt class="py-op">(</tt><tt id="link-163" class="py-name" targets="Class lpm.lib.authorization.AlgunPermiso=lpm.lib.authorization.AlgunPermiso-class.html"><a title="lpm.lib.authorization.AlgunPermiso" class="py-name" href="#" onclick="return doclink('link-163', 'AlgunPermiso', 'link-163');">AlgunPermiso</a></tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">)</tt><tt class="py-op">.</tt><tt id="link-164" class="py-name"><a title="lpm.controllers.rol.RolPlantillaAddForm.__init__
+lpm.controllers.rol.RolPlantillaEditForm.__init__
+lpm.lib.app_globals.Globals.__init__
+lpm.lib.authorization.AlgunPermiso.__init__
+lpm.lib.authorization.PoseePermiso.__init__
+lpm.lib.mail.Gmail.__init__
+lpm.lib.sproxcustom.CustomPropertySingleSelectField.__init__
+lpm.model.administracion.AtributosPorTipoItem.__init__
+lpm.model.administracion.Fase.__init__
+lpm.model.administracion.Proyecto.__init__
+lpm.model.administracion.TipoItem.__init__
+lpm.model.auth.Permiso.__init__
+lpm.model.auth.Rol.__init__
+lpm.model.auth.Usuario.__init__
+lpm.model.desarrollo.ArchivosExternos.__init__
+lpm.model.desarrollo.ArchivosPorItem.__init__
+lpm.model.desarrollo.AtributosDeItems.__init__
+lpm.model.desarrollo.AtributosPorItem.__init__
+lpm.model.desarrollo.HiloContador.__init__
+lpm.model.desarrollo.HistorialItems.__init__
+lpm.model.desarrollo.Item.__init__
+lpm.model.desarrollo.PropiedadItem.__init__
+lpm.model.desarrollo.Relacion.__init__
+lpm.model.desarrollo.RelacionPorItem.__init__
+lpm.model.excepciones.CondicionAprobarError.__init__
+lpm.model.excepciones.ModificarItemError.__init__
+lpm.model.excepciones.RelacionError.__init__
+lpm.model.gestconf.HistorialLB.__init__
+lpm.model.gestconf.ItemsPorLB.__init__
+lpm.model.gestconf.LB.__init__" class="py-name" href="#" onclick="return doclink('link-164', '__init__', 'link-118');">__init__</a></tt><tt class="py-op">(</tt><tt class="py-op">**</tt><tt class="py-name">kw</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L176"></a><tt class="py-lineno">176</tt>  <tt class="py-line">     </tt>
+<a name="AlgunPermiso.evaluate"></a><div id="AlgunPermiso.evaluate-def"><a name="L177"></a><tt class="py-lineno">177</tt> <a class="py-toggle" href="#" id="AlgunPermiso.evaluate-toggle" onclick="return toggle('AlgunPermiso.evaluate');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.lib.authorization.AlgunPermiso-class.html#evaluate">evaluate</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">environ</tt><tt class="py-op">,</tt> <tt class="py-param">credentials</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="AlgunPermiso.evaluate-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="AlgunPermiso.evaluate-expanded"><a name="L178"></a><tt class="py-lineno">178</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">is_anonymous</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">.</tt><tt class="py-name">is_met</tt><tt class="py-op">(</tt><tt class="py-name">environ</tt><tt class="py-op">)</tt><tt class="py-op">:</tt>  </tt>
+<a name="L179"></a><tt class="py-lineno">179</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">unmet</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L180"></a><tt class="py-lineno">180</tt>  <tt class="py-line">        <tt id="link-165" class="py-name"><a title="lpm.controllers.historialitem.HistorialItemTableFiller.nombre_usuario
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre_usuario
+lpm.controllers.validaciones.usuario_validator.UsuarioEditFormValidator.nombre_usuario
+lpm.model.auth.Usuario.nombre_usuario" class="py-name" href="#" onclick="return doclink('link-165', 'nombre_usuario', 'link-119');">nombre_usuario</a></tt> <tt class="py-op">=</tt> <tt class="py-name">credentials</tt><tt class="py-op">[</tt><tt class="py-string">"repoze.what.userid"</tt><tt class="py-op">]</tt> </tt>
+<a name="L181"></a><tt class="py-lineno">181</tt>  <tt class="py-line">        <tt id="link-166" class="py-name"><a title="lpm.controllers.usuario
+lpm.model.desarrollo.HistorialItems.usuario
+lpm.model.gestconf.HistorialLB.usuario
+lpm.templates.usuario" class="py-name" href="#" onclick="return doclink('link-166', 'usuario', 'link-120');">usuario</a></tt> <tt class="py-op">=</tt> <tt id="link-167" class="py-name"><a title="lpm.model.auth.Usuario" class="py-name" href="#" onclick="return doclink('link-167', 'Usuario', 'link-2');">Usuario</a></tt><tt class="py-op">.</tt><tt id="link-168" class="py-name"><a title="lpm.model.auth.Usuario.by_user_name" class="py-name" href="#" onclick="return doclink('link-168', 'by_user_name', 'link-122');">by_user_name</a></tt><tt class="py-op">(</tt><tt id="link-169" class="py-name"><a title="lpm.controllers.historialitem.HistorialItemTableFiller.nombre_usuario
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre_usuario
+lpm.controllers.validaciones.usuario_validator.UsuarioEditFormValidator.nombre_usuario
+lpm.model.auth.Usuario.nombre_usuario" class="py-name" href="#" onclick="return doclink('link-169', 'nombre_usuario', 'link-119');">nombre_usuario</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L182"></a><tt class="py-lineno">182</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-name">r</tt> <tt class="py-keyword">in</tt> <tt id="link-170" class="py-name"><a title="lpm.controllers.usuario
+lpm.model.desarrollo.HistorialItems.usuario
+lpm.model.gestconf.HistorialLB.usuario
+lpm.templates.usuario" class="py-name" href="#" onclick="return doclink('link-170', 'usuario', 'link-120');">usuario</a></tt><tt class="py-op">.</tt><tt id="link-171" class="py-name"><a title="lpm.controllers.root.RootController.roles
+lpm.controllers.usuario.UsuarioController.roles
+lpm.model.administracion.Fase.roles
+lpm.model.administracion.Proyecto.roles
+lpm.model.administracion.TipoItem.roles
+lpm.model.auth.Permiso.roles" class="py-name" href="#" onclick="return doclink('link-171', 'roles', 'link-125');">roles</a></tt><tt class="py-op">:</tt> </tt>
+<a name="L183"></a><tt class="py-lineno">183</tt>  <tt class="py-line">            <tt class="py-name">algun</tt> <tt class="py-op">=</tt> <tt class="py-name">False</tt> </tt>
+<a name="L184"></a><tt class="py-lineno">184</tt>  <tt class="py-line">            <tt class="py-keyword">for</tt> <tt class="py-name">p</tt> <tt class="py-keyword">in</tt> <tt class="py-name">r</tt><tt class="py-op">.</tt><tt id="link-172" class="py-name"><a title="lpm.controllers.validaciones.rol_validator.RolFormValidator.permisos
+lpm.model.auth.Usuario.permisos" class="py-name" href="#" onclick="return doclink('link-172', 'permisos', 'link-126');">permisos</a></tt><tt class="py-op">:</tt> </tt>
+<a name="L185"></a><tt class="py-lineno">185</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">p</tt><tt class="py-op">.</tt><tt id="link-173" class="py-name"><a title="lpm.model.auth.Permiso.nombre_permiso" class="py-name" href="#" onclick="return doclink('link-173', 'nombre_permiso', 'link-97');">nombre_permiso</a></tt><tt class="py-op">.</tt><tt class="py-name">find</tt><tt class="py-op">(</tt><tt class="py-string">u"consultar"</tt><tt class="py-op">)</tt> <tt class="py-op">&lt;</tt> <tt class="py-number">0</tt> <tt class="py-keyword">and</tt> \ </tt>
+<a name="L186"></a><tt class="py-lineno">186</tt>  <tt class="py-line">                   <tt class="py-name">p</tt><tt class="py-op">.</tt><tt id="link-174" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-174', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">.</tt><tt class="py-name">find</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-175" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-175', 'tipo', 'link-8');">tipo</a></tt><tt class="py-op">)</tt> <tt class="py-op">&gt;=</tt> <tt class="py-number">0</tt><tt class="py-op">:</tt> </tt>
+<a name="L187"></a><tt class="py-lineno">187</tt>  <tt class="py-line">                    <tt class="py-name">algun</tt> <tt class="py-op">=</tt> <tt class="py-name">True</tt> </tt>
+<a name="L188"></a><tt class="py-lineno">188</tt>  <tt class="py-line">                    <tt class="py-keyword">break</tt> </tt>
+<a name="L189"></a><tt class="py-lineno">189</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-keyword">not</tt> <tt class="py-name">algun</tt><tt class="py-op">:</tt> </tt>
+<a name="L190"></a><tt class="py-lineno">190</tt>  <tt class="py-line">                <tt class="py-keyword">continue</tt> </tt>
+<a name="L191"></a><tt class="py-lineno">191</tt>  <tt class="py-line">             </tt>
+<a name="L192"></a><tt class="py-lineno">192</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-176" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_fase
+lpm.controllers.rol.RolContextoEditForm.id_fase
+lpm.model.administracion.Fase.id_fase
+lpm.model.administracion.TipoItem.id_fase
+lpm.model.auth.Rol.id_fase
+lpm.model.desarrollo.Item.id_fase" class="py-name" href="#" onclick="return doclink('link-176', 'id_fase', 'link-100');">id_fase</a></tt> <tt class="py-op">+</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-177" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_proyecto
+lpm.controllers.rol.RolContextoEditForm.id_proyecto
+lpm.model.administracion.Fase.id_proyecto
+lpm.model.administracion.Proyecto.id_proyecto
+lpm.model.administracion.TipoItem.id_proyecto
+lpm.model.auth.Rol.id_proyecto" class="py-name" href="#" onclick="return doclink('link-177', 'id_proyecto', 'link-99');">id_proyecto</a></tt> <tt class="py-op">+</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-178" class="py-name"><a title="lpm.controllers.item.ItemAddForm.id_tipo_item
+lpm.controllers.rol.RolContextoAddForm.id_tipo_item
+lpm.controllers.rol.RolContextoEditForm.id_tipo_item
+lpm.model.administracion.AtributosPorTipoItem.id_tipo_item
+lpm.model.administracion.TipoItem.id_tipo_item
+lpm.model.auth.Rol.id_tipo_item
+lpm.model.desarrollo.Item.id_tipo_item" class="py-name" href="#" onclick="return doclink('link-178', 'id_tipo_item', 'link-101');">id_tipo_item</a></tt> <tt class="py-op">==</tt> <tt class="py-number">0</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L193"></a><tt class="py-lineno">193</tt>  <tt class="py-line">                <tt class="py-keyword">return</tt> </tt>
+<a name="L194"></a><tt class="py-lineno">194</tt>  <tt class="py-line">             </tt>
+<a name="L195"></a><tt class="py-lineno">195</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-op">(</tt><tt class="py-name">r</tt><tt class="py-op">.</tt><tt id="link-179" class="py-name"><a title="lpm.model.auth.Rol.es_rol_sistema" class="py-name" href="#" onclick="return doclink('link-179', 'es_rol_sistema', 'link-129');">es_rol_sistema</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L196"></a><tt class="py-lineno">196</tt>  <tt class="py-line">                <tt class="py-keyword">return</tt> </tt>
+<a name="L197"></a><tt class="py-lineno">197</tt>  <tt class="py-line">             </tt>
+<a name="L198"></a><tt class="py-lineno">198</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-180" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_proyecto
+lpm.controllers.rol.RolContextoEditForm.id_proyecto
+lpm.model.administracion.Fase.id_proyecto
+lpm.model.administracion.Proyecto.id_proyecto
+lpm.model.administracion.TipoItem.id_proyecto
+lpm.model.auth.Rol.id_proyecto" class="py-name" href="#" onclick="return doclink('link-180', 'id_proyecto', 'link-99');">id_proyecto</a></tt> <tt class="py-op">==</tt> <tt class="py-name">r</tt><tt class="py-op">.</tt><tt id="link-181" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_proyecto
+lpm.controllers.rol.RolContextoEditForm.id_proyecto
+lpm.model.administracion.Fase.id_proyecto
+lpm.model.administracion.Proyecto.id_proyecto
+lpm.model.administracion.TipoItem.id_proyecto
+lpm.model.auth.Rol.id_proyecto" class="py-name" href="#" onclick="return doclink('link-181', 'id_proyecto', 'link-99');">id_proyecto</a></tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L199"></a><tt class="py-lineno">199</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-op">(</tt><tt class="py-name">r</tt><tt class="py-op">.</tt><tt id="link-182" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-182', 'tipo', 'link-8');">tipo</a></tt> <tt class="py-op">==</tt> <tt class="py-string">u"Proyecto"</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L200"></a><tt class="py-lineno">200</tt>  <tt class="py-line">                    <tt class="py-keyword">return</tt> </tt>
+<a name="L201"></a><tt class="py-lineno">201</tt>  <tt class="py-line">                 </tt>
+<a name="L202"></a><tt class="py-lineno">202</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-183" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_fase
+lpm.controllers.rol.RolContextoEditForm.id_fase
+lpm.model.administracion.Fase.id_fase
+lpm.model.administracion.TipoItem.id_fase
+lpm.model.auth.Rol.id_fase
+lpm.model.desarrollo.Item.id_fase" class="py-name" href="#" onclick="return doclink('link-183', 'id_fase', 'link-100');">id_fase</a></tt> <tt class="py-op">==</tt> <tt class="py-name">r</tt><tt class="py-op">.</tt><tt id="link-184" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_fase
+lpm.controllers.rol.RolContextoEditForm.id_fase
+lpm.model.administracion.Fase.id_fase
+lpm.model.administracion.TipoItem.id_fase
+lpm.model.auth.Rol.id_fase
+lpm.model.desarrollo.Item.id_fase" class="py-name" href="#" onclick="return doclink('link-184', 'id_fase', 'link-100');">id_fase</a></tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L203"></a><tt class="py-lineno">203</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-op">(</tt><tt class="py-name">r</tt><tt class="py-op">.</tt><tt id="link-185" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.tipo
+lpm.controllers.atributoitem.AtributoItemEditForm.tipo
+lpm.controllers.atributoitem.AtributoItemTableFiller.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemAddForm.tipo
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.tipo
+lpm.controllers.lineabase.ItemGenerarTableFiller.tipo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.tipo
+lpm.model.administracion.AtributosPorTipoItem.tipo
+lpm.model.auth.Permiso.tipo
+lpm.model.auth.Rol.tipo
+lpm.model.desarrollo.Relacion.tipo" class="py-name" href="#" onclick="return doclink('link-185', 'tipo', 'link-8');">tipo</a></tt> <tt class="py-op">==</tt> <tt class="py-string">u"Fase"</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L204"></a><tt class="py-lineno">204</tt>  <tt class="py-line">                    <tt class="py-keyword">return</tt> </tt>
+<a name="L205"></a><tt class="py-lineno">205</tt>  <tt class="py-line">                 </tt>
+<a name="L206"></a><tt class="py-lineno">206</tt>  <tt class="py-line">            <tt class="py-name">ti</tt> <tt class="py-op">=</tt> <tt id="link-186" class="py-name"><a title="lpm.model.administracion.TipoItem" class="py-name" href="#" onclick="return doclink('link-186', 'TipoItem', 'link-4');">TipoItem</a></tt><tt class="py-op">.</tt><tt id="link-187" class="py-name"><a title="lpm.model.administracion.AtributosPorTipoItem.por_id
+lpm.model.administracion.Fase.por_id
+lpm.model.administracion.Proyecto.por_id
+lpm.model.administracion.TipoItem.por_id
+lpm.model.auth.Permiso.por_id
+lpm.model.auth.Rol.por_id
+lpm.model.auth.Usuario.por_id
+lpm.model.desarrollo.ArchivosExternos.por_id
+lpm.model.desarrollo.ArchivosPorItem.por_id
+lpm.model.desarrollo.AtributosPorItem.por_id
+lpm.model.desarrollo.HistorialItems.por_id
+lpm.model.desarrollo.Item.por_id
+lpm.model.desarrollo.PropiedadItem.por_id
+lpm.model.desarrollo.Relacion.por_id
+lpm.model.desarrollo.RelacionPorItem.por_id
+lpm.model.gestconf.LB.por_id" class="py-name" href="#" onclick="return doclink('link-187', 'por_id', 'link-105');">por_id</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-188" class="py-name"><a title="lpm.controllers.item.ItemAddForm.id_tipo_item
+lpm.controllers.rol.RolContextoAddForm.id_tipo_item
+lpm.controllers.rol.RolContextoEditForm.id_tipo_item
+lpm.model.administracion.AtributosPorTipoItem.id_tipo_item
+lpm.model.administracion.TipoItem.id_tipo_item
+lpm.model.auth.Rol.id_tipo_item
+lpm.model.desarrollo.Item.id_tipo_item" class="py-name" href="#" onclick="return doclink('link-188', 'id_tipo_item', 'link-101');">id_tipo_item</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L207"></a><tt class="py-lineno">207</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-op">(</tt><tt class="py-name">ti</tt> <tt class="py-keyword">and</tt> <tt class="py-name">ti</tt><tt class="py-op">.</tt><tt id="link-189" class="py-name"><a title="lpm.model.administracion.TipoItem.es_o_es_hijo" class="py-name" href="#" onclick="return doclink('link-189', 'es_o_es_hijo', 'link-139');">es_o_es_hijo</a></tt><tt class="py-op">(</tt><tt class="py-name">r</tt><tt class="py-op">.</tt><tt id="link-190" class="py-name"><a title="lpm.controllers.item.ItemAddForm.id_tipo_item
+lpm.controllers.rol.RolContextoAddForm.id_tipo_item
+lpm.controllers.rol.RolContextoEditForm.id_tipo_item
+lpm.model.administracion.AtributosPorTipoItem.id_tipo_item
+lpm.model.administracion.TipoItem.id_tipo_item
+lpm.model.auth.Rol.id_tipo_item
+lpm.model.desarrollo.Item.id_tipo_item" class="py-name" href="#" onclick="return doclink('link-190', 'id_tipo_item', 'link-101');">id_tipo_item</a></tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L208"></a><tt class="py-lineno">208</tt>  <tt class="py-line">                <tt class="py-keyword">return</tt> </tt>
+<a name="L209"></a><tt class="py-lineno">209</tt>  <tt class="py-line">             </tt>
+<a name="L210"></a><tt class="py-lineno">210</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">unmet</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-191" class="py-name"><a title="lpm.lib.authorization.AlgunPermiso.message
+lpm.lib.authorization.PoseePermiso.message" class="py-name" href="#" onclick="return doclink('link-191', 'message', 'link-96');">message</a></tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L211"></a><tt class="py-lineno">211</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="lpm-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Sat Jun 25 12:33:41 2011
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

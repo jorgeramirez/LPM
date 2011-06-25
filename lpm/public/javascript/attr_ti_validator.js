@@ -3,13 +3,9 @@
  **/
 $(function(){
     var validator = function(tipo){
-        if(tipo == "Texto"){
-            $("input#valor_por_defecto").live('keyup', function(){
-                $(this).val($(this).val().replace(/[0-9]/g, ''));
-            });
-        }else if(tipo == "Fecha"){
+    if(tipo == "Fecha"){
             $("input#valor_por_defecto").datepicker({dateFormat: 'yy-mm-dd'});
-        }else{
+    }else if(tipo != 'Texto'){
             $("input#valor_por_defecto").live('keyup', function(){
                 $(this).val($(this).val().replace(/[^0-9]/g, ''));
             });

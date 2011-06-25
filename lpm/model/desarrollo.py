@@ -159,12 +159,18 @@ class Item(DeclarativeBase):
         """
         p_item = PropiedadItem.por_id(self.id_propiedad_item)
         fase = lpm.model.Fase.por_id(self.id_fase)
-        anteriores_count = DBSession.query(Relacion).filter_by( \
-            id_posterior=self.id_item).count()
+        anteriores_count = DBSession.query(Relacion).filter(and_( \
+           Relacion.id_posterior== self.id_item,
+           RelacionPorItem.id_propiedad_item==self.id_propiedad_item,
+           RelacionPorItem.id_relacion==Relacion.id_relacion,
+           Relacion.tipo==u'Antecesor-Sucesor', 
+           PropiedadItem.id_propiedad_item==self.id_propiedad_item,
+           PropiedadItem.estado==u'Bloqueado')).count()
         
-        if fase.posicion > 1 and anteriores_count == 0:
+        #anteriores = Relacion.relaciones_como_posterior(self.id_item)
+        if fase.posicion > 1 and anteriores_count== 0:
             raise CondicionAprobarError(u"El ítem debe tener al menos un antecesor o padre")
-                        
+        '''
         for rpi in p_item.relaciones:
             if rpi.relacion.id_anterior == self.id_item: 
                 continue
@@ -175,11 +181,12 @@ class Item(DeclarativeBase):
             if lb.estado != u"Cerrada":
                 raise CondicionAprobarError(u"Todos los antecesores y padres " + \
                                             "deben estar en una LB cerrada")
-        
+        '''
         if p_item.estado == u"Desaprobado":
-            for rpi in p_item.relaciones:
-                item_rel = rpi.relacion.obtener_otro_item(self.id_item)
-                item_rel.marcar_para_revisar(self.id_item)
+            self.marcar_para_revisar()
+            #for rpi in p_item.relaciones:
+              #  item_rel = rpi.relacion.obtener_otro_item(self.id_item)
+               # item_rel.marcar_para_revisar(self.id_item)
         
         p_item.estado = u"Aprobado"
         op = u"Aprobación"
@@ -281,9 +288,12 @@ class Item(DeclarativeBase):
         rev-desbloqueado
         @return: True si se marcó para revisión"""
         
-        p_item = PropieadadItem.por_id(self.id_propiedad_item)
+        p_item = PropiedadItem.por_id(self.id_propiedad_item)
         if (p_item.estado == u"Bloqueado"):
             p_item.estado = u"Revisión-Bloq"
+            lb = DBSession.query(lpm.model.LB).filter(and_(lpm.model.LB.id_lb == lpm.model.ItemsPorLB.id_lb,
+                    lpm.model.ItemsPorLB.id_item==p_item.id_propiedad_item)).first()
+            lb.estado = u"Para-Revisión"
             return True
         elif (p_item.estado == u"Aprobado"):
             p_item.estado = u"Revisión-Desbloq"
@@ -773,7 +783,7 @@ class PropiedadItem(DeclarativeBase):
                 i = int(i)
             else:
                 continue
-            print "i:", i
+
             
             antecesor = Item.por_id(i)
             p_item_ant = PropiedadItem.por_id(antecesor.id_propiedad_item)

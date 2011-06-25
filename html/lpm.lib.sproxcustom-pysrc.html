@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>lpm.lib.sproxcustom</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="lpm-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="lpm-module.html">Package&nbsp;lpm</a> ::
+        <a href="lpm.lib-module.html">Package&nbsp;lib</a> ::
+        Module&nbsp;sproxcustom
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="lpm.lib.sproxcustom-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="lpm.lib.sproxcustom-module.html">Module lpm.lib.sproxcustom</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno">  1</tt>  <tt class="py-line"><tt class="py-comment"># -*- coding: utf-8 -*-</tt> </tt>
+<a name="L2"></a><tt class="py-lineno">  2</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"><tt class="py-docstring">Modulo que contiene clases bases que guardan</tt> </tt>
+<a name="L4"></a><tt class="py-lineno">  4</tt>  <tt class="py-line"><tt class="py-docstring">relacion con el m&#243;dulo sprox</tt> </tt>
+<a name="L5"></a><tt class="py-lineno">  5</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L6"></a><tt class="py-lineno">  6</tt>  <tt class="py-line"><tt class="py-docstring">@authors:</tt> </tt>
+<a name="L7"></a><tt class="py-lineno">  7</tt>  <tt class="py-line"><tt class="py-docstring">    - U{Carlos Bellino&lt;mailto:carlosbellino@gmail.com&gt;}</tt> </tt>
+<a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line"><tt class="py-docstring">    - U{Nahuel Hern&#225;ndez&lt;mailto:nahuel.11990@gmail.com&gt;}</tt> </tt>
+<a name="L9"></a><tt class="py-lineno">  9</tt>  <tt class="py-line"><tt class="py-docstring">    - U{Jorge Ram&#237;rez&lt;mailto:jorgeramirez1990@gmail.com&gt;}</tt> </tt>
+<a name="L10"></a><tt class="py-lineno"> 10</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L11"></a><tt class="py-lineno"> 11</tt>  <tt class="py-line"><tt class="py-docstring">@since: 1.0</tt> </tt>
+<a name="L12"></a><tt class="py-lineno"> 12</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">tg</tt> <tt class="py-keyword">import</tt> <tt class="py-name">session</tt> </tt>
+<a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line"> </tt>
+<a name="L15"></a><tt class="py-lineno"> 15</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">sprox</tt><tt class="py-op">.</tt><tt class="py-name">fillerbase</tt> <tt class="py-keyword">import</tt> <tt class="py-name">TableFiller</tt> </tt>
+<a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">sprox</tt><tt class="py-op">.</tt><tt class="py-name">widgets</tt> <tt class="py-keyword">import</tt> <tt id="link-0" class="py-name" targets="Class sprox.widgets.widgets.PropertySingleSelectField=sprox.widgets.widgets.PropertySingleSelectField-class.html"><a title="sprox.widgets.widgets.PropertySingleSelectField" class="py-name" href="#" onclick="return doclink('link-0', 'PropertySingleSelectField', 'link-0');">PropertySingleSelectField</a></tt> </tt>
+<a name="L17"></a><tt class="py-lineno"> 17</tt>  <tt class="py-line"> </tt>
+<a name="L18"></a><tt class="py-lineno"> 18</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">tw</tt><tt class="py-op">.</tt><tt id="link-1" class="py-name" targets="Package lpm.templates.dojo=lpm.templates.dojo-module.html"><a title="lpm.templates.dojo" class="py-name" href="#" onclick="return doclink('link-1', 'dojo', 'link-1');">dojo</a></tt><tt class="py-op">.</tt><tt class="py-name">selectshuttle</tt> <tt class="py-keyword">import</tt> <tt class="py-name">DojoSelectShuttleField</tt> </tt>
+<a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">sprox</tt><tt class="py-op">.</tt><tt class="py-name">widgets</tt> <tt class="py-keyword">import</tt> <tt class="py-name">PropertyMixin</tt> </tt>
+<a name="L20"></a><tt class="py-lineno"> 20</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">sprox</tt><tt class="py-op">.</tt><tt class="py-name">widgetselector</tt> <tt class="py-keyword">import</tt> <tt id="link-2" class="py-name" targets="Class sprox.widgetselector.SAWidgetSelector=sprox.widgetselector.SAWidgetSelector-class.html"><a title="sprox.widgetselector.SAWidgetSelector" class="py-name" href="#" onclick="return doclink('link-2', 'SAWidgetSelector', 'link-2');">SAWidgetSelector</a></tt> </tt>
+<a name="L21"></a><tt class="py-lineno"> 21</tt>  <tt class="py-line"> </tt>
+<a name="L22"></a><tt class="py-lineno"> 22</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">sqlalchemy</tt> <tt class="py-keyword">import</tt> <tt class="py-name">and_</tt><tt class="py-op">,</tt> <tt class="py-name">between</tt> </tt>
+<a name="L23"></a><tt class="py-lineno"> 23</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">sqlalchemy</tt><tt class="py-op">.</tt><tt class="py-name">sql</tt> <tt class="py-keyword">import</tt> <tt class="py-name">func</tt> </tt>
+<a name="L24"></a><tt class="py-lineno"> 24</tt>  <tt class="py-line"> </tt>
+<a name="L25"></a><tt class="py-lineno"> 25</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt id="link-3" class="py-name" targets="Package lpm=lpm-module.html"><a title="lpm" class="py-name" href="#" onclick="return doclink('link-3', 'lpm', 'link-3');">lpm</a></tt><tt class="py-op">.</tt><tt id="link-4" class="py-name" targets="Variable lpm.controllers.proyecto.ProyectoController.model=lpm.controllers.proyecto.ProyectoController-class.html#model,Variable lpm.controllers.rol.RolPlantillaController.model=lpm.controllers.rol.RolPlantillaController-class.html#model,Variable lpm.controllers.usuario.UsuarioController.model=lpm.controllers.usuario.UsuarioController-class.html#model,Package lpm.model=lpm.model-module.html"><a title="lpm.controllers.proyecto.ProyectoController.model
+lpm.controllers.rol.RolPlantillaController.model
+lpm.controllers.usuario.UsuarioController.model
+lpm.model" class="py-name" href="#" onclick="return doclink('link-4', 'model', 'link-4');">model</a></tt> <tt class="py-keyword">import</tt> <tt id="link-5" class="py-name" targets="Variable lpm.model.DBSession=lpm.model-module.html#DBSession"><a title="lpm.model.DBSession" class="py-name" href="#" onclick="return doclink('link-5', 'DBSession', 'link-5');">DBSession</a></tt> </tt>
+<a name="L26"></a><tt class="py-lineno"> 26</tt>  <tt class="py-line"> </tt>
+<a name="L27"></a><tt class="py-lineno"> 27</tt>  <tt class="py-line"><tt class="py-name">__all__</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-string">'CustomTableFiller'</tt><tt class="py-op">]</tt> </tt>
+<a name="L28"></a><tt class="py-lineno"> 28</tt>  <tt class="py-line"> </tt>
+<a name="CustomTableFiller"></a><div id="CustomTableFiller-def"><a name="L29"></a><tt class="py-lineno"> 29</tt> <a class="py-toggle" href="#" id="CustomTableFiller-toggle" onclick="return toggle('CustomTableFiller');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.lib.sproxcustom.CustomTableFiller-class.html">CustomTableFiller</a><tt class="py-op">(</tt><tt class="py-base-class">TableFiller</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CustomTableFiller-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="CustomTableFiller-expanded"><a name="L30"></a><tt class="py-lineno"> 30</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L31"></a><tt class="py-lineno"> 31</tt>  <tt class="py-line"><tt class="py-docstring">    Clase base utilizada para rellenar una tabla.</tt> </tt>
+<a name="L32"></a><tt class="py-lineno"> 32</tt>  <tt class="py-line"><tt class="py-docstring">    A&#241;ade la capacidad de filtrado de elementos.</tt> </tt>
+<a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L34"></a><tt class="py-lineno"> 34</tt>  <tt class="py-line">    <tt id="link-6" class="py-name" targets="Variable lpm.lib.sproxcustom.CustomTableFiller.__filtros=lpm.lib.sproxcustom.CustomTableFiller-class.html#__filtros"><a title="lpm.lib.sproxcustom.CustomTableFiller.__filtros" class="py-name" href="#" onclick="return doclink('link-6', '__filtros', 'link-6');">__filtros</a></tt> <tt class="py-op">=</tt> <tt class="py-op">{</tt><tt class="py-op">}</tt> </tt>
+<a name="L35"></a><tt class="py-lineno"> 35</tt>  <tt class="py-line">    <tt id="link-7" class="py-name" targets="Variable lpm.lib.sproxcustom.CustomTableFiller.cualquiera=lpm.lib.sproxcustom.CustomTableFiller-class.html#cualquiera"><a title="lpm.lib.sproxcustom.CustomTableFiller.cualquiera" class="py-name" href="#" onclick="return doclink('link-7', 'cualquiera', 'link-7');">cualquiera</a></tt> <tt class="py-op">=</tt> <tt class="py-string">""</tt> </tt>
+<a name="L36"></a><tt class="py-lineno"> 36</tt>  <tt class="py-line">     </tt>
+<a name="CustomTableFiller.get_filtros"></a><div id="CustomTableFiller.get_filtros-def"><a name="L37"></a><tt class="py-lineno"> 37</tt> <a class="py-toggle" href="#" id="CustomTableFiller.get_filtros-toggle" onclick="return toggle('CustomTableFiller.get_filtros');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.lib.sproxcustom.CustomTableFiller-class.html#get_filtros">get_filtros</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CustomTableFiller.get_filtros-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="CustomTableFiller.get_filtros-expanded"><a name="L38"></a><tt class="py-lineno"> 38</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-8" class="py-name"><a title="lpm.lib.sproxcustom.CustomTableFiller.__filtros" class="py-name" href="#" onclick="return doclink('link-8', '__filtros', 'link-6');">__filtros</a></tt> </tt>
+</div><a name="L39"></a><tt class="py-lineno"> 39</tt>  <tt class="py-line">         </tt>
+<a name="CustomTableFiller.set_filtros"></a><div id="CustomTableFiller.set_filtros-def"><a name="L40"></a><tt class="py-lineno"> 40</tt> <a class="py-toggle" href="#" id="CustomTableFiller.set_filtros-toggle" onclick="return toggle('CustomTableFiller.set_filtros');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.lib.sproxcustom.CustomTableFiller-class.html#set_filtros">set_filtros</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">filtros</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CustomTableFiller.set_filtros-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="CustomTableFiller.set_filtros-expanded"><a name="L41"></a><tt class="py-lineno"> 41</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L42"></a><tt class="py-lineno"> 42</tt>  <tt class="py-line"><tt class="py-docstring">        Setea los filtros enviados por el formulario de busqueda.</tt> </tt>
+<a name="L43"></a><tt class="py-lineno"> 43</tt>  <tt class="py-line"><tt class="py-docstring">        Los mismos hay que parsearlos al formato apropiado</tt> </tt>
+<a name="L44"></a><tt class="py-lineno"> 44</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L45"></a><tt class="py-lineno"> 45</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-9" class="py-name"><a title="lpm.lib.sproxcustom.CustomTableFiller.__filtros" class="py-name" href="#" onclick="return doclink('link-9', '__filtros', 'link-6');">__filtros</a></tt> <tt class="py-op">=</tt> <tt class="py-op">{</tt><tt class="py-op">}</tt> </tt>
+<a name="L46"></a><tt class="py-lineno"> 46</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">buscar_enteros</tt> <tt class="py-op">=</tt> <tt class="py-name">True</tt> </tt>
+<a name="L47"></a><tt class="py-lineno"> 47</tt>  <tt class="py-line"> </tt>
+<a name="L48"></a><tt class="py-lineno"> 48</tt>  <tt class="py-line">        <tt class="py-comment">#contaminado c&#243;digo</tt> </tt>
+<a name="L49"></a><tt class="py-lineno"> 49</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-op">(</tt><tt id="link-10" class="py-name" targets="Variable lpm.lib.sproxcustom.CustomTableFiller.filtros=lpm.lib.sproxcustom.CustomTableFiller-class.html#filtros"><a title="lpm.lib.sproxcustom.CustomTableFiller.filtros" class="py-name" href="#" onclick="return doclink('link-10', 'filtros', 'link-10');">filtros</a></tt><tt class="py-op">.</tt><tt class="py-name">has_key</tt><tt class="py-op">(</tt><tt class="py-string">'cualquiera'</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L50"></a><tt class="py-lineno"> 50</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-11" class="py-name"><a title="lpm.lib.sproxcustom.CustomTableFiller.cualquiera" class="py-name" href="#" onclick="return doclink('link-11', 'cualquiera', 'link-7');">cualquiera</a></tt> <tt class="py-op">=</tt> <tt id="link-12" class="py-name"><a title="lpm.lib.sproxcustom.CustomTableFiller.filtros" class="py-name" href="#" onclick="return doclink('link-12', 'filtros', 'link-10');">filtros</a></tt><tt class="py-op">[</tt><tt class="py-string">'cualquiera'</tt><tt class="py-op">]</tt> </tt>
+<a name="L51"></a><tt class="py-lineno"> 51</tt>  <tt class="py-line">            <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L52"></a><tt class="py-lineno"> 52</tt>  <tt class="py-line">                <tt class="py-name">int</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-13" class="py-name"><a title="lpm.lib.sproxcustom.CustomTableFiller.cualquiera" class="py-name" href="#" onclick="return doclink('link-13', 'cualquiera', 'link-7');">cualquiera</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L53"></a><tt class="py-lineno"> 53</tt>  <tt class="py-line">            <tt class="py-keyword">except</tt><tt class="py-op">:</tt> </tt>
+<a name="L54"></a><tt class="py-lineno"> 54</tt>  <tt class="py-line">                <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">buscar_enteros</tt> <tt class="py-op">=</tt> <tt class="py-name">False</tt> </tt>
+<a name="L55"></a><tt class="py-lineno"> 55</tt>  <tt class="py-line">        <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L56"></a><tt class="py-lineno"> 56</tt>  <tt class="py-line">            <tt class="py-keyword">for</tt> <tt class="py-name">fil_col</tt><tt class="py-op">,</tt> <tt class="py-name">fil_val_list</tt> <tt class="py-keyword">in</tt> <tt id="link-14" class="py-name"><a title="lpm.lib.sproxcustom.CustomTableFiller.filtros" class="py-name" href="#" onclick="return doclink('link-14', 'filtros', 'link-10');">filtros</a></tt><tt class="py-op">.</tt><tt id="link-15" class="py-name" targets="Variable lpm.controllers.fase.FaseController.items=lpm.controllers.fase.FaseController-class.html#items,Variable lpm.controllers.root.RootController.items=lpm.controllers.root.RootController-class.html#items,Variable lpm.model.administracion.Fase.items=lpm.model.administracion.Fase-class.html#items,Variable lpm.model.administracion.TipoItem.items=lpm.model.administracion.TipoItem-class.html#items,Variable lpm.model.gestconf.LB.items=lpm.model.gestconf.LB-class.html#items"><a title="lpm.controllers.fase.FaseController.items
+lpm.controllers.root.RootController.items
+lpm.model.administracion.Fase.items
+lpm.model.administracion.TipoItem.items
+lpm.model.gestconf.LB.items" class="py-name" href="#" onclick="return doclink('link-15', 'items', 'link-15');">items</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L57"></a><tt class="py-lineno"> 57</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-op">(</tt><tt class="py-keyword">not</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">__entity__</tt><tt class="py-op">.</tt><tt id="link-16" class="py-name" targets="Variable lpm.model.administracion.AtributosPorTipoItem.__mapper__=lpm.model.administracion.AtributosPorTipoItem-class.html#__mapper__,Variable lpm.model.administracion.Fase.__mapper__=lpm.model.administracion.Fase-class.html#__mapper__,Variable lpm.model.administracion.Proyecto.__mapper__=lpm.model.administracion.Proyecto-class.html#__mapper__,Variable lpm.model.administracion.TipoItem.__mapper__=lpm.model.administracion.TipoItem-class.html#__mapper__,Variable lpm.model.auth.Permiso.__mapper__=lpm.model.auth.Permiso-class.html#__mapper__,Variable lpm.model.auth.Rol.__mapper__=lpm.model.auth.Rol-class.html#__mapper__,Variable lpm.model.auth.Usuario.__mapper__=lpm.model.auth.Usuario-class.html#__mapper__,Variable lpm.model.desarrollo.ArchivosExternos.__mapper__=lpm.model.desarrollo.ArchivosExternos-class.html#__mapper__,Variable lpm.model.desarrollo.ArchivosPorItem.__mapper__=lpm.model.desarrollo.ArchivosPorItem-class.html#__mapper__,Variable lpm.model.desarrollo.AtributosDeItems.__mapper__=lpm.model.desarrollo.AtributosDeItems-class.html#__mapper__,Variable lpm.model.desarrollo.AtributosPorItem.__mapper__=lpm.model.desarrollo.AtributosPorItem-class.html#__mapper__,Variable lpm.model.desarrollo.HistorialItems.__mapper__=lpm.model.desarrollo.HistorialItems-class.html#__mapper__,Variable lpm.model.desarrollo.Item.__mapper__=lpm.model.desarrollo.Item-class.html#__mapper__,Variable lpm.model.desarrollo.PropiedadItem.__mapper__=lpm.model.desarrollo.PropiedadItem-class.html#__mapper__,Variable lpm.model.desarrollo.Relacion.__mapper__=lpm.model.desarrollo.Relacion-class.html#__mapper__,Variable lpm.model.desarrollo.RelacionPorItem.__mapper__=lpm.model.desarrollo.RelacionPorItem-class.html#__mapper__,Variable lpm.model.gestconf.HistorialLB.__mapper__=lpm.model.gestconf.HistorialLB-class.html#__mapper__,Variable lpm.model.gestconf.ItemsPorLB.__mapper__=lpm.model.gestconf.ItemsPorLB-class.html#__mapper__,Variable lpm.model.gestconf.LB.__mapper__=lpm.model.gestconf.LB-class.html#__mapper__"><a title="lpm.model.administracion.AtributosPorTipoItem.__mapper__
+lpm.model.administracion.Fase.__mapper__
+lpm.model.administracion.Proyecto.__mapper__
+lpm.model.administracion.TipoItem.__mapper__
+lpm.model.auth.Permiso.__mapper__
+lpm.model.auth.Rol.__mapper__
+lpm.model.auth.Usuario.__mapper__
+lpm.model.desarrollo.ArchivosExternos.__mapper__
+lpm.model.desarrollo.ArchivosPorItem.__mapper__
+lpm.model.desarrollo.AtributosDeItems.__mapper__
+lpm.model.desarrollo.AtributosPorItem.__mapper__
+lpm.model.desarrollo.HistorialItems.__mapper__
+lpm.model.desarrollo.Item.__mapper__
+lpm.model.desarrollo.PropiedadItem.__mapper__
+lpm.model.desarrollo.Relacion.__mapper__
+lpm.model.desarrollo.RelacionPorItem.__mapper__
+lpm.model.gestconf.HistorialLB.__mapper__
+lpm.model.gestconf.ItemsPorLB.__mapper__
+lpm.model.gestconf.LB.__mapper__" class="py-name" href="#" onclick="return doclink('link-16', '__mapper__', 'link-16');">__mapper__</a></tt><tt class="py-op">.</tt><tt class="py-name">columns</tt><tt class="py-op">.</tt><tt class="py-name">has_key</tt><tt class="py-op">(</tt><tt class="py-name">fil_col</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L58"></a><tt class="py-lineno"> 58</tt>  <tt class="py-line">                    <tt class="py-keyword">continue</tt> </tt>
+<a name="L59"></a><tt class="py-lineno"> 59</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-op">(</tt><tt class="py-name">type</tt><tt class="py-op">(</tt><tt id="link-17" class="py-name"><a title="lpm.lib.sproxcustom.CustomTableFiller.filtros" class="py-name" href="#" onclick="return doclink('link-17', 'filtros', 'link-10');">filtros</a></tt><tt class="py-op">[</tt><tt class="py-name">fil_col</tt><tt class="py-op">]</tt><tt class="py-op">)</tt><tt class="py-op">.</tt><tt class="py-name">__name__</tt> <tt class="py-op">==</tt> <tt class="py-string">'list'</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L60"></a><tt class="py-lineno"> 60</tt>  <tt class="py-line">                    <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-18" class="py-name"><a title="lpm.lib.sproxcustom.CustomTableFiller.__filtros" class="py-name" href="#" onclick="return doclink('link-18', '__filtros', 'link-6');">__filtros</a></tt><tt class="py-op">[</tt><tt class="py-name">fil_col</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">fil_val_list</tt> </tt>
+<a name="L61"></a><tt class="py-lineno"> 61</tt>  <tt class="py-line">                <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L62"></a><tt class="py-lineno"> 62</tt>  <tt class="py-line">                    <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-19" class="py-name"><a title="lpm.lib.sproxcustom.CustomTableFiller.__filtros" class="py-name" href="#" onclick="return doclink('link-19', '__filtros', 'link-6');">__filtros</a></tt><tt class="py-op">[</tt><tt class="py-name">fil_col</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-name">fil_val_list</tt><tt class="py-op">]</tt> </tt>
+</div><a name="L63"></a><tt class="py-lineno"> 63</tt>  <tt class="py-line"> </tt>
+<a name="L64"></a><tt class="py-lineno"> 64</tt>  <tt class="py-line">    <tt id="link-20" class="py-name"><a title="lpm.lib.sproxcustom.CustomTableFiller.filtros" class="py-name" href="#" onclick="return doclink('link-20', 'filtros', 'link-10');">filtros</a></tt> <tt class="py-op">=</tt> <tt class="py-name">property</tt><tt class="py-op">(</tt><tt id="link-21" class="py-name" targets="Method lpm.lib.sproxcustom.CustomTableFiller.get_filtros()=lpm.lib.sproxcustom.CustomTableFiller-class.html#get_filtros"><a title="lpm.lib.sproxcustom.CustomTableFiller.get_filtros" class="py-name" href="#" onclick="return doclink('link-21', 'get_filtros', 'link-21');">get_filtros</a></tt><tt class="py-op">,</tt> <tt id="link-22" class="py-name" targets="Method lpm.lib.sproxcustom.CustomTableFiller.set_filtros()=lpm.lib.sproxcustom.CustomTableFiller-class.html#set_filtros"><a title="lpm.lib.sproxcustom.CustomTableFiller.set_filtros" class="py-name" href="#" onclick="return doclink('link-22', 'set_filtros', 'link-22');">set_filtros</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L65"></a><tt class="py-lineno"> 65</tt>  <tt class="py-line">     </tt>
+<a name="CustomTableFiller._do_get_provider_count_and_objs"></a><div id="CustomTableFiller._do_get_provider_count_and_objs-def"><a name="L66"></a><tt class="py-lineno"> 66</tt> <a class="py-toggle" href="#" id="CustomTableFiller._do_get_provider_count_and_objs-toggle" onclick="return toggle('CustomTableFiller._do_get_provider_count_and_objs');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.lib.sproxcustom.CustomTableFiller-class.html#_do_get_provider_count_and_objs">_do_get_provider_count_and_objs</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">order</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">kw</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-comment">#sobreescribimos el m&#233;todo</tt> </tt>
+</div><a name="L67"></a><tt class="py-lineno"> 67</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L68"></a><tt class="py-lineno"> 68</tt>  <tt class="py-line"><tt class="py-docstring">        Este m&#233;todo define como la consulta a la base de</tt> </tt>
+<a name="L69"></a><tt class="py-lineno"> 69</tt>  <tt class="py-line"><tt class="py-docstring">        datos se debe realizar.</tt> </tt>
+<a name="L70"></a><tt class="py-lineno"> 70</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L71"></a><tt class="py-lineno"> 71</tt>  <tt class="py-line">        <tt class="py-name">filtrados</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-op">]</tt> </tt>
+<a name="L72"></a><tt class="py-lineno"> 72</tt>  <tt class="py-line">        <tt class="py-name">query</tt> <tt class="py-op">=</tt> <tt id="link-23" class="py-name"><a title="lpm.model.DBSession" class="py-name" href="#" onclick="return doclink('link-23', 'DBSession', 'link-5');">DBSession</a></tt><tt class="py-op">.</tt><tt class="py-name">query</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">__entity__</tt><tt class="py-op">)</tt> </tt>
+<a name="L73"></a><tt class="py-lineno"> 73</tt>  <tt class="py-line">        <tt class="py-name">mapper</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">__entity__</tt><tt class="py-op">.</tt><tt id="link-24" class="py-name"><a title="lpm.model.administracion.AtributosPorTipoItem.__mapper__
+lpm.model.administracion.Fase.__mapper__
+lpm.model.administracion.Proyecto.__mapper__
+lpm.model.administracion.TipoItem.__mapper__
+lpm.model.auth.Permiso.__mapper__
+lpm.model.auth.Rol.__mapper__
+lpm.model.auth.Usuario.__mapper__
+lpm.model.desarrollo.ArchivosExternos.__mapper__
+lpm.model.desarrollo.ArchivosPorItem.__mapper__
+lpm.model.desarrollo.AtributosDeItems.__mapper__
+lpm.model.desarrollo.AtributosPorItem.__mapper__
+lpm.model.desarrollo.HistorialItems.__mapper__
+lpm.model.desarrollo.Item.__mapper__
+lpm.model.desarrollo.PropiedadItem.__mapper__
+lpm.model.desarrollo.Relacion.__mapper__
+lpm.model.desarrollo.RelacionPorItem.__mapper__
+lpm.model.gestconf.HistorialLB.__mapper__
+lpm.model.gestconf.ItemsPorLB.__mapper__
+lpm.model.gestconf.LB.__mapper__" class="py-name" href="#" onclick="return doclink('link-24', '__mapper__', 'link-16');">__mapper__</a></tt> </tt>
+<a name="L74"></a><tt class="py-lineno"> 74</tt>  <tt class="py-line">        <tt class="py-name">res</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-op">]</tt> </tt>
+<a name="L75"></a><tt class="py-lineno"> 75</tt>  <tt class="py-line">         </tt>
+<a name="L76"></a><tt class="py-lineno"> 76</tt>  <tt class="py-line"><tt class="py-comment"># p = " "</tt> </tt>
+<a name="L77"></a><tt class="py-lineno"> 77</tt>  <tt class="py-line"> </tt>
+<a name="L78"></a><tt class="py-lineno"> 78</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-keyword">not</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-25" class="py-name"><a title="lpm.lib.sproxcustom.CustomTableFiller.filtros" class="py-name" href="#" onclick="return doclink('link-25', 'filtros', 'link-10');">filtros</a></tt><tt class="py-op">:</tt> </tt>
+<a name="L79"></a><tt class="py-lineno"> 79</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-26" class="py-name"><a title="lpm.lib.sproxcustom.CustomTableFiller.cualquiera" class="py-name" href="#" onclick="return doclink('link-26', 'cualquiera', 'link-7');">cualquiera</a></tt> <tt class="py-op">==</tt> <tt class="py-string">""</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L80"></a><tt class="py-lineno"> 80</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-op">(</tt><tt class="py-name">order</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L81"></a><tt class="py-lineno"> 81</tt>  <tt class="py-line">                    <tt class="py-keyword">return</tt> <tt class="py-name">query</tt><tt class="py-op">.</tt><tt class="py-name">count</tt><tt class="py-op">,</tt> <tt class="py-name">query</tt><tt class="py-op">.</tt><tt class="py-name">order_by</tt><tt class="py-op">(</tt><tt class="py-name">order</tt><tt class="py-op">)</tt><tt class="py-op">.</tt><tt class="py-name">all</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L82"></a><tt class="py-lineno"> 82</tt>  <tt class="py-line">                <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L83"></a><tt class="py-lineno"> 83</tt>  <tt class="py-line">                    <tt class="py-keyword">return</tt> <tt class="py-name">query</tt><tt class="py-op">.</tt><tt class="py-name">count</tt><tt class="py-op">,</tt> <tt class="py-name">query</tt><tt class="py-op">.</tt><tt class="py-name">all</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L84"></a><tt class="py-lineno"> 84</tt>  <tt class="py-line">             </tt>
+<a name="L85"></a><tt class="py-lineno"> 85</tt>  <tt class="py-line">            <tt class="py-comment">#contaminando c&#243;digo</tt> </tt>
+<a name="L86"></a><tt class="py-lineno"> 86</tt>  <tt class="py-line">            <tt class="py-keyword">for</tt> <tt class="py-name">key</tt> <tt class="py-keyword">in</tt> <tt class="py-name">mapper</tt><tt class="py-op">.</tt><tt class="py-name">columns</tt><tt class="py-op">.</tt><tt class="py-name">keys</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L87"></a><tt class="py-lineno"> 87</tt>  <tt class="py-line">                <tt class="py-name">column</tt> <tt class="py-op">=</tt> <tt class="py-name">mapper</tt><tt class="py-op">.</tt><tt class="py-name">columns</tt><tt class="py-op">.</tt><tt class="py-name">get</tt><tt class="py-op">(</tt><tt class="py-name">key</tt><tt class="py-op">)</tt> </tt>
+<a name="L88"></a><tt class="py-lineno"> 88</tt>  <tt class="py-line">                  </tt>
+<a name="L89"></a><tt class="py-lineno"> 89</tt>  <tt class="py-line"><tt class="py-comment"># p = p + "/" + str(column) + ":" + column.type.__visit_name__</tt> </tt>
+<a name="L90"></a><tt class="py-lineno"> 90</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-name">column</tt><tt class="py-op">.</tt><tt class="py-name">type</tt><tt class="py-op">.</tt><tt class="py-name">__visit_name__</tt> <tt class="py-op">==</tt> <tt class="py-string">'unicode'</tt><tt class="py-op">:</tt> </tt>
+<a name="L91"></a><tt class="py-lineno"> 91</tt>  <tt class="py-line"> </tt>
+<a name="L92"></a><tt class="py-lineno"> 92</tt>  <tt class="py-line">                    <tt class="py-name">res</tt><tt class="py-op">.</tt><tt class="py-name">extend</tt><tt class="py-op">(</tt><tt class="py-name">query</tt><tt class="py-op">.</tt><tt class="py-name">filter</tt><tt class="py-op">(</tt><tt class="py-name">column</tt><tt class="py-op">.</tt><tt class="py-name">ilike</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-27" class="py-name"><a title="lpm.lib.sproxcustom.CustomTableFiller.cualquiera" class="py-name" href="#" onclick="return doclink('link-27', 'cualquiera', 'link-7');">cualquiera</a></tt> <tt class="py-op">+</tt> <tt class="py-string">"%"</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">.</tt><tt class="py-name">all</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L93"></a><tt class="py-lineno"> 93</tt>  <tt class="py-line"><tt class="py-comment">#                    query = query.filter(column.ilike(self.cualquiera + "%"))</tt> </tt>
+<a name="L94"></a><tt class="py-lineno"> 94</tt>  <tt class="py-line">                <tt class="py-keyword">elif</tt> <tt class="py-op">(</tt><tt class="py-name">column</tt><tt class="py-op">.</tt><tt class="py-name">type</tt><tt class="py-op">.</tt><tt class="py-name">__visit_name__</tt> <tt class="py-op">==</tt> <tt class="py-string">'integer'</tt> <tt class="py-keyword">and</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">buscar_enteros</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L95"></a><tt class="py-lineno"> 95</tt>  <tt class="py-line">                    <tt class="py-name">entero</tt> <tt class="py-op">=</tt> <tt class="py-name">int</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-28" class="py-name"><a title="lpm.lib.sproxcustom.CustomTableFiller.cualquiera" class="py-name" href="#" onclick="return doclink('link-28', 'cualquiera', 'link-7');">cualquiera</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L96"></a><tt class="py-lineno"> 96</tt>  <tt class="py-line">                    <tt class="py-name">res</tt><tt class="py-op">.</tt><tt class="py-name">extend</tt><tt class="py-op">(</tt><tt class="py-name">query</tt><tt class="py-op">.</tt><tt class="py-name">filter</tt><tt class="py-op">(</tt><tt class="py-name">column</tt><tt class="py-op">.</tt><tt class="py-name">in_</tt><tt class="py-op">(</tt><tt class="py-op">[</tt><tt class="py-name">entero</tt><tt class="py-op">]</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">.</tt><tt class="py-name">all</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L97"></a><tt class="py-lineno"> 97</tt>  <tt class="py-line"><tt class="py-comment">#                    query = query.filter(column.in_([entero]))</tt> </tt>
+<a name="L98"></a><tt class="py-lineno"> 98</tt>  <tt class="py-line">                     </tt>
+<a name="L99"></a><tt class="py-lineno"> 99</tt>  <tt class="py-line">                <tt class="py-name">filtrados</tt><tt class="py-op">.</tt><tt class="py-name">extend</tt><tt class="py-op">(</tt><tt class="py-name">res</tt><tt class="py-op">)</tt> </tt>
+<a name="L100"></a><tt class="py-lineno">100</tt>  <tt class="py-line"><tt class="py-comment"># session["print"] = p</tt> </tt>
+<a name="L101"></a><tt class="py-lineno">101</tt>  <tt class="py-line"><tt class="py-comment"># session.save()</tt> </tt>
+<a name="L102"></a><tt class="py-lineno">102</tt>  <tt class="py-line">            <tt class="py-name">filtrados</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-29" class="py-name" targets="Method lpm.lib.sproxcustom.CustomTableFiller.__remover_duplicados()=lpm.lib.sproxcustom.CustomTableFiller-class.html#__remover_duplicados"><a title="lpm.lib.sproxcustom.CustomTableFiller.__remover_duplicados" class="py-name" href="#" onclick="return doclink('link-29', '__remover_duplicados', 'link-29');">__remover_duplicados</a></tt><tt class="py-op">(</tt><tt class="py-name">filtrados</tt><tt class="py-op">)</tt> </tt>
+<a name="L103"></a><tt class="py-lineno">103</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-name">len</tt><tt class="py-op">(</tt><tt class="py-name">filtrados</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">filtrados</tt> </tt>
+<a name="L104"></a><tt class="py-lineno">104</tt>  <tt class="py-line"><tt class="py-comment"># p = ""</tt> </tt>
+<a name="L105"></a><tt class="py-lineno">105</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-name">fil_col</tt><tt class="py-op">,</tt> <tt class="py-name">fil_val_list</tt> <tt class="py-keyword">in</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-30" class="py-name"><a title="lpm.lib.sproxcustom.CustomTableFiller.filtros" class="py-name" href="#" onclick="return doclink('link-30', 'filtros', 'link-10');">filtros</a></tt><tt class="py-op">.</tt><tt id="link-31" class="py-name"><a title="lpm.controllers.fase.FaseController.items
+lpm.controllers.root.RootController.items
+lpm.model.administracion.Fase.items
+lpm.model.administracion.TipoItem.items
+lpm.model.gestconf.LB.items" class="py-name" href="#" onclick="return doclink('link-31', 'items', 'link-15');">items</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-comment">#filtrado OR</tt> </tt>
+<a name="L106"></a><tt class="py-lineno">106</tt>  <tt class="py-line">            <tt class="py-name">col</tt> <tt class="py-op">=</tt> <tt class="py-name">mapper</tt><tt class="py-op">.</tt><tt class="py-name">columns</tt><tt class="py-op">.</tt><tt class="py-name">get</tt><tt class="py-op">(</tt><tt class="py-name">fil_col</tt><tt class="py-op">)</tt> </tt>
+<a name="L107"></a><tt class="py-lineno">107</tt>  <tt class="py-line">            <tt class="py-name">col_type</tt> <tt class="py-op">=</tt> <tt class="py-name">col</tt><tt class="py-op">.</tt><tt class="py-name">type</tt><tt class="py-op">.</tt><tt class="py-name">__visit_name__</tt> </tt>
+<a name="L108"></a><tt class="py-lineno">108</tt>  <tt class="py-line">             </tt>
+<a name="L109"></a><tt class="py-lineno">109</tt>  <tt class="py-line"><tt class="py-comment"># p = p + "/" + str(col) + ":" + col_type</tt> </tt>
+<a name="L110"></a><tt class="py-lineno">110</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">col_type</tt> <tt class="py-op">==</tt> <tt class="py-string">'integer'</tt><tt class="py-op">:</tt> </tt>
+<a name="L111"></a><tt class="py-lineno">111</tt>  <tt class="py-line">                <tt class="py-name">lista</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-op">]</tt> </tt>
+<a name="L112"></a><tt class="py-lineno">112</tt>  <tt class="py-line">                <tt class="py-keyword">for</tt> <tt id="link-32" class="py-name" targets="Variable lpm.controllers.rol.RolPlantillaController.i=lpm.controllers.rol.RolPlantillaController-class.html#i"><a title="lpm.controllers.rol.RolPlantillaController.i" class="py-name" href="#" onclick="return doclink('link-32', 'i', 'link-32');">i</a></tt><tt class="py-op">,</tt> <tt class="py-name">fvl</tt> <tt class="py-keyword">in</tt> <tt class="py-name">enumerate</tt><tt class="py-op">(</tt><tt class="py-name">fil_val_list</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L113"></a><tt class="py-lineno">113</tt>  <tt class="py-line">                    <tt class="py-keyword">try</tt><tt class="py-op">:</tt> </tt>
+<a name="L114"></a><tt class="py-lineno">114</tt>  <tt class="py-line">                        <tt class="py-name">lista</tt><tt class="py-op">.</tt><tt class="py-name">append</tt><tt class="py-op">(</tt><tt class="py-name">int</tt><tt class="py-op">(</tt><tt class="py-name">fvl</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L115"></a><tt class="py-lineno">115</tt>  <tt class="py-line">                    <tt class="py-keyword">except</tt><tt class="py-op">:</tt> </tt>
+<a name="L116"></a><tt class="py-lineno">116</tt>  <tt class="py-line">                        <tt class="py-keyword">continue</tt> </tt>
+<a name="L117"></a><tt class="py-lineno">117</tt>  <tt class="py-line">                <tt class="py-name">res</tt> <tt class="py-op">=</tt> <tt class="py-name">query</tt><tt class="py-op">.</tt><tt class="py-name">filter</tt><tt class="py-op">(</tt><tt class="py-name">col</tt><tt class="py-op">.</tt><tt class="py-name">in_</tt><tt class="py-op">(</tt><tt class="py-name">lista</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">.</tt><tt class="py-name">all</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L118"></a><tt class="py-lineno">118</tt>  <tt class="py-line">            <tt class="py-keyword">elif</tt> <tt class="py-name">col_type</tt> <tt class="py-op">==</tt> <tt class="py-string">'unicode'</tt><tt class="py-op">:</tt> </tt>
+<a name="L119"></a><tt class="py-lineno">119</tt>  <tt class="py-line">                <tt class="py-keyword">for</tt> <tt class="py-name">fvl</tt> <tt class="py-keyword">in</tt> <tt class="py-name">fil_val_list</tt><tt class="py-op">:</tt> </tt>
+<a name="L120"></a><tt class="py-lineno">120</tt>  <tt class="py-line">                    <tt class="py-name">res</tt><tt class="py-op">.</tt><tt class="py-name">extend</tt><tt class="py-op">(</tt><tt class="py-name">query</tt><tt class="py-op">.</tt><tt class="py-name">filter</tt><tt class="py-op">(</tt><tt class="py-name">col</tt><tt class="py-op">.</tt><tt class="py-name">ilike</tt><tt class="py-op">(</tt><tt class="py-name">fvl</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">.</tt><tt class="py-name">all</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L121"></a><tt class="py-lineno">121</tt>  <tt class="py-line">            <tt class="py-keyword">elif</tt> <tt class="py-name">col_type</tt> <tt class="py-op">==</tt> <tt class="py-string">'datetime'</tt><tt class="py-op">:</tt> </tt>
+<a name="L122"></a><tt class="py-lineno">122</tt>  <tt class="py-line">                <tt class="py-keyword">for</tt> <tt id="link-33" class="py-name"><a title="lpm.controllers.rol.RolPlantillaController.i" class="py-name" href="#" onclick="return doclink('link-33', 'i', 'link-32');">i</a></tt> <tt class="py-keyword">in</tt> <tt class="py-name">range</tt><tt class="py-op">(</tt><tt class="py-number">0</tt><tt class="py-op">,</tt> <tt class="py-name">len</tt><tt class="py-op">(</tt><tt class="py-name">fil_val_list</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-number">2</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L123"></a><tt class="py-lineno">123</tt>  <tt class="py-line">                    <tt class="py-name">date0</tt> <tt class="py-op">=</tt> <tt class="py-name">fil_val_list</tt><tt class="py-op">[</tt><tt id="link-34" class="py-name"><a title="lpm.controllers.rol.RolPlantillaController.i" class="py-name" href="#" onclick="return doclink('link-34', 'i', 'link-32');">i</a></tt><tt class="py-op">]</tt> </tt>
+<a name="L124"></a><tt class="py-lineno">124</tt>  <tt class="py-line">                    <tt class="py-name">date1</tt> <tt class="py-op">=</tt> <tt class="py-name">fil_val_list</tt><tt class="py-op">[</tt><tt id="link-35" class="py-name"><a title="lpm.controllers.rol.RolPlantillaController.i" class="py-name" href="#" onclick="return doclink('link-35', 'i', 'link-32');">i</a></tt> <tt class="py-op">+</tt> <tt class="py-number">1</tt><tt class="py-op">]</tt> </tt>
+<a name="L125"></a><tt class="py-lineno">125</tt>  <tt class="py-line">                    <tt class="py-keyword">if</tt> <tt class="py-op">(</tt><tt class="py-name">date0</tt> <tt class="py-op">==</tt> <tt class="py-string">''</tt> <tt class="py-keyword">or</tt> <tt class="py-name">date1</tt> <tt class="py-op">==</tt> <tt class="py-string">''</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L126"></a><tt class="py-lineno">126</tt>  <tt class="py-line">                        <tt class="py-keyword">continue</tt> </tt>
+<a name="L127"></a><tt class="py-lineno">127</tt>  <tt class="py-line">                    <tt class="py-name">res</tt><tt class="py-op">.</tt><tt class="py-name">extend</tt><tt class="py-op">(</tt><tt class="py-name">query</tt><tt class="py-op">.</tt><tt class="py-name">filter</tt><tt class="py-op">(</tt><tt class="py-name">col</tt><tt class="py-op">.</tt><tt class="py-name">between</tt><tt class="py-op">(</tt><tt class="py-name">date0</tt><tt class="py-op">,</tt> <tt class="py-name">date1</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L128"></a><tt class="py-lineno">128</tt>  <tt class="py-line">                            </tt>
+<a name="L129"></a><tt class="py-lineno">129</tt>  <tt class="py-line">            <tt class="py-name">filtrados</tt><tt class="py-op">.</tt><tt class="py-name">extend</tt><tt class="py-op">(</tt><tt class="py-name">res</tt><tt class="py-op">)</tt> </tt>
+<a name="L130"></a><tt class="py-lineno">130</tt>  <tt class="py-line"><tt class="py-comment"># session["print"] = p</tt> </tt>
+<a name="L131"></a><tt class="py-lineno">131</tt>  <tt class="py-line"><tt class="py-comment"># session.save()</tt> </tt>
+<a name="L132"></a><tt class="py-lineno">132</tt>  <tt class="py-line">        <tt class="py-name">filtrados</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-36" class="py-name"><a title="lpm.lib.sproxcustom.CustomTableFiller.__remover_duplicados" class="py-name" href="#" onclick="return doclink('link-36', '__remover_duplicados', 'link-29');">__remover_duplicados</a></tt><tt class="py-op">(</tt><tt class="py-name">filtrados</tt><tt class="py-op">)</tt> </tt>
+<a name="L133"></a><tt class="py-lineno">133</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">len</tt><tt class="py-op">(</tt><tt class="py-name">filtrados</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">filtrados</tt> </tt>
+</div><a name="L134"></a><tt class="py-lineno">134</tt>  <tt class="py-line"> </tt>
+<a name="CustomTableFiller.__remover_duplicados"></a><div id="CustomTableFiller.__remover_duplicados-def"><a name="L135"></a><tt class="py-lineno">135</tt> <a class="py-toggle" href="#" id="CustomTableFiller.__remover_duplicados-toggle" onclick="return toggle('CustomTableFiller.__remover_duplicados');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.lib.sproxcustom.CustomTableFiller-class.html#__remover_duplicados">__remover_duplicados</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">l</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CustomTableFiller.__remover_duplicados-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="CustomTableFiller.__remover_duplicados-expanded"><a name="L136"></a><tt class="py-lineno">136</tt>  <tt class="py-line">        <tt class="py-name">l2</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-op">]</tt> </tt>
+<a name="L137"></a><tt class="py-lineno">137</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt id="link-37" class="py-name"><a title="lpm.controllers.rol.RolPlantillaController.i" class="py-name" href="#" onclick="return doclink('link-37', 'i', 'link-32');">i</a></tt> <tt class="py-keyword">in</tt> <tt class="py-name">l</tt><tt class="py-op">:</tt> </tt>
+<a name="L138"></a><tt class="py-lineno">138</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt id="link-38" class="py-name"><a title="lpm.controllers.rol.RolPlantillaController.i" class="py-name" href="#" onclick="return doclink('link-38', 'i', 'link-32');">i</a></tt> <tt class="py-keyword">not</tt> <tt class="py-keyword">in</tt> <tt class="py-name">l2</tt><tt class="py-op">:</tt> </tt>
+<a name="L139"></a><tt class="py-lineno">139</tt>  <tt class="py-line">                <tt class="py-name">l2</tt><tt class="py-op">.</tt><tt class="py-name">append</tt><tt class="py-op">(</tt><tt id="link-39" class="py-name"><a title="lpm.controllers.rol.RolPlantillaController.i" class="py-name" href="#" onclick="return doclink('link-39', 'i', 'link-32');">i</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L140"></a><tt class="py-lineno">140</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">l2</tt> </tt>
+</div></div><a name="L141"></a><tt class="py-lineno">141</tt>  <tt class="py-line"> </tt>
+<a name="L142"></a><tt class="py-lineno">142</tt>  <tt class="py-line"> </tt>
+<a name="CustomPropertySingleSelectField"></a><div id="CustomPropertySingleSelectField-def"><a name="L143"></a><tt class="py-lineno">143</tt> <a class="py-toggle" href="#" id="CustomPropertySingleSelectField-toggle" onclick="return toggle('CustomPropertySingleSelectField');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.lib.sproxcustom.CustomPropertySingleSelectField-class.html">CustomPropertySingleSelectField</a><tt class="py-op">(</tt><tt class="py-base-class">PropertySingleSelectField</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CustomPropertySingleSelectField-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="CustomPropertySingleSelectField-expanded"><a name="L144"></a><tt class="py-lineno">144</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L145"></a><tt class="py-lineno">145</tt>  <tt class="py-line"><tt class="py-docstring">    Clase que proporciona un combobox. La misma extiende de </tt> </tt>
+<a name="L146"></a><tt class="py-lineno">146</tt>  <tt class="py-line"><tt class="py-docstring">    L{PropertySingleSelectField} y agrega el campo accion</tt> </tt>
+<a name="L147"></a><tt class="py-lineno">147</tt>  <tt class="py-line"><tt class="py-docstring">    utilizado para controlar el metodo _my_update_params.</tt> </tt>
+<a name="L148"></a><tt class="py-lineno">148</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L149"></a><tt class="py-lineno">149</tt>  <tt class="py-line">    <tt id="link-40" class="py-name" targets="Variable lpm.lib.sproxcustom.CustomPropertySingleSelectField.accion=lpm.lib.sproxcustom.CustomPropertySingleSelectField-class.html#accion"><a title="lpm.lib.sproxcustom.CustomPropertySingleSelectField.accion" class="py-name" href="#" onclick="return doclink('link-40', 'accion', 'link-40');">accion</a></tt> <tt class="py-op">=</tt> <tt class="py-name">None</tt> </tt>
+<a name="L150"></a><tt class="py-lineno">150</tt>  <tt class="py-line">     </tt>
+<a name="CustomPropertySingleSelectField.__init__"></a><div id="CustomPropertySingleSelectField.__init__-def"><a name="L151"></a><tt class="py-lineno">151</tt> <a class="py-toggle" href="#" id="CustomPropertySingleSelectField.__init__-toggle" onclick="return toggle('CustomPropertySingleSelectField.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.lib.sproxcustom.CustomPropertySingleSelectField-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">id</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-param">parent</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-param">children</tt><tt class="py-op">=</tt><tt class="py-op">[</tt><tt class="py-op">]</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">kw</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CustomPropertySingleSelectField.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="CustomPropertySingleSelectField.__init__-expanded"><a name="L152"></a><tt class="py-lineno">152</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-string">"accion"</tt> <tt class="py-keyword">in</tt> <tt class="py-name">kw</tt><tt class="py-op">:</tt> </tt>
+<a name="L153"></a><tt class="py-lineno">153</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-41" class="py-name"><a title="lpm.lib.sproxcustom.CustomPropertySingleSelectField.accion" class="py-name" href="#" onclick="return doclink('link-41', 'accion', 'link-40');">accion</a></tt> <tt class="py-op">=</tt> <tt class="py-name">kw</tt><tt class="py-op">[</tt><tt class="py-string">"accion"</tt><tt class="py-op">]</tt> </tt>
+<a name="L154"></a><tt class="py-lineno">154</tt>  <tt class="py-line">            <tt class="py-keyword">del</tt> <tt class="py-name">kw</tt><tt class="py-op">[</tt><tt class="py-string">"accion"</tt><tt class="py-op">]</tt> </tt>
+<a name="L155"></a><tt class="py-lineno">155</tt>  <tt class="py-line">        <tt class="py-name">super</tt><tt class="py-op">(</tt><tt id="link-42" class="py-name" targets="Class lpm.lib.sproxcustom.CustomPropertySingleSelectField=lpm.lib.sproxcustom.CustomPropertySingleSelectField-class.html"><a title="lpm.lib.sproxcustom.CustomPropertySingleSelectField" class="py-name" href="#" onclick="return doclink('link-42', 'CustomPropertySingleSelectField', 'link-42');">CustomPropertySingleSelectField</a></tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">)</tt><tt class="py-op">.</tt><tt id="link-43" class="py-name" targets="Method lpm.controllers.rol.RolPlantillaAddForm.__init__()=lpm.controllers.rol.RolPlantillaAddForm-class.html#__init__,Method lpm.controllers.rol.RolPlantillaEditForm.__init__()=lpm.controllers.rol.RolPlantillaEditForm-class.html#__init__,Method lpm.lib.app_globals.Globals.__init__()=lpm.lib.app_globals.Globals-class.html#__init__,Method lpm.lib.authorization.AlgunPermiso.__init__()=lpm.lib.authorization.AlgunPermiso-class.html#__init__,Method lpm.lib.authorization.PoseePermiso.__init__()=lpm.lib.authorization.PoseePermiso-class.html#__init__,Method lpm.lib.mail.Gmail.__init__()=lpm.lib.mail.Gmail-class.html#__init__,Method lpm.lib.sproxcustom.CustomPropertySingleSelectField.__init__()=lpm.lib.sproxcustom.CustomPropertySingleSelectField-class.html#__init__,Method lpm.model.administracion.AtributosPorTipoItem.__init__()=lpm.model.administracion.AtributosPorTipoItem-class.html#__init__,Method lpm.model.administracion.Fase.__init__()=lpm.model.administracion.Fase-class.html#__init__,Method lpm.model.administracion.Proyecto.__init__()=lpm.model.administracion.Proyecto-class.html#__init__,Method lpm.model.administracion.TipoItem.__init__()=lpm.model.administracion.TipoItem-class.html#__init__,Method lpm.model.auth.Permiso.__init__()=lpm.model.auth.Permiso-class.html#__init__,Method lpm.model.auth.Rol.__init__()=lpm.model.auth.Rol-class.html#__init__,Method lpm.model.auth.Usuario.__init__()=lpm.model.auth.Usuario-class.html#__init__,Method lpm.model.desarrollo.ArchivosExternos.__init__()=lpm.model.desarrollo.ArchivosExternos-class.html#__init__,Method lpm.model.desarrollo.ArchivosPorItem.__init__()=lpm.model.desarrollo.ArchivosPorItem-class.html#__init__,Method lpm.model.desarrollo.AtributosDeItems.__init__()=lpm.model.desarrollo.AtributosDeItems-class.html#__init__,Method lpm.model.desarrollo.AtributosPorItem.__init__()=lpm.model.desarrollo.AtributosPorItem-class.html#__init__,Method lpm.model.desarrollo.HiloContador.__init__()=lpm.model.desarrollo.HiloContador-class.html#__init__,Method lpm.model.desarrollo.HistorialItems.__init__()=lpm.model.desarrollo.HistorialItems-class.html#__init__,Method lpm.model.desarrollo.Item.__init__()=lpm.model.desarrollo.Item-class.html#__init__,Method lpm.model.desarrollo.PropiedadItem.__init__()=lpm.model.desarrollo.PropiedadItem-class.html#__init__,Method lpm.model.desarrollo.Relacion.__init__()=lpm.model.desarrollo.Relacion-class.html#__init__,Method lpm.model.desarrollo.RelacionPorItem.__init__()=lpm.model.desarrollo.RelacionPorItem-class.html#__init__,Method lpm.model.excepciones.CondicionAprobarError.__init__()=lpm.model.excepciones.CondicionAprobarError-class.html#__init__,Method lpm.model.excepciones.ModificarItemError.__init__()=lpm.model.excepciones.ModificarItemError-class.html#__init__,Method lpm.model.excepciones.RelacionError.__init__()=lpm.model.excepciones.RelacionError-class.html#__init__,Method lpm.model.gestconf.HistorialLB.__init__()=lpm.model.gestconf.HistorialLB-class.html#__init__,Method lpm.model.gestconf.ItemsPorLB.__init__()=lpm.model.gestconf.ItemsPorLB-class.html#__init__,Method lpm.model.gestconf.LB.__init__()=lpm.model.gestconf.LB-class.html#__init__"><a title="lpm.controllers.rol.RolPlantillaAddForm.__init__
+lpm.controllers.rol.RolPlantillaEditForm.__init__
+lpm.lib.app_globals.Globals.__init__
+lpm.lib.authorization.AlgunPermiso.__init__
+lpm.lib.authorization.PoseePermiso.__init__
+lpm.lib.mail.Gmail.__init__
+lpm.lib.sproxcustom.CustomPropertySingleSelectField.__init__
+lpm.model.administracion.AtributosPorTipoItem.__init__
+lpm.model.administracion.Fase.__init__
+lpm.model.administracion.Proyecto.__init__
+lpm.model.administracion.TipoItem.__init__
+lpm.model.auth.Permiso.__init__
+lpm.model.auth.Rol.__init__
+lpm.model.auth.Usuario.__init__
+lpm.model.desarrollo.ArchivosExternos.__init__
+lpm.model.desarrollo.ArchivosPorItem.__init__
+lpm.model.desarrollo.AtributosDeItems.__init__
+lpm.model.desarrollo.AtributosPorItem.__init__
+lpm.model.desarrollo.HiloContador.__init__
+lpm.model.desarrollo.HistorialItems.__init__
+lpm.model.desarrollo.Item.__init__
+lpm.model.desarrollo.PropiedadItem.__init__
+lpm.model.desarrollo.Relacion.__init__
+lpm.model.desarrollo.RelacionPorItem.__init__
+lpm.model.excepciones.CondicionAprobarError.__init__
+lpm.model.excepciones.ModificarItemError.__init__
+lpm.model.excepciones.RelacionError.__init__
+lpm.model.gestconf.HistorialLB.__init__
+lpm.model.gestconf.ItemsPorLB.__init__
+lpm.model.gestconf.LB.__init__" class="py-name" href="#" onclick="return doclink('link-43', '__init__', 'link-43');">__init__</a></tt><tt class="py-op">(</tt><tt class="py-name">id</tt><tt class="py-op">,</tt> <tt class="py-name">parent</tt><tt class="py-op">,</tt>  </tt>
+<a name="L156"></a><tt class="py-lineno">156</tt>  <tt class="py-line">                                                              <tt class="py-name">children</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-name">kw</tt><tt class="py-op">)</tt> </tt>
+</div><a name="CustomPropertySingleSelectField._my_update_params"></a><div id="CustomPropertySingleSelectField._my_update_params-def"><a name="L157"></a><tt class="py-lineno">157</tt> <a class="py-toggle" href="#" id="CustomPropertySingleSelectField._my_update_params-toggle" onclick="return toggle('CustomPropertySingleSelectField._my_update_params');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.lib.sproxcustom.CustomPropertySingleSelectField-class.html#_my_update_params">_my_update_params</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">d</tt><tt class="py-op">,</tt> <tt class="py-param">nullable</tt><tt class="py-op">=</tt><tt class="py-name">False</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CustomPropertySingleSelectField._my_update_params-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="CustomPropertySingleSelectField._my_update_params-expanded"><a name="L158"></a><tt class="py-lineno">158</tt>  <tt class="py-line">        <tt class="py-docstring">"""Metodo utilizado para cargar el combobox"""</tt> </tt>
+<a name="L159"></a><tt class="py-lineno">159</tt>  <tt class="py-line">        <tt class="py-comment">#debe sobreescribirse.</tt> </tt>
+<a name="L160"></a><tt class="py-lineno">160</tt>  <tt class="py-line">        <tt class="py-keyword">pass</tt> </tt>
+</div></div><a name="L161"></a><tt class="py-lineno">161</tt>  <tt class="py-line"> </tt>
+<a name="MultipleSelectDojo"></a><div id="MultipleSelectDojo-def"><a name="L162"></a><tt class="py-lineno">162</tt> <a class="py-toggle" href="#" id="MultipleSelectDojo-toggle" onclick="return toggle('MultipleSelectDojo');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.lib.sproxcustom.MultipleSelectDojo-class.html">MultipleSelectDojo</a><tt class="py-op">(</tt><tt class="py-base-class">DojoSelectShuttleField</tt><tt class="py-op">,</tt> <tt class="py-base-class">PropertyMixin</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="MultipleSelectDojo-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="MultipleSelectDojo-expanded"><a name="L163"></a><tt class="py-lineno">163</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L164"></a><tt class="py-lineno">164</tt>  <tt class="py-line"><tt class="py-docstring">    Clase que proporciona un widget para selecci&#243;n multiple. </tt> </tt>
+<a name="L165"></a><tt class="py-lineno">165</tt>  <tt class="py-line"><tt class="py-docstring">    La misma extiende de </tt> </tt>
+<a name="L166"></a><tt class="py-lineno">166</tt>  <tt class="py-line"><tt class="py-docstring">    L{DojoSelectShuttleField} y L{PropertyMixin} y cambia el template</tt> </tt>
+<a name="L167"></a><tt class="py-lineno">167</tt>  <tt class="py-line"><tt class="py-docstring">    utilizado por defecto que no est&#225; muy trabajado.</tt> </tt>
+<a name="L168"></a><tt class="py-lineno">168</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L169"></a><tt class="py-lineno">169</tt>  <tt class="py-line">    <tt id="link-44" class="py-name" targets="Module lpm.controllers.template=lpm.controllers.template-module.html,Variable lpm.lib.sproxcustom.MultipleSelectDojo.template=lpm.lib.sproxcustom.MultipleSelectDojo-class.html#template,Variable sprox.widgets.widgets.SproxDataGrid.template=sprox.widgets.widgets.SproxDataGrid-class.html#template,Variable tw.forms.fields.TableForm.template=tw.forms.fields.TableForm-class.html#template,Variable tw.forms.fields.TextArea.template=tw.forms.fields.TextArea-class.html#template"><a title="lpm.controllers.template
+lpm.lib.sproxcustom.MultipleSelectDojo.template
+sprox.widgets.widgets.SproxDataGrid.template
+tw.forms.fields.TableForm.template
+tw.forms.fields.TextArea.template" class="py-name" href="#" onclick="return doclink('link-44', 'template', 'link-44');">template</a></tt> <tt class="py-op">=</tt> <tt class="py-string">'lpm.templates.dojo.selectshuttle'</tt> </tt>
+<a name="L170"></a><tt class="py-lineno">170</tt>  <tt class="py-line">    <tt id="link-45" class="py-name" targets="Variable lpm.lib.sproxcustom.MultipleSelectDojo.css=lpm.lib.sproxcustom.MultipleSelectDojo-class.html#css"><a title="lpm.lib.sproxcustom.MultipleSelectDojo.css" class="py-name" href="#" onclick="return doclink('link-45', 'css', 'link-45');">css</a></tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-op">]</tt> </tt>
+<a name="L171"></a><tt class="py-lineno">171</tt>  <tt class="py-line">    <tt id="link-46" class="py-name" targets="Variable lpm.lib.sproxcustom.MultipleSelectDojo.params=lpm.lib.sproxcustom.MultipleSelectDojo-class.html#params,Variable sprox.widgets.dojo.SproxDojoSelectShuttleField.params=sprox.widgets.dojo.SproxDojoSelectShuttleField-class.html#params,Variable sprox.widgets.widgets.PropertyMultipleSelectField.params=sprox.widgets.widgets.PropertyMultipleSelectField-class.html#params,Variable sprox.widgets.widgets.PropertySingleSelectField.params=sprox.widgets.widgets.PropertySingleSelectField-class.html#params,Variable sprox.widgets.widgets.SproxDataGrid.params=sprox.widgets.widgets.SproxDataGrid-class.html#params,Variable tw.forms.fields.TableForm.params=tw.forms.fields.TableForm-class.html#params,Variable tw.forms.fields.TextArea.params=tw.forms.fields.TextArea-class.html#params"><a title="lpm.lib.sproxcustom.MultipleSelectDojo.params
+sprox.widgets.dojo.SproxDojoSelectShuttleField.params
+sprox.widgets.widgets.PropertyMultipleSelectField.params
+sprox.widgets.widgets.PropertySingleSelectField.params
+sprox.widgets.widgets.SproxDataGrid.params
+tw.forms.fields.TableForm.params
+tw.forms.fields.TextArea.params" class="py-name" href="#" onclick="return doclink('link-46', 'params', 'link-46');">params</a></tt> <tt class="py-op">=</tt> <tt class="py-op">{</tt><tt class="py-op">}</tt> </tt>
+<a name="MultipleSelectDojo.update_params"></a><div id="MultipleSelectDojo.update_params-def"><a name="L172"></a><tt class="py-lineno">172</tt> <a class="py-toggle" href="#" id="MultipleSelectDojo.update_params-toggle" onclick="return toggle('MultipleSelectDojo.update_params');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.lib.sproxcustom.MultipleSelectDojo-class.html#update_params">update_params</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">d</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="MultipleSelectDojo.update_params-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="MultipleSelectDojo.update_params-expanded"><a name="L173"></a><tt class="py-lineno">173</tt>  <tt class="py-line">        <tt class="py-comment">#en este orden no se pierden los selected_options</tt> </tt>
+<a name="L174"></a><tt class="py-lineno">174</tt>  <tt class="py-line">        <tt class="py-name">super</tt><tt class="py-op">(</tt><tt id="link-47" class="py-name" targets="Class lpm.lib.sproxcustom.MultipleSelectDojo=lpm.lib.sproxcustom.MultipleSelectDojo-class.html"><a title="lpm.lib.sproxcustom.MultipleSelectDojo" class="py-name" href="#" onclick="return doclink('link-47', 'MultipleSelectDojo', 'link-47');">MultipleSelectDojo</a></tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">)</tt><tt class="py-op">.</tt><tt id="link-48" class="py-name" targets="Method lpm.lib.sproxcustom.MultipleSelectDojo.update_params()=lpm.lib.sproxcustom.MultipleSelectDojo-class.html#update_params"><a title="lpm.lib.sproxcustom.MultipleSelectDojo.update_params" class="py-name" href="#" onclick="return doclink('link-48', 'update_params', 'link-48');">update_params</a></tt><tt class="py-op">(</tt><tt class="py-name">d</tt><tt class="py-op">)</tt> </tt>
+<a name="L175"></a><tt class="py-lineno">175</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-49" class="py-name" targets="Method lpm.controllers.atributotipoitem.AtributoTipoField._my_update_params()=lpm.controllers.atributotipoitem.AtributoTipoField-class.html#_my_update_params,Method lpm.controllers.fase.PosicionField._my_update_params()=lpm.controllers.fase.PosicionField-class.html#_my_update_params,Method lpm.controllers.item.ComplejidadPrioridadField._my_update_params()=lpm.controllers.item.ComplejidadPrioridadField-class.html#_my_update_params,Method lpm.controllers.item.TipoItemField._my_update_params()=lpm.controllers.item.TipoItemField-class.html#_my_update_params,Method lpm.controllers.proyecto.LiderField._my_update_params()=lpm.controllers.proyecto.LiderField-class.html#_my_update_params,Method lpm.controllers.rol.CodFaseField._my_update_params()=lpm.controllers.rol.CodFaseField-class.html#_my_update_params,Method lpm.controllers.rol.CodProyectoField._my_update_params()=lpm.controllers.rol.CodProyectoField-class.html#_my_update_params,Method lpm.controllers.rol.CodTipoItemField._my_update_params()=lpm.controllers.rol.CodTipoItemField-class.html#_my_update_params,Method lpm.controllers.rol.PermisosMultipleSelect._my_update_params()=lpm.controllers.rol.PermisosMultipleSelect-class.html#_my_update_params,Method lpm.controllers.tipoitem.TipoImportadoField._my_update_params()=lpm.controllers.tipoitem.TipoImportadoField-class.html#_my_update_params,Method lpm.controllers.tipoitem.TipoPadreField._my_update_params()=lpm.controllers.tipoitem.TipoPadreField-class.html#_my_update_params,Method lpm.lib.sproxcustom.CustomPropertySingleSelectField._my_update_params()=lpm.lib.sproxcustom.CustomPropertySingleSelectField-class.html#_my_update_params"><a title="lpm.controllers.atributotipoitem.AtributoTipoField._my_update_params
+lpm.controllers.fase.PosicionField._my_update_params
+lpm.controllers.item.ComplejidadPrioridadField._my_update_params
+lpm.controllers.item.TipoItemField._my_update_params
+lpm.controllers.proyecto.LiderField._my_update_params
+lpm.controllers.rol.CodFaseField._my_update_params
+lpm.controllers.rol.CodProyectoField._my_update_params
+lpm.controllers.rol.CodTipoItemField._my_update_params
+lpm.controllers.rol.PermisosMultipleSelect._my_update_params
+lpm.controllers.tipoitem.TipoImportadoField._my_update_params
+lpm.controllers.tipoitem.TipoPadreField._my_update_params
+lpm.lib.sproxcustom.CustomPropertySingleSelectField._my_update_params" class="py-name" href="#" onclick="return doclink('link-49', '_my_update_params', 'link-49');">_my_update_params</a></tt><tt class="py-op">(</tt><tt class="py-name">d</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L176"></a><tt class="py-lineno">176</tt>  <tt class="py-line"> </tt>
+<a name="WidgetSelectorDojo"></a><div id="WidgetSelectorDojo-def"><a name="L177"></a><tt class="py-lineno">177</tt> <a class="py-toggle" href="#" id="WidgetSelectorDojo-toggle" onclick="return toggle('WidgetSelectorDojo');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.lib.sproxcustom.WidgetSelectorDojo-class.html">WidgetSelectorDojo</a><tt class="py-op">(</tt><tt class="py-base-class">SAWidgetSelector</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="WidgetSelectorDojo-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="WidgetSelectorDojo-expanded"><a name="L178"></a><tt class="py-lineno">178</tt>  <tt class="py-line">    <tt class="py-name">default_multiple_select_field_widget_type</tt> <tt class="py-op">=</tt> <tt id="link-50" class="py-name"><a title="lpm.lib.sproxcustom.MultipleSelectDojo" class="py-name" href="#" onclick="return doclink('link-50', 'MultipleSelectDojo', 'link-47');">MultipleSelectDojo</a></tt> </tt>
+</div><a name="L179"></a><tt class="py-lineno">179</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="lpm-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Sat Jun 25 12:33:30 2011
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

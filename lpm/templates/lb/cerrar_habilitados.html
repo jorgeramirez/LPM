@@ -17,33 +17,26 @@
     <table cellspacing="0" cellpadding="2" border="0">
     <tbody>
         <tr>
-            <h2 style="margin-top:1px; padding-left: 60px;">
-                Items habilitados para generar LB parcial
-            </h2>
-            <td>
+<td>
+            <h2 class="color-sobra" style="font-size: 1.5em; margin-top: 5px;">Items Habilitados (LB Parcial)</h2>
+
                 <form id="form_seleccionados" method="POST" action="${tg.url('../')}">
                 <input id="generar" class="boton" type="submit" value="Generar LB Parcial" style="margin-top: 10px; width: 160px;"/>
                 </form>
             </td>
         </tr>
         <tr>
-            <div style="clear:both;"></div>
-        </tr>
-        <tr>
-            <div style="clear:both;"></div>
-        </tr>
-        <tr>
-            <td>
+            <td colspan="2">
                 <div id="tabla_items_habilitados" class="crud_table" style="height:65%; width:700px; margin-top: 10px;">
                     ${XML(tmpl_context.tabla_items_habilitados(value=habilitados))} 
                 </div>
             </td>
         </tr>
         <tr>
-            <h2 style="margin-top:1px; padding-left: 60px;">
-                Items inhabilitados
-            </h2>
             <td>
+            <h2 class="color-sobra" style="font-size: 1.5em; margin-top: 5px;">Items Inhabilitados</h2>
+
+            
                 <div id="tabla_items_inhabilitados" class="crud_table" style="height:65%; width:700px; margin-top: 10px;">
                     ${XML(tmpl_context.tabla_items(value=inhabilitados))} 
                 </div>

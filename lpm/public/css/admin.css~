@@ -1,0 +1,123 @@
+.admin_grid{
+    margin-top: 1em;
+    width: 400px;
+}
+.admin_grid img{
+    border: 0;
+    vertical-align: middle;
+}
+
+a.add_link, a.edit_link{
+    background-repeat: no-repeat;
+    padding-left: 20px;
+}
+a.add_link{
+    background-image: url('/images/add.png');
+}
+a.edit_link{
+    background-image: url('/images/pencil.png');
+}
+
+/* admin list view */
+.crud_table .grid {
+    border-collapse: collapse;
+    border: 1px solid #ccc;
+}
+
+.crud_table {
+    margin-bottom: 60px;
+}
+
+.crud_table .grid .odd{
+    background-color: #eee;
+}
+.crud_table .grid th{
+    background: url("/images/blank.gif") repeat-x scroll -20px top transparent;
+    color: #fff;
+    font-size: 1.2em;
+    font-family:arial, verdana, sans-serif;
+    line-height:27px;
+    color:#ddd;
+    text-decoration:none;
+
+    font-size:11px;
+
+    font-weight:bold;
+    text-shadow:0 -1px 0 rgba(0, 0, 0, 0.3);
+    text-transform: capitalize;
+}
+.crud_table .grid td a{
+    color: #286571;
+}
+.crud_table .grid td.col_0 div{
+    float: left;
+}
+.crud_table .grid td.col_0 .edit_link, .crud_table .grid td.col_0 .delete-button{
+    display:block;
+    height:17px;
+    width:20px;
+    padding:0;
+    text-indent:-400px;
+    background-repeat: no-repeat;
+}
+.crud_table .grid td.col_0 .delete-button{
+    font-size: inherit;
+    background-image: url('/images/delete.png');
+    cursor: pointer;
+}
+
+/* admin add/edit view */
+.crud_edit label, .crud_add label{
+    font-size: 12px;
+}
+
+/*paginacion*/
+
+
+.pager_curpage, .pager_link{
+    font-family: arial,verdana,sans-serif;
+/*    font-size:1.2em;*/
+    color:#dddddd;
+    background-color:#247ebd;
+    display: inline;
+    padding: 1px 6px 1px 6px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+.pager_link:hover{
+color: #FFFFFF;
+background-color:#246ebd;
+}
+
+.pager_curpage {
+color:#111111;
+font-weight: bold;
+}
+
+/*forularios*/
+.textfield {
+width:200px;
+
+}
+
+/*actions*/
+.actions_fase {
+background-color: transparent;
+border: 0 none;
+color: #286571;
+display: inline;
+}
+
+/*impacto*/
+.grafo{
+font-size: 12px;
+}
+
+.impacto{
+font-weight:bold;
+}
+.fila{
+font-size:11px;
+}

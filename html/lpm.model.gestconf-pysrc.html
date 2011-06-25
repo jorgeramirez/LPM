@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>lpm.model.gestconf</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="lpm-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="lpm-module.html">Package&nbsp;lpm</a> ::
+        <a href="lpm.model-module.html">Package&nbsp;model</a> ::
+        Module&nbsp;gestconf
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="lpm.model.gestconf-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="lpm.model.gestconf-module.html">Module lpm.model.gestconf</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno">  1</tt>  <tt class="py-line"><tt class="py-comment"># -*- coding: utf-8 -*-</tt> </tt>
+<a name="L2"></a><tt class="py-lineno">  2</tt>  <tt class="py-line"> </tt>
+<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L4"></a><tt class="py-lineno">  4</tt>  <tt class="py-line"><tt class="py-docstring">Este m&#243;dulo contiene las clases del modelo referentes</tt> </tt>
+<a name="L5"></a><tt class="py-lineno">  5</tt>  <tt class="py-line"><tt class="py-docstring">al B{M&#243;dulo de Gesti&#243;n de Configuraci&#243;n}</tt> </tt>
+<a name="L6"></a><tt class="py-lineno">  6</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L7"></a><tt class="py-lineno">  7</tt>  <tt class="py-line"><tt class="py-docstring">Ejemplo de utilizaci&#243;n de L{ItemsPorLB}, L{LB} y L{PropiedadItem}::</tt> </tt>
+<a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L9"></a><tt class="py-lineno">  9</tt>  <tt class="py-line"><tt class="py-docstring">    lb = LB()</tt> </tt>
+<a name="L10"></a><tt class="py-lineno"> 10</tt>  <tt class="py-line"><tt class="py-docstring">    iplb = ItemsPorLB()</tt> </tt>
+<a name="L11"></a><tt class="py-lineno"> 11</tt>  <tt class="py-line"><tt class="py-docstring">    iplb.propiedad_item = PropiedadItem()</tt> </tt>
+<a name="L12"></a><tt class="py-lineno"> 12</tt>  <tt class="py-line"><tt class="py-docstring">    lb.items.append(iplb)</tt> </tt>
+<a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line"><tt class="py-docstring">Iterar sobre los objetos PropiedadItem via ItemsPorLB::</tt> </tt>
+<a name="L15"></a><tt class="py-lineno"> 15</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line"><tt class="py-docstring">    for iplb in lb.items:</tt> </tt>
+<a name="L17"></a><tt class="py-lineno"> 17</tt>  <tt class="py-line"><tt class="py-docstring">        print iplb.propiedad_item</tt> </tt>
+<a name="L18"></a><tt class="py-lineno"> 18</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line"><tt class="py-docstring">@authors:</tt> </tt>
+<a name="L20"></a><tt class="py-lineno"> 20</tt>  <tt class="py-line"><tt class="py-docstring">    - U{Carlos Bellino&lt;mailto:carlosbellino@gmail.com&gt;}</tt> </tt>
+<a name="L21"></a><tt class="py-lineno"> 21</tt>  <tt class="py-line"><tt class="py-docstring">    - U{Nahuel Hern&#225;ndez&lt;mailto:nahuel.11990@gmail.com&gt;}</tt> </tt>
+<a name="L22"></a><tt class="py-lineno"> 22</tt>  <tt class="py-line"><tt class="py-docstring">    - U{Jorge Ram&#237;rez&lt;mailto:jorgeramirez1990@gmail.com&gt;}</tt> </tt>
+<a name="L23"></a><tt class="py-lineno"> 23</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L24"></a><tt class="py-lineno"> 24</tt>  <tt class="py-line"><tt class="py-docstring">@since: 1.0</tt> </tt>
+<a name="L25"></a><tt class="py-lineno"> 25</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L26"></a><tt class="py-lineno"> 26</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">os</tt> </tt>
+<a name="L27"></a><tt class="py-lineno"> 27</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">datetime</tt> <tt class="py-keyword">import</tt> <tt class="py-name">datetime</tt> </tt>
+<a name="L28"></a><tt class="py-lineno"> 28</tt>  <tt class="py-line"> </tt>
+<a name="L29"></a><tt class="py-lineno"> 29</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">sqlalchemy</tt> <tt class="py-keyword">import</tt> <tt class="py-name">ForeignKey</tt><tt class="py-op">,</tt> <tt class="py-name">Column</tt> </tt>
+<a name="L30"></a><tt class="py-lineno"> 30</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">sqlalchemy</tt><tt class="py-op">.</tt><tt class="py-name">types</tt> <tt class="py-keyword">import</tt> <tt class="py-name">Integer</tt><tt class="py-op">,</tt> <tt class="py-name">Unicode</tt><tt class="py-op">,</tt> <tt class="py-name">DateTime</tt> </tt>
+<a name="L31"></a><tt class="py-lineno"> 31</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">sqlalchemy</tt><tt class="py-op">.</tt><tt class="py-name">orm</tt> <tt class="py-keyword">import</tt> <tt class="py-name">relation</tt><tt class="py-op">,</tt> <tt class="py-name">backref</tt> </tt>
+<a name="L32"></a><tt class="py-lineno"> 32</tt>  <tt class="py-line"> </tt>
+<a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt id="link-0" class="py-name" targets="Package lpm=lpm-module.html"><a title="lpm" class="py-name" href="#" onclick="return doclink('link-0', 'lpm', 'link-0');">lpm</a></tt><tt class="py-op">.</tt><tt id="link-1" class="py-name" targets="Variable lpm.controllers.proyecto.ProyectoController.model=lpm.controllers.proyecto.ProyectoController-class.html#model,Variable lpm.controllers.rol.RolPlantillaController.model=lpm.controllers.rol.RolPlantillaController-class.html#model,Variable lpm.controllers.usuario.UsuarioController.model=lpm.controllers.usuario.UsuarioController-class.html#model,Package lpm.model=lpm.model-module.html"><a title="lpm.controllers.proyecto.ProyectoController.model
+lpm.controllers.rol.RolPlantillaController.model
+lpm.controllers.usuario.UsuarioController.model
+lpm.model" class="py-name" href="#" onclick="return doclink('link-1', 'model', 'link-1');">model</a></tt> <tt class="py-keyword">import</tt> <tt class="py-op">*</tt> </tt>
+<a name="L34"></a><tt class="py-lineno"> 34</tt>  <tt class="py-line"> </tt>
+<a name="L35"></a><tt class="py-lineno"> 35</tt>  <tt class="py-line"> </tt>
+<a name="L36"></a><tt class="py-lineno"> 36</tt>  <tt class="py-line"><tt class="py-name">__all__</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-string">'LB'</tt><tt class="py-op">,</tt> <tt class="py-string">'HistorialLB'</tt><tt class="py-op">,</tt> <tt class="py-string">'ItemsPorLB'</tt><tt class="py-op">]</tt> </tt>
+<a name="LB"></a><div id="LB-def"><a name="L37"></a><tt class="py-lineno"> 37</tt>  <tt class="py-line"> </tt>
+<a name="L38"></a><tt class="py-lineno"> 38</tt> <a class="py-toggle" href="#" id="LB-toggle" onclick="return toggle('LB');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.model.gestconf.LB-class.html">LB</a><tt class="py-op">(</tt><tt class="py-base-class">DeclarativeBase</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="LB-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="LB-expanded"><a name="L39"></a><tt class="py-lineno"> 39</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L40"></a><tt class="py-lineno"> 40</tt>  <tt class="py-line"><tt class="py-docstring">    Clase que define un Linea Base.</tt> </tt>
+<a name="L41"></a><tt class="py-lineno"> 41</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L42"></a><tt class="py-lineno"> 42</tt>  <tt class="py-line">    <tt id="link-2" class="py-name" targets="Variable lpm.model.administracion.AtributosPorTipoItem.__tablename__=lpm.model.administracion.AtributosPorTipoItem-class.html#__tablename__,Variable lpm.model.administracion.Fase.__tablename__=lpm.model.administracion.Fase-class.html#__tablename__,Variable lpm.model.administracion.Proyecto.__tablename__=lpm.model.administracion.Proyecto-class.html#__tablename__,Variable lpm.model.administracion.TipoItem.__tablename__=lpm.model.administracion.TipoItem-class.html#__tablename__,Variable lpm.model.auth.Permiso.__tablename__=lpm.model.auth.Permiso-class.html#__tablename__,Variable lpm.model.auth.Rol.__tablename__=lpm.model.auth.Rol-class.html#__tablename__,Variable lpm.model.auth.Usuario.__tablename__=lpm.model.auth.Usuario-class.html#__tablename__,Variable lpm.model.desarrollo.ArchivosExternos.__tablename__=lpm.model.desarrollo.ArchivosExternos-class.html#__tablename__,Variable lpm.model.desarrollo.ArchivosPorItem.__tablename__=lpm.model.desarrollo.ArchivosPorItem-class.html#__tablename__,Variable lpm.model.desarrollo.AtributosDeItems.__tablename__=lpm.model.desarrollo.AtributosDeItems-class.html#__tablename__,Variable lpm.model.desarrollo.AtributosPorItem.__tablename__=lpm.model.desarrollo.AtributosPorItem-class.html#__tablename__,Variable lpm.model.desarrollo.HistorialItems.__tablename__=lpm.model.desarrollo.HistorialItems-class.html#__tablename__,Variable lpm.model.desarrollo.Item.__tablename__=lpm.model.desarrollo.Item-class.html#__tablename__,Variable lpm.model.desarrollo.PropiedadItem.__tablename__=lpm.model.desarrollo.PropiedadItem-class.html#__tablename__,Variable lpm.model.desarrollo.Relacion.__tablename__=lpm.model.desarrollo.Relacion-class.html#__tablename__,Variable lpm.model.desarrollo.RelacionPorItem.__tablename__=lpm.model.desarrollo.RelacionPorItem-class.html#__tablename__,Variable lpm.model.gestconf.HistorialLB.__tablename__=lpm.model.gestconf.HistorialLB-class.html#__tablename__,Variable lpm.model.gestconf.ItemsPorLB.__tablename__=lpm.model.gestconf.ItemsPorLB-class.html#__tablename__,Variable lpm.model.gestconf.LB.__tablename__=lpm.model.gestconf.LB-class.html#__tablename__"><a title="lpm.model.administracion.AtributosPorTipoItem.__tablename__
+lpm.model.administracion.Fase.__tablename__
+lpm.model.administracion.Proyecto.__tablename__
+lpm.model.administracion.TipoItem.__tablename__
+lpm.model.auth.Permiso.__tablename__
+lpm.model.auth.Rol.__tablename__
+lpm.model.auth.Usuario.__tablename__
+lpm.model.desarrollo.ArchivosExternos.__tablename__
+lpm.model.desarrollo.ArchivosPorItem.__tablename__
+lpm.model.desarrollo.AtributosDeItems.__tablename__
+lpm.model.desarrollo.AtributosPorItem.__tablename__
+lpm.model.desarrollo.HistorialItems.__tablename__
+lpm.model.desarrollo.Item.__tablename__
+lpm.model.desarrollo.PropiedadItem.__tablename__
+lpm.model.desarrollo.Relacion.__tablename__
+lpm.model.desarrollo.RelacionPorItem.__tablename__
+lpm.model.gestconf.HistorialLB.__tablename__
+lpm.model.gestconf.ItemsPorLB.__tablename__
+lpm.model.gestconf.LB.__tablename__" class="py-name" href="#" onclick="return doclink('link-2', '__tablename__', 'link-2');">__tablename__</a></tt> <tt class="py-op">=</tt> <tt class="py-string">'tbl_lb'</tt> </tt>
+<a name="L43"></a><tt class="py-lineno"> 43</tt>  <tt class="py-line">     </tt>
+<a name="L44"></a><tt class="py-lineno"> 44</tt>  <tt class="py-line">    <tt class="py-comment">#{ Columnas</tt> </tt>
+<a name="L45"></a><tt class="py-lineno"> 45</tt>  <tt class="py-line">    <tt id="link-3" class="py-name" targets="Variable lpm.model.gestconf.HistorialLB.id_lb=lpm.model.gestconf.HistorialLB-class.html#id_lb,Variable lpm.model.gestconf.ItemsPorLB.id_lb=lpm.model.gestconf.ItemsPorLB-class.html#id_lb,Variable lpm.model.gestconf.LB.id_lb=lpm.model.gestconf.LB-class.html#id_lb"><a title="lpm.model.gestconf.HistorialLB.id_lb
+lpm.model.gestconf.ItemsPorLB.id_lb
+lpm.model.gestconf.LB.id_lb" class="py-name" href="#" onclick="return doclink('link-3', 'id_lb', 'link-3');">id_lb</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">Integer</tt><tt class="py-op">,</tt> <tt class="py-name">autoincrement</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">primary_key</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+<a name="L46"></a><tt class="py-lineno"> 46</tt>  <tt class="py-line">    <tt id="link-4" class="py-name" targets="Variable lpm.model.desarrollo.Item.numero=lpm.model.desarrollo.Item-class.html#numero,Variable lpm.model.gestconf.LB.numero=lpm.model.gestconf.LB-class.html#numero"><a title="lpm.model.desarrollo.Item.numero
+lpm.model.gestconf.LB.numero" class="py-name" href="#" onclick="return doclink('link-4', 'numero', 'link-4');">numero</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">Integer</tt><tt class="py-op">,</tt> <tt id="link-5" class="py-name" targets="Variable sprox.widgets.widgets.PropertySingleSelectField.nullable=sprox.widgets.widgets.PropertySingleSelectField-class.html#nullable"><a title="sprox.widgets.widgets.PropertySingleSelectField.nullable" class="py-name" href="#" onclick="return doclink('link-5', 'nullable', 'link-5');">nullable</a></tt><tt class="py-op">=</tt><tt class="py-name">False</tt><tt class="py-op">)</tt> </tt>
+<a name="L47"></a><tt class="py-lineno"> 47</tt>  <tt class="py-line">    <tt id="link-6" class="py-name" targets="Method lpm.controllers.item.ItemRelacionTableFiller.estado()=lpm.controllers.item.ItemRelacionTableFiller-class.html#estado,Method lpm.controllers.item.ItemTableFiller.estado()=lpm.controllers.item.ItemTableFiller-class.html#estado,Method lpm.controllers.lineabase.ItemLBTableFiller.estado()=lpm.controllers.lineabase.ItemLBTableFiller-class.html#estado,Method lpm.controllers.relacion.RelacionTableFiller.estado()=lpm.controllers.relacion.RelacionTableFiller-class.html#estado,Variable lpm.model.administracion.Fase.estado=lpm.model.administracion.Fase-class.html#estado,Variable lpm.model.administracion.Proyecto.estado=lpm.model.administracion.Proyecto-class.html#estado,Variable lpm.model.desarrollo.PropiedadItem.estado=lpm.model.desarrollo.PropiedadItem-class.html#estado,Variable lpm.model.gestconf.LB.estado=lpm.model.gestconf.LB-class.html#estado"><a title="lpm.controllers.item.ItemRelacionTableFiller.estado
+lpm.controllers.item.ItemTableFiller.estado
+lpm.controllers.lineabase.ItemLBTableFiller.estado
+lpm.controllers.relacion.RelacionTableFiller.estado
+lpm.model.administracion.Fase.estado
+lpm.model.administracion.Proyecto.estado
+lpm.model.desarrollo.PropiedadItem.estado
+lpm.model.gestconf.LB.estado" class="py-name" href="#" onclick="return doclink('link-6', 'estado', 'link-6');">estado</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">Unicode</tt><tt class="py-op">(</tt><tt class="py-number">20</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt id="link-7" class="py-name"><a title="sprox.widgets.widgets.PropertySingleSelectField.nullable" class="py-name" href="#" onclick="return doclink('link-7', 'nullable', 'link-5');">nullable</a></tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">default</tt><tt class="py-op">=</tt><tt class="py-string">u"Cerrada"</tt><tt class="py-op">)</tt> </tt>
+<a name="L48"></a><tt class="py-lineno"> 48</tt>  <tt class="py-line">    <tt id="link-8" class="py-name" targets="Method lpm.controllers.historialitem.HistorialItemTableFiller.codigo()=lpm.controllers.historialitem.HistorialItemTableFiller-class.html#codigo,Method lpm.controllers.lineabase.ItemInhabilitadosTableFiller.codigo()=lpm.controllers.lineabase.ItemInhabilitadosTableFiller-class.html#codigo,Variable lpm.model.administracion.Fase.codigo=lpm.model.administracion.Fase-class.html#codigo,Variable lpm.model.administracion.Proyecto.codigo=lpm.model.administracion.Proyecto-class.html#codigo,Variable lpm.model.administracion.TipoItem.codigo=lpm.model.administracion.TipoItem-class.html#codigo,Variable lpm.model.auth.Rol.codigo=lpm.model.auth.Rol-class.html#codigo,Variable lpm.model.desarrollo.Item.codigo=lpm.model.desarrollo.Item-class.html#codigo,Variable lpm.model.desarrollo.Relacion.codigo=lpm.model.desarrollo.Relacion-class.html#codigo,Variable lpm.model.gestconf.LB.codigo=lpm.model.gestconf.LB-class.html#codigo"><a title="lpm.controllers.historialitem.HistorialItemTableFiller.codigo
+lpm.controllers.lineabase.ItemInhabilitadosTableFiller.codigo
+lpm.model.administracion.Fase.codigo
+lpm.model.administracion.Proyecto.codigo
+lpm.model.administracion.TipoItem.codigo
+lpm.model.auth.Rol.codigo
+lpm.model.desarrollo.Item.codigo
+lpm.model.desarrollo.Relacion.codigo
+lpm.model.gestconf.LB.codigo" class="py-name" href="#" onclick="return doclink('link-8', 'codigo', 'link-8');">codigo</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">Unicode</tt><tt class="py-op">(</tt><tt class="py-number">50</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">unique</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+<a name="L49"></a><tt class="py-lineno"> 49</tt>  <tt class="py-line">    <tt id="link-9" class="py-name" targets="Variable lpm.model.administracion.Fase.estados_posibles=lpm.model.administracion.Fase-class.html#estados_posibles,Variable lpm.model.administracion.Proyecto.estados_posibles=lpm.model.administracion.Proyecto-class.html#estados_posibles,Variable lpm.model.desarrollo.Item.estados_posibles=lpm.model.desarrollo.Item-class.html#estados_posibles,Variable lpm.model.gestconf.LB.estados_posibles=lpm.model.gestconf.LB-class.html#estados_posibles"><a title="lpm.model.administracion.Fase.estados_posibles
+lpm.model.administracion.Proyecto.estados_posibles
+lpm.model.desarrollo.Item.estados_posibles
+lpm.model.gestconf.LB.estados_posibles" class="py-name" href="#" onclick="return doclink('link-9', 'estados_posibles', 'link-9');">estados_posibles</a></tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-string">u"Abierta"</tt><tt class="py-op">,</tt> <tt class="py-string">u"Cerrada"</tt><tt class="py-op">,</tt> <tt class="py-string">u"Rota"</tt><tt class="py-op">,</tt> <tt class="py-string">u"Para-Revisi&#243;n"</tt><tt class="py-op">]</tt> </tt>
+<a name="L50"></a><tt class="py-lineno"> 50</tt>  <tt class="py-line">    <tt class="py-comment"># template para codificacion</tt> </tt>
+<a name="L51"></a><tt class="py-lineno"> 51</tt>  <tt class="py-line">    <tt id="link-10" class="py-name" targets="Variable lpm.model.administracion.Fase.tmpl_codigo=lpm.model.administracion.Fase-class.html#tmpl_codigo,Variable lpm.model.administracion.Proyecto.tmpl_codigo=lpm.model.administracion.Proyecto-class.html#tmpl_codigo,Variable lpm.model.administracion.TipoItem.tmpl_codigo=lpm.model.administracion.TipoItem-class.html#tmpl_codigo,Variable lpm.model.auth.Rol.tmpl_codigo=lpm.model.auth.Rol-class.html#tmpl_codigo,Variable lpm.model.desarrollo.Item.tmpl_codigo=lpm.model.desarrollo.Item-class.html#tmpl_codigo,Variable lpm.model.desarrollo.Relacion.tmpl_codigo=lpm.model.desarrollo.Relacion-class.html#tmpl_codigo,Variable lpm.model.gestconf.LB.tmpl_codigo=lpm.model.gestconf.LB-class.html#tmpl_codigo"><a title="lpm.model.administracion.Fase.tmpl_codigo
+lpm.model.administracion.Proyecto.tmpl_codigo
+lpm.model.administracion.TipoItem.tmpl_codigo
+lpm.model.auth.Rol.tmpl_codigo
+lpm.model.desarrollo.Item.tmpl_codigo
+lpm.model.desarrollo.Relacion.tmpl_codigo
+lpm.model.gestconf.LB.tmpl_codigo" class="py-name" href="#" onclick="return doclink('link-10', 'tmpl_codigo', 'link-10');">tmpl_codigo</a></tt> <tt class="py-op">=</tt> <tt class="py-string">u"lb-{id_lb}"</tt> </tt>
+<a name="L52"></a><tt class="py-lineno"> 52</tt>  <tt class="py-line">    <tt class="py-comment">#{ Relaciones</tt> </tt>
+<a name="L53"></a><tt class="py-lineno"> 53</tt>  <tt class="py-line">    <tt id="link-11" class="py-name" targets="Variable lpm.controllers.fase.FaseController.items=lpm.controllers.fase.FaseController-class.html#items,Variable lpm.controllers.root.RootController.items=lpm.controllers.root.RootController-class.html#items,Variable lpm.model.administracion.Fase.items=lpm.model.administracion.Fase-class.html#items,Variable lpm.model.administracion.TipoItem.items=lpm.model.administracion.TipoItem-class.html#items,Variable lpm.model.gestconf.LB.items=lpm.model.gestconf.LB-class.html#items"><a title="lpm.controllers.fase.FaseController.items
+lpm.controllers.root.RootController.items
+lpm.model.administracion.Fase.items
+lpm.model.administracion.TipoItem.items
+lpm.model.gestconf.LB.items" class="py-name" href="#" onclick="return doclink('link-11', 'items', 'link-11');">items</a></tt> <tt class="py-op">=</tt> <tt class="py-name">relation</tt><tt class="py-op">(</tt><tt class="py-string">"ItemsPorLB"</tt><tt class="py-op">,</tt> <tt class="py-name">backref</tt><tt class="py-op">=</tt><tt class="py-string">'lb'</tt><tt class="py-op">)</tt> </tt>
+<a name="L54"></a><tt class="py-lineno"> 54</tt>  <tt class="py-line">    <tt class="py-comment">#}</tt> </tt>
+<a name="L55"></a><tt class="py-lineno"> 55</tt>  <tt class="py-line"> </tt>
+<a name="L56"></a><tt class="py-lineno"> 56</tt>  <tt class="py-line">    <tt class="py-decorator">@</tt><tt class="py-decorator">classmethod</tt> </tt>
+<a name="LB.generar_codigo"></a><div id="LB.generar_codigo-def"><a name="L57"></a><tt class="py-lineno"> 57</tt> <a class="py-toggle" href="#" id="LB.generar_codigo-toggle" onclick="return toggle('LB.generar_codigo');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.model.gestconf.LB-class.html#generar_codigo">generar_codigo</a><tt class="py-op">(</tt><tt class="py-param">cls</tt><tt class="py-op">,</tt> <tt class="py-param">lb</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="LB.generar_codigo-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="LB.generar_codigo-expanded"><a name="L58"></a><tt class="py-lineno"> 58</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L59"></a><tt class="py-lineno"> 59</tt>  <tt class="py-line"><tt class="py-docstring">        Genera el codigo para el elemento pasado como parametro</tt> </tt>
+<a name="L60"></a><tt class="py-lineno"> 60</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L61"></a><tt class="py-lineno"> 61</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">cls</tt><tt class="py-op">.</tt><tt id="link-12" class="py-name"><a title="lpm.model.administracion.Fase.tmpl_codigo
+lpm.model.administracion.Proyecto.tmpl_codigo
+lpm.model.administracion.TipoItem.tmpl_codigo
+lpm.model.auth.Rol.tmpl_codigo
+lpm.model.desarrollo.Item.tmpl_codigo
+lpm.model.desarrollo.Relacion.tmpl_codigo
+lpm.model.gestconf.LB.tmpl_codigo" class="py-name" href="#" onclick="return doclink('link-12', 'tmpl_codigo', 'link-10');">tmpl_codigo</a></tt><tt class="py-op">.</tt><tt class="py-name">format</tt><tt class="py-op">(</tt><tt id="link-13" class="py-name"><a title="lpm.model.gestconf.HistorialLB.id_lb
+lpm.model.gestconf.ItemsPorLB.id_lb
+lpm.model.gestconf.LB.id_lb" class="py-name" href="#" onclick="return doclink('link-13', 'id_lb', 'link-3');">id_lb</a></tt><tt class="py-op">=</tt><tt id="link-14" class="py-name" targets="Variable lpm.model.gestconf.HistorialLB.lb=lpm.model.gestconf.HistorialLB-class.html#lb,Package lpm.templates.lb=lpm.templates.lb-module.html"><a title="lpm.model.gestconf.HistorialLB.lb
+lpm.templates.lb" class="py-name" href="#" onclick="return doclink('link-14', 'lb', 'link-14');">lb</a></tt><tt class="py-op">.</tt><tt id="link-15" class="py-name"><a title="lpm.model.gestconf.HistorialLB.id_lb
+lpm.model.gestconf.ItemsPorLB.id_lb
+lpm.model.gestconf.LB.id_lb" class="py-name" href="#" onclick="return doclink('link-15', 'id_lb', 'link-3');">id_lb</a></tt><tt class="py-op">)</tt> </tt>
+</div><a name="L62"></a><tt class="py-lineno"> 62</tt>  <tt class="py-line"> </tt>
+<a name="LB.agregar_item"></a><div id="LB.agregar_item-def"><a name="L63"></a><tt class="py-lineno"> 63</tt> <a class="py-toggle" href="#" id="LB.agregar_item-toggle" onclick="return toggle('LB.agregar_item');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.model.gestconf.LB-class.html#agregar_item">agregar_item</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">p_item</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> <tt class="py-comment">#jorge</tt> </tt>
+</div><a name="L64"></a><tt class="py-lineno"> 64</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L65"></a><tt class="py-lineno"> 65</tt>  <tt class="py-line"><tt class="py-docstring">        Agrega un &#237;tem al conjunto de &#237;tems de la L&#237;nea Base</tt> </tt>
+<a name="L66"></a><tt class="py-lineno"> 66</tt>  <tt class="py-line"><tt class="py-docstring">        </tt> </tt>
+<a name="L67"></a><tt class="py-lineno"> 67</tt>  <tt class="py-line"><tt class="py-docstring">        @param item: El &#237;tem a insertar</tt> </tt>
+<a name="L68"></a><tt class="py-lineno"> 68</tt>  <tt class="py-line"><tt class="py-docstring">        @type item: L{Item}</tt> </tt>
+<a name="L69"></a><tt class="py-lineno"> 69</tt>  <tt class="py-line"><tt class="py-docstring">        @raises BloquearItemError: si no se ejecuta con exito L{bloquear}</tt> </tt>
+<a name="L70"></a><tt class="py-lineno"> 70</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L71"></a><tt class="py-lineno"> 71</tt>  <tt class="py-line">        <tt class="py-comment">#item.bloquear()</tt> </tt>
+<a name="L72"></a><tt class="py-lineno"> 72</tt>  <tt class="py-line">        <tt class="py-name">iplb</tt> <tt class="py-op">=</tt> <tt id="link-16" class="py-name" targets="Class lpm.model.gestconf.ItemsPorLB=lpm.model.gestconf.ItemsPorLB-class.html"><a title="lpm.model.gestconf.ItemsPorLB" class="py-name" href="#" onclick="return doclink('link-16', 'ItemsPorLB', 'link-16');">ItemsPorLB</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L73"></a><tt class="py-lineno"> 73</tt>  <tt class="py-line">        <tt class="py-comment">#iplb.propiedad_item = PropiedadItem.por_id(item.id_propiedad_item)</tt> </tt>
+<a name="L74"></a><tt class="py-lineno"> 74</tt>  <tt class="py-line">        <tt class="py-name">iplb</tt><tt class="py-op">.</tt><tt id="link-17" class="py-name" targets="Variable lpm.model.gestconf.ItemsPorLB.propiedad_item=lpm.model.gestconf.ItemsPorLB-class.html#propiedad_item"><a title="lpm.model.gestconf.ItemsPorLB.propiedad_item" class="py-name" href="#" onclick="return doclink('link-17', 'propiedad_item', 'link-17');">propiedad_item</a></tt> <tt class="py-op">=</tt> <tt class="py-name">p_item</tt> </tt>
+<a name="L75"></a><tt class="py-lineno"> 75</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-18" class="py-name"><a title="lpm.controllers.fase.FaseController.items
+lpm.controllers.root.RootController.items
+lpm.model.administracion.Fase.items
+lpm.model.administracion.TipoItem.items
+lpm.model.gestconf.LB.items" class="py-name" href="#" onclick="return doclink('link-18', 'items', 'link-11');">items</a></tt><tt class="py-op">.</tt><tt class="py-name">append</tt><tt class="py-op">(</tt><tt class="py-name">iplb</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L76"></a><tt class="py-lineno"> 76</tt>  <tt class="py-line">     </tt>
+<a name="LB.romper"></a><div id="LB.romper-def"><a name="L77"></a><tt class="py-lineno"> 77</tt> <a class="py-toggle" href="#" id="LB.romper-toggle" onclick="return toggle('LB.romper');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.model.gestconf.LB-class.html#romper">romper</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="LB.romper-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="LB.romper-expanded"><a name="L78"></a><tt class="py-lineno"> 78</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L79"></a><tt class="py-lineno"> 79</tt>  <tt class="py-line"><tt class="py-docstring">        Rompe una linea base</tt> </tt>
+<a name="L80"></a><tt class="py-lineno"> 80</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L81"></a><tt class="py-lineno"> 81</tt>  <tt class="py-line">        <tt class="py-keyword">pass</tt> </tt>
+</div><a name="L82"></a><tt class="py-lineno"> 82</tt>  <tt class="py-line">     </tt>
+<a name="L83"></a><tt class="py-lineno"> 83</tt>  <tt class="py-line">    <tt class="py-decorator">@</tt><tt class="py-decorator">classmethod</tt> </tt>
+<a name="LB.por_id"></a><div id="LB.por_id-def"><a name="L84"></a><tt class="py-lineno"> 84</tt> <a class="py-toggle" href="#" id="LB.por_id-toggle" onclick="return toggle('LB.por_id');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.model.gestconf.LB-class.html#por_id">por_id</a><tt class="py-op">(</tt><tt class="py-param">cls</tt><tt class="py-op">,</tt> <tt class="py-param">id</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="LB.por_id-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="LB.por_id-expanded"><a name="L85"></a><tt class="py-lineno"> 85</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L86"></a><tt class="py-lineno"> 86</tt>  <tt class="py-line"><tt class="py-docstring">        M&#233;todo de clase que realiza las b&#250;squedas por identificador</tt> </tt>
+<a name="L87"></a><tt class="py-lineno"> 87</tt>  <tt class="py-line"><tt class="py-docstring">        de &#237;tem.</tt> </tt>
+<a name="L88"></a><tt class="py-lineno"> 88</tt>  <tt class="py-line"><tt class="py-docstring">        </tt> </tt>
+<a name="L89"></a><tt class="py-lineno"> 89</tt>  <tt class="py-line"><tt class="py-docstring">        @param id: identificador del &#237;tem</tt> </tt>
+<a name="L90"></a><tt class="py-lineno"> 90</tt>  <tt class="py-line"><tt class="py-docstring">        @type id: C{Integer}</tt> </tt>
+<a name="L91"></a><tt class="py-lineno"> 91</tt>  <tt class="py-line"><tt class="py-docstring">        @return: el elemento recuperado</tt> </tt>
+<a name="L92"></a><tt class="py-lineno"> 92</tt>  <tt class="py-line"><tt class="py-docstring">        @rtype: L{ItemsPorLB}</tt> </tt>
+<a name="L93"></a><tt class="py-lineno"> 93</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L94"></a><tt class="py-lineno"> 94</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt id="link-19" class="py-name" targets="Variable lpm.model.DBSession=lpm.model-module.html#DBSession"><a title="lpm.model.DBSession" class="py-name" href="#" onclick="return doclink('link-19', 'DBSession', 'link-19');">DBSession</a></tt><tt class="py-op">.</tt><tt class="py-name">query</tt><tt class="py-op">(</tt><tt class="py-name">cls</tt><tt class="py-op">)</tt><tt class="py-op">.</tt><tt class="py-name">filter_by</tt><tt class="py-op">(</tt><tt id="link-20" class="py-name"><a title="lpm.model.gestconf.HistorialLB.id_lb
+lpm.model.gestconf.ItemsPorLB.id_lb
+lpm.model.gestconf.LB.id_lb" class="py-name" href="#" onclick="return doclink('link-20', 'id_lb', 'link-3');">id_lb</a></tt><tt class="py-op">=</tt><tt class="py-name">id</tt><tt class="py-op">)</tt><tt class="py-op">.</tt><tt class="py-name">one</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L95"></a><tt class="py-lineno"> 95</tt>  <tt class="py-line"> </tt>
+<a name="HistorialLB"></a><div id="HistorialLB-def"><a name="L96"></a><tt class="py-lineno"> 96</tt>  <tt class="py-line"> </tt>
+<a name="L97"></a><tt class="py-lineno"> 97</tt>  <tt class="py-line"> </tt>
+<a name="L98"></a><tt class="py-lineno"> 98</tt>  <tt class="py-line"> </tt>
+<a name="L99"></a><tt class="py-lineno"> 99</tt> <a class="py-toggle" href="#" id="HistorialLB-toggle" onclick="return toggle('HistorialLB');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.model.gestconf.HistorialLB-class.html">HistorialLB</a><tt class="py-op">(</tt><tt class="py-base-class">DeclarativeBase</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="HistorialLB-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="HistorialLB-expanded"><a name="L100"></a><tt class="py-lineno">100</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L101"></a><tt class="py-lineno">101</tt>  <tt class="py-line"><tt class="py-docstring">    Clase que define un historial de modificaciones</tt> </tt>
+<a name="L102"></a><tt class="py-lineno">102</tt>  <tt class="py-line"><tt class="py-docstring">    hechas sobre los las L&#237;neas Bases.</tt> </tt>
+<a name="L103"></a><tt class="py-lineno">103</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L104"></a><tt class="py-lineno">104</tt>  <tt class="py-line">    <tt id="link-21" class="py-name"><a title="lpm.model.administracion.AtributosPorTipoItem.__tablename__
+lpm.model.administracion.Fase.__tablename__
+lpm.model.administracion.Proyecto.__tablename__
+lpm.model.administracion.TipoItem.__tablename__
+lpm.model.auth.Permiso.__tablename__
+lpm.model.auth.Rol.__tablename__
+lpm.model.auth.Usuario.__tablename__
+lpm.model.desarrollo.ArchivosExternos.__tablename__
+lpm.model.desarrollo.ArchivosPorItem.__tablename__
+lpm.model.desarrollo.AtributosDeItems.__tablename__
+lpm.model.desarrollo.AtributosPorItem.__tablename__
+lpm.model.desarrollo.HistorialItems.__tablename__
+lpm.model.desarrollo.Item.__tablename__
+lpm.model.desarrollo.PropiedadItem.__tablename__
+lpm.model.desarrollo.Relacion.__tablename__
+lpm.model.desarrollo.RelacionPorItem.__tablename__
+lpm.model.gestconf.HistorialLB.__tablename__
+lpm.model.gestconf.ItemsPorLB.__tablename__
+lpm.model.gestconf.LB.__tablename__" class="py-name" href="#" onclick="return doclink('link-21', '__tablename__', 'link-2');">__tablename__</a></tt> <tt class="py-op">=</tt> <tt class="py-string">'tbl_historial_lb'</tt> </tt>
+<a name="L105"></a><tt class="py-lineno">105</tt>  <tt class="py-line">     </tt>
+<a name="L106"></a><tt class="py-lineno">106</tt>  <tt class="py-line">    <tt class="py-comment">#{ Columnas</tt> </tt>
+<a name="L107"></a><tt class="py-lineno">107</tt>  <tt class="py-line">    <tt id="link-22" class="py-name" targets="Variable lpm.model.gestconf.HistorialLB.id_historial_lb=lpm.model.gestconf.HistorialLB-class.html#id_historial_lb"><a title="lpm.model.gestconf.HistorialLB.id_historial_lb" class="py-name" href="#" onclick="return doclink('link-22', 'id_historial_lb', 'link-22');">id_historial_lb</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">Integer</tt><tt class="py-op">,</tt> <tt class="py-name">autoincrement</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">primary_key</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+<a name="L108"></a><tt class="py-lineno">108</tt>  <tt class="py-line">    <tt id="link-23" class="py-name" targets="Variable lpm.model.gestconf.HistorialLB.tipo_operacion=lpm.model.gestconf.HistorialLB-class.html#tipo_operacion"><a title="lpm.model.gestconf.HistorialLB.tipo_operacion" class="py-name" href="#" onclick="return doclink('link-23', 'tipo_operacion', 'link-23');">tipo_operacion</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">Unicode</tt><tt class="py-op">(</tt><tt class="py-number">45</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt id="link-24" class="py-name"><a title="sprox.widgets.widgets.PropertySingleSelectField.nullable" class="py-name" href="#" onclick="return doclink('link-24', 'nullable', 'link-5');">nullable</a></tt><tt class="py-op">=</tt><tt class="py-name">False</tt><tt class="py-op">)</tt> </tt>
+<a name="L109"></a><tt class="py-lineno">109</tt>  <tt class="py-line">    <tt id="link-25" class="py-name" targets="Variable lpm.model.desarrollo.HistorialItems.fecha_modificacion=lpm.model.desarrollo.HistorialItems-class.html#fecha_modificacion,Variable lpm.model.gestconf.HistorialLB.fecha_modificacion=lpm.model.gestconf.HistorialLB-class.html#fecha_modificacion"><a title="lpm.model.desarrollo.HistorialItems.fecha_modificacion
+lpm.model.gestconf.HistorialLB.fecha_modificacion" class="py-name" href="#" onclick="return doclink('link-25', 'fecha_modificacion', 'link-25');">fecha_modificacion</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">DateTime</tt><tt class="py-op">,</tt> <tt id="link-26" class="py-name"><a title="sprox.widgets.widgets.PropertySingleSelectField.nullable" class="py-name" href="#" onclick="return doclink('link-26', 'nullable', 'link-5');">nullable</a></tt><tt class="py-op">=</tt><tt class="py-name">False</tt><tt class="py-op">,</tt> <tt class="py-name">default</tt><tt class="py-op">=</tt><tt class="py-name">datetime</tt><tt class="py-op">.</tt><tt class="py-name">now</tt><tt class="py-op">)</tt> </tt>
+<a name="L110"></a><tt class="py-lineno">110</tt>  <tt class="py-line">    <tt id="link-27" class="py-name" targets="Variable lpm.model.auth.Usuario.id_usuario=lpm.model.auth.Usuario-class.html#id_usuario,Variable lpm.model.desarrollo.HistorialItems.id_usuario=lpm.model.desarrollo.HistorialItems-class.html#id_usuario,Variable lpm.model.gestconf.HistorialLB.id_usuario=lpm.model.gestconf.HistorialLB-class.html#id_usuario"><a title="lpm.model.auth.Usuario.id_usuario
+lpm.model.desarrollo.HistorialItems.id_usuario
+lpm.model.gestconf.HistorialLB.id_usuario" class="py-name" href="#" onclick="return doclink('link-27', 'id_usuario', 'link-27');">id_usuario</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">Integer</tt><tt class="py-op">,</tt> <tt class="py-name">ForeignKey</tt><tt class="py-op">(</tt><tt class="py-string">'tg_user.id_usuario'</tt><tt class="py-op">,</tt> </tt>
+<a name="L111"></a><tt class="py-lineno">111</tt>  <tt class="py-line">                                            <tt class="py-name">onupdate</tt><tt class="py-op">=</tt><tt class="py-string">"CASCADE"</tt><tt class="py-op">,</tt>  </tt>
+<a name="L112"></a><tt class="py-lineno">112</tt>  <tt class="py-line">                                            <tt class="py-name">ondelete</tt><tt class="py-op">=</tt><tt class="py-string">"CASCADE"</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L113"></a><tt class="py-lineno">113</tt>  <tt class="py-line">    <tt id="link-28" class="py-name"><a title="lpm.model.gestconf.HistorialLB.id_lb
+lpm.model.gestconf.ItemsPorLB.id_lb
+lpm.model.gestconf.LB.id_lb" class="py-name" href="#" onclick="return doclink('link-28', 'id_lb', 'link-3');">id_lb</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">Integer</tt><tt class="py-op">,</tt> <tt class="py-name">ForeignKey</tt><tt class="py-op">(</tt><tt class="py-string">'tbl_lb.id_lb'</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L114"></a><tt class="py-lineno">114</tt>  <tt class="py-line">     </tt>
+<a name="L115"></a><tt class="py-lineno">115</tt>  <tt class="py-line">    <tt class="py-comment">#{ Relaciones</tt> </tt>
+<a name="L116"></a><tt class="py-lineno">116</tt>  <tt class="py-line">    <tt id="link-29" class="py-name" targets="Module lpm.controllers.usuario=lpm.controllers.usuario-module.html,Variable lpm.model.desarrollo.HistorialItems.usuario=lpm.model.desarrollo.HistorialItems-class.html#usuario,Variable lpm.model.gestconf.HistorialLB.usuario=lpm.model.gestconf.HistorialLB-class.html#usuario,Package lpm.templates.usuario=lpm.templates.usuario-module.html"><a title="lpm.controllers.usuario
+lpm.model.desarrollo.HistorialItems.usuario
+lpm.model.gestconf.HistorialLB.usuario
+lpm.templates.usuario" class="py-name" href="#" onclick="return doclink('link-29', 'usuario', 'link-29');">usuario</a></tt> <tt class="py-op">=</tt> <tt class="py-name">relation</tt><tt class="py-op">(</tt><tt class="py-string">"Usuario"</tt><tt class="py-op">,</tt> <tt class="py-name">backref</tt><tt class="py-op">=</tt><tt class="py-string">"historial_lb"</tt><tt class="py-op">)</tt> </tt>
+<a name="L117"></a><tt class="py-lineno">117</tt>  <tt class="py-line">    <tt id="link-30" class="py-name"><a title="lpm.model.gestconf.HistorialLB.lb
+lpm.templates.lb" class="py-name" href="#" onclick="return doclink('link-30', 'lb', 'link-14');">lb</a></tt> <tt class="py-op">=</tt> <tt class="py-name">relation</tt><tt class="py-op">(</tt><tt class="py-string">"LB"</tt><tt class="py-op">,</tt> <tt class="py-name">backref</tt><tt class="py-op">=</tt><tt class="py-string">"historial_lb"</tt><tt class="py-op">)</tt> </tt>
+<a name="L118"></a><tt class="py-lineno">118</tt>  <tt class="py-line"> </tt>
+<a name="L119"></a><tt class="py-lineno">119</tt>  <tt class="py-line">    <tt class="py-decorator">@</tt><tt class="py-decorator">classmethod</tt> </tt>
+<a name="HistorialLB.registrar"></a><div id="HistorialLB.registrar-def"><a name="L120"></a><tt class="py-lineno">120</tt> <a class="py-toggle" href="#" id="HistorialLB.registrar-toggle" onclick="return toggle('HistorialLB.registrar');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.model.gestconf.HistorialLB-class.html#registrar">registrar</a><tt class="py-op">(</tt><tt class="py-param">cls</tt><tt class="py-op">,</tt> <tt class="py-param">usuario</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-param">lb</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-param">op</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="HistorialLB.registrar-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="HistorialLB.registrar-expanded"><a name="L121"></a><tt class="py-lineno">121</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L122"></a><tt class="py-lineno">122</tt>  <tt class="py-line"><tt class="py-docstring">        Registra una nueva entrada en el historial de lbs.</tt> </tt>
+<a name="L123"></a><tt class="py-lineno">123</tt>  <tt class="py-line"><tt class="py-docstring">        </tt> </tt>
+<a name="L124"></a><tt class="py-lineno">124</tt>  <tt class="py-line"><tt class="py-docstring">        @param usuario: el usuario que realiza los cambios.</tt> </tt>
+<a name="L125"></a><tt class="py-lineno">125</tt>  <tt class="py-line"><tt class="py-docstring">        @type usuario: L{Usuario}</tt> </tt>
+<a name="L126"></a><tt class="py-lineno">126</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L127"></a><tt class="py-lineno">127</tt>  <tt class="py-line">        <tt class="py-name">hist_lb</tt> <tt class="py-op">=</tt> <tt id="link-31" class="py-name" targets="Class lpm.model.gestconf.HistorialLB=lpm.model.gestconf.HistorialLB-class.html"><a title="lpm.model.gestconf.HistorialLB" class="py-name" href="#" onclick="return doclink('link-31', 'HistorialLB', 'link-31');">HistorialLB</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L128"></a><tt class="py-lineno">128</tt>  <tt class="py-line">        <tt class="py-name">hist_lb</tt><tt class="py-op">.</tt><tt id="link-32" class="py-name"><a title="lpm.model.gestconf.HistorialLB.tipo_operacion" class="py-name" href="#" onclick="return doclink('link-32', 'tipo_operacion', 'link-23');">tipo_operacion</a></tt> <tt class="py-op">=</tt> <tt class="py-name">unicode</tt><tt class="py-op">(</tt><tt class="py-name">op</tt><tt class="py-op">)</tt> </tt>
+<a name="L129"></a><tt class="py-lineno">129</tt>  <tt class="py-line">        <tt class="py-name">hist_lb</tt><tt class="py-op">.</tt><tt id="link-33" class="py-name"><a title="lpm.controllers.usuario
+lpm.model.desarrollo.HistorialItems.usuario
+lpm.model.gestconf.HistorialLB.usuario
+lpm.templates.usuario" class="py-name" href="#" onclick="return doclink('link-33', 'usuario', 'link-29');">usuario</a></tt> <tt class="py-op">=</tt> <tt id="link-34" class="py-name"><a title="lpm.controllers.usuario
+lpm.model.desarrollo.HistorialItems.usuario
+lpm.model.gestconf.HistorialLB.usuario
+lpm.templates.usuario" class="py-name" href="#" onclick="return doclink('link-34', 'usuario', 'link-29');">usuario</a></tt> </tt>
+<a name="L130"></a><tt class="py-lineno">130</tt>  <tt class="py-line">        <tt class="py-name">hist_lb</tt><tt class="py-op">.</tt><tt id="link-35" class="py-name"><a title="lpm.model.gestconf.HistorialLB.lb
+lpm.templates.lb" class="py-name" href="#" onclick="return doclink('link-35', 'lb', 'link-14');">lb</a></tt> <tt class="py-op">=</tt> <tt id="link-36" class="py-name"><a title="lpm.model.gestconf.HistorialLB.lb
+lpm.templates.lb" class="py-name" href="#" onclick="return doclink('link-36', 'lb', 'link-14');">lb</a></tt> </tt>
+<a name="L131"></a><tt class="py-lineno">131</tt>  <tt class="py-line">        <tt id="link-37" class="py-name"><a title="lpm.model.DBSession" class="py-name" href="#" onclick="return doclink('link-37', 'DBSession', 'link-19');">DBSession</a></tt><tt class="py-op">.</tt><tt class="py-name">add</tt><tt class="py-op">(</tt><tt class="py-name">hist_lb</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L132"></a><tt class="py-lineno">132</tt>  <tt class="py-line">    <tt class="py-comment">#}</tt> </tt>
+<a name="ItemsPorLB"></a><div id="ItemsPorLB-def"><a name="L133"></a><tt class="py-lineno">133</tt>  <tt class="py-line">     </tt>
+<a name="L134"></a><tt class="py-lineno">134</tt>  <tt class="py-line">     </tt>
+<a name="L135"></a><tt class="py-lineno">135</tt> <a class="py-toggle" href="#" id="ItemsPorLB-toggle" onclick="return toggle('ItemsPorLB');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.model.gestconf.ItemsPorLB-class.html">ItemsPorLB</a><tt class="py-op">(</tt><tt class="py-base-class">DeclarativeBase</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ItemsPorLB-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="ItemsPorLB-expanded"><a name="L136"></a><tt class="py-lineno">136</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L137"></a><tt class="py-lineno">137</tt>  <tt class="py-line"><tt class="py-docstring">    Clase que define el conjunto de &#237;tems que forman parte</tt> </tt>
+<a name="L138"></a><tt class="py-lineno">138</tt>  <tt class="py-line"><tt class="py-docstring">    de una l&#237;nea base</tt> </tt>
+<a name="L139"></a><tt class="py-lineno">139</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L140"></a><tt class="py-lineno">140</tt>  <tt class="py-line">    <tt id="link-38" class="py-name"><a title="lpm.model.administracion.AtributosPorTipoItem.__tablename__
+lpm.model.administracion.Fase.__tablename__
+lpm.model.administracion.Proyecto.__tablename__
+lpm.model.administracion.TipoItem.__tablename__
+lpm.model.auth.Permiso.__tablename__
+lpm.model.auth.Rol.__tablename__
+lpm.model.auth.Usuario.__tablename__
+lpm.model.desarrollo.ArchivosExternos.__tablename__
+lpm.model.desarrollo.ArchivosPorItem.__tablename__
+lpm.model.desarrollo.AtributosDeItems.__tablename__
+lpm.model.desarrollo.AtributosPorItem.__tablename__
+lpm.model.desarrollo.HistorialItems.__tablename__
+lpm.model.desarrollo.Item.__tablename__
+lpm.model.desarrollo.PropiedadItem.__tablename__
+lpm.model.desarrollo.Relacion.__tablename__
+lpm.model.desarrollo.RelacionPorItem.__tablename__
+lpm.model.gestconf.HistorialLB.__tablename__
+lpm.model.gestconf.ItemsPorLB.__tablename__
+lpm.model.gestconf.LB.__tablename__" class="py-name" href="#" onclick="return doclink('link-38', '__tablename__', 'link-2');">__tablename__</a></tt> <tt class="py-op">=</tt> <tt class="py-string">'tbl_items_por_lb'</tt> </tt>
+<a name="L141"></a><tt class="py-lineno">141</tt>  <tt class="py-line">     </tt>
+<a name="L142"></a><tt class="py-lineno">142</tt>  <tt class="py-line">    <tt class="py-comment">#{ Columnas</tt> </tt>
+<a name="L143"></a><tt class="py-lineno">143</tt>  <tt class="py-line">    <tt id="link-39" class="py-name" targets="Variable lpm.model.gestconf.ItemsPorLB.id_item_por_lb=lpm.model.gestconf.ItemsPorLB-class.html#id_item_por_lb"><a title="lpm.model.gestconf.ItemsPorLB.id_item_por_lb" class="py-name" href="#" onclick="return doclink('link-39', 'id_item_por_lb', 'link-39');">id_item_por_lb</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">Integer</tt><tt class="py-op">,</tt> <tt class="py-name">autoincrement</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">primary_key</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+<a name="L144"></a><tt class="py-lineno">144</tt>  <tt class="py-line">    <tt id="link-40" class="py-name" targets="Variable lpm.model.desarrollo.HistorialItems.id_item=lpm.model.desarrollo.HistorialItems-class.html#id_item,Variable lpm.model.desarrollo.Item.id_item=lpm.model.desarrollo.Item-class.html#id_item,Variable lpm.model.gestconf.ItemsPorLB.id_item=lpm.model.gestconf.ItemsPorLB-class.html#id_item"><a title="lpm.model.desarrollo.HistorialItems.id_item
+lpm.model.desarrollo.Item.id_item
+lpm.model.gestconf.ItemsPorLB.id_item" class="py-name" href="#" onclick="return doclink('link-40', 'id_item', 'link-40');">id_item</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">Integer</tt><tt class="py-op">,</tt>  </tt>
+<a name="L145"></a><tt class="py-lineno">145</tt>  <tt class="py-line">                     <tt class="py-name">ForeignKey</tt><tt class="py-op">(</tt><tt class="py-string">'tbl_propiedad_item.id_propiedad_item'</tt><tt class="py-op">,</tt> </tt>
+<a name="L146"></a><tt class="py-lineno">146</tt>  <tt class="py-line">                                <tt class="py-name">onupdate</tt><tt class="py-op">=</tt><tt class="py-string">"CASCADE"</tt><tt class="py-op">,</tt> <tt class="py-name">ondelete</tt><tt class="py-op">=</tt><tt class="py-string">"CASCADE"</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L147"></a><tt class="py-lineno">147</tt>  <tt class="py-line">    <tt id="link-41" class="py-name"><a title="lpm.model.gestconf.HistorialLB.id_lb
+lpm.model.gestconf.ItemsPorLB.id_lb
+lpm.model.gestconf.LB.id_lb" class="py-name" href="#" onclick="return doclink('link-41', 'id_lb', 'link-3');">id_lb</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">Integer</tt><tt class="py-op">,</tt> <tt class="py-name">ForeignKey</tt><tt class="py-op">(</tt><tt class="py-string">'tbl_lb.id_lb'</tt><tt class="py-op">,</tt> </tt>
+<a name="L148"></a><tt class="py-lineno">148</tt>  <tt class="py-line">                                        <tt class="py-name">onupdate</tt><tt class="py-op">=</tt><tt class="py-string">"CASCADE"</tt><tt class="py-op">,</tt> <tt class="py-name">ondelete</tt><tt class="py-op">=</tt><tt class="py-string">"CASCADE"</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L149"></a><tt class="py-lineno">149</tt>  <tt class="py-line">     </tt>
+<a name="L150"></a><tt class="py-lineno">150</tt>  <tt class="py-line">    <tt class="py-comment">#{ Relaciones</tt> </tt>
+<a name="L151"></a><tt class="py-lineno">151</tt>  <tt class="py-line">    <tt id="link-42" class="py-name"><a title="lpm.model.gestconf.ItemsPorLB.propiedad_item" class="py-name" href="#" onclick="return doclink('link-42', 'propiedad_item', 'link-17');">propiedad_item</a></tt> <tt class="py-op">=</tt> <tt class="py-name">relation</tt><tt class="py-op">(</tt><tt class="py-string">'PropiedadItem'</tt><tt class="py-op">,</tt> <tt class="py-name">backref</tt><tt class="py-op">=</tt><tt class="py-string">'item_lb_assocs'</tt><tt class="py-op">)</tt> </tt>
+<a name="L152"></a><tt class="py-lineno">152</tt>  <tt class="py-line">    <tt class="py-comment">#}</tt> </tt>
+<a name="L153"></a><tt class="py-lineno">153</tt>  <tt class="py-line">     </tt>
+<a name="L154"></a><tt class="py-lineno">154</tt>  <tt class="py-line">    <tt class="py-decorator">@</tt><tt class="py-decorator">classmethod</tt> </tt>
+<a name="ItemsPorLB.filter_by_id_item"></a><div id="ItemsPorLB.filter_by_id_item-def"><a name="L155"></a><tt class="py-lineno">155</tt> <a class="py-toggle" href="#" id="ItemsPorLB.filter_by_id_item-toggle" onclick="return toggle('ItemsPorLB.filter_by_id_item');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.model.gestconf.ItemsPorLB-class.html#filter_by_id_item">filter_by_id_item</a><tt class="py-op">(</tt><tt class="py-param">cls</tt><tt class="py-op">,</tt> <tt class="py-param">id</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ItemsPorLB.filter_by_id_item-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="ItemsPorLB.filter_by_id_item-expanded"><a name="L156"></a><tt class="py-lineno">156</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L157"></a><tt class="py-lineno">157</tt>  <tt class="py-line"><tt class="py-docstring">        M&#233;todo de clase que realiza las b&#250;squedas por identificador</tt> </tt>
+<a name="L158"></a><tt class="py-lineno">158</tt>  <tt class="py-line"><tt class="py-docstring">        de &#237;tem.</tt> </tt>
+<a name="L159"></a><tt class="py-lineno">159</tt>  <tt class="py-line"><tt class="py-docstring">        </tt> </tt>
+<a name="L160"></a><tt class="py-lineno">160</tt>  <tt class="py-line"><tt class="py-docstring">        @param id: identificador del &#237;tem</tt> </tt>
+<a name="L161"></a><tt class="py-lineno">161</tt>  <tt class="py-line"><tt class="py-docstring">        @type id: C{Integer}</tt> </tt>
+<a name="L162"></a><tt class="py-lineno">162</tt>  <tt class="py-line"><tt class="py-docstring">        @return: el elemento recuperado</tt> </tt>
+<a name="L163"></a><tt class="py-lineno">163</tt>  <tt class="py-line"><tt class="py-docstring">        @rtype: L{ItemsPorLB}</tt> </tt>
+<a name="L164"></a><tt class="py-lineno">164</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L165"></a><tt class="py-lineno">165</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt id="link-43" class="py-name"><a title="lpm.model.DBSession" class="py-name" href="#" onclick="return doclink('link-43', 'DBSession', 'link-19');">DBSession</a></tt><tt class="py-op">.</tt><tt class="py-name">query</tt><tt class="py-op">(</tt><tt class="py-name">cls</tt><tt class="py-op">)</tt><tt class="py-op">.</tt><tt class="py-name">filter_by</tt><tt class="py-op">(</tt><tt id="link-44" class="py-name"><a title="lpm.model.desarrollo.HistorialItems.id_item
+lpm.model.desarrollo.Item.id_item
+lpm.model.gestconf.ItemsPorLB.id_item" class="py-name" href="#" onclick="return doclink('link-44', 'id_item', 'link-40');">id_item</a></tt><tt class="py-op">=</tt><tt class="py-name">id</tt><tt class="py-op">)</tt><tt class="py-op">.</tt><tt class="py-name">one</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L166"></a><tt class="py-lineno">166</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="lpm-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Sat Jun 25 12:33:27 2011
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

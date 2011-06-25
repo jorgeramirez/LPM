@@ -1,0 +1,467 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>sprox.widgets.widgets.SproxDataGrid</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="lpm-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        sprox ::
+        widgets ::
+        widgets ::
+        SproxDataGrid ::
+        Class&nbsp;SproxDataGrid
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="sprox.widgets.widgets.SproxDataGrid-class.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS DESCRIPTION ==================== -->
+<h1 class="epydoc">Class SproxDataGrid</h1><p class="nomargin-top"></p>
+<pre class="base-tree">
+             object --+            
+                      |            
+tw.core.view.Renderable --+        
+                          |        
+        tw.core.base.Widget --+    
+                              |    
+     tw.forms.datagrid.DataGrid --+
+                                  |
+                                 <strong class="uidshort">SproxDataGrid</strong>
+</pre>
+
+<hr />
+<p>Base class for all widgets.</p>
+  <p>Example:</p>
+  <p>.. sourcecode:: python</p>
+<pre class="py-doctest">
+<span class="py-prompt">&gt;&gt;&gt; </span>w = Widget(<span class="py-string">'foo'</span>)
+<span class="py-prompt">&gt;&gt;&gt; </span>w.id
+<span class="py-output">'foo'</span></pre>
+<pre class="py-doctest">
+<span class="py-prompt">&gt;&gt;&gt; </span>w = Widget(<span class="py-string">'foo'</span>, children=[Widget(<span class="py-string">'c1'</span>), Widget(<span class="py-string">'c2'</span>)])
+<span class="py-prompt">&gt;&gt;&gt; </span>[c.id <span class="py-keyword">for</span> c <span class="py-keyword">in</span> w.children]
+<span class="py-output">['foo_c1', 'foo_c2']</span>
+<span class="py-output"></span><span class="py-prompt">&gt;&gt;&gt; </span>[c.parent.id <span class="py-keyword">for</span> c <span class="py-keyword">in</span> w.children]
+<span class="py-output">['foo', 'foo']</span></pre>
+  <p>It is a **must** that all initial state is entirely determined by the 
+  arguments to this function. This means that two widgets (of the same 
+  class) that receive the same parameters must behave in exactly the same 
+  way. You should not rely on external sources inside __init__ to set 
+  initial state.</p>
+  <p>If you need to fetch data from external sources, do it at 
+  :meth:`update_params` instead.</p>
+  <p>Essential pre, and post initialization is done in :meth:`__new__` and 
+  :meth:`post_init` respectively. :meth:`post_init` is guaranteed to run 
+  after the instance finishes initialization and it's behavior is rather 
+  special as all post_init's in mro will be called to have a chance to set 
+  final state in the instance.</p>
+  <p>Basic pre-initialization consists of binding all kw arguments to the 
+  widget instance, attaching the widget to it's parent (if given), 
+  attaching the children and copying mutable arguments listed at 
+  :attr:`params` from the class to the instance to avoid accidental 
+  manipulation.</p>
+  <p>.. sourcecode:: python</p>
+<pre class="py-doctest">
+<span class="py-prompt">&gt;&gt;&gt; </span>w = Widget(<span class="py-string">'foo'</span>, a=1, b=2)
+<span class="py-prompt">&gt;&gt;&gt; </span>w.id
+<span class="py-output">'foo'</span>
+<span class="py-output"></span><span class="py-prompt">&gt;&gt;&gt; </span>w.a
+<span class="py-output">1</span>
+<span class="py-output"></span><span class="py-prompt">&gt;&gt;&gt; </span>w.b
+<span class="py-output">2</span></pre>
+  <p>Basic post-initialization consists of caching required CSS and JS 
+  resources and setting the widget as initialized preventing further 
+  modification of it's attributes.</p>
+  <p>.. sourcecode:: python</p>
+<pre class="py-doctest">
+<span class="py-prompt">&gt;&gt;&gt; </span>w = Widget(<span class="py-string">'foo'</span>, a=<span class="py-string">'1'</span>, b=<span class="py-string">'2'</span>)
+<span class="py-prompt">&gt;&gt;&gt; </span>w.a = <span class="py-string">'bar'</span>
+<span class="py-except">Traceback (most recent call last):</span>
+<span class="py-except">    ...</span>
+<span class="py-except">WidgetLocked: The widget is locked. It's unthread-safe to alter it's attributes after initialization.</span></pre>
+  <p>Widget attributes can only be modified in this method because widgets 
+  should behave in a state-less way as they are shared among threads for 
+  multiple requests.</p>
+  <p>Per request modification of variables sent to the template should be 
+  done inside :meth:`update_params` and all state flowing from parent to 
+  children should occur inside that dict.</p>
+  <p>Widgets should be instantiated at import time and reused among 
+  requests, most widgets allow overriding most of their parameters (not 
+  neccesarily all of them) at display time to change behavior. You should 
+  try avoiding instantiating widgets for every request as their 
+  initialization could be quite expensive for heavily nested widgets.</p>
+  <p>Request-local storage provided by the hosting framework in 
+  ``tw.framework.request`` can be used to pass state among widgets which 
+  don't share the same root.</p>
+
+<!-- ==================== NESTED CLASSES ==================== -->
+<a name="section-NestedClasses"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Nested Classes</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-NestedClasses"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>tw.core.base.Widget</code></b>:
+      <code><a href="tw.core.meta.WidgetType-class.html">__metaclass__</a></code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== INSTANCE METHODS ==================== -->
+<a name="section-InstanceMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>tw.forms.datagrid.DataGrid</code></b>:
+      <code>__getitem__</code>,
+      <code>get_column</code>,
+      <code>update_params</code>
+      </p>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code>tw.forms.datagrid.DataGrid</code></b> (private):
+      <code>_parse</code>
+      </p></div>
+    <p class="indent-wrapped-lines"><b>Inherited from <code>tw.core.base.Widget</code></b>:
+      <code>__call__</code>,
+      <code>__delattr__</code>,
+      <code>__eq__</code>,
+      <code>__init__</code>,
+      <code>__ne__</code>,
+      <code>__repr__</code>,
+      <code>__setattr__</code>,
+      <code>__str__</code>,
+      <code>adapt_value</code>,
+      <code>add_call</code>,
+      <code>clone</code>,
+      <code>display</code>,
+      <code>get_default</code>,
+      <code>ifilter_children</code>,
+      <code>post_init</code>,
+      <code>prepare_dict</code>,
+      <code>register_resources</code>,
+      <code>render</code>,
+      <code>retrieve_css</code>,
+      <code>retrieve_javascript</code>,
+      <code>retrieve_resources</code>,
+      <code>walk</code>
+      </p>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code>tw.core.base.Widget</code></b> (private):
+      <code>_append_child</code>,
+      <code>_append_to</code>,
+      <code>_as_repeated</code>,
+      <code>_collect_resources</code>,
+      <code>_get_child_args_getter</code>,
+      <code>_get_child_value_getter</code>
+      </p></div>
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__format__</code>,
+      <code>__getattribute__</code>,
+      <code>__hash__</code>,
+      <code>__reduce__</code>,
+      <code>__reduce_ex__</code>,
+      <code>__sizeof__</code>,
+      <code>__subclasshook__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== STATIC METHODS ==================== -->
+<a name="section-StaticMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Static Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-StaticMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>tw.forms.datagrid.DataGrid</code></b>:
+      <code>get_field_getter</code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code>tw.core.base.Widget</code></b>:
+      <code>__new__</code>
+      </p>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code>tw.core.base.Widget</code></b> (private):
+      <code>_child_displayer</code>
+      </p></div>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS VARIABLES ==================== -->
+<a name="section-ClassVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="available_engines"></a><span class="summary-name">available_engines</span> = <code title="['mako', 'genshi']"><code class="variable-group">[</code><code class="variable-quote">'</code><code class="variable-string">mako</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">genshi</code><code class="variable-quote">'</code><code class="variable-group">]</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="sprox.widgets.widgets.SproxDataGrid-class.html#params" class="summary-name">params</a> = <code title="frozenset(['controller',
+           'css_class',
+           'css_classes',
+           'fields',
+           'id',
+           'pks',
+           'xml_fields'])"><code class="variable-group">frozenset([</code><code class="variable-quote">'</code><code class="variable-string">controller</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">css_class</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">css_classes</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-ellipsis">...</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="template"></a><span class="summary-name">template</span> = <code title="'sprox.widgets.templates.datagrid'"><code class="variable-quote">'</code><code class="variable-string">sprox.widgets.templates.datagrid</code><code class="variable-quote">'</code></code><br />
+      hash(x)
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="xml_fields"></a><span class="summary-name">xml_fields</span> = <code title="['actions']"><code class="variable-group">[</code><code class="variable-quote">'</code><code class="variable-string">actions</code><code class="variable-quote">'</code><code class="variable-group">]</code></code>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>tw.forms.datagrid.DataGrid</code></b>:
+      <code>css</code>,
+      <code>css_class</code>,
+      <code>engine_name</code>,
+      <code>fields</code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code>tw.core.base.Widget</code></b>:
+      <code>css_class__doc</code>,
+      <code>css_classes</code>,
+      <code>css_classes__doc</code>,
+      <code>default</code>,
+      <code>id__doc</code>,
+      <code>javascript</code>,
+      <code>parent</code>,
+      <code>source_vars</code>
+      </p>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code>tw.core.base.Widget</code></b> (private):
+      <code>_cls_children</code>,
+      <code>_is_initialized</code>,
+      <code>_is_locked</code>
+      </p></div>
+    </td>
+  </tr>
+</table>
+<!-- ==================== PROPERTIES ==================== -->
+<a name="section-Properties"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Properties</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Properties"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>tw.core.base.Widget</code></b>:
+      <code>children_deep</code>,
+      <code>displays_on</code>,
+      <code>id</code>,
+      <code>id_path_elem</code>,
+      <code>is_root</code>,
+      <code>key</code>,
+      <code>path</code>,
+      <code>root</code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__class__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS VARIABLE DETAILS ==================== -->
+<a name="section-ClassVariableDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Variable Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassVariableDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="params"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">params</h3>
+  
+  <dl class="fields">
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+<code class="variable-group">frozenset([</code><code class="variable-quote">'</code><code class="variable-string">controller</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">css_class</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">css_classes</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">fields</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">id</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">pks</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+           <code class="variable-quote">'</code><code class="variable-string">xml_fields</code><code class="variable-quote">'</code><code class="variable-group">])</code>
+</pre></td></tr></table>
+</dd>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="lpm-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Sat Jun 25 12:33:20 2011
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

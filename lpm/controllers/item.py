@@ -183,7 +183,7 @@ class ItemTableFiller(CustomTableFiller):
             if aprobar:
                 value += '<div>' + \
                             '<a href="' + controller + 'aprobar/' +str(obj.id_item) +'" ' + \
-                            'class="' + clase + '">Aprobar</a>' + \
+                            'style="margin-right:8px;" class="' + clase + '">Aprobar</a>' + \
                          '</div><br />'
             elif desaprobar:
                 value += '<div>' + \
@@ -458,36 +458,7 @@ class RelacionItemTableFiller(RelacionTableFiller):
     def check(self, obj, **kw):
         checkbox = '<input type="checkbox" class="checkbox_tabla" id="' + str(obj.id_relacion) + '"/>'
         return checkbox
-    
-#    def __actions__(self, obj):
-#        """Links de acciones para un registro dado"""
-#
-#        value = '<div>'
-#        clase = 'actions_fase'
-#        id = str(obj.id_relacion)
-#        controller = "./eliminar_relaciones/" + id
-#        id_item = UrlParser.parse_id(request.url, "items")
-#        item = Item.por_id(id_item)
-#
-#        if PoseePermiso('modificar item', 
-#                        id_fase=item.id_fase).is_met(request.environ):
-#                        
-#            if UrlParser.parse_nombre(request.url, "relacionar_item"):
-#                #pagina relacionar item XXX
-#                value += '<div>' + \
-#                            '<a href="./relaciones/relacionar/' + id + '" ' + \
-#                            'class="' + clase + '">Relacionar</a>' + \
-#                         '</div><br />'
-#            else:
-#                value += '<div><form method="POST" action="' + controller + '" class="button-to">'+\
-#                         '<input type="hidden" name="_method" value="DELETE" />' +\
-#                         '<input onclick="return confirm(\'¿Está seguro?\');" value="Eliminar" type="submit" '+\
-#                         'style="background-color: transparent; float:left; border:0; color: #286571; display: inline;'+\
-#                         'margin: 0; padding: 0;' + clase + '"/>'+\
-#                         '</form></div><br />'
-#        
-#        value += '</div>'
-#        return value
+
 
 
 class ItemController(CrudRestController):
@@ -748,7 +719,7 @@ class ItemController(CrudRestController):
         bucle = False
         if (kw.has_key('retorno')):
             mensaje = u"No se pudo crear la relación con %s" % kw['retorno']
-#            flash(retorno, "warning")
+            flash(retorno, "warning")
             bucle = True
 
             

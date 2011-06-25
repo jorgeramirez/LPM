@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>lpm.model.excepciones</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="lpm-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="lpm-module.html">Package&nbsp;lpm</a> ::
+        <a href="lpm.model-module.html">Package&nbsp;model</a> ::
+        Module&nbsp;excepciones
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="lpm.model.excepciones-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="lpm.model.excepciones-module.html">Module lpm.model.excepciones</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno">  1</tt>  <tt class="py-line"><tt class="py-comment"># -*- coding: utf-8 -*-</tt> </tt>
+<a name="L2"></a><tt class="py-lineno">  2</tt>  <tt class="py-line"> </tt>
+<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L4"></a><tt class="py-lineno">  4</tt>  <tt class="py-line"><tt class="py-docstring">Este m&#243;dulo contiene las clases de las excepciones que se pueden lanzar por</tt> </tt>
+<a name="L5"></a><tt class="py-lineno">  5</tt>  <tt class="py-line"><tt class="py-docstring">el modelo</tt> </tt>
+<a name="L6"></a><tt class="py-lineno">  6</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L7"></a><tt class="py-lineno">  7</tt>  <tt class="py-line"><tt class="py-docstring">@authors:</tt> </tt>
+<a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line"><tt class="py-docstring">    - U{Carlos Bellino&lt;mailto:carlosbellino@gmail.com&gt;}</tt> </tt>
+<a name="L9"></a><tt class="py-lineno">  9</tt>  <tt class="py-line"><tt class="py-docstring">    - U{Nahuel Hern&#225;ndez&lt;mailto:nahuel.11990@gmail.com&gt;}</tt> </tt>
+<a name="L10"></a><tt class="py-lineno"> 10</tt>  <tt class="py-line"><tt class="py-docstring">    - U{Jorge Ram&#237;rez&lt;mailto:jorgeramirez1990@gmail.com&gt;}</tt> </tt>
+<a name="L11"></a><tt class="py-lineno"> 11</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L12"></a><tt class="py-lineno"> 12</tt>  <tt class="py-line"><tt class="py-docstring">@since: 1.0</tt> </tt>
+<a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line"> </tt>
+<a name="L15"></a><tt class="py-lineno"> 15</tt>  <tt class="py-line"><tt class="py-name">__all__</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt> </tt>
+<a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line">    <tt class="py-string">'ModelError'</tt><tt class="py-op">,</tt> <tt class="py-string">'NombreDeAtributoError'</tt><tt class="py-op">,</tt> <tt class="py-string">'NombreFaseError'</tt><tt class="py-op">,</tt> </tt>
+<a name="L17"></a><tt class="py-lineno"> 17</tt>  <tt class="py-line">    <tt class="py-string">'NombreTipoItemError'</tt><tt class="py-op">,</tt> <tt class="py-string">'TipoAtributoError'</tt><tt class="py-op">,</tt> <tt class="py-string">'CondicionAprobarError'</tt><tt class="py-op">,</tt> </tt>
+<a name="L18"></a><tt class="py-lineno"> 18</tt>  <tt class="py-line">    <tt class="py-string">'BloquearItemError'</tt><tt class="py-op">,</tt> <tt class="py-string">'DesBloquearItemError'</tt><tt class="py-op">,</tt> <tt class="py-string">'DesAprobarItemError'</tt><tt class="py-op">,</tt> </tt>
+<a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line">    <tt class="py-string">'ModificarItemError'</tt><tt class="py-op">,</tt> <tt class="py-string">'EliminarItemError'</tt><tt class="py-op">,</tt> <tt class="py-string">'AdjuntarArchivoError'</tt><tt class="py-op">,</tt> </tt>
+<a name="L20"></a><tt class="py-lineno"> 20</tt>  <tt class="py-line">    <tt class="py-string">'EliminarArchivoAdjuntoError'</tt><tt class="py-op">,</tt> <tt class="py-string">'RevivirItemError'</tt> </tt>
+<a name="L21"></a><tt class="py-lineno"> 21</tt>  <tt class="py-line"><tt class="py-op">]</tt> </tt>
+<a name="L22"></a><tt class="py-lineno"> 22</tt>  <tt class="py-line"> </tt>
+<a name="L23"></a><tt class="py-lineno"> 23</tt>  <tt class="py-line"> </tt>
+<a name="ModelError"></a><div id="ModelError-def"><a name="L24"></a><tt class="py-lineno"> 24</tt> <a class="py-toggle" href="#" id="ModelError-toggle" onclick="return toggle('ModelError');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.model.excepciones.ModelError-class.html">ModelError</a><tt class="py-op">(</tt><tt class="py-base-class">Exception</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ModelError-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="ModelError-expanded"><a name="L25"></a><tt class="py-lineno"> 25</tt>  <tt class="py-line">    <tt class="py-docstring">""" Excepcion Base para todas las del modulo """</tt> </tt>
+<a name="L26"></a><tt class="py-lineno"> 26</tt>  <tt class="py-line">    <tt class="py-keyword">pass</tt> </tt>
+</div><a name="L27"></a><tt class="py-lineno"> 27</tt>  <tt class="py-line"> </tt>
+<a name="L28"></a><tt class="py-lineno"> 28</tt>  <tt class="py-line"> </tt>
+<a name="NombreFaseError"></a><div id="NombreFaseError-def"><a name="L29"></a><tt class="py-lineno"> 29</tt> <a class="py-toggle" href="#" id="NombreFaseError-toggle" onclick="return toggle('NombreFaseError');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.model.excepciones.NombreFaseError-class.html">NombreFaseError</a><tt class="py-op">(</tt><tt class="py-base-class">ModelError</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="NombreFaseError-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="NombreFaseError-expanded"><a name="NombreFaseError.__str__"></a><div id="NombreFaseError.__str__-def"><a name="L30"></a><tt class="py-lineno"> 30</tt> <a class="py-toggle" href="#" id="NombreFaseError.__str__-toggle" onclick="return toggle('NombreFaseError.__str__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.model.excepciones.NombreFaseError-class.html#__str__">__str__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="NombreFaseError.__str__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="NombreFaseError.__str__-expanded"><a name="L31"></a><tt class="py-lineno"> 31</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-string">u"El nombre de fase ya existe"</tt> </tt>
+</div></div><a name="L32"></a><tt class="py-lineno"> 32</tt>  <tt class="py-line"> </tt>
+<a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line">     </tt>
+<a name="NombreDeAtributoError"></a><div id="NombreDeAtributoError-def"><a name="L34"></a><tt class="py-lineno"> 34</tt> <a class="py-toggle" href="#" id="NombreDeAtributoError-toggle" onclick="return toggle('NombreDeAtributoError');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.model.excepciones.NombreDeAtributoError-class.html">NombreDeAtributoError</a><tt class="py-op">(</tt><tt class="py-base-class">ModelError</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="NombreDeAtributoError-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="NombreDeAtributoError-expanded"><a name="NombreDeAtributoError.__str__"></a><div id="NombreDeAtributoError.__str__-def"><a name="L35"></a><tt class="py-lineno"> 35</tt> <a class="py-toggle" href="#" id="NombreDeAtributoError.__str__-toggle" onclick="return toggle('NombreDeAtributoError.__str__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.model.excepciones.NombreDeAtributoError-class.html#__str__">__str__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="NombreDeAtributoError.__str__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="NombreDeAtributoError.__str__-expanded"><a name="L36"></a><tt class="py-lineno"> 36</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-string">u"El nombre de atributo ya existe"</tt> </tt>
+</div></div><a name="L37"></a><tt class="py-lineno"> 37</tt>  <tt class="py-line"> </tt>
+<a name="RelacionError"></a><div id="RelacionError-def"><a name="L38"></a><tt class="py-lineno"> 38</tt> <a class="py-toggle" href="#" id="RelacionError-toggle" onclick="return toggle('RelacionError');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.model.excepciones.RelacionError-class.html">RelacionError</a><tt class="py-op">(</tt><tt class="py-base-class">ModelError</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="RelacionError-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="RelacionError-expanded"><a name="RelacionError.__init__"></a><div id="RelacionError.__init__-def"><a name="L39"></a><tt class="py-lineno"> 39</tt> <a class="py-toggle" href="#" id="RelacionError.__init__-toggle" onclick="return toggle('RelacionError.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.model.excepciones.RelacionError-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">msg</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="RelacionError.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="RelacionError.__init__-expanded"><a name="L40"></a><tt class="py-lineno"> 40</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L41"></a><tt class="py-lineno"> 41</tt>  <tt class="py-line"><tt class="py-docstring">        Constructor para la clase</tt> </tt>
+<a name="L42"></a><tt class="py-lineno"> 42</tt>  <tt class="py-line"><tt class="py-docstring">        </tt> </tt>
+<a name="L43"></a><tt class="py-lineno"> 43</tt>  <tt class="py-line"><tt class="py-docstring">        @param msg: el mensaje a desplegar</tt> </tt>
+<a name="L44"></a><tt class="py-lineno"> 44</tt>  <tt class="py-line"><tt class="py-docstring">        @type msg: C{unicode} o C{str}</tt> </tt>
+<a name="L45"></a><tt class="py-lineno"> 45</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L46"></a><tt class="py-lineno"> 46</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">isinstance</tt><tt class="py-op">(</tt><tt id="link-0" class="py-name" targets="Variable lpm.model.excepciones.ModificarItemError.msg=lpm.model.excepciones.ModificarItemError-class.html#msg"><a title="lpm.model.excepciones.ModificarItemError.msg" class="py-name" href="#" onclick="return doclink('link-0', 'msg', 'link-0');">msg</a></tt><tt class="py-op">,</tt> <tt class="py-name">str</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L47"></a><tt class="py-lineno"> 47</tt>  <tt class="py-line">            <tt id="link-1" class="py-name"><a title="lpm.model.excepciones.ModificarItemError.msg" class="py-name" href="#" onclick="return doclink('link-1', 'msg', 'link-0');">msg</a></tt> <tt class="py-op">=</tt> <tt class="py-name">unicode</tt><tt class="py-op">(</tt><tt id="link-2" class="py-name"><a title="lpm.model.excepciones.ModificarItemError.msg" class="py-name" href="#" onclick="return doclink('link-2', 'msg', 'link-0');">msg</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L48"></a><tt class="py-lineno"> 48</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-3" class="py-name"><a title="lpm.model.excepciones.ModificarItemError.msg" class="py-name" href="#" onclick="return doclink('link-3', 'msg', 'link-0');">msg</a></tt> <tt class="py-op">=</tt> <tt id="link-4" class="py-name"><a title="lpm.model.excepciones.ModificarItemError.msg" class="py-name" href="#" onclick="return doclink('link-4', 'msg', 'link-0');">msg</a></tt> </tt>
+</div><a name="L49"></a><tt class="py-lineno"> 49</tt>  <tt class="py-line">     </tt>
+<a name="RelacionError.__str__"></a><div id="RelacionError.__str__-def"><a name="L50"></a><tt class="py-lineno"> 50</tt> <a class="py-toggle" href="#" id="RelacionError.__str__-toggle" onclick="return toggle('RelacionError.__str__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.model.excepciones.RelacionError-class.html#__str__">__str__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="RelacionError.__str__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="RelacionError.__str__-expanded"><a name="L51"></a><tt class="py-lineno"> 51</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-string">u"Error: %s"</tt> <tt class="py-op">%</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-5" class="py-name"><a title="lpm.model.excepciones.ModificarItemError.msg" class="py-name" href="#" onclick="return doclink('link-5', 'msg', 'link-0');">msg</a></tt> </tt>
+</div></div><a name="L52"></a><tt class="py-lineno"> 52</tt>  <tt class="py-line"> </tt>
+<a name="NombreTipoItemError"></a><div id="NombreTipoItemError-def"><a name="L53"></a><tt class="py-lineno"> 53</tt> <a class="py-toggle" href="#" id="NombreTipoItemError-toggle" onclick="return toggle('NombreTipoItemError');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.model.excepciones.NombreTipoItemError-class.html">NombreTipoItemError</a><tt class="py-op">(</tt><tt class="py-base-class">ModelError</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="NombreTipoItemError-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="NombreTipoItemError-expanded"><a name="NombreTipoItemError.__str__"></a><div id="NombreTipoItemError.__str__-def"><a name="L54"></a><tt class="py-lineno"> 54</tt> <a class="py-toggle" href="#" id="NombreTipoItemError.__str__-toggle" onclick="return toggle('NombreTipoItemError.__str__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.model.excepciones.NombreTipoItemError-class.html#__str__">__str__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="NombreTipoItemError.__str__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="NombreTipoItemError.__str__-expanded"><a name="L55"></a><tt class="py-lineno"> 55</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-string">u"El nombre para el tipo de item es repetido"</tt> </tt>
+</div></div><a name="L56"></a><tt class="py-lineno"> 56</tt>  <tt class="py-line"> </tt>
+<a name="L57"></a><tt class="py-lineno"> 57</tt>  <tt class="py-line"> </tt>
+<a name="TipoAtributoError"></a><div id="TipoAtributoError-def"><a name="L58"></a><tt class="py-lineno"> 58</tt> <a class="py-toggle" href="#" id="TipoAtributoError-toggle" onclick="return toggle('TipoAtributoError');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.model.excepciones.TipoAtributoError-class.html">TipoAtributoError</a><tt class="py-op">(</tt><tt class="py-base-class">ModelError</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TipoAtributoError-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="TipoAtributoError-expanded"><a name="TipoAtributoError.__str__"></a><div id="TipoAtributoError.__str__-def"><a name="L59"></a><tt class="py-lineno"> 59</tt> <a class="py-toggle" href="#" id="TipoAtributoError.__str__-toggle" onclick="return toggle('TipoAtributoError.__str__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.model.excepciones.TipoAtributoError-class.html#__str__">__str__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TipoAtributoError.__str__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="TipoAtributoError.__str__-expanded"><a name="L60"></a><tt class="py-lineno"> 60</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-string">u"No se puede cambiar el tipo de un atributo de tipo instanciado"</tt> </tt>
+</div></div><a name="L61"></a><tt class="py-lineno"> 61</tt>  <tt class="py-line"> </tt>
+<a name="L62"></a><tt class="py-lineno"> 62</tt>  <tt class="py-line">     </tt>
+<a name="CondicionAprobarError"></a><div id="CondicionAprobarError-def"><a name="L63"></a><tt class="py-lineno"> 63</tt> <a class="py-toggle" href="#" id="CondicionAprobarError-toggle" onclick="return toggle('CondicionAprobarError');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.model.excepciones.CondicionAprobarError-class.html">CondicionAprobarError</a><tt class="py-op">(</tt><tt class="py-base-class">ModelError</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CondicionAprobarError-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="CondicionAprobarError-expanded"><a name="L64"></a><tt class="py-lineno"> 64</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L65"></a><tt class="py-lineno"> 65</tt>  <tt class="py-line"><tt class="py-docstring">    Excepcion que indica que algunas de las condiciones</tt> </tt>
+<a name="L66"></a><tt class="py-lineno"> 66</tt>  <tt class="py-line"><tt class="py-docstring">    de aprobaci&#243;n de un &#237;tem no se cumplieron.</tt> </tt>
+<a name="L67"></a><tt class="py-lineno"> 67</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L68"></a><tt class="py-lineno"> 68</tt>  <tt class="py-line">     </tt>
+<a name="CondicionAprobarError.__init__"></a><div id="CondicionAprobarError.__init__-def"><a name="L69"></a><tt class="py-lineno"> 69</tt> <a class="py-toggle" href="#" id="CondicionAprobarError.__init__-toggle" onclick="return toggle('CondicionAprobarError.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.model.excepciones.CondicionAprobarError-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">msg</tt><tt class="py-op">=</tt><tt class="py-string">u"Algunas condiciones no se cumplen"</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CondicionAprobarError.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="CondicionAprobarError.__init__-expanded"><a name="L70"></a><tt class="py-lineno"> 70</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L71"></a><tt class="py-lineno"> 71</tt>  <tt class="py-line"><tt class="py-docstring">        Constructor para la clase</tt> </tt>
+<a name="L72"></a><tt class="py-lineno"> 72</tt>  <tt class="py-line"><tt class="py-docstring">        </tt> </tt>
+<a name="L73"></a><tt class="py-lineno"> 73</tt>  <tt class="py-line"><tt class="py-docstring">        @param msg: el mensaje a desplegar</tt> </tt>
+<a name="L74"></a><tt class="py-lineno"> 74</tt>  <tt class="py-line"><tt class="py-docstring">        @type msg: C{unicode} o C{str}</tt> </tt>
+<a name="L75"></a><tt class="py-lineno"> 75</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L76"></a><tt class="py-lineno"> 76</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">isinstance</tt><tt class="py-op">(</tt><tt id="link-6" class="py-name"><a title="lpm.model.excepciones.ModificarItemError.msg" class="py-name" href="#" onclick="return doclink('link-6', 'msg', 'link-0');">msg</a></tt><tt class="py-op">,</tt> <tt class="py-name">str</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L77"></a><tt class="py-lineno"> 77</tt>  <tt class="py-line">            <tt id="link-7" class="py-name"><a title="lpm.model.excepciones.ModificarItemError.msg" class="py-name" href="#" onclick="return doclink('link-7', 'msg', 'link-0');">msg</a></tt> <tt class="py-op">=</tt> <tt class="py-name">unicode</tt><tt class="py-op">(</tt><tt id="link-8" class="py-name"><a title="lpm.model.excepciones.ModificarItemError.msg" class="py-name" href="#" onclick="return doclink('link-8', 'msg', 'link-0');">msg</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L78"></a><tt class="py-lineno"> 78</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-9" class="py-name"><a title="lpm.model.excepciones.ModificarItemError.msg" class="py-name" href="#" onclick="return doclink('link-9', 'msg', 'link-0');">msg</a></tt> <tt class="py-op">=</tt> <tt id="link-10" class="py-name"><a title="lpm.model.excepciones.ModificarItemError.msg" class="py-name" href="#" onclick="return doclink('link-10', 'msg', 'link-0');">msg</a></tt> </tt>
+</div><a name="L79"></a><tt class="py-lineno"> 79</tt>  <tt class="py-line">     </tt>
+<a name="CondicionAprobarError.__str__"></a><div id="CondicionAprobarError.__str__-def"><a name="L80"></a><tt class="py-lineno"> 80</tt> <a class="py-toggle" href="#" id="CondicionAprobarError.__str__-toggle" onclick="return toggle('CondicionAprobarError.__str__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.model.excepciones.CondicionAprobarError-class.html#__str__">__str__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CondicionAprobarError.__str__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="CondicionAprobarError.__str__-expanded"><a name="L81"></a><tt class="py-lineno"> 81</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-string">u"Error: %s"</tt> <tt class="py-op">%</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-11" class="py-name"><a title="lpm.model.excepciones.ModificarItemError.msg" class="py-name" href="#" onclick="return doclink('link-11', 'msg', 'link-0');">msg</a></tt> </tt>
+</div></div><a name="L82"></a><tt class="py-lineno"> 82</tt>  <tt class="py-line"> </tt>
+<a name="L83"></a><tt class="py-lineno"> 83</tt>  <tt class="py-line"> </tt>
+<a name="BloquearItemError"></a><div id="BloquearItemError-def"><a name="L84"></a><tt class="py-lineno"> 84</tt> <a class="py-toggle" href="#" id="BloquearItemError-toggle" onclick="return toggle('BloquearItemError');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.model.excepciones.BloquearItemError-class.html">BloquearItemError</a><tt class="py-op">(</tt><tt class="py-base-class">ModelError</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BloquearItemError-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="BloquearItemError-expanded"><a name="L85"></a><tt class="py-lineno"> 85</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L86"></a><tt class="py-lineno"> 86</tt>  <tt class="py-line"><tt class="py-docstring">    Excepcion lanzada cuando se intenta bloquear un L{Item}</tt> </tt>
+<a name="L87"></a><tt class="py-lineno"> 87</tt>  <tt class="py-line"><tt class="py-docstring">    con estado distinto al de "Aprobado"</tt> </tt>
+<a name="L88"></a><tt class="py-lineno"> 88</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="BloquearItemError.__str__"></a><div id="BloquearItemError.__str__-def"><a name="L89"></a><tt class="py-lineno"> 89</tt> <a class="py-toggle" href="#" id="BloquearItemError.__str__-toggle" onclick="return toggle('BloquearItemError.__str__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.model.excepciones.BloquearItemError-class.html#__str__">__str__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BloquearItemError.__str__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BloquearItemError.__str__-expanded"><a name="L90"></a><tt class="py-lineno"> 90</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-string">u"Error: Para bloquear un &#237;tem, el mismo de estar Aprobado"</tt> </tt>
+</div></div><a name="L91"></a><tt class="py-lineno"> 91</tt>  <tt class="py-line"> </tt>
+<a name="DesBloquearItemError"></a><div id="DesBloquearItemError-def"><a name="L92"></a><tt class="py-lineno"> 92</tt> <a class="py-toggle" href="#" id="DesBloquearItemError-toggle" onclick="return toggle('DesBloquearItemError');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.model.excepciones.DesBloquearItemError-class.html">DesBloquearItemError</a><tt class="py-op">(</tt><tt class="py-base-class">ModelError</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="DesBloquearItemError-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="DesBloquearItemError-expanded"><a name="L93"></a><tt class="py-lineno"> 93</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L94"></a><tt class="py-lineno"> 94</tt>  <tt class="py-line"><tt class="py-docstring">    Excepcion lanzada cuando se intenta desbloquear un L{Item}</tt> </tt>
+<a name="L95"></a><tt class="py-lineno"> 95</tt>  <tt class="py-line"><tt class="py-docstring">    con estado distinto al de "Bloqueado"</tt> </tt>
+<a name="L96"></a><tt class="py-lineno"> 96</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="DesBloquearItemError.__str__"></a><div id="DesBloquearItemError.__str__-def"><a name="L97"></a><tt class="py-lineno"> 97</tt> <a class="py-toggle" href="#" id="DesBloquearItemError.__str__-toggle" onclick="return toggle('DesBloquearItemError.__str__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.model.excepciones.DesBloquearItemError-class.html#__str__">__str__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="DesBloquearItemError.__str__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="DesBloquearItemError.__str__-expanded"><a name="L98"></a><tt class="py-lineno"> 98</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-string">u"Error: Para desbloquear un &#237;tem, el mismo de estar Bloqueado o Revision-Bloq"</tt> </tt>
+</div></div><a name="L99"></a><tt class="py-lineno"> 99</tt>  <tt class="py-line"> </tt>
+<a name="DesAprobarItemError"></a><div id="DesAprobarItemError-def"><a name="L100"></a><tt class="py-lineno">100</tt> <a class="py-toggle" href="#" id="DesAprobarItemError-toggle" onclick="return toggle('DesAprobarItemError');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.model.excepciones.DesAprobarItemError-class.html">DesAprobarItemError</a><tt class="py-op">(</tt><tt class="py-base-class">ModelError</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="DesAprobarItemError-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="DesAprobarItemError-expanded"><a name="L101"></a><tt class="py-lineno">101</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L102"></a><tt class="py-lineno">102</tt>  <tt class="py-line"><tt class="py-docstring">    Excepcion lanzada cuando se intenta desaprobar un L{Item}</tt> </tt>
+<a name="L103"></a><tt class="py-lineno">103</tt>  <tt class="py-line"><tt class="py-docstring">    con estado distinto al de "Aprobado" o &#8220;Revisi&#243;n-Desbloq&#8221;</tt> </tt>
+<a name="L104"></a><tt class="py-lineno">104</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="DesAprobarItemError.__str__"></a><div id="DesAprobarItemError.__str__-def"><a name="L105"></a><tt class="py-lineno">105</tt> <a class="py-toggle" href="#" id="DesAprobarItemError.__str__-toggle" onclick="return toggle('DesAprobarItemError.__str__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.model.excepciones.DesAprobarItemError-class.html#__str__">__str__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="DesAprobarItemError.__str__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="DesAprobarItemError.__str__-expanded"><a name="L106"></a><tt class="py-lineno">106</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-string">u"Error: Para desaprobar un &#237;tem, el mismo de estar Aprobabo o Revision-Desbloq"</tt> </tt>
+</div></div><a name="L107"></a><tt class="py-lineno">107</tt>  <tt class="py-line"> </tt>
+<a name="L108"></a><tt class="py-lineno">108</tt>  <tt class="py-line"> </tt>
+<a name="ModificarItemError"></a><div id="ModificarItemError-def"><a name="L109"></a><tt class="py-lineno">109</tt> <a class="py-toggle" href="#" id="ModificarItemError-toggle" onclick="return toggle('ModificarItemError');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.model.excepciones.ModificarItemError-class.html">ModificarItemError</a><tt class="py-op">(</tt><tt class="py-base-class">ModelError</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ModificarItemError-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="ModificarItemError-expanded"><a name="L110"></a><tt class="py-lineno">110</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L111"></a><tt class="py-lineno">111</tt>  <tt class="py-line"><tt class="py-docstring">    Excepcion lanzada cuando se intenta modificar un L{Item}</tt> </tt>
+<a name="L112"></a><tt class="py-lineno">112</tt>  <tt class="py-line"><tt class="py-docstring">    con estado igual a "Bloqueado", "Revision-Bloq" o "Eliminado"</tt> </tt>
+<a name="L113"></a><tt class="py-lineno">113</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L114"></a><tt class="py-lineno">114</tt>  <tt class="py-line">    <tt id="link-12" class="py-name"><a title="lpm.model.excepciones.ModificarItemError.msg" class="py-name" href="#" onclick="return doclink('link-12', 'msg', 'link-0');">msg</a></tt> <tt class="py-op">=</tt> <tt class="py-string">u"No puede modificar un &#237;tem en estado "</tt> <tt class="py-op">+</tt> \ </tt>
+<a name="L115"></a><tt class="py-lineno">115</tt>  <tt class="py-line">          <tt class="py-string">u"Bloqueado, Revision-Bloq o Eliminado"</tt>    </tt>
+<a name="L116"></a><tt class="py-lineno">116</tt>  <tt class="py-line"> </tt>
+<a name="ModificarItemError.__init__"></a><div id="ModificarItemError.__init__-def"><a name="L117"></a><tt class="py-lineno">117</tt> <a class="py-toggle" href="#" id="ModificarItemError.__init__-toggle" onclick="return toggle('ModificarItemError.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.model.excepciones.ModificarItemError-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">msg</tt><tt class="py-op">=</tt><tt class="py-string">u""</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ModificarItemError.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="ModificarItemError.__init__-expanded"><a name="L118"></a><tt class="py-lineno">118</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L119"></a><tt class="py-lineno">119</tt>  <tt class="py-line"><tt class="py-docstring">        Constructor para la clase</tt> </tt>
+<a name="L120"></a><tt class="py-lineno">120</tt>  <tt class="py-line"><tt class="py-docstring">        </tt> </tt>
+<a name="L121"></a><tt class="py-lineno">121</tt>  <tt class="py-line"><tt class="py-docstring">        @param msg: el mensaje a desplegar</tt> </tt>
+<a name="L122"></a><tt class="py-lineno">122</tt>  <tt class="py-line"><tt class="py-docstring">        @type msg: C{unicode} o C{str}</tt> </tt>
+<a name="L123"></a><tt class="py-lineno">123</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L124"></a><tt class="py-lineno">124</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">isinstance</tt><tt class="py-op">(</tt><tt id="link-13" class="py-name"><a title="lpm.model.excepciones.ModificarItemError.msg" class="py-name" href="#" onclick="return doclink('link-13', 'msg', 'link-0');">msg</a></tt><tt class="py-op">,</tt> <tt class="py-name">str</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L125"></a><tt class="py-lineno">125</tt>  <tt class="py-line">            <tt id="link-14" class="py-name"><a title="lpm.model.excepciones.ModificarItemError.msg" class="py-name" href="#" onclick="return doclink('link-14', 'msg', 'link-0');">msg</a></tt> <tt class="py-op">=</tt> <tt class="py-name">unicode</tt><tt class="py-op">(</tt><tt id="link-15" class="py-name"><a title="lpm.model.excepciones.ModificarItemError.msg" class="py-name" href="#" onclick="return doclink('link-15', 'msg', 'link-0');">msg</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L126"></a><tt class="py-lineno">126</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt id="link-16" class="py-name"><a title="lpm.model.excepciones.ModificarItemError.msg" class="py-name" href="#" onclick="return doclink('link-16', 'msg', 'link-0');">msg</a></tt><tt class="py-op">:</tt> </tt>
+<a name="L127"></a><tt class="py-lineno">127</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-17" class="py-name"><a title="lpm.model.excepciones.ModificarItemError.msg" class="py-name" href="#" onclick="return doclink('link-17', 'msg', 'link-0');">msg</a></tt> <tt class="py-op">=</tt> <tt id="link-18" class="py-name"><a title="lpm.model.excepciones.ModificarItemError.msg" class="py-name" href="#" onclick="return doclink('link-18', 'msg', 'link-0');">msg</a></tt> </tt>
+</div><a name="L128"></a><tt class="py-lineno">128</tt>  <tt class="py-line">         </tt>
+<a name="ModificarItemError.__str__"></a><div id="ModificarItemError.__str__-def"><a name="L129"></a><tt class="py-lineno">129</tt> <a class="py-toggle" href="#" id="ModificarItemError.__str__-toggle" onclick="return toggle('ModificarItemError.__str__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.model.excepciones.ModificarItemError-class.html#__str__">__str__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ModificarItemError.__str__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="ModificarItemError.__str__-expanded"><a name="L130"></a><tt class="py-lineno">130</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-string">u"Error: %s"</tt> <tt class="py-op">%</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-19" class="py-name"><a title="lpm.model.excepciones.ModificarItemError.msg" class="py-name" href="#" onclick="return doclink('link-19', 'msg', 'link-0');">msg</a></tt> </tt>
+</div></div><a name="L131"></a><tt class="py-lineno">131</tt>  <tt class="py-line"> </tt>
+<a name="RevivirItemError"></a><div id="RevivirItemError-def"><a name="L132"></a><tt class="py-lineno">132</tt> <a class="py-toggle" href="#" id="RevivirItemError-toggle" onclick="return toggle('RevivirItemError');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.model.excepciones.RevivirItemError-class.html">RevivirItemError</a><tt class="py-op">(</tt><tt class="py-base-class">ModelError</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="RevivirItemError-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="RevivirItemError-expanded"><a name="L133"></a><tt class="py-lineno">133</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L134"></a><tt class="py-lineno">134</tt>  <tt class="py-line"><tt class="py-docstring">    Excepcion lanzada cuando se intenta revivir un L{Item}</tt> </tt>
+<a name="L135"></a><tt class="py-lineno">135</tt>  <tt class="py-line"><tt class="py-docstring">    con estado distinto al de "Eliminado"</tt> </tt>
+<a name="L136"></a><tt class="py-lineno">136</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="RevivirItemError.__str__"></a><div id="RevivirItemError.__str__-def"><a name="L137"></a><tt class="py-lineno">137</tt> <a class="py-toggle" href="#" id="RevivirItemError.__str__-toggle" onclick="return toggle('RevivirItemError.__str__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.model.excepciones.RevivirItemError-class.html#__str__">__str__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="RevivirItemError.__str__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="RevivirItemError.__str__-expanded"><a name="L138"></a><tt class="py-lineno">138</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-string">u"Error: Para revivir un &#237;tem, el mismo debio haber sido eliminado"</tt> </tt>
+</div></div><a name="L139"></a><tt class="py-lineno">139</tt>  <tt class="py-line"> </tt>
+<a name="L140"></a><tt class="py-lineno">140</tt>  <tt class="py-line"> </tt>
+<a name="EliminarItemError"></a><div id="EliminarItemError-def"><a name="L141"></a><tt class="py-lineno">141</tt> <a class="py-toggle" href="#" id="EliminarItemError-toggle" onclick="return toggle('EliminarItemError');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.model.excepciones.EliminarItemError-class.html">EliminarItemError</a><tt class="py-op">(</tt><tt class="py-base-class">ModelError</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="EliminarItemError-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="EliminarItemError-expanded"><a name="L142"></a><tt class="py-lineno">142</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L143"></a><tt class="py-lineno">143</tt>  <tt class="py-line"><tt class="py-docstring">    Excepcion lanzada cuando se intenta eliminar un L{Item}</tt> </tt>
+<a name="L144"></a><tt class="py-lineno">144</tt>  <tt class="py-line"><tt class="py-docstring">    con estado igual a "Bloqueado", "Revision-Bloq" o "Eliminado"</tt> </tt>
+<a name="L145"></a><tt class="py-lineno">145</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="EliminarItemError.__str__"></a><div id="EliminarItemError.__str__-def"><a name="L146"></a><tt class="py-lineno">146</tt> <a class="py-toggle" href="#" id="EliminarItemError.__str__-toggle" onclick="return toggle('EliminarItemError.__str__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.model.excepciones.EliminarItemError-class.html#__str__">__str__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="EliminarItemError.__str__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="EliminarItemError.__str__-expanded"><a name="L147"></a><tt class="py-lineno">147</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-string">u"Error: No puede eliminar un &#237;tem en estado Bloqueado, Revision-Bloq o Eliminado"</tt> </tt>
+</div></div><a name="L148"></a><tt class="py-lineno">148</tt>  <tt class="py-line"> </tt>
+<a name="L149"></a><tt class="py-lineno">149</tt>  <tt class="py-line"> </tt>
+<a name="AdjuntarArchivoError"></a><div id="AdjuntarArchivoError-def"><a name="L150"></a><tt class="py-lineno">150</tt> <a class="py-toggle" href="#" id="AdjuntarArchivoError-toggle" onclick="return toggle('AdjuntarArchivoError');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.model.excepciones.AdjuntarArchivoError-class.html">AdjuntarArchivoError</a><tt class="py-op">(</tt><tt class="py-base-class">ModelError</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="AdjuntarArchivoError-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="AdjuntarArchivoError-expanded"><a name="L151"></a><tt class="py-lineno">151</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L152"></a><tt class="py-lineno">152</tt>  <tt class="py-line"><tt class="py-docstring">    Excepcion lanzada cuando se intenta adjuntar un archivo a un L{Item}</tt> </tt>
+<a name="L153"></a><tt class="py-lineno">153</tt>  <tt class="py-line"><tt class="py-docstring">    con estado igual a "Bloqueado", "Revision-Bloq" o "Eliminado"</tt> </tt>
+<a name="L154"></a><tt class="py-lineno">154</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="AdjuntarArchivoError.__str__"></a><div id="AdjuntarArchivoError.__str__-def"><a name="L155"></a><tt class="py-lineno">155</tt> <a class="py-toggle" href="#" id="AdjuntarArchivoError.__str__-toggle" onclick="return toggle('AdjuntarArchivoError.__str__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.model.excepciones.AdjuntarArchivoError-class.html#__str__">__str__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="AdjuntarArchivoError.__str__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="AdjuntarArchivoError.__str__-expanded"><a name="L156"></a><tt class="py-lineno">156</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-string">u"Error: No puede adjuntar un archivo a un &#237;tem en estado Bloqueado, Revision-Bloq o Eliminado"</tt> </tt>
+</div></div><a name="L157"></a><tt class="py-lineno">157</tt>  <tt class="py-line"> </tt>
+<a name="L158"></a><tt class="py-lineno">158</tt>  <tt class="py-line"> </tt>
+<a name="EliminarArchivoAdjuntoError"></a><div id="EliminarArchivoAdjuntoError-def"><a name="L159"></a><tt class="py-lineno">159</tt> <a class="py-toggle" href="#" id="EliminarArchivoAdjuntoError-toggle" onclick="return toggle('EliminarArchivoAdjuntoError');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.model.excepciones.EliminarArchivoAdjuntoError-class.html">EliminarArchivoAdjuntoError</a><tt class="py-op">(</tt><tt class="py-base-class">ModelError</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="EliminarArchivoAdjuntoError-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="EliminarArchivoAdjuntoError-expanded"><a name="L160"></a><tt class="py-lineno">160</tt>  <tt class="py-line">    <tt class="py-docstring">"""</tt> </tt>
+<a name="L161"></a><tt class="py-lineno">161</tt>  <tt class="py-line"><tt class="py-docstring">    Excepcion lanzada cuando se intenta eliminar un archivo de un L{Item}</tt> </tt>
+<a name="L162"></a><tt class="py-lineno">162</tt>  <tt class="py-line"><tt class="py-docstring">    con estado igual a "Bloqueado", "Revision-Bloq" o "Eliminado"</tt> </tt>
+<a name="L163"></a><tt class="py-lineno">163</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="EliminarArchivoAdjuntoError.__str__"></a><div id="EliminarArchivoAdjuntoError.__str__-def"><a name="L164"></a><tt class="py-lineno">164</tt> <a class="py-toggle" href="#" id="EliminarArchivoAdjuntoError.__str__-toggle" onclick="return toggle('EliminarArchivoAdjuntoError.__str__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.model.excepciones.EliminarArchivoAdjuntoError-class.html#__str__">__str__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="EliminarArchivoAdjuntoError.__str__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="EliminarArchivoAdjuntoError.__str__-expanded"><a name="L165"></a><tt class="py-lineno">165</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-string">u"Error: No puede eliminar un archivo de un &#237;tem en estado Bloqueado, Revision-Bloq o Eliminado"</tt> </tt>
+</div></div><a name="L166"></a><tt class="py-lineno">166</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="lpm-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Sat Jun 25 12:33:34 2011
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

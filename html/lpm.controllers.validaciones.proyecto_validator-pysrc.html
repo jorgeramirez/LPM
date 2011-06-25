@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>lpm.controllers.validaciones.proyecto_validator</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="lpm-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="lpm-module.html">Package&nbsp;lpm</a> ::
+        <a href="lpm.controllers-module.html">Package&nbsp;controllers</a> ::
+        <a href="lpm.controllers.validaciones-module.html">Package&nbsp;validaciones</a> ::
+        Module&nbsp;proyecto_validator
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="lpm.controllers.validaciones.proyecto_validator-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="lpm.controllers.validaciones.proyecto_validator-module.html">Module lpm.controllers.validaciones.proyecto_validator</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno"> 1</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">tg</tt> <tt class="py-keyword">import</tt> <tt class="py-name">request</tt> </tt>
+<a name="L2"></a><tt class="py-lineno"> 2</tt>  <tt class="py-line"> </tt>
+<a name="L3"></a><tt class="py-lineno"> 3</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt id="link-0" class="py-name" targets="Package lpm=lpm-module.html"><a title="lpm" class="py-name" href="#" onclick="return doclink('link-0', 'lpm', 'link-0');">lpm</a></tt><tt class="py-op">.</tt><tt id="link-1" class="py-name" targets="Package lpm.lib=lpm.lib-module.html"><a title="lpm.lib" class="py-name" href="#" onclick="return doclink('link-1', 'lib', 'link-1');">lib</a></tt><tt class="py-op">.</tt><tt id="link-2" class="py-name" targets="Module lpm.lib.util=lpm.lib.util-module.html"><a title="lpm.lib.util" class="py-name" href="#" onclick="return doclink('link-2', 'util', 'link-2');">util</a></tt> <tt class="py-keyword">import</tt> <tt id="link-3" class="py-name" targets="Class lpm.lib.util.UrlParser=lpm.lib.util.UrlParser-class.html"><a title="lpm.lib.util.UrlParser" class="py-name" href="#" onclick="return doclink('link-3', 'UrlParser', 'link-3');">UrlParser</a></tt> </tt>
+<a name="L4"></a><tt class="py-lineno"> 4</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt id="link-4" class="py-name"><a title="lpm" class="py-name" href="#" onclick="return doclink('link-4', 'lpm', 'link-0');">lpm</a></tt><tt class="py-op">.</tt><tt id="link-5" class="py-name" targets="Variable lpm.controllers.proyecto.ProyectoController.model=lpm.controllers.proyecto.ProyectoController-class.html#model,Variable lpm.controllers.rol.RolPlantillaController.model=lpm.controllers.rol.RolPlantillaController-class.html#model,Variable lpm.controllers.usuario.UsuarioController.model=lpm.controllers.usuario.UsuarioController-class.html#model,Package lpm.model=lpm.model-module.html"><a title="lpm.controllers.proyecto.ProyectoController.model
+lpm.controllers.rol.RolPlantillaController.model
+lpm.controllers.usuario.UsuarioController.model
+lpm.model" class="py-name" href="#" onclick="return doclink('link-5', 'model', 'link-5');">model</a></tt> <tt class="py-keyword">import</tt> <tt id="link-6" class="py-name" targets="Class lpm.model.administracion.Proyecto=lpm.model.administracion.Proyecto-class.html"><a title="lpm.model.administracion.Proyecto" class="py-name" href="#" onclick="return doclink('link-6', 'Proyecto', 'link-6');">Proyecto</a></tt> </tt>
+<a name="L5"></a><tt class="py-lineno"> 5</tt>  <tt class="py-line"> </tt>
+<a name="L6"></a><tt class="py-lineno"> 6</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">formencode</tt><tt class="py-op">.</tt><tt class="py-name">validators</tt> <tt class="py-keyword">import</tt> <tt class="py-name">String</tt><tt class="py-op">,</tt> <tt class="py-name">NotEmpty</tt> </tt>
+<a name="L7"></a><tt class="py-lineno"> 7</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">formencode</tt> <tt class="py-keyword">import</tt> <tt class="py-name">Schema</tt><tt class="py-op">,</tt> <tt class="py-name">All</tt><tt class="py-op">,</tt> <tt class="py-name">FancyValidator</tt><tt class="py-op">,</tt> <tt class="py-name">Invalid</tt> </tt>
+<a name="L8"></a><tt class="py-lineno"> 8</tt>  <tt class="py-line"> </tt>
+<a name="L9"></a><tt class="py-lineno"> 9</tt>  <tt class="py-line"><tt class="py-name">__all__</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-string">'ProyectoAddFormValidator'</tt><tt class="py-op">,</tt> <tt class="py-string">'ProyectoEditFormValidator'</tt><tt class="py-op">]</tt> </tt>
+<a name="L10"></a><tt class="py-lineno">10</tt>  <tt class="py-line"> </tt>
+<a name="UniqueNewNombre"></a><div id="UniqueNewNombre-def"><a name="L11"></a><tt class="py-lineno">11</tt> <a class="py-toggle" href="#" id="UniqueNewNombre-toggle" onclick="return toggle('UniqueNewNombre');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.controllers.validaciones.proyecto_validator.UniqueNewNombre-class.html">UniqueNewNombre</a><tt class="py-op">(</tt><tt class="py-base-class">FancyValidator</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="UniqueNewNombre-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="UniqueNewNombre-expanded"><a name="UniqueNewNombre._to_python"></a><div id="UniqueNewNombre._to_python-def"><a name="L12"></a><tt class="py-lineno">12</tt> <a class="py-toggle" href="#" id="UniqueNewNombre._to_python-toggle" onclick="return toggle('UniqueNewNombre._to_python');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.controllers.validaciones.proyecto_validator.UniqueNewNombre-class.html#_to_python">_to_python</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">value</tt><tt class="py-op">,</tt> <tt class="py-param">state</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="UniqueNewNombre._to_python-collapsed" style="display:none;" pad="++" indent="++++++++"></div><div id="UniqueNewNombre._to_python-expanded"><a name="L13"></a><tt class="py-lineno">13</tt>  <tt class="py-line">        <tt class="py-name">nombres</tt> <tt class="py-op">=</tt> <tt id="link-7" class="py-name"><a title="lpm.model.administracion.Proyecto" class="py-name" href="#" onclick="return doclink('link-7', 'Proyecto', 'link-6');">Proyecto</a></tt><tt class="py-op">.</tt><tt id="link-8" class="py-name" targets="Class Method lpm.model.administracion.Proyecto.por_nombre()=lpm.model.administracion.Proyecto-class.html#por_nombre,Class Method lpm.model.administracion.TipoItem.por_nombre()=lpm.model.administracion.TipoItem-class.html#por_nombre"><a title="lpm.model.administracion.Proyecto.por_nombre
+lpm.model.administracion.TipoItem.por_nombre" class="py-name" href="#" onclick="return doclink('link-8', 'por_nombre', 'link-8');">por_nombre</a></tt><tt class="py-op">(</tt><tt class="py-name">value</tt><tt class="py-op">)</tt> </tt>
+<a name="L14"></a><tt class="py-lineno">14</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">nombres</tt> <tt class="py-op">!=</tt> <tt class="py-name">None</tt><tt class="py-op">:</tt> </tt>
+<a name="L15"></a><tt class="py-lineno">15</tt>  <tt class="py-line">            <tt class="py-keyword">raise</tt> <tt class="py-name">Invalid</tt><tt class="py-op">(</tt><tt class="py-string">'El nombre de proyecto ya existe en sistema'</tt><tt class="py-op">,</tt> </tt>
+<a name="L16"></a><tt class="py-lineno">16</tt>  <tt class="py-line">                                        <tt class="py-name">value</tt><tt class="py-op">,</tt> <tt class="py-name">state</tt><tt class="py-op">)</tt> </tt>
+<a name="L17"></a><tt class="py-lineno">17</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">value</tt> </tt>
+</div></div><a name="L18"></a><tt class="py-lineno">18</tt>  <tt class="py-line"> </tt>
+<a name="ProyectoAddFormValidator"></a><div id="ProyectoAddFormValidator-def"><a name="L19"></a><tt class="py-lineno">19</tt> <a class="py-toggle" href="#" id="ProyectoAddFormValidator-toggle" onclick="return toggle('ProyectoAddFormValidator');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator-class.html">ProyectoAddFormValidator</a><tt class="py-op">(</tt><tt class="py-base-class">Schema</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ProyectoAddFormValidator-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="ProyectoAddFormValidator-expanded"><a name="L20"></a><tt class="py-lineno">20</tt>  <tt class="py-line">    <tt id="link-9" class="py-name" targets="Method lpm.controllers.atributoitem.AtributoItemEditFiller.nombre()=lpm.controllers.atributoitem.AtributoItemEditFiller-class.html#nombre,Variable lpm.controllers.atributoitem.AtributoItemEditForm.nombre=lpm.controllers.atributoitem.AtributoItemEditForm-class.html#nombre,Method lpm.controllers.atributoitem.AtributoItemTableFiller.nombre()=lpm.controllers.atributoitem.AtributoItemTableFiller-class.html#nombre,Variable lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre=lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm-class.html#nombre,Variable lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre=lpm.controllers.validaciones.fase_validator.FaseFormValidator-class.html#nombre,Variable lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre=lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator-class.html#nombre,Variable lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre=lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator-class.html#nombre,Variable lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre=lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator-class.html#nombre,Variable lpm.model.administracion.AtributosPorTipoItem.nombre=lpm.model.administracion.AtributosPorTipoItem-class.html#nombre,Variable lpm.model.administracion.Fase.nombre=lpm.model.administracion.Fase-class.html#nombre,Variable lpm.model.administracion.Proyecto.nombre=lpm.model.administracion.Proyecto-class.html#nombre,Variable lpm.model.administracion.TipoItem.nombre=lpm.model.administracion.TipoItem-class.html#nombre,Variable lpm.model.auth.Usuario.nombre=lpm.model.auth.Usuario-class.html#nombre"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-9', 'nombre', 'link-9');">nombre</a></tt> <tt class="py-op">=</tt> <tt class="py-name">All</tt><tt class="py-op">(</tt><tt class="py-name">String</tt><tt class="py-op">(</tt><tt class="py-name">min</tt><tt class="py-op">=</tt><tt class="py-number">4</tt><tt class="py-op">,</tt> <tt class="py-name">max</tt><tt class="py-op">=</tt><tt class="py-number">32</tt><tt class="py-op">,</tt><tt class="py-name">messages</tt><tt class="py-op">=</tt><tt class="py-op">{</tt><tt class="py-string">'tooShort'</tt><tt class="py-op">:</tt> </tt>
+<a name="L21"></a><tt class="py-lineno">21</tt>  <tt class="py-line">            <tt class="py-string">'Nombre de proyecto incorrecto, minimo 4 caracteres'</tt><tt class="py-op">,</tt><tt class="py-string">'tooLong'</tt><tt class="py-op">:</tt> </tt>
+<a name="L22"></a><tt class="py-lineno">22</tt>  <tt class="py-line">            <tt class="py-string">'Nombre de rol incorrecto, maximo 32 caracteres'</tt><tt class="py-op">}</tt><tt class="py-op">)</tt><tt class="py-op">,</tt><tt id="link-10" class="py-name" targets="Class lpm.controllers.validaciones.proyecto_validator.UniqueNewNombre=lpm.controllers.validaciones.proyecto_validator.UniqueNewNombre-class.html"><a title="lpm.controllers.validaciones.proyecto_validator.UniqueNewNombre" class="py-name" href="#" onclick="return doclink('link-10', 'UniqueNewNombre', 'link-10');">UniqueNewNombre</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">,</tt>  </tt>
+<a name="L23"></a><tt class="py-lineno">23</tt>  <tt class="py-line">            <tt class="py-name">NotEmpty</tt><tt class="py-op">(</tt><tt class="py-name">messages</tt><tt class="py-op">=</tt><tt class="py-op">{</tt><tt class="py-string">'empty'</tt><tt class="py-op">:</tt> </tt>
+<a name="L24"></a><tt class="py-lineno">24</tt>  <tt class="py-line">                <tt class="py-string">'Ingrese un nombre de proyecto'</tt><tt class="py-op">}</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L25"></a><tt class="py-lineno">25</tt>  <tt class="py-line">    <tt id="link-11" class="py-name" targets="Variable lpm.controllers.item.ItemAddForm.descripcion=lpm.controllers.item.ItemAddForm-class.html#descripcion,Method lpm.controllers.item.ItemEditFiller.descripcion()=lpm.controllers.item.ItemEditFiller-class.html#descripcion,Variable lpm.controllers.item.ItemEditForm.descripcion=lpm.controllers.item.ItemEditForm-class.html#descripcion,Variable lpm.controllers.rol.RolContextoAddForm.descripcion=lpm.controllers.rol.RolContextoAddForm-class.html#descripcion,Variable lpm.controllers.rol.RolContextoEditForm.descripcion=lpm.controllers.rol.RolContextoEditForm-class.html#descripcion,Variable lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion=lpm.controllers.validaciones.fase_validator.FaseFormValidator-class.html#descripcion,Variable lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion=lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator-class.html#descripcion,Variable lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion=lpm.controllers.validaciones.rol_validator.RolFormValidator-class.html#descripcion,Variable lpm.model.administracion.Fase.descripcion=lpm.model.administracion.Fase-class.html#descripcion,Variable lpm.model.administracion.Proyecto.descripcion=lpm.model.administracion.Proyecto-class.html#descripcion,Variable lpm.model.administracion.TipoItem.descripcion=lpm.model.administracion.TipoItem-class.html#descripcion,Variable lpm.model.auth.Permiso.descripcion=lpm.model.auth.Permiso-class.html#descripcion,Variable lpm.model.auth.Rol.descripcion=lpm.model.auth.Rol-class.html#descripcion,Variable lpm.model.desarrollo.PropiedadItem.descripcion=lpm.model.desarrollo.PropiedadItem-class.html#descripcion"><a title="lpm.controllers.item.ItemAddForm.descripcion
+lpm.controllers.item.ItemEditFiller.descripcion
+lpm.controllers.item.ItemEditForm.descripcion
+lpm.controllers.rol.RolContextoAddForm.descripcion
+lpm.controllers.rol.RolContextoEditForm.descripcion
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.descripcion
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.descripcion
+lpm.controllers.validaciones.rol_validator.RolFormValidator.descripcion
+lpm.model.administracion.Fase.descripcion
+lpm.model.administracion.Proyecto.descripcion
+lpm.model.administracion.TipoItem.descripcion
+lpm.model.auth.Permiso.descripcion
+lpm.model.auth.Rol.descripcion
+lpm.model.desarrollo.PropiedadItem.descripcion" class="py-name" href="#" onclick="return doclink('link-11', 'descripcion', 'link-11');">descripcion</a></tt> <tt class="py-op">=</tt> <tt class="py-name">String</tt><tt class="py-op">(</tt><tt class="py-name">max</tt><tt class="py-op">=</tt><tt class="py-number">200</tt><tt class="py-op">,</tt><tt class="py-name">messages</tt><tt class="py-op">=</tt><tt class="py-op">{</tt><tt class="py-string">'tooLong'</tt><tt class="py-op">:</tt> </tt>
+<a name="L26"></a><tt class="py-lineno">26</tt>  <tt class="py-line">            <tt class="py-string">'Descripcion no debe superar 200 caracteres'</tt><tt class="py-op">}</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L27"></a><tt class="py-lineno">27</tt>  <tt class="py-line">  </tt>
+<a name="UniqueEditNombre"></a><div id="UniqueEditNombre-def"><a name="L28"></a><tt class="py-lineno">28</tt> <a class="py-toggle" href="#" id="UniqueEditNombre-toggle" onclick="return toggle('UniqueEditNombre');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.controllers.validaciones.proyecto_validator.UniqueEditNombre-class.html">UniqueEditNombre</a><tt class="py-op">(</tt><tt class="py-base-class">FancyValidator</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="UniqueEditNombre-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="UniqueEditNombre-expanded"><a name="UniqueEditNombre._to_python"></a><div id="UniqueEditNombre._to_python-def"><a name="L29"></a><tt class="py-lineno">29</tt> <a class="py-toggle" href="#" id="UniqueEditNombre._to_python-toggle" onclick="return toggle('UniqueEditNombre._to_python');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="lpm.controllers.validaciones.proyecto_validator.UniqueEditNombre-class.html#_to_python">_to_python</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">value</tt><tt class="py-op">,</tt> <tt class="py-param">state</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="UniqueEditNombre._to_python-collapsed" style="display:none;" pad="++" indent="++++++++"></div><div id="UniqueEditNombre._to_python-expanded"><a name="L30"></a><tt class="py-lineno">30</tt>  <tt class="py-line">        <tt class="py-name">nombres</tt> <tt class="py-op">=</tt> <tt id="link-12" class="py-name"><a title="lpm.model.administracion.Proyecto" class="py-name" href="#" onclick="return doclink('link-12', 'Proyecto', 'link-6');">Proyecto</a></tt><tt class="py-op">.</tt><tt id="link-13" class="py-name"><a title="lpm.model.administracion.Proyecto.por_nombre
+lpm.model.administracion.TipoItem.por_nombre" class="py-name" href="#" onclick="return doclink('link-13', 'por_nombre', 'link-8');">por_nombre</a></tt><tt class="py-op">(</tt><tt class="py-name">value</tt><tt class="py-op">)</tt> </tt>
+<a name="L31"></a><tt class="py-lineno">31</tt>  <tt class="py-line">        <tt id="link-14" class="py-name" targets="Variable lpm.controllers.rol.RolContextoAddForm.id_proyecto=lpm.controllers.rol.RolContextoAddForm-class.html#id_proyecto,Variable lpm.controllers.rol.RolContextoEditForm.id_proyecto=lpm.controllers.rol.RolContextoEditForm-class.html#id_proyecto,Variable lpm.model.administracion.Fase.id_proyecto=lpm.model.administracion.Fase-class.html#id_proyecto,Variable lpm.model.administracion.Proyecto.id_proyecto=lpm.model.administracion.Proyecto-class.html#id_proyecto,Variable lpm.model.administracion.TipoItem.id_proyecto=lpm.model.administracion.TipoItem-class.html#id_proyecto,Variable lpm.model.auth.Rol.id_proyecto=lpm.model.auth.Rol-class.html#id_proyecto"><a title="lpm.controllers.rol.RolContextoAddForm.id_proyecto
+lpm.controllers.rol.RolContextoEditForm.id_proyecto
+lpm.model.administracion.Fase.id_proyecto
+lpm.model.administracion.Proyecto.id_proyecto
+lpm.model.administracion.TipoItem.id_proyecto
+lpm.model.auth.Rol.id_proyecto" class="py-name" href="#" onclick="return doclink('link-14', 'id_proyecto', 'link-14');">id_proyecto</a></tt> <tt class="py-op">=</tt> <tt id="link-15" class="py-name"><a title="lpm.lib.util.UrlParser" class="py-name" href="#" onclick="return doclink('link-15', 'UrlParser', 'link-3');">UrlParser</a></tt><tt class="py-op">.</tt><tt id="link-16" class="py-name" targets="Class Method lpm.lib.util.UrlParser.parse_id()=lpm.lib.util.UrlParser-class.html#parse_id"><a title="lpm.lib.util.UrlParser.parse_id" class="py-name" href="#" onclick="return doclink('link-16', 'parse_id', 'link-16');">parse_id</a></tt><tt class="py-op">(</tt><tt class="py-name">request</tt><tt class="py-op">.</tt><tt class="py-name">url</tt><tt class="py-op">,</tt> <tt class="py-string">"proyectos"</tt><tt class="py-op">)</tt> </tt>
+<a name="L32"></a><tt class="py-lineno">32</tt>  <tt class="py-line">        <tt class="py-keyword">print</tt> <tt id="link-17" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_proyecto
+lpm.controllers.rol.RolContextoEditForm.id_proyecto
+lpm.model.administracion.Fase.id_proyecto
+lpm.model.administracion.Proyecto.id_proyecto
+lpm.model.administracion.TipoItem.id_proyecto
+lpm.model.auth.Rol.id_proyecto" class="py-name" href="#" onclick="return doclink('link-17', 'id_proyecto', 'link-14');">id_proyecto</a></tt> </tt>
+<a name="L33"></a><tt class="py-lineno">33</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">nombres</tt> <tt class="py-op">!=</tt> <tt class="py-name">None</tt> <tt class="py-keyword">and</tt> <tt id="link-18" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_proyecto
+lpm.controllers.rol.RolContextoEditForm.id_proyecto
+lpm.model.administracion.Fase.id_proyecto
+lpm.model.administracion.Proyecto.id_proyecto
+lpm.model.administracion.TipoItem.id_proyecto
+lpm.model.auth.Rol.id_proyecto" class="py-name" href="#" onclick="return doclink('link-18', 'id_proyecto', 'link-14');">id_proyecto</a></tt> <tt class="py-op">!=</tt> <tt class="py-name">nombres</tt><tt class="py-op">.</tt><tt id="link-19" class="py-name"><a title="lpm.controllers.rol.RolContextoAddForm.id_proyecto
+lpm.controllers.rol.RolContextoEditForm.id_proyecto
+lpm.model.administracion.Fase.id_proyecto
+lpm.model.administracion.Proyecto.id_proyecto
+lpm.model.administracion.TipoItem.id_proyecto
+lpm.model.auth.Rol.id_proyecto" class="py-name" href="#" onclick="return doclink('link-19', 'id_proyecto', 'link-14');">id_proyecto</a></tt><tt class="py-op">:</tt> </tt>
+<a name="L34"></a><tt class="py-lineno">34</tt>  <tt class="py-line">            <tt class="py-keyword">raise</tt> <tt class="py-name">Invalid</tt><tt class="py-op">(</tt><tt class="py-string">'El nombre de proyecto ya existe en sistema'</tt><tt class="py-op">,</tt> </tt>
+<a name="L35"></a><tt class="py-lineno">35</tt>  <tt class="py-line">                                        <tt class="py-name">value</tt><tt class="py-op">,</tt> <tt class="py-name">state</tt><tt class="py-op">)</tt> </tt>
+<a name="L36"></a><tt class="py-lineno">36</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">value</tt> </tt>
+</div></div><a name="L37"></a><tt class="py-lineno">37</tt>  <tt class="py-line"> </tt>
+<a name="ProyectoEditFormValidator"></a><div id="ProyectoEditFormValidator-def"><a name="L38"></a><tt class="py-lineno">38</tt> <a class="py-toggle" href="#" id="ProyectoEditFormValidator-toggle" onclick="return toggle('ProyectoEditFormValidator');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator-class.html">ProyectoEditFormValidator</a><tt class="py-op">(</tt><tt class="py-base-class">ProyectoAddFormValidator</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ProyectoEditFormValidator-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="ProyectoEditFormValidator-expanded"><a name="L39"></a><tt class="py-lineno">39</tt>  <tt class="py-line">    <tt id="link-20" class="py-name"><a title="lpm.controllers.atributoitem.AtributoItemEditFiller.nombre
+lpm.controllers.atributoitem.AtributoItemEditForm.nombre
+lpm.controllers.atributoitem.AtributoItemTableFiller.nombre
+lpm.controllers.atributotipoitem.AtributosPorTipoItemEditForm.nombre
+lpm.controllers.validaciones.fase_validator.FaseFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoAddFormValidator.nombre
+lpm.controllers.validaciones.proyecto_validator.ProyectoEditFormValidator.nombre
+lpm.controllers.validaciones.usuario_validator.UsuarioAddFormValidator.nombre
+lpm.model.administracion.AtributosPorTipoItem.nombre
+lpm.model.administracion.Fase.nombre
+lpm.model.administracion.Proyecto.nombre
+lpm.model.administracion.TipoItem.nombre
+lpm.model.auth.Usuario.nombre" class="py-name" href="#" onclick="return doclink('link-20', 'nombre', 'link-9');">nombre</a></tt> <tt class="py-op">=</tt> <tt class="py-name">All</tt><tt class="py-op">(</tt><tt class="py-name">String</tt><tt class="py-op">(</tt><tt class="py-name">min</tt><tt class="py-op">=</tt><tt class="py-number">4</tt><tt class="py-op">,</tt> <tt class="py-name">max</tt><tt class="py-op">=</tt><tt class="py-number">32</tt><tt class="py-op">,</tt><tt class="py-name">messages</tt><tt class="py-op">=</tt><tt class="py-op">{</tt><tt class="py-string">'tooShort'</tt><tt class="py-op">:</tt> </tt>
+<a name="L40"></a><tt class="py-lineno">40</tt>  <tt class="py-line">            <tt class="py-string">'Nombre de proyecto incorrecto, minimo 4 caracteres'</tt><tt class="py-op">,</tt><tt class="py-string">'tooLong'</tt><tt class="py-op">:</tt> </tt>
+<a name="L41"></a><tt class="py-lineno">41</tt>  <tt class="py-line">            <tt class="py-string">'Nombre de rol incorrecto, maximo 32 caracteres'</tt><tt class="py-op">}</tt><tt class="py-op">)</tt><tt class="py-op">,</tt><tt id="link-21" class="py-name" targets="Class lpm.controllers.validaciones.proyecto_validator.UniqueEditNombre=lpm.controllers.validaciones.proyecto_validator.UniqueEditNombre-class.html"><a title="lpm.controllers.validaciones.proyecto_validator.UniqueEditNombre" class="py-name" href="#" onclick="return doclink('link-21', 'UniqueEditNombre', 'link-21');">UniqueEditNombre</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">,</tt>  </tt>
+<a name="L42"></a><tt class="py-lineno">42</tt>  <tt class="py-line">            <tt class="py-name">NotEmpty</tt><tt class="py-op">(</tt><tt class="py-name">messages</tt><tt class="py-op">=</tt><tt class="py-op">{</tt><tt class="py-string">'empty'</tt><tt class="py-op">:</tt> </tt>
+<a name="L43"></a><tt class="py-lineno">43</tt>  <tt class="py-line">                <tt class="py-string">'Ingrese un nombre de proyecto'</tt><tt class="py-op">}</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L44"></a><tt class="py-lineno">44</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="lpm-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Sat Jun 25 12:33:37 2011
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

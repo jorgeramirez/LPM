@@ -814,5 +814,11 @@ class RolPlantillaController(RolController):
         Rol.actualizar_rol(**kw)
         flash(msg)
         redirect(atras)
-    
+        
+    @expose()
+    def post_delete(self, *args, **kw):
+        rol = Rol.por_id(int(args[0]))
+        if rol.nombre_rol == u"Lider de Proyecto" and rol.tipo == u"Plantilla Proyecto":
+            flash(u'Rol Lider de Proyecto no puede ser eliminado', 'warning')
+        super(RolPlantillaController, self).post_delete(*args, **kw)
     #}

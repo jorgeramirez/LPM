@@ -197,7 +197,7 @@ class ItemGenerarTableFiller(CustomTableFiller):
         """
         Recupera los items aprobados de la fase en cuestión
         """
-        if items:
+        if items or items == []:
             return len(items), items
             
         id_fase = int(id_fase)             #falta probar.
@@ -218,27 +218,28 @@ class ItemInhabilitadosTable(TableBase):
                     'tipo': u'Tipo',
                     
                   }
-    __add_fields__ = {'tipo': None}
+    __add_fields__ = {'tipo': None, 'codigo': None}
     
-   __omit_fields__ = ['id_propiedad_item', 'prioridad', 'descripcion', 'observaciones',
-                       'id_item_actual', '__actions__']
+    __omit_fields__ = ['id_propiedad_item', 'prioridad', 'descripcion', 'observaciones',
+                       'id_item_actual', '__actions__', 'historial_item',
+                        'item_lb_assocs', 'archivos', 'relaciones', 'atributos']
     __default_column_width__ = '15em'
 
-    __field_order__ = ["codigo", "version","tipo", "check"]
+    __field_order__ = ["codigo", "version","tipo"]
     
 
 class ItemInhabilitadosTableFiller(CustomTableFiller):
-    __model__ = Item
-    __add_fields__ = {'version': None, 'tipo': None}
+    __model__ = PropiedadItem
+    __add_fields__ = {'tipo': None, 'codigo': None}
     
     def tipo(self, obj, **kw):
-        ti = TipoItem.por_id(obj.id_tipo_item)
+        item = Item.por_id(obj.id_item_actual)
+        ti = TipoItem.por_id(item.id_tipo_item)
         return ti.codigo
-    
-    def version(self, obj, **kw):
-        p_item = PropiedadItem.por_id(obj.id_propiedad_item)
-        return p_item.version
-    
+
+    def codigo(self, obj, **kw):
+        return Item.por_id(obj.id_item_actual).codigo
+               
 
     def _do_get_provider_count_and_objs(self, items=None, **kw):
         return len(items), items
@@ -439,8 +440,7 @@ class LineaBaseController(CrudRestController):
         fase.generar_lb(pks, user)
         transaction.commit()
         flash(u"Se ha generado la línea base")
-        redirect("../edit")
-        
+        redirect("/fases/%d/edit" % id_fase)
         
     
     @expose()
@@ -474,7 +474,7 @@ class LineaBaseController(CrudRestController):
         flash("Se ha abierto la LB")
         redirect(url)
         
-
+    '''
     @expose("lpm.templates.lb.cerrar_habilitados")
     def cerrar_habilitados(self, id, hab=None, inh=None, *args, **kw):
         """
@@ -502,7 +502,7 @@ class LineaBaseController(CrudRestController):
                     habilitados=habilitados,
                     inhabilitados=inhabilitados
                     )
-
+    '''
     @expose("lpm.templates.lb.cerrar_habilitados")
     def post_cerrar(self, *args, **kw):
         """
@@ -537,9 +537,7 @@ class LineaBaseController(CrudRestController):
         
         atras = "../"
             
-        return dict(anteriores=anteriores, 
-                    actuales=actuales,
-                    page=page, 
+        return dict(page=page, 
                     id=id, 
                     atras=atras,
                     habilitados=habilitados,

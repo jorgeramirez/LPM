@@ -17,12 +17,12 @@
     <table>
     <tbody>
 	    <tr>
-	    	<td  colspan="2">
+	    	<td  colspan="3">
 	    		<div class="color-sombra"><span style="font-size:18px; margin: 2px 2px 2px 0;">Iniciar Sesión</span></div>
 	    	</td>
 	    </tr>
 	    <tr>
-	    	<td>
+	    	<td colspan="2">
 		    	<label for="loginusername">Username</label>
 	    	</td>
 	    	<td>
@@ -31,7 +31,7 @@
 	    	</td>
 	    </tr>
 	    <tr>
-	    	<td>
+	    	<td colspan="2">
 	    		<label for="loginpassword">Password</label>
 	    	</td>
 	    	<td>
@@ -40,14 +40,16 @@
 	    	</td>
 	    </tr>
 	    <tr>
-	    	<td  colspan="2">
+	    	<td  colspan="3">
 		    	<a style="margin-top:3px;" href="${tg.url('/recuperar_pass')}">Recuperar Contrase&ntilde;a</a>
 		    	<br/>
 	    	</td>
 	    </tr>
 	    <tr>
-	    	<td>
+	    	<td aling="center">
 		    	<label id="labelremember" for="loginremember">No cerrar sesión</label>
+            </td>
+            <td aling="right">    
 		    	<input type="checkbox" id="loginremember" name="remember" value="2252000"/>
 		    </td>
 	    	<td>

@@ -1,0 +1,36 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<xi:include href="esquema.html" />
+<head>
+<title>$page</title>
+</head>
+<body>
+  <div style="height:0px;"> &nbsp; </div>
+  <h2 style="margin-top:1px; padding-left: 60px;">$page</h2>
+  <div style="float:left; padding-left: 95px;" class="crud_add">
+     <table>
+             <tbody>
+                <tr>
+                <td>
+                     <div class="grafo">
+                             <py:for each="fil in filas">
+                                <div class="fila">${fil}</div>
+                             </py:for>
+                     </div>
+                </td>
+                </tr>
+                
+                <tr>
+                <td>
+                        <div class="fila">Sumatoria de complejidad: ${suma}, Complejidad Total Proyecto: ${ct}</div>
+                        <div class="impacto">El impacto sobre el proyecto es del ${impacto}</div>
+                </td>
+                </tr>
+             </tbody>
+     </table>
+  </div>
+  <div style="height:0px; clear:both;"> &nbsp; </div>
+</body>
+</html>
