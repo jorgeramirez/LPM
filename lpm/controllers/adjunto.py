@@ -160,7 +160,7 @@ class AdjuntoController(CrudRestController):
             
             if puede_crear:
                 p_item = PropiedadItem.por_id(item.id_propiedad_item)
-                if p_item.estado not in [u"Bloqueado", u"Revisión-Bloq", 
+                if p_item.estado in [u"Bloqueado", u"Revisión-Bloq", 
                                          u"Eliminado"]:
                     puede_crear = False
             
@@ -211,7 +211,7 @@ class AdjuntoController(CrudRestController):
 
             if puede_crear:
                 p_item = PropiedadItem.por_id(item.id_propiedad_item)
-                if p_item.estado not in [u"Bloqueado", u"Revisión-Bloq", 
+                if p_item.estado in [u"Bloqueado", u"Revisión-Bloq", 
                                          u"Eliminado"]:
                     puede_crear = False
 
