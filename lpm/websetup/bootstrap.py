@@ -54,7 +54,7 @@ def bootstrap(command, conf, vars):
         
         #Rol de Miembro de Tipo de Ítem
         rmti = model.Rol()
-        rmti.nombre_rol = u"Miembro de Tipo Ítem"
+        rmti.nombre_rol = u"Miembro de Tipo Item"
         rmti.descripcion = u"Rol Miembro de Tipo Ítem, indica si un usuario" + \
                           u"es miembro de un tipo de ítem"
         rmti.tipo = u"Plantilla tipo ítem"        

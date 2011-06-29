@@ -17,7 +17,7 @@ from tg import redirect, request, require, flash, url, validate
 
 from lpm.model import DBSession, Usuario, Proyecto, Rol, Fase
 from lpm.lib.sproxcustom import CustomTableFiller
-from lpm.lib.authorization import PoseePermiso, AlgunPermiso
+from lpm.lib.authorization import PoseePermiso, AlgunPermiso, Miembro
 from lpm.lib.util import UrlParser
 from lpm.controllers.usuario import UsuarioEditForm, UsuarioEditFiller
 from lpm.controllers.miembros_fase import (miembros_fase_table)
@@ -92,9 +92,13 @@ class NoMiembrosFaseTableFiller(CustomTableFiller):
                          self)._do_get_provider_count_and_objs(**kw)
         
         filtrados = []
+        fase = Fase.por_id(id_fase)
         for u in lista:
-            if not AlgunPermiso(tipo="Fase", id_fase=id_fase,
-                            id_usuario=u.id_usuario):
+            if Miembro(id_proyecto=fase.id_proyecto,
+                       id_usuario=u.id_usuario).is_met(request.environ) and \
+                       not Miembro(id_fase=id_fase,
+                                   id_usuario=u.id_usuario).is_met(request.environ):
+
                 filtrados.append(u)
         return len(filtrados), filtrados
 

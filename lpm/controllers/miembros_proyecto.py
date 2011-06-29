@@ -17,7 +17,7 @@ from tg import redirect, request, require, flash, url, validate
 
 from lpm.model import DBSession, Usuario, Proyecto, Rol
 from lpm.lib.sproxcustom import CustomTableFiller
-from lpm.lib.authorization import PoseePermiso, AlgunPermiso
+from lpm.lib.authorization import PoseePermiso, AlgunPermiso, Miembro
 from lpm.lib.util import UrlParser
 from lpm.controllers.usuario import UsuarioEditForm, UsuarioEditFiller
 
@@ -105,8 +105,8 @@ class MiembrosProyectoTableFiller(CustomTableFiller):
         
         filtrados = []
         for u in lista:
-            if AlgunPermiso(tipo="Proyecto", id_proyecto=id_proyecto,
-                            id_usuario=u.id_usuario):
+            if Miembro(id_proyecto=id_proyecto, 
+                           id_usuario=u.id_usuario).is_met(request.environ):
                 filtrados.append(u)
         return len(filtrados), filtrados
 
@@ -517,6 +517,8 @@ class MiembrosProyectoController(RestController):
         #rol = DBSession.query(Rol) \
         #               .filter(and_(Rol.id_proyecto == id_proyecto,
         #                       Rol.nombre_rol == u"Miembro de Proyecto")).first()
+
+        transaction.begin()
         if kw:
             pks = []
             for k, pk in kw.items():
@@ -524,7 +526,7 @@ class MiembrosProyectoController(RestController):
                     continue
                 pks.append(int(pk))
 
-            transaction.begin()
+
             usuarios = DBSession.query(Usuario) \
                                 .filter(Usuario.id_usuario.in_(pks)).all()
             for u in usuarios:
@@ -536,7 +538,7 @@ class MiembrosProyectoController(RestController):
                     else:
                         c += 1
 
-            transaction.commit()
+        transaction.commit()
 
         flash("Usuarios removidos correctamente")
         return "/proyectos/%d/miembros/" % id_proyecto

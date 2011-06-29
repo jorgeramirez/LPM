@@ -135,7 +135,7 @@ class Rol(DeclarativeBase):
                                         Rol.tipo.like(u"Plantilla%"))).first()
         elif "nombre_rol" in kw:
             rol = base_query.filter(and_(
-                                    Rol.nombre_rol == kw["nombre_rol"],
+                                    Rol.nombre_rol == unicode(kw["nombre_rol"]),
                                     Rol.tipo.like(u"Plantilla%"))).first()
         return rol
     

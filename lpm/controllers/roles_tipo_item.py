@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Módulo que define el controlador de roles de fase.
+Módulo que define el controlador de roles de tipos de ítem.
 
 @authors:
     - U{Carlos Bellino<mailto:carlosbellino@gmail.com>}
@@ -22,7 +22,7 @@ from lpm.lib.sproxcustom import CustomTableFiller, CustomPropertySingleSelectFie
 from lpm.lib.sproxcustom import WidgetSelectorDojo, MultipleSelectDojo
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
 from lpm.lib.util import UrlParser
-from lpm.controllers.rol import (RolTable, SelectorPermisosPlantillaFase,
+from lpm.controllers.rol import (RolTable, SelectorPermisosPlantillaTi,
                                  RolEditFiller)
 
 from sprox.tablebase import TableBase
@@ -43,9 +43,9 @@ import transaction
 import urllib
 
 
-roles_fase_table = RolTable(DBSession)
+roles_tipo_table = RolTable(DBSession)
 
-class RolesFaseTableFiller(CustomTableFiller):
+class RolesTipoTableFiller(CustomTableFiller):
     __model__ = Rol
     __omit_fields__ = ['permisos', 'usuarios',
                        'id_proyecto', 'id_fase', 'id_tipo_item',
@@ -56,23 +56,12 @@ class RolesFaseTableFiller(CustomTableFiller):
         value = '<div>'
         clase = 'actions'
         
-        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        if id_proyecto:
-            url_cont = "/proyectos/%d/" % id_proyecto
-        else:
-            id_proyecto = UrlParser.parse_id(request.url, "proyectos_fase")
-            url_cont = "/proyectos_fase/%d/" % id_proyecto
-        
-        id_fase = UrlParser.parse_id(request.url, "fases")
-        url_cont += "fases/%d/rolesfase/"
-        url_cont %= id_fase
-        
-        perm_mod = PoseePermiso('modificar rol', id_fase=id_fase)
-        perm_del = PoseePermiso('eliminar rol', id_fase=id_fase)
+        perm_mod = PoseePermiso('modificar rol', id_tipo_item=obj.id_tipo_item)
+        perm_del = PoseePermiso('eliminar rol', id_tipo_item=obj.id_tipo_item)
             
         if perm_mod.is_met(request.environ):
             value += '<div>' + \
-                        '<a href="' +  url_cont + str(obj.id_rol) + "/edit"+  \
+                        '<a href="./' + str(obj.id_rol) + "/edit"+  \
                         '" class="' + clase + '">Modificar</a>' + \
                      '</div><br />'
 
@@ -86,26 +75,26 @@ class RolesFaseTableFiller(CustomTableFiller):
         value += '</div>'
         return value
     
-    def _do_get_provider_count_and_objs(self, id_fase=None, **kw):
+    def _do_get_provider_count_and_objs(self, id_tipo_item=None, **kw):
         """
-        Se muestra la lista de roles para este proyecto.
+        Se muestra la lista de roles para este tipo de ítem.
         """
         filtrados = []
-        if AlgunPermiso(tipo="Fase", 
-                        id_fase=id_fase).is_met(request.environ):
-            count, lista = super(RolesFaseTableFiller,
+        if AlgunPermiso(tipo="Tipo", 
+                        id_tipo_item=id_tipo_item).is_met(request.environ):
+            count, lista = super(RolesTipoTableFiller,
                          self)._do_get_provider_count_and_objs(**kw)
             
             for rol in lista:
-                if rol.tipo == u"Fase" and rol.id_fase == id_fase:
+                if rol.tipo.find("Tipo") >=0 and rol.id_tipo_item == id_tipo_item:
                     filtrados.append(rol)
 
         return len(filtrados), filtrados
 
-roles_fase_table_filler = RolesFaseTableFiller(DBSession)
+roles_tipo_table_filler = RolesTipoTableFiller(DBSession)
 
 
-class RolesFaseAddForm(AddRecordForm):
+class RolesTipoAddForm(AddRecordForm):
     __model__ = Rol
     __omit_fields__ = ['id_rol', 'usuarios', 'codigo', 'creado']
     __hide_fields__ = ['tipo', 'id_proyecto', 'id_tipo_item', 'id_fase']
@@ -115,13 +104,13 @@ class RolesFaseAddForm(AddRecordForm):
     __field_attrs__ = {'descripcion' : {'row': '1'},
                        'nombre_rol': { 'maxlength' : '32'}
                        }
-    __widget_selector_type__ = SelectorPermisosPlantillaFase
+    __widget_selector_type__ = SelectorPermisosPlantillaTi
     descripcion = TextArea
 
-roles_fase_add_form = RolesFaseAddForm(DBSession)
+roles_tipo_add_form = RolesTipoAddForm(DBSession)
 
 
-class RolesFaseEditForm(EditableForm):
+class RolesTipoEditForm(EditableForm):
     __model__ = Rol
     __hide_fields__ = ['id_rol', 'tipo', 'id_proyecto', 'id_fase', 
                        'id_tipo_item']
@@ -132,29 +121,29 @@ class RolesFaseEditForm(EditableForm):
     __field_attrs__ = {'descripcion' : {'row': '1'},
                        'nombre_rol': { 'maxlength' : '32'}
                       }
-    __widget_selector_type__ = SelectorPermisosPlantillaFase
+    __widget_selector_type__ = SelectorPermisosPlantillaTi
     __field_order__ = ['id_rol', 'nombre_rol', 'descripcion', 'tipo', 'permisos']
     descripcion = TextArea
 
-roles_fase_edit_form = RolesFaseEditForm(DBSession)
+roles_tipo_edit_form = RolesTipoEditForm(DBSession)
 
-roles_fase_edit_form_filler = RolEditFiller(DBSession)
+roles_tipo_edit_form_filler = RolEditFiller(DBSession)
 
 
-class RolesFaseController(CrudRestController):
+class RolesTipoController(CrudRestController):
     """Controlador de roles de tipo plantilla"""
     #{ Variables
-    title = u"Roles de la Fase"
+    title = u"Roles del Tipo de Ítem"
     tmp_action = "./"
-    rol_tipo = u"Fase" 
+    rol_tipo = u"Tipo Ítem" 
 
     #{ Modificadores
     model = Rol
-    table = roles_fase_table
-    table_filler = roles_fase_table_filler
-    new_form = roles_fase_add_form
-    edit_form = roles_fase_edit_form
-    edit_filler = roles_fase_edit_form_filler
+    table = roles_tipo_table
+    table_filler = roles_tipo_table_filler
+    new_form = roles_tipo_add_form
+    edit_form = roles_tipo_edit_form
+    edit_filler = roles_tipo_edit_form_filler
 
     #para el form de busqueda
     opciones = dict(codigo= u'Código',
@@ -174,14 +163,14 @@ class RolesFaseController(CrudRestController):
         Retorna todos los registros
         Retorna una página HTML si no se especifica JSON
         """
-        id_fase = UrlParser.parse_id(request.url, "fases")
+        id_tipo_item = UrlParser.parse_id(request.url, "tipositems")
         puede_crear = PoseePermiso("crear rol",
-                                   id_fase=id_fase).is_met(request.environ)
+                                   id_tipo_item=id_tipo_item).is_met(request.environ)
         
         if request.response_type == 'application/json':
-            return self.table_filler.get_value(id_fase=id_fase, **kw)
+            return self.table_filler.get_value(id_tipo_item=id_tipo_item, **kw)
         if not getattr(self.table.__class__, '__retrieves_own_value__', False):
-            roles = self.table_filler.get_value(id_fase=id_fase, **kw)
+            roles = self.table_filler.get_value(id_tipo_item=id_tipo_item, **kw)
         else:
             roles = []
         tmpl_context.widget = self.table
@@ -203,13 +192,13 @@ class RolesFaseController(CrudRestController):
     @expose('lpm.templates.rol.get_all')
     @expose('json')
     def post_buscar(self, *args, **kw):
-        id_fase = UrlParser.parse_id(request.url, "fases")
+        id_tipo_item = UrlParser.parse_id(request.url, "tipositems")
         puede_crear = PoseePermiso("crear rol",
-                                   id_fase=id_fase).is_met(request.environ)
+                                   id_tipo_item=id_tipo_item).is_met(request.environ)
         tmpl_context.widget = self.table
         buscar_table_filler = self.table_filler.__class__(DBSession)
         buscar_table_filler.filtros = kw
-        roles = buscar_table_filler.get_value(id_fase=id_fase)
+        roles = buscar_table_filler.get_value(id_tipo_item=id_tipo_item)
         atras = "../"
         return dict(lista_elementos=roles, 
                     page=self.title, 
@@ -225,11 +214,11 @@ class RolesFaseController(CrudRestController):
     @expose('lpm.templates.rol.edit')
     def edit(self, id_rol, *args, **kw):
         """Despliega una pagina para modificar rol"""
-        id_fase = UrlParser.parse_id(request.url, "fases")
+        id_tipo_item = UrlParser.parse_id(request.url, "tipositems")
         url_action = "../../"
         tmpl_context.widget = self.edit_form
         value = self.edit_filler.get_value(values={'id_rol': int(id_rol)})
-        page=u"Editar Rol de Fase"
+        page=u"Editar Rol de Tipo Ítem"
         return dict(value=value, 
                     page=page, 
                     atras=url_action)
@@ -237,12 +226,12 @@ class RolesFaseController(CrudRestController):
     @without_trailing_slash
     @expose('lpm.templates.rol.new')
     def new(self, *args, **kw):
-        kw['tipo'] = u'Fase'
-        id_fase = UrlParser.parse_id(request.url, "fases")
+        kw['tipo'] = u'Tipo de Ítem'
+        id_tipo_item = UrlParser.parse_id(request.url, "tipositems")
         url_action = "./"
         tmpl_context.widget = self.new_form
         return dict(value=kw, 
-                    page="Nuevo Rol de Fase", 
+                    page=u"Nuevo Rol de Tipo Ítem", 
                     action=url_action, 
                     atras=url_action)
 
@@ -250,18 +239,22 @@ class RolesFaseController(CrudRestController):
     @expose()
     def post(self, *args, **kw):
         """ Crea un nuevo rol plantilla o con contexto"""
-        id_fase = UrlParser.parse_id(request.url, "fases")
+        id_tipo_item = UrlParser.parse_id(request.url, "tipositems")
         url_action = "./"
-        pp = PoseePermiso('crear rol', id_fase=id_fase)
-        kw["id_fase"] = id_fase
+        pp = PoseePermiso('crear rol', id_tipo_item=id_tipo_item)
+        
 
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        id_fase = UrlParser.parse_id(request.url, "fases")
         if not id_proyecto:
             id_proyecto = UrlParser.parse_id(request.url, "proyectos_fase")
+            if not id_proyecto:
+                id_proyecto = UrlParser.parse_id(request.url, "proyectos_fase_ti")
+                id_fase = UrlParser.parse_id(request.url, "fases_ti")
         
         kw["id_proyecto"] = id_proyecto
-        
-        
+        kw["id_fase"] = id_fase
+        kw["id_tipo_item"] = id_tipo_item
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect(url_action)
@@ -290,10 +283,10 @@ class RolesFaseController(CrudRestController):
     @expose()
     def put(self, *args, **kw):
         """actualiza un rol"""
-        id_fase = UrlParser.parse_id(request.url, "fases")
+        id_tipo_item = UrlParser.parse_id(request.url, "tipositems")
         url_action = "../../"
         msg = u"El Rol se ha actualizado con éxito"
-        pp = PoseePermiso('modificar rol', id_fase=id_fase)
+        pp = PoseePermiso('modificar rol', id_tipo_item=id_tipo_item)
 
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
@@ -310,10 +303,10 @@ class RolesFaseController(CrudRestController):
     @expose()
     def post_delete(self, *args, **kw):
         rol = Rol.por_id(int(args[0]))
-        if rol.nombre_rol == u"Miembro de Fase":
-            flash(u'Rol Miembro de Fase no puede ser eliminado', 'warning')
+        if rol.nombre_rol == u"Miembro de Tipo Item":
+            flash(u'Rol Miembro de Tipo Item no puede ser eliminado', 'warning')
         flash("El rol se ha eliminado")
-        super(RolesFaseController, self).post_delete(*args, **kw)
+        super(RolesTipoController, self).post_delete(*args, **kw)
 
 
 

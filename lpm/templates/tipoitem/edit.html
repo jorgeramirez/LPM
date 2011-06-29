@@ -21,51 +21,9 @@ $(function(){
 </head>
 <body class="tundra">
   <div style="height:0px;"> &nbsp; </div>
-  <h2 style="margin-top:1px; padding-left: 60px;">$page</h2> 
+  <h2 style="margin-top:1px; padding-left: 60px;">$page</h2>
   <div style="float:left; padding-left: 95px;" class="crud_edit">
-    <table cellspacing="0" cellpadding="2" border="0">
-    <tbody>
-        <tr>
-            <td>
-                ${XML(tmpl_context.widget(value=value))}
-                
-            </td>
-            <td valign="top">
-                <div style="clear:both;">
-                <a py:if="puede_asignar_rol" class="link_boton" href="${tg.url('/usuarios?id_tipo_item=' + id)}">
-                    <input id="ar_ti" style="margin-top:0; float:right;" class="boton" type="button" value="Asignar Rol"/>
-                </a>
-                
-                </div>
-                <br />
-                <div style="clear:both;">
-                <a py:if="puede_crear_rol" class="link_boton" href="${tg.url('/rolesplantilla/new/ti?id_tipo_item=' + id)}">
-                    <input id="cr_ti" class="boton" style="float:right;" type="button" value="Crear Rol"/>
-                </a>
-                </div>
-            </td>
-        </tr>
-
-        <tr>
-            <td colspan="2">
-                <a class="link_boton" href="${tg.url(url_action + id + url_subaction + 'new')}">
-                <input id="nuevo_atributo" class="boton" style="width:110px;" type="button" value="Nuevo Atributo"/>
-                </a>
-            </td>
-        </tr>
-        <tr>
-            <div style="clear:both;"></div>
-        </tr>
-        <tr>
-            <td colspan="2">
-                <!--<h3 style="margin-top:5px;">Atributos</h3>-->
-                <div class="crud_table" style="height:65%; width:700px; margin-top: 5px;">
-                    ${XML(tmpl_context.atributos_table(value=atributos))}
-                </div>
-            </td>
-        </tr>
-  </tbody>
-  </table>
+     ${XML(tmpl_context.widget(value=value, action='./'))}
   </div>
   <div style="height:0px; clear:both;"> &nbsp; </div>
 

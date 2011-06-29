@@ -97,14 +97,14 @@
                                                 </li>
                                             </ul>
                                     </li>
-                                    <li py:if="not request.puede_proyecto and request.puede_fase"><a href="${tg.url('/proyectos_fase/')}" class="fly">Fases</a>
+                                    <li py:if="not request.puede_proyecto and request.puede_fase"><a href="${tg.url('/proyectos/')}" class="fly">Fases</a>
                                             <ul>
-                                                <li><a href="${tg.url('/proyectos_fase/')}">Búsqueda</a></li>
+                                                <li><a href="${tg.url('/proyectos/')}">Búsqueda</a></li>
                                             </ul>
                                     </li>
-                                    <li py:if="not (request.puede_proyecto or request.puede_fase) and request.puede_ti"><a href="${tg.url('/proyectos_fase_ti')}" class="fly">Tipos de Ítem</a>
+                                    <li py:if="not (request.puede_proyecto or request.puede_fase) and request.puede_ti"><a href="${tg.url('/proyectos')}" class="fly">Tipos de Ítem</a>
                                             <ul>
-                                                <li><a href="${tg.url('/proyectos_fase_ti/')}">Búsqueda</a></li>
+                                                <li><a href="${tg.url('/proyectos/')}">Búsqueda</a></li>
                                             </ul>
                                     </li>
                                 </ul>

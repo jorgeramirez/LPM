@@ -271,6 +271,9 @@ class FaseController(CrudRestController):
         puede_crear = PoseePermiso("crear fase", 
                                    id_proyecto=id_proyecto).is_met(request.environ)
         proy = Proyecto.por_id(id_proyecto)
+        if proy.estado == "Iniciado":
+            puede_crear = False
+
         titulo = self.title % proy.nombre
         atras = "../"
         fases = self.table_filler.get_value(id_proyecto=id_proyecto, **kw)
@@ -307,7 +310,11 @@ class FaseController(CrudRestController):
 
         puede_crear = PoseePermiso("crear fase", 
                                    id_proyecto=id_proyecto).is_met(request.environ)
+
         proy = Proyecto.por_id(id_proyecto)
+        if proy.estado == "Iniciado":
+            puede_crear = False
+            
         titulo = self.title % proy.nombre
         tmpl_context.widget = self.table
         buscar_table_filler = FaseTableFiller(DBSession)
@@ -417,6 +424,10 @@ class FaseController(CrudRestController):
         id_fase = int(args[0])
         puede_crear = PoseePermiso("crear fase", 
                                    id_proyecto=id_proyecto).is_met(request.environ)
+        proy = Proyecto.por_id(id_proyecto)
+        if proy.estado == "Iniciado":
+            puede_crear = False
+            
         if pylons.request.response_type == 'application/json':
             return dict(lista=self.table_filler.get_value(id_fase=id_fase, **kw))
         if not getattr(self.table.__class__, ' ', False):
@@ -425,7 +436,6 @@ class FaseController(CrudRestController):
             fase = []
             
         tmpl_context.widget = self.table
-        proy = Proyecto.por_id(id_proyecto)
         titulo = self.title % proy.nombre
         atras = '../'
         return dict(lista_elementos=fase, 

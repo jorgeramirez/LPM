@@ -196,7 +196,7 @@ class ProyectoController(CrudRestController):
     
     #{ Sub Controlador
     fases = FaseController(DBSession)
-    tipositems = TipoItemController(DBSession)
+    tipositems = None #TipoItemController(DBSession)
     miembros = MiembrosProyectoController()
     nomiembros = NoMiembrosProyectoController()
     rolesproyecto = RolesProyectoController(DBSession)

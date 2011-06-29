@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Módulo que define el controlador de usuarios miembros
-de un proyecto.
+de un tipo de ítem.
 
 @authors:
     - U{Carlos Bellino<mailto:carlosbellino@gmail.com>}
@@ -15,7 +15,7 @@ from tg.decorators import (paginate, expose, with_trailing_slash,
                            without_trailing_slash)
 from tg import redirect, request, require, flash, url, validate 
 
-from lpm.model import DBSession, Usuario, Proyecto, Rol, Fase
+from lpm.model import DBSession, Usuario, Proyecto, Rol, Fase, TipoItem
 from lpm.lib.sproxcustom import CustomTableFiller
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso, Miembro
 from lpm.lib.util import UrlParser
@@ -39,10 +39,10 @@ import transaction
 from tg import tmpl_context, request
 
 
-miembros_fase_table = MiembrosProyectoTable(DBSession)
+miembros_tipo_table = MiembrosProyectoTable(DBSession)
 
 
-class MiembrosFaseTableFiller(CustomTableFiller):
+class MiembrosTipoTableFiller(CustomTableFiller):
     __model__ = Usuario
     __omit_fields__ = ['password', 'telefono', 'nro_documento', 
                        '_password', 'historial_lb', 'roles',
@@ -56,33 +56,23 @@ class MiembrosFaseTableFiller(CustomTableFiller):
 
     def __actions__(self, obj):
         """Links de acciones para un registro dado"""
-        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        if id_proyecto:
-            url_cont = "/proyectos/%d/" % id_proyecto
-        else:
-            id_proyecto = UrlParser.parse_id(request.url, "proyectos_fase")
-            url_cont = "/proyectos_fase/%d/" % id_proyecto
-        
-        id_fase = UrlParser.parse_id(request.url, "fases")
-        url_cont += "fases/%d/"
-        url_cont %= id_fase
-        
         clase = 'actions'
         value = "<div>"
         value += '<div>' + \
-                    '<a href="' + url_cont + "miembrosfase/" + str(obj.id_usuario) + '" ' + \
+                    '<a href="./' + str(obj.id_usuario) + '/" ' + \
                     'class="' + clase + '">Ver</a>' + \
                  '</div><br />'
-        
+
+        id_tipo_item = UrlParser.parse_id(request.url, "tipositems")
         if PoseePermiso("asignar-desasignar rol", 
-                        id_proyecto=id_proyecto).is_met(request.environ):
+                        id_tipo_item=id_tipo_item).is_met(request.environ):
             value += '<div>' + \
-                        '<a href="'+ url_cont + "miembrosfase/" + str(obj.id_usuario) + \
+                        '<a href="./'+ str(obj.id_usuario) + \
                         "/rolesasignados/" '" ' + \
                         'class="' + clase + '">Roles Asig.</a>' + \
                      '</div><br />'
             value += '<div>' + \
-                        '<a href="'+ url_cont + "miembrosfase/" + str(obj.id_usuario) + \
+                        '<a href="./' + str(obj.id_usuario) + \
                         "/rolesdesasignados/" '" ' + \
                         'class="' + clase + '">Roles Desasig.</a>' + \
                      '</div><br />'
@@ -90,30 +80,28 @@ class MiembrosFaseTableFiller(CustomTableFiller):
         
         return value
         
-    def _do_get_provider_count_and_objs(self, id_fase=None, **kw):
+    def _do_get_provider_count_and_objs(self, id_tipo_item=None, **kw):
         """
-        Se muestra la lista de usuario si se tiene un permiso 
-        necesario. Caso contrario se muestra solo su usuario
+        Se muestra la lista de usuario miembros
         """
-        count, lista = super(MiembrosFaseTableFiller,
+        count, lista = super(MiembrosTipoTableFiller,
                          self)._do_get_provider_count_and_objs(**kw)
         
         filtrados = []
-        fase = Fase.por_id(id_fase)
         for u in lista:
-            if Miembro(id_fase=id_fase, 
+            if Miembro(id_tipo_item=id_tipo_item,
                        id_usuario=u.id_usuario).is_met(request.environ):
                 filtrados.append(u)
         return len(filtrados), filtrados
 
-miembros_fase_table_filler = MiembrosFaseTableFiller(DBSession)
+miembros_tipo_table_filler = MiembrosTipoTableFiller(DBSession)
 
 
 #tabla de roles asignados/desasignados al usuario.
-miembros_fase_roles_table = MiembrosProyectoRolesTable(DBSession)
+miembros_tipo_roles_table = MiembrosProyectoRolesTable(DBSession)
 
 
-class MiembrosFaseRolesTableFiller(CustomTableFiller):
+class MiembrosTipoRolesTableFiller(CustomTableFiller):
     __model__ = Rol
     __add_fields__ = {'check' : None}
 
@@ -134,38 +122,38 @@ class MiembrosFaseRolesTableFiller(CustomTableFiller):
         return value
 
     def _do_get_provider_count_and_objs(self, usuario=None, asignados=True, 
-                                        id_fase=None, **kw):
-        count, lista = super(MiembrosFaseRolesTableFiller,
+                                        id_tipo_item=None, **kw):
+        count, lista = super(MiembrosTipoRolesTableFiller,
                          self)._do_get_provider_count_and_objs(**kw)
         
         roles = []
         
         if not asignados:
-            roles_fase = DBSession.query(Rol) \
-                                  .filter(or_(and_(Rol.tipo == u"Fase",
-                                          Rol.id_fase == id_fase),
-                                          and_(Rol.tipo == u"Plantilla fase")
+            roles_tipo = DBSession.query(Rol) \
+                                  .filter(or_(and_(Rol.tipo.like(u"Tipo%"),
+                                          Rol.id_tipo_item == id_tipo_item),
+                                          and_(Rol.tipo.like(u"Plantilla tipo ítem"))
                                                )).all()
-            for r in roles_fase:
+            for r in roles_tipo:
                 if r not in usuario.roles:
                     roles.append(r)
         else:
-            if id_fase:
+            if id_tipo_item:
                 for r in usuario.roles:
-                    if r.tipo == "Fase" and r.id_fase == id_fase:
+                    if r.tipo.find(u"Tipo") >= 0 and r.id_tipo_item == id_tipo_item:
                         roles.append(r)
 
         return len(roles), roles
     
     
 
-miembros_fase_roles_table_filler = MiembrosFaseRolesTableFiller(DBSession)
+miembros_tipo_roles_table_filler = MiembrosTipoRolesTableFiller(DBSession)
 
 
 #controlador de roles asignados al usuario.
 class RolesAsignadosController(RestController):
-    table = miembros_fase_roles_table
-    table_filler = miembros_fase_roles_table_filler
+    table = miembros_tipo_roles_table
+    table_filler = miembros_tipo_roles_table_filler
     action = "./"
 
   
@@ -189,21 +177,21 @@ class RolesAsignadosController(RestController):
         Retorna todos los registros
         Retorna una página HTML si no se especifica JSON
         """
-        id_fase = UrlParser.parse_id(request.url, "fases")
-        id_usuario = UrlParser.parse_id(request.url, "miembrosfase")
+        id_tipo_item = UrlParser.parse_id(request.url, "tipositems")
+        id_usuario = UrlParser.parse_id(request.url, "miembrostipo")
         usuario = Usuario.por_id(id_usuario)
-        fase = Fase.por_id(id_fase)
+        tipo = TipoItem.por_id(id_tipo_item)
         puede_desasignar = PoseePermiso("asignar-desasignar rol", 
-                                        id_fase=id_fase).is_met(request.environ)
+                                        id_tipo_item=id_tipo_item).is_met(request.environ)
         
-        titulo = "Roles de: %s" % usuario.nombre_usuario
+        titulo = u"Roles de: %s" % usuario.nombre_usuario
 
         if request.response_type == 'application/json':
             return self.table_filler.get_value(usuario=usuario, 
-                                               id_fase=id_fase, **kw)
+                                               id_tipo_item=id_tipo_item, **kw)
         if not getattr(self.table.__class__, '__retrieves_own_value__', False):
             roles = self.table_filler.get_value(usuario=usuario, 
-                                               id_fase=id_fase, **kw)
+                                               id_tipo_item=id_tipo_item, **kw)
         else:
             roles = []
             
@@ -224,20 +212,19 @@ class RolesAsignadosController(RestController):
     @expose('lpm.templates.miembros.roles_asignados_get_all')
     @expose('json')
     def post_buscar(self, *args, **kw):
-        id_fase = UrlParser.parse_id(request.url, "fases")
-        id_usuario = UrlParser.parse_id(request.url, "miembrosfase")
+        id_tipo_item = UrlParser.parse_id(request.url, "tipositems")
+        id_usuario = UrlParser.parse_id(request.url, "miembrostipo")
         usuario = Usuario.por_id(id_usuario)
-        
-        fase = Fase.por_id(id_fase)
+        tipo = TipoItem.por_id(id_tipo_item)
         puede_desasignar = PoseePermiso("asignar-desasignar rol", 
-                                        id_fase=id_fase).is_met(request.environ)
+                                        id_tipo_item=id_tipo_item).is_met(request.environ)
         
-        titulo = "Roles de: %s" % usuario.nombre_usuario
+        titulo = u"Roles de: %s" % usuario.nombre_usuario
         tmpl_context.widget = self.table
         buscar_table_filler = MiembrosFaseRolesTableFiller(DBSession)
         buscar_table_filler.filtros = kw
         usuarios = buscar_table_filler.get_value(usuario=usuario, 
-                                                 id_fase=id_fase, **kw)
+                                                 id_tipo_item=id_tipo_item, **kw)
 
         atras = "../../"
         return dict(lista_elementos=usuarios, 
@@ -261,7 +248,7 @@ class RolesAsignadosController(RestController):
                     continue
                 pks.append(int(pk))
             transaction.begin()
-            id_user = UrlParser.parse_id(request.url, "miembrosfase")
+            id_user = UrlParser.parse_id(request.url, "miembrostipo")
             user = Usuario.por_id(id_user)
             c = 0
             while c < len(user.roles):
@@ -279,8 +266,8 @@ class RolesAsignadosController(RestController):
 
 #controlador de roles desasignados al usuario.
 class RolesDesasignadosController(RestController):
-    table = miembros_fase_roles_table
-    table_filler = miembros_fase_roles_table_filler
+    table = miembros_tipo_roles_table
+    table_filler = miembros_tipo_roles_table_filler
     action = "./"
 
   
@@ -304,21 +291,21 @@ class RolesDesasignadosController(RestController):
         Retorna todos los registros
         Retorna una página HTML si no se especifica JSON
         """
-        id_fase = UrlParser.parse_id(request.url, "fases")
-        id_usuario = UrlParser.parse_id(request.url, "miembrosfase")
+        id_tipo_item = UrlParser.parse_id(request.url, "tipositems")
+        id_usuario = UrlParser.parse_id(request.url, "miembrostipo")
         usuario = Usuario.por_id(id_usuario)
-        fase = Fase.por_id(id_fase)
+        tipo = TipoItem.por_id(id_tipo_item)
+        puede_asignar = PoseePermiso("asignar-desasignar rol", 
+                                        id_tipo_item=id_tipo_item).is_met(request.environ)
                                         
         titulo = u"Roles Desasignados para: %s" % usuario.nombre_usuario
-        puede_asignar = PoseePermiso("asignar-desasignar rol", 
-                                     id_fase=id_fase).is_met(request.environ)
                                         
         if request.response_type == 'application/json':
             return self.table_filler.get_value(usuario=usuario, asignados=False,
-                                               id_fase=id_fase, **kw)
+                                               id_tipo_item=id_tipo_item, **kw)
         if not getattr(self.table.__class__, '__retrieves_own_value__', False):
             roles = self.table_filler.get_value(usuario=usuario, asignados=False,
-                                               id_fase=id_fase, **kw)
+                                               id_tipo_item=id_tipo_item, **kw)
         else:
             roles = []
             
@@ -339,19 +326,18 @@ class RolesDesasignadosController(RestController):
     @expose('lpm.templates.miembros.roles_desasignados_get_all')
     @expose('json')
     def post_buscar(self, *args, **kw):
-        id_fase = UrlParser.parse_id(request.url, "fases")
-        id_usuario = UrlParser.parse_id(request.url, "miembrosfase")
+        id_tipo_item = UrlParser.parse_id(request.url, "tipositems")
+        id_usuario = UrlParser.parse_id(request.url, "miembrostipo")
         usuario = Usuario.por_id(id_usuario)
-        fase = Fase.por_id(id_fase)
-        
-        puede_asignar = PoseePermiso("asignar-desasignar rol", 
-                                        id_fase=id_fase).is_met(request.environ)
+        tipo = TipoItem.por_id(id_tipo_item)
+        puede_desasignar = PoseePermiso("asignar-desasignar rol", 
+                                        id_tipo_item=id_tipo_item).is_met(request.environ)
         titulo = u"Roles Desasignados para: %s" % usuario.nombre_usuario
         tmpl_context.widget = self.table
-        buscar_table_filler = MiembrosFaseRolesTableFiller(DBSession)
+        buscar_table_filler = MiembrosTipoRolesTableFiller(DBSession)
         buscar_table_filler.filtros = kw
         roles = buscar_table_filler.get_value(usuario=usuario, asignados=False,
-                                               id_fase=id_fase, **kw)
+                                               id_tipo_item=id_tipo_item, **kw)
         
         atras = "../../"
         return dict(lista_elementos=roles, 
@@ -375,14 +361,14 @@ class RolesDesasignadosController(RestController):
                     continue
                 pks.append(int(pk))
             transaction.begin()
-            id_user = UrlParser.parse_id(request.url, "miembrosfase")
-            id_fase = UrlParser.parse_id(request.url, "fases")
+            id_user = UrlParser.parse_id(request.url, "miembrostipo")
+            id_tipo_item = UrlParser.parse_id(request.url, "tipositems")
             user = Usuario.por_id(id_user)
             roles = DBSession.query(Rol).filter(Rol.id_rol.in_(pks)).all()
             for r in roles:
                 if r.tipo.find(u"Plantilla") >= 0: #crear rol a partir de plantilla
                     rol_new = Rol.nuevo_rol_desde_plantilla(plantilla=r, 
-                                                            id=id_fase)
+                                                            id=id_tipo_item)
                     rol_new.usuarios.append(user)
                 else:
                     r.usuarios.append(user)
@@ -391,9 +377,9 @@ class RolesDesasignadosController(RestController):
         return "./"
 
 
-class MiembrosFaseController(RestController):
-    table = miembros_fase_table
-    table_filler = miembros_fase_table_filler
+class MiembrosTipoController(RestController):
+    table = miembros_tipo_table
+    table_filler = miembros_tipo_table_filler
     action = "./"
     
     #{Sub Controladores
@@ -422,18 +408,17 @@ class MiembrosFaseController(RestController):
         Retorna todos los registros
         Retorna una página HTML si no se especifica JSON
         """
-        id_fase = UrlParser.parse_id(request.url, "fases")
-        fase = Fase.por_id(id_fase)
+        id_tipo_item = UrlParser.parse_id(request.url, "tipositems")
+        tipo = TipoItem.por_id(id_tipo_item)
 
-        titulo = "Miembros de la Fase: %s" % fase.nombre
-
+        titulo = u"Miembros del Tipo de Item: %s" % tipo.nombre
         puede_remover = PoseePermiso("asignar-desasignar rol", 
-                                        id_fase=id_fase).is_met(request.environ)
-
+                                      id_tipo_item=id_tipo_item).is_met(request.environ)
+        
         if request.response_type == 'application/json':
-            return self.table_filler.get_value(id_fase=id_fase,**kw)
+            return self.table_filler.get_value(id_tipo_item=id_tipo_item,**kw)
         if not getattr(self.table.__class__, '__retrieves_own_value__', False):
-            miembros = self.table_filler.get_value(id_fase=id_fase,**kw)
+            miembros = self.table_filler.get_value(id_tipo_item=id_tipo_item,**kw)
         else:
             miembros = []
             
@@ -455,16 +440,17 @@ class MiembrosFaseController(RestController):
     @expose('lpm.templates.miembros.get_all')
     @expose('json')
     def post_buscar(self, *args, **kw):
-        id_fase = UrlParser.parse_id(request.url, "fases")
-        fase = Fase.por_id(id_fase)
+        id_tipo_item = UrlParser.parse_id(request.url, "tipositems")
+        tipo = TipoItem.por_id(id_tipo_item)
 
-        titulo = "Miembros de la Fase: %s" % fase.nombre
+        titulo = u"Miembros del Tipo de Ítem: %s" % tipo.nombre
+
         puede_remover = PoseePermiso("asignar-desasignar rol", 
-                                     id_fase=id_fase).is_met(request.environ)
-        tmpl_context.widget = miembros_fase_table
-        buscar_table_filler = MiembrosFaseTableFiller(DBSession)
+                                        id_tipo_item=id_tipo_item).is_met(request.environ)
+        tmpl_context.widget = miembros_tipo_table
+        buscar_table_filler = MiembrosTipoTableFiller(DBSession)
         buscar_table_filler.filtros = kw
-        usuarios = buscar_table_filler.get_value(id_fase=id_fase,**kw)
+        usuarios = buscar_table_filler.get_value(id_tipo_item=id_tipo_item,**kw)
         
         #atras = "/proyectos/%d/" % id_proyecto
         atras = "../"
@@ -481,7 +467,7 @@ class MiembrosFaseController(RestController):
         """
         Muestras los datos de un usuario miembro de la fase.
         """
-        id_fase = UrlParser.parse_id(request.url, "fases")
+        id_tipo_item = UrlParser.parse_id(request.url, "tipositems")
         tmpl_context.widget = UsuarioEditForm(DBSession)
         filler = UsuarioEditFiller(DBSession)
         value = filler.get_value(values={'id_usuario': int(args[0])})
@@ -494,7 +480,7 @@ class MiembrosFaseController(RestController):
         """ 
         Desasigna miembros de la fase.
         """
-        id_fase = UrlParser.parse_id(request.url, "fases")
+        id_tipo_item = UrlParser.parse_id(request.url, "tipositems")
 
         if kw:
             pks = []
@@ -509,8 +495,8 @@ class MiembrosFaseController(RestController):
             for u in usuarios:
                 c = 0
                 while c < len(u.roles):
-                    if u.roles[c].id_fase == id_fase and \
-                       u.roles[c].tipo == u"Fase":
+                    if u.roles[c].id_tipo_item == id_tipo_item and \
+                       u.roles[c].tipo == u"Tipo Ítem":
                         del u.roles[c]
                     else:
                         c += 1

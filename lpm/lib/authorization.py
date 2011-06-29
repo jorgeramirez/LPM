@@ -90,6 +90,7 @@ class PoseePermiso(Predicate):
         self.id_proyecto = 0
         self.id_fase = 0
         self.id_tipo_item = 0
+        self.id_usuario = 0
         
         if not kw.has_key('id_proyecto'):
             if kw.has_key('id_fase'):
@@ -105,6 +106,10 @@ class PoseePermiso(Predicate):
         else:
             self.id_proyecto = int(kw['id_proyecto'])
             del kw['id_proyecto']        
+
+        if kw.has_key("id_usuario"):
+            self.id_usuario = int(kw["id_usuario"])
+            del kw["id_usuario"]
         
         super(PoseePermiso, self).__init__(**kw)
         
@@ -113,7 +118,10 @@ class PoseePermiso(Predicate):
             self.unmet()
         nombre_usuario = credentials['repoze.what.userid']
         usuario = Usuario.by_user_name(nombre_usuario)
-        
+
+        if self.id_usuario:
+            usuario = Usuario.por_id(self.id_usuario)
+                    
         for r in usuario.roles:
                 tiene = False
                 for p in r.permisos:
@@ -196,7 +204,8 @@ class AlgunPermiso(Predicate):
             algun = False
             for p in r.permisos:
                 if p.nombre_permiso.find(u"consultar") < 0 and \
-                   p.tipo.find(self.tipo) >= 0:
+                   p.tipo.find(self.tipo) >= 0 and \
+                   p.nombre_permiso != "miembro":
                     algun = True
                     break
             if not algun:
@@ -221,4 +230,71 @@ class AlgunPermiso(Predicate):
                 return
             
         self.unmet(self.message)
+
+
+
+
+
+class Miembro(Predicate):
+    """
+    Evalua si el usuario tiene algún permiso para un
+    contexto dado.
+    """
+    message = u"No tiene algun permiso para dicho contexto"
+    def __init__(self, **kw):
+        """
+        Método inicializador
+        
+        @param kw: Parametros para inicializar
+        @keyword tipo: El tipo de permiso (Rol, Usuario, Proyecto, Fase, Tipo Ítem).
+        """
+        self.id_proyecto = 0
+        self.id_fase = 0
+        self.id_tipo_item = 0
+        self.id_usuario = 0
+        
+        
+        if kw.has_key('id_proyecto'):
+            self.id_proyecto = int(kw['id_proyecto'])
+            del kw['id_proyecto']
+        elif kw.has_key('id_fase'):
+            self.id_fase = int(kw['id_fase'])
+            del kw['id_fase']
+        elif kw.has_key('id_tipo_item'):
+            self.id_tipo_item = int(kw['id_tipo_item'])
+            del kw['id_tipo_item']
+        
+        if kw.has_key("id_usuario"):
+            self.id_usuario = int(kw["id_usuario"])
+            del kw["id_usuario"]
+        
+            
+        super(Miembro, self).__init__(**kw)
+    
+    def evaluate(self, environ, credentials):
+        if is_anonymous().is_met(environ): 
+            self.unmet()
+        nombre_usuario = credentials["repoze.what.userid"]
+        usuario = Usuario.by_user_name(nombre_usuario)
+        
+        if self.id_usuario:
+            usuario = Usuario.por_id(self.id_usuario)
+        
+        for r in usuario.roles:
+            for p in r.permisos:
+                if p.nombre_permiso.find(u"miembro") >= 0:
+                    if self.id_proyecto:
+                        if r.tipo == "Proyecto" and \
+                           r.id_proyecto == self.id_proyecto:
+                            return
+                    elif self.id_fase:
+                        if r.tipo == "Fase" and \
+                           r.id_fase == self.id_fase:
+                            return
+                    else:
+                        if r.tipo.find("Tipo") >= 0 and \
+                           r.id_tipo_item == self.id_tipo_item:
+                            return
+        self.unmet(self.message)
+
 
