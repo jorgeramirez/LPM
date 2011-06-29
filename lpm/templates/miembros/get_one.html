@@ -5,20 +5,28 @@
 <xi:include href="esquema.html" />
 <head>
 <title>$page</title>
+<link href="${tg.url('/css/jquery-ui.css')}" rel="stylesheet" type="text/css"/>
+<script src="${tg.url('/javascript/jquery-1.5.1.min.js')}"></script>
+<script src="${tg.url('/javascript/jquery-ui-1.8.13.custom.min.js')}"></script>
+<script type="text/javascript">
+
+$(function(){
+    $("input[type=submit]").attr("disabled", true).hide();
+});
+
+</script>
 </head>
-<body class="tundra">
+<body>
   <div style="height:0px;"> &nbsp; </div>
   <h2 style="margin-top:1px; padding-left: 60px;">$page</h2>
   <div style="float:left; padding-left: 95px;" class="crud_edit">
     <table cellspacing="0" cellpadding="2" border="0">
     <tbody>
         <tr>
-            <td>
-                ${XML(tmpl_context.widget(value=value))}
+            <td colspan="2">
+                ${XML(tmpl_context.widget(value=value, action='./'))}
+                
             </td>
-        </tr>
-        <tr>
-            <div style="clear:both;"></div>
         </tr>
   </tbody>
   </table>

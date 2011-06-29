@@ -22,15 +22,12 @@ from lpm.lib.authorization import PoseePermiso, AlgunPermiso
 from lpm.lib.util import UrlParser
 from lpm.controllers.rol import (RolTable as RolRolTable,
                                      RolTableFiller as RolRolTableFiller)
-from lpm.controllers.proyecto import (ProyectoTableFiller, ProyectoController)
+
 from lpm.controllers.historialitem import HistorialItemController
 
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller
-#from sprox.dojo.tablebase import DojoTableBase as TableBase
-#from sprox.dojo.fillerbase import DojoTableFiller as TableFiller
 from sprox.fillerbase import EditFormFiller
-#from sprox.formbase import AddRecordForm, EditableForm
 from sprox.dojo.formbase import DojoAddRecordForm as AddRecordForm
 from sprox.dojo.formbase import DojoEditableForm as EditableForm
 from sprox.widgets import PropertySingleSelectField
@@ -48,7 +45,8 @@ from tg import tmpl_context, request
 class UsuarioTable(TableBase):
     __model__ = Usuario
     __headers__ = {'nombre_usuario' : u'Nombre de Usuario', 'email' : u"E-mail",
-                   'nombre' : u"Nombre", 'apellido' : u"Apellido", 'creado': u"Fecha Creación"
+                   'nombre' : u"Nombre", 'apellido' : u"Apellido", 
+                   'creado': u"Fecha Creación"
                   }
     __omit_fields__ = ['id_usuario', 'password', 'telefono', 'nro_documento', 
                        '_password', 'historial_lb', 'roles',
@@ -58,7 +56,7 @@ class UsuarioTable(TableBase):
                          'creado': "35em",
                          '__actions__' : "50em"
                         }
-#    __url__ = '/usuarios.json'
+
     
 usuario_table = UsuarioTable(DBSession)
 
@@ -68,30 +66,12 @@ class UsuarioTableFiller(CustomTableFiller):
     __omit_fields__ = ['password', 'telefono', 'nro_documento', 
                        '_password', 'historial_lb', 'roles',
                        'historial_item']
-
     def __actions__(self, obj):
         """Links de acciones para un registro dado"""
 
         clase = 'actions'
         value = "<div>"
-        kw = request.params
-        contexto=""
-        if kw.has_key("id_proyecto"):
-            contexto="id_proyecto"
-        elif kw.has_key("id_fase"):
-            contexto="id_fase"
-        elif kw.has_key("id_tipo_item"):
-            contexto="id_tipo_item"
 
-        if contexto:
-            id = kw[contexto]
-            url = "/usuarios/roles/{id}?{ctx}={val}"
-            url = url.format(id=obj.id_usuario, ctx=contexto, val=kw[contexto])
-            value = '<div>' + \
-                    '<a href="' + url + '" class="' + clase + '">Asignar</a>' + \
-                    '</div>'
-            return value
-        
         if PoseePermiso('modificar usuario').is_met(request.environ):
             value += '<div>' + \
                         '<a href="/usuarios/'+ str(obj.id_usuario) +'/edit" ' + \
@@ -105,14 +85,9 @@ class UsuarioTableFiller(CustomTableFiller):
                      'display: inline; margin: 0; padding: 0;" class="' + clase + '"/>'+\
                      '</form></div><br />'
 
-        if PoseePermiso('asignar-desasignar rol').is_met(request.environ):
-            value += '<div>' + \
-                        '<a href="/usuarios/roles/' + str(obj.id_usuario) + '" ' +\
-                        'class="' + clase + '">Roles</a>' + \
-                     '</div><br />'
         value += '</div>'
         return value
-
+        
     def _do_get_provider_count_and_objs(self, **kw):
         """
         Se muestra la lista de usuario si se tiene un permiso 
@@ -126,26 +101,6 @@ class UsuarioTableFiller(CustomTableFiller):
         return 1, [user]
 
 
-#    def _do_get_provider_count_and_objs(self, **kw):
-#        """
-#        Se muestra la lista de usuario si se tiene un permiso 
-#        necesario
-#        """
-#        count, filtrados = super(UsuarioTableFiller, self). \
-#                                 _do_get_provider_count_and_objs(**kw)
-#        if count == 0:
-#            return count, filtrados
-#        nombre_usuario = request.credentials['repoze.what.userid']
-#        usuario = Usuario.by_user_name(nombre_usuario)
-#        for r in usuario.roles:
-#            for p in r.permisos:
-#                if p.nombre_permiso.find("usuario") > 0:
-#                    return count, filtrados
-#
-#        #si no tiene permisos necesarios lo unico que puede ver es su usuario
-#        return 1, [usuario]
-
-    
 usuario_table_filler = UsuarioTableFiller(DBSession)
 
 
@@ -162,9 +117,6 @@ class UsuarioAddForm(AddRecordForm):
     
     repita_password = PasswordField('repita_password')
 
-#    from sprox.formbase import Field
-#    roles_boton = Field(SubmitButton('roles'))
-                             
 
 usuario_add_form = UsuarioAddForm(DBSession)
 
@@ -180,8 +132,7 @@ class UsuarioEditForm(EditableForm):
     __field_order__ = ['nombre_usuario', 'nombre', 'apellido', 'nuevo_password',
                        'repita_password', 'email', 'nro_documento', 'telefono']
     __field_attrs__ = {
-                       'nombre_usuario': { 'maxlength' : '32'},
-                       'roles' : {'label_text' :'Roles'}
+                       'nombre_usuario': { 'maxlength' : '32'}
                        }
 
     nuevo_password = PasswordField('nuevo_password')
@@ -197,6 +148,7 @@ usuario_edit_filler = UsuarioEditFiller(DBSession)
 
 
 #tablas para la asignación/desasignación de roles
+'''
 class RolTable(TableBase):
     __model__ = Rol
     __headers__ = {'nombre_rol' : u'Nombre de Rol',
@@ -354,7 +306,7 @@ class RolTableFiller(TableFiller):
         return value
         
 roles_usuario_filler = RolTableFiller(DBSession)
-
+'''
 
 class UsuarioController(CrudRestController):
     """Controlador de usuarios"""
@@ -365,7 +317,7 @@ class UsuarioController(CrudRestController):
 
     # No permitir usuarios anonimos (?)
     allow_only = not_anonymous(u"El usuario debe haber iniciado sesión")
-    historialitems = HistorialItemController(DBSession)
+
     #{ Modificadores
     model = Usuario
     table = usuario_table
@@ -375,19 +327,14 @@ class UsuarioController(CrudRestController):
     edit_filler = usuario_edit_filler
 
     #para el form de busqueda
-    #columnas = dict(nombre_usuario="texto", nombre="texto", apellido="texto",
-    #                email="texto", nro_documento="texto")
     opciones = dict(nombre_usuario="Nombre de Usuario", 
                     nombre="Nombre", 
                     apellido="Apellido",
-                    email="Email", 
-                    nro_documento="Nro. de Documento")
+                    email="Email")
     columnas = dict(nombre_usuario="texto", 
                     nombre="texto", 
                     apellido="texto",
-                    email="texto", 
-                    nro_documento="entero")
-    #comboboxes = dict()
+                    email="texto")
  
     #{ Métodos
     @with_trailing_slash
@@ -410,23 +357,7 @@ class UsuarioController(CrudRestController):
             usuarios = []
             
         tmpl_context.widget = usuario_table
-        de_proyectos = ""
-        try:
-            de_proyectos = "http://" + request.environ.get('HTTP_HOST',) + "/proyectos/" + kw["id_proyecto"] + "/edit"
-        except Exception: 
-            pass
-        if request.environ.get('HTTP_REFERER') == de_proyectos:
-            atras = request.environ.get('HTTP_REFERER')
-        elif kw.has_key("id_fase"):
-            #atras = request.environ.get('HTTP_REFERER')
-            atras = "/fases/%s/edit" % kw["id_fase"]
-        elif kw.has_key("id_tipo_item"):
-            #atras = request.environ.get('HTTP_REFERER')
-            atras = "/tipositems/%s/edit" % kw["id_tipo_item"]
-        else:
-            atras = '/'
-
-        
+        atras = "/"
         retorno = dict(lista_elementos=usuarios, 
                     page=titulo, titulo=titulo, 
                     modelo=self.model.__name__, 
@@ -435,84 +366,26 @@ class UsuarioController(CrudRestController):
                     url_action=self.action,
                     puede_crear=puede_crear, 
                     atras=atras)
-
-        params_buscar = u""
-        if kw.has_key("id_proyecto"):
-            params_buscar = "id_proyecto=%s" % kw["id_proyecto"]
-        elif kw.has_key("id_fase"):
-            params_buscar = "id_proyecto=%s" % kw["id_fase"]
-        elif kw.has_key("id_tipo_item"):
-            params_buscar = "id_proyecto=%s" % kw["id_tipo_item"]
-        
-        if params_buscar:
-            retorno["titulo"] = u"Seleccionar Usuario"
-            retorno["params_buscar"] = params_buscar
-            retorno["puede_crear"] = False
         
         return retorno
 
     @expose('lpm.templates.usuario.edit')
     def edit(self, *args, **kw):
         """Despliega una pagina para modificar usuario"""
-        '''
-        pp = PoseePermiso('modificar usuario', id_usuario=args[0])
+        
+        pp = PoseePermiso('modificar usuario')
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect("/usuarios")
-        '''
         
-        puede_asignar_rol = PoseePermiso("asignar-desasignar rol").is_met(request.environ)
-        class mis_roles_tf(RolRolTableFiller):
-            def __actions__(self, obj):
-                """Links de acciones para un registro dado"""
-                clase = 'actions'
-                contexto = ""
-                url_cont = ""
-                value = "<div></div>"
-                if (obj.tipo == "Sistema"):
-                    url_cont = "/roles/"
-                else:
-                    url_cont = "/rolesplantilla/"
-                    tipo = obj.tipo.lower()
-                    if (tipo.find(u"proyecto") >= 0):
-                        contexto = "proyecto"
-                    elif (tipo.find(u"fase") >= 0):
-                        contexto = "fase"
-                    else:
-                        contexto = "ti"
-                
-                if PoseePermiso('modificar rol').is_met(request.environ):
-                    value = '<div>' + \
-                                '<a href="' +  url_cont + str(obj.id_rol) + "/edit?contexto="+  \
-                                contexto + '" class="' + clase + '">Ver</a>' + \
-                             '</div>'
-                return value
-
-            def _do_get_provider_count_and_objs(self, **kw):
-                user = Usuario.por_id(int(kw["id_usuario"]))
-                return len(user.roles), user.roles
-
         tmpl_context.widget = self.edit_form
         usuarios = self.table_filler.get_value(**kw)
-        roles = mis_roles_tf(DBSession).get_value(id_usuario=args[0])
-        tmpl_context.tabla_roles = RolRolTable(DBSession)
         user = Usuario.por_id(args[0])
-        
-        if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/":
-            atras = "/"
-        else:
-            atras = '/usuarios'
-        
-        if (False): # si viene de /usuarios/perfil
-            page = "Mi perfil"
-        else:
-            page = "Usuario {nombre}".format(nombre=user.nombre_usuario)
-        
+        page = "Usuario {nombre}".format(nombre=user.nombre_usuario)
+        atras = "/usuarios/"
         return dict(super(UsuarioController, self).edit(*args, **kw), 
                     page=page,
-                    roles=roles,
                     id=args[0], 
-                    puede_asignar_rol=puede_asignar_rol,
                     atras=atras
                     )
         
@@ -521,24 +394,24 @@ class UsuarioController(CrudRestController):
         """ Despliega una pagina para modificar el perfil del usuario que 
         inició sesión """
         user = request.identity['repoze.who.userid']
-        id = Usuario.by_user_name(user)
+        usuario = Usuario.by_user_name(user)
 
-        url = '/usuarios/' + str(id.id_usuario) + '/edit'
+        url = "/usuarios/%d/edit" % usuario.id_usuario
         redirect(url)
 
     @expose('lpm.templates.usuario.new')
     def new(self, *args, **kw):
         """Despliega una pagina para crear un usuario"""
-#        pp = PoseePermiso('modificar usuario', id_usuario=args[0])
-#        if not pp.is_met(request.environ):
-#            flash(pp.message % pp.nombre_permiso, 'warning')
-#            redirect("/usuarios")
-        if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/":
-            atras = "../"
-        else:
-            atras = self.action
+        pp = PoseePermiso('crear usuario')
+        if not pp.is_met(request.environ):
+            flash(pp.message % pp.nombre_permiso, 'warning')
+            redirect("/usuarios/")
+        
+        page = u"Nuevo Usuario"
+        atras = "/usuarios/"
         return dict(super(UsuarioController, self).new(*args, **kw),
-                     page='Nuevo Usuario', atras=atras)
+                    page=page, 
+                    atras=atras)
  
     @validate(usuario_edit_form, error_handler=edit)
     @expose()
@@ -549,6 +422,7 @@ class UsuarioController(CrudRestController):
             del kw["repita_nuevo_password"]
         if kw["nro_documento"]:
             kw["nro_documento"] = int(kw["nro_documento"])
+        
         pp = PoseePermiso('modificar usuario')
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
@@ -578,86 +452,18 @@ class UsuarioController(CrudRestController):
         DBSession.add(usuario)
         redirect("./")
 
-    @expose('lpm.templates.usuario.roles')
-    def roles(self, *args, **kw):
-        """ Asignar y desasignar Roles """
-        tmpl_context.tabla_asignados = rol_user_table
-        tmpl_context.tabla_desasignados = rol_user_table
-        user = Usuario.por_id(args[0])
-        page = u"Roles de Usuario {nombre}".format(nombre=user.nombre_usuario)
-
-        contexto=""
-        valor = None
-        for k in ["id_fase", "id_proyecto", "id_tipo_item"]:
-            if kw.has_key(k):
-                kw[k] = int(kw[k])
-                contexto = k
-                valor = kw[k]
-                break
-                
-        asignados = roles_usuario_filler.get_value(usuario=user,
-                                                          asignados=True, **kw)
-        desasignados = roles_usuario_filler.get_value(usuario=user,
-                                                       asignados=False, **kw)
-        
-        if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/usuarios/":
-            atras = self.action
-        elif kw.has_key("id_proyecto"):
-            atras = "/proyectos/%s/edit" % kw["id_proyecto"]
-        elif kw.has_key("id_fase"):
-            atras = "/fases/%s/edit" % kw["id_fase"]
-        elif kw.has_key("id_tipo_item"):
-            atras = "/tipositems/%s/edit" % kw["id_tipo_item"]
-        else:
-            atras = self.action + str(user.id_usuario) + '/edit'
-        return dict(asignados=asignados, 
-                    desasignados=desasignados,
-                    page=page, 
-                    id=args[0], 
-                    atras=atras,
-                    contexto=contexto,
-                    valor_contexto=valor)
-
     @with_trailing_slash
     @paginate('lista_elementos', items_per_page=5)
     @expose('lpm.templates.usuario.get_all')
     @expose('json')
     def post_buscar(self, *args, **kw):
-
-        params_buscar = u""
-        ctx = ""
-        val_ctx = ""
-        if kw.has_key("id_proyecto"):
-            params_buscar = "id_proyecto=%s" % kw["id_proyecto"]
-            ctx = "id_proyecto"
-        elif kw.has_key("id_fase"):
-            params_buscar = "id_proyecto=%s" % kw["id_fase"]
-            ctx = "id_fase"
-        elif kw.has_key("id_tipo_item"):
-            params_buscar = "id_proyecto=%s" % kw["id_tipo_item"]
-            ctx = "id_tipo_item"
-        
-        if ctx:
-            val_ctx = kw[ctx]
-            del kw[ctx]
-
         puede_crear = PoseePermiso("crear usuario").is_met(request.environ)
         tmpl_context.widget = self.table
         buscar_table_filler = UsuarioTableFiller(DBSession)
         buscar_table_filler.filtros = kw
-        
-        if ctx:
-            kw[ctx] = int(val_ctx)
-            
         usuarios = buscar_table_filler.get_value(**kw)
-        
-        if request.environ.get('HTTP_REFERER') != "http://" + request.environ.get('HTTP_HOST',) + "/usuarios/":
-            atras = request.environ.get('HTTP_REFERER')
-        else:
-            atras = '/usuarios'  
-
-        
-        retorno = dict(lista_elementos=usuarios, 
+        atras = "/usuarios/"
+        return dict(lista_elementos=usuarios, 
                     page=self.title, titulo=self.title, 
                     modelo=self.model.__name__, 
                     columnas=self.columnas,
@@ -665,15 +471,8 @@ class UsuarioController(CrudRestController):
                     url_action=self.action, 
                     puede_crear=puede_crear, 
                     atras=atras)
-
-        if params_buscar:
-            retorno["titulo"] = u"Seleccionar Usuario"
-            retorno["params_buscar"] = params_buscar
-            retorno["puede_crear"] = False
-        
-        return retorno
-            
     
+'''
     @expose('lpm.templates.usuario.roles')
     def desasignar_roles(self, *args, **kw):
         """ Desasigna los roles seleccionados a un usuario """
@@ -695,6 +494,7 @@ class UsuarioController(CrudRestController):
             transaction.commit()
 
         return self.roles(*args, **kw)
+
 
     @expose('lpm.templates.usuario.roles')
     def asignar_roles(self, *args, **kw):
@@ -722,64 +522,6 @@ class UsuarioController(CrudRestController):
                     r.usuarios.append(user)
             transaction.commit()
         return self.roles(*args, **kw)
-    
-    @without_trailing_slash
-    @paginate('lista_elementos', items_per_page=5)
-    @expose('lpm.templates.proyecto.get_all')
-    @expose('json')
-    def proyectos(self, *args, **kw):
-        id_usuario = args[0]
+'''
 
-
-        class user_proy_filler(ProyectoTableFiller):
-            """
-            TableFiller temporal utilizado para recuperar los proyectos del
-            usuario
-            """
-            def _do_get_provider_count_and_objs(self, id_usuario=None, **kw):
-                count, proys = super(user_proy_filler, 
-                                     self)._do_get_provider_count_and_objs(**kw)
-                filtrados = []
-                for p in proys:
-                    if p.obtener_lider().id_usuario == int(id_usuario):
-                        filtrados.append(p)
-                return len(filtrados), filtrados
-
-            def __actions__(self, obj):
-                """Links de acciones para un registro dado"""
-                value = '<div>'
-                clase = 'actions'
-                if PoseePermiso('modificar proyecto',
-                                id_proyecto=obj.id_proyecto).is_met(request.environ):
-                    value += '<div>' + \
-                                '<a href="/proyectos/'+ str(obj.id_proyecto) + '/edit" ' + \
-                                'class="' + clase + '">Examinar</a>' + \
-                             '</div><br />'
-                value += '</div>'
-                return value
-
-        
-        upf = user_proy_filler(DBSession)
-        if kw.keys():
-            upf.filtros = kw
-        proyectos = upf.get_value(id_usuario=id_usuario)
-        tmpl_context.widget = ProyectoController.table
-        atras = '../%s/edit' % id_usuario
-        titulo = u"Proyectos del Usuario"
-        url_action = "./%s/" % id_usuario
-        if UrlParser.parse_nombre(request.url, "post_buscar"):
-            url_action = "../"
-            atras = "../"
-            
-        return dict(lista_elementos=proyectos, 
-                    page=titulo,
-                    titulo=titulo, 
-                    modelo="Proyecto", 
-                    columnas=ProyectoController.columnas,
-                    opciones=ProyectoController.opciones,
-                    url_action=url_action,
-                    puede_crear=False,
-                    comboboxes=ProyectoController.comboboxes,
-                    atras=atras
-                    )
     #}

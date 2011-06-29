@@ -89,27 +89,22 @@
                                             </ul>
                                      </li>                                                
 
-                                    <li><a href="${tg.url('/proyectos')}" class="fly">Proyecto</a>
+                                    <li py:if="request.puede_proyecto"><a href="${tg.url('/proyectos')}" class="fly">Proyecto</a>
                                             <ul>
                                                 <li><a href="${tg.url('/proyectos/')}">Búsqueda</a></li>
-                                                <li><a href="${tg.url('/proyectos/mis_proyectos')}">Mis Proyectos</a></li>
                                                 <li py:if='request.credentials and "crear proyecto" in request.credentials["permissions"]'>
                                                     <a href="${tg.url('/proyectos/new')}">Nuevo</a>
                                                 </li>
-                                                <li><a href="${tg.url('/proyectos/')}">Participando</a></li>
                                             </ul>
                                     </li>
-                                   <li><a href="${tg.url('/fases')}" class="fly">Fase</a>
+                                    <li py:if="not request.puede_proyecto and request.puede_fase"><a href="${tg.url('/proyectos_fase/')}" class="fly">Fases</a>
                                             <ul>
-                                                <li><a href="${tg.url('/fases/')}">Búsqueda</a></li>
-                                                <li><a href="${tg.url('/fases/')}">Participando</a></li>
-                                                <!-- <li><a href="#nogo5">Nueva(?)</a></li> -->
+                                                <li><a href="${tg.url('/proyectos_fase/')}">Búsqueda</a></li>
                                             </ul>
                                     </li>
-                                    <li><a href="${tg.url('/tipositems')}" class="fly">Tipos de Ítem</a>
+                                    <li py:if="not (request.puede_proyecto or request.puede_fase) and request.puede_ti"><a href="${tg.url('/proyectos_fase_ti')}" class="fly">Tipos de Ítem</a>
                                             <ul>
-                                                <li><a href="${tg.url('/tipositems/')}">Búsqueda</a></li>
-                                                <!-- <li><a href="#nogo5">Nuevo(?)</a></li> -->
+                                                <li><a href="${tg.url('/proyectos_fase_ti/')}">Búsqueda</a></li>
                                             </ul>
                                     </li>
                                 </ul>

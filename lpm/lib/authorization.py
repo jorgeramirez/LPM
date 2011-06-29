@@ -31,6 +31,9 @@ Permisos = [
     dict(nombre= u"modificar rol", descripcion= u"Permite modificar un rol", tipo= u"Proyecto, Fase, Tipo Ítem, Rol"),
     dict(nombre= u"asignar-desasignar rol", descripcion= u"Permite realizar la operación de asignar un rol", tipo= u"Proyecto, Fase, Tipo Ítem, Rol"),
     dict(nombre= u"consultar rol", descripcion= u"Permite consultar atributos de un rol", tipo= u"Proyecto, Fase, Tipo Ítem, Rol"),
+
+    dict(nombre= u"miembro proyecto", descripcion= u"Indica si es miembro del proyecto", tipo= u"Proyecto"),
+
 #proyecto
     dict(nombre= u"consultar proyecto", descripcion= (u"Permite consultar valores de atributos de " +
                            u"proyecto"), tipo= u"Proyecto"),
@@ -40,7 +43,7 @@ Permisos = [
                          u"proyecto"), tipo= u"Proyecto"),
     dict(nombre= u"crear proyecto", descripcion= u"Permite crear proyectos", tipo= u"Sistema"),
     dict(nombre= u"eliminar proyecto", descripcion= u"Permite eliminar proyectos", tipo= u"Sistema"),
-    
+
 #fases
     dict(nombre= u"crear fase", descripcion= u"Permite crear fases", tipo= u"Proyecto"),
     dict(nombre= u"modificar fase", descripcion= u"Permite modificar valores de atributos de una fase", tipo= u"Proyecto, Fase"),
@@ -153,6 +156,7 @@ class AlgunPermiso(Predicate):
         self.id_proyecto = 0
         self.id_fase = 0
         self.id_tipo_item = 0
+        self.id_usuario = 0
         
         self.tipo = unicode(kw["tipo"])
         del kw["tipo"]
@@ -171,6 +175,11 @@ class AlgunPermiso(Predicate):
         else:
             self.id_proyecto = int(kw['id_proyecto'])
             del kw['id_proyecto']
+        
+        if kw.has_key("id_usuario"):
+            self.id_usuario = int(kw["id_usuario"])
+            del kw["id_usuario"]
+        
             
         super(AlgunPermiso, self).__init__(**kw)
     
@@ -179,6 +188,10 @@ class AlgunPermiso(Predicate):
             self.unmet()
         nombre_usuario = credentials["repoze.what.userid"]
         usuario = Usuario.by_user_name(nombre_usuario)
+        
+        if self.id_usuario:
+            usuario = Usuario.por_id(self.id_usuario)
+        
         for r in usuario.roles:
             algun = False
             for p in r.permisos:

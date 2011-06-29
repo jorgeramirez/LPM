@@ -28,24 +28,27 @@ def bootstrap(command, conf, vars):
         r.nombre_rol = u'Administrador del Sistema'
         r.descripcion= u'Rol por defecto que tiene todos los permisos del sistema'
         r.tipo = u"Sistema"
-#        r.id_fase = 0
-#        r.id_proyecto = 0
-#        r.id_tipo_item = 0
         r.usuarios.append(u)
         
         #Rol Lider de Proyecto
         rlp = model.Rol()
         rlp.nombre_rol = u"Lider de Proyecto"
-        rlp.descripcion = u"Rol Lider de Proyecto, administra componentes" +\
-                           "de un proyecto"
+        rlp.descripcion = u"Rol Lider de Proyecto, administra componentes " +\
+                          u"de un proyecto"
         rlp.tipo = u"Plantilla proyecto"
-#        rlp.id_fase = 0
-#        rlp.id_proyecto = 0
-#        rlp.id_tipo_item = 0
-        model.DBSession.add_all([r, rlp])
+        
+        #Rol de Miembro de Proyecto
+        rmp = model.Rol()
+        rmp.nombre_rol = u"Miembro de Proyecto"
+        rmp.descripcion = u"Rol Miembro de Proyecto, indica si un usuario" + \
+                          u"es miembro de un proyecto"
+        rmp.tipo = u"Plantilla proyecto"
+
+        model.DBSession.add_all([r, rlp, rmp])
         model.DBSession.flush()
         rlp.codigo = model.Rol.generar_codigo(rlp)
         r.codigo = model.Rol.generar_codigo(r)
+        rmp.codigo = model.Rol.generar_codigo(rmp)
         
         #permisos del sistema
         print "Creando los permisos del sistema..."
@@ -57,10 +60,12 @@ def bootstrap(command, conf, vars):
             p.roles.append(r) # Administrador del sistema.
             
             if (perm['tipo'] != u'Sistema'):
-                p.roles.append(rlp) #Líder de Proyecto.            
+                if perm["nombre"] == u"miembro proyecto":
+                    p.roles.append(rmp)
+                p.roles.append(rlp) #Líder de Proyecto.
+
 
         model.DBSession.flush()
-        ####Asignar los permisos para lider de proyecto
         transaction.commit()
         print "Se han creado correctamente las tablas"
     except IntegrityError:

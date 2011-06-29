@@ -22,6 +22,8 @@ from lpm.lib.authorization import PoseePermiso, AlgunPermiso
 from lpm.lib.util import UrlParser
 from lpm.controllers.fase import FaseController, FaseTableFiller, FaseTable
 from lpm.controllers.tipoitem import TipoItemController, TipoItemTableFiller
+from lpm.controllers.miembros_proyecto import MiembrosProyectoController
+from lpm.controllers.no_miembros_proyecto import NoMiembrosProyectoController
 
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, EditFormFiller, RecordFiller
@@ -85,14 +87,31 @@ class ProyectoTableFiller(CustomTableFiller):
                         'class="' + clase + '">Modificar</a>' + \
                      '</div><br />'
 
-        if PoseePermiso('eliminar proyecto',
-                        id_proyecto=obj.id_proyecto).is_met(request.environ):
-            value += '<div><form method="POST" action="' + str(obj.id_proyecto) + '" class="button-to">'+\
-                     '<input type="hidden" name="_method" value="DELETE" />' +\
-                     '<input onclick="return confirm(\'¿Está seguro?\');" value="Delete" type="submit" '+\
-                     'style="background-color: transparent; float:left; border:0; color: #286571;'+\
-                     'display: inline; margin: 0; padding: 0;" class="' + clase + '"/>'+\
-                     '</form></div><br />'
+            value += '<div>' + \
+                        '<a href="./'+ str(obj.id_proyecto) + '/fases" ' + \
+                        'class="' + clase + '">Fases</a>' + \
+                     '</div><br />'
+
+            value += '<div>' + \
+                        '<a href="./'+ str(obj.id_proyecto) + '/tipositems" ' + \
+                        'class="' + clase + '">Tipos de Ítem</a>' + \
+                     '</div><br />'
+                     
+            value += '<div>' + \
+                        '<a href="./'+ str(obj.id_proyecto) + '/roles" ' + \
+                        'class="' + clase + '">Roles de Proyecto</a>' + \
+                     '</div><br />'
+
+            value += '<div>' + \
+                        '<a href="./'+ str(obj.id_proyecto) + '/miembros" ' + \
+                        'class="' + clase + '">Miembros</a>' + \
+                     '</div><br />'
+
+            value += '<div>' + \
+                        '<a href="./'+ str(obj.id_proyecto) + '/nomiembros" ' + \
+                        'class="' + clase + '">No miembros</a>' + \
+                     '</div><br />'
+
 
         if obj.estado == u"No Iniciado":
             if PoseePermiso('iniciar proyecto', 
@@ -101,78 +120,36 @@ class ProyectoTableFiller(CustomTableFiller):
                             '<a href="./iniciar/' + str(obj.id_proyecto) + '" ' +\
                             'class="' + clase + '">Iniciar</a>' + \
                          '</div><br />'
+
+
+        if PoseePermiso('eliminar proyecto',
+                        id_proyecto=obj.id_proyecto).is_met(request.environ):
+            value += '<div><form method="POST" action="' + str(obj.id_proyecto) + '" class="button-to">'+\
+                     '<input type="hidden" name="_method" value="DELETE" />' +\
+                     '<input onclick="return confirm(\'¿Está seguro?\');" value="Eliminar" type="submit" '+\
+                     'style="background-color: transparent; float:left; border:0; color: #286571;'+\
+                     'display: inline; margin: 0; padding: 0; margin-left: -3px;" class="' + clase + '"/>'+\
+                     '</form></div><br />'
+
         value += '</div>'
         return value
     
     def _do_get_provider_count_and_objs(self, **kw):
         """
-        Sobreescribimos este método para poder listar
-        solamente los proyectos para los cuales tenemos
-        algun permiso.
+        Retorna la Lista los proyectos del sistema sobre
         """
-        #verificar si filtra adecuadamente segun permisos
-        count, filtrados = super(ProyectoTableFiller, self). \
-                                 _do_get_provider_count_and_objs(**kw)
-        if count == 0:
-            return count, filtrados
-        pks = []
-        nombre_usuario = request.credentials['repoze.what.userid']
-        usuario = Usuario.by_user_name(nombre_usuario)
-        for r in usuario.roles:
-            if r.es_rol_sistema():
-                for p in r.permisos:
-                    if p.nombre_permiso.find("proyecto") > 0 and \
-                       p.nombre_permiso != u"consultar proyecto":
-                        return count, filtrados
-            elif r.id_proyecto != 0 and r.id_proyecto not in pks:
-                pks.append(r.id_proyecto)
-        c = 0
-        while True:
-            if filtrados[c].id_proyecto not in pks:
-                filtrados.pop(c)
-            else:
-                c += 1
-            if c == len(filtrados):
-                break
+        count, lista = super(ProyectoTableFiller, self).\
+                            _do_get_provider_count_and_objs(**kw)
+        filtrados = []                    
+        for p in lista:
+            pp = PoseePermiso(u"modificar proyecto", id_proyecto=p.id_proyecto)
+            if pp.is_met(request.environ):
+                filtrados.append(p)
             
-        return len(filtrados), filtrados
+        return len(filtrados), filtrados         
 
 
 proyecto_table_filler = ProyectoTableFiller(DBSession)
-
-
-class LiderField(CustomPropertySingleSelectField):
-    """Dropdown list para líder de proyecto
-    al crear por defecto se selecciona el usuario actual"""
-    def _my_update_params(self, d, nullable=False):
-        options = []
-        if self.accion == "edit":
-            id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-            if id_proyecto:
-                proy = Proyecto.por_id(id_proyecto)
-                lider = proy.obtener_lider()
-                options.append((lider.id_usuario, '%s (%s)'%(lider.nombre_usuario, 
-                                lider.nombre + " " + lider.apellido)))
-                if (PoseePermiso('asignar-desasignar rol').is_met(request.environ)):
-                    usuarios = DBSession.query(Usuario).\
-                        filter(Usuario.id_usuario!=lider.id_usuario).all()
-                    for u in usuarios:
-                        options.append((u.id_usuario, '%s (%s)'%(u.nombre_usuario, 
-                        u.nombre + " " + u.apellido)))
-                        
-        elif self.accion == "new":
-            user = Usuario.by_user_name(request.identity['repoze.who.userid'])
-            options.append((user.id_usuario, '%s (%s)'%(user.nombre_usuario, 
-                        user.nombre + " " + user.apellido)))
-            usuarios = DBSession.query(Usuario).\
-                filter(Usuario.id_usuario != user.id_usuario).all()
-            for u in usuarios:
-                options.append((u.id_usuario, '%s (%s)'%(u.nombre_usuario, 
-                    u.nombre + " " + u.apellido)))
-                    
-        d['options'] = options
-        return d
-
 
 class ProyectoAddForm(AddRecordForm):
     __model__ = Proyecto
@@ -182,9 +159,6 @@ class ProyectoAddForm(AddRecordForm):
     __field_order__ = ['nombre', 'descripcion']
     __base_validator__ = ProyectoAddFormValidator
     
-    if PoseePermiso('asignar-desasignar rol').is_met(request.environ):
-        lider = LiderField('lider', label_text="Lider", accion="new")
-        __field_order__.append('lider')
 
 proyecto_add_form = ProyectoAddForm(DBSession)
 
@@ -196,10 +170,6 @@ class ProyectoEditForm(EditableForm):
                        'estado', 'numero_fases', 'codigo', 'fases', 
                        'tipos_de_item', 'roles']
     __base_validator__ = ProyectoEditFormValidator
-    #__disable_fields__ = ['nombre']
-    if PoseePermiso('asignar-desasignar rol').is_met(request.environ):
-        lider = LiderField('lider', label_text="Lider", 
-                           accion="edit")
 
 proyecto_edit_form = ProyectoEditForm(DBSession)        
 
@@ -209,7 +179,6 @@ class ProyectoEditFiller(EditFormFiller):
 proyecto_edit_filler = ProyectoEditFiller(DBSession)
 
     
-#tabla_fases_filler = FasesProyectoTableFiller(DBSession)
     
 class ProyectoController(CrudRestController):
     """Controlador de Proyectos"""
@@ -219,10 +188,12 @@ class ProyectoController(CrudRestController):
     tmp_action = "/proyectos/buscar"
     # No permitir usuarios anonimos (?)
     allow_only = not_anonymous(u"El usuario debe haber iniciado sesión")
+    
     #{ Sub Controlador
-    id_proy = UrlParser.parse_id(request.url, "proyectos")
     fases = FaseController(DBSession)
     tipositems = TipoItemController(DBSession)
+    miembros = MiembrosProyectoController()
+    nomiembros = NoMiembrosProyectoController()
     #{ Modificadores
     model = Proyecto
     table = proyecto_table
@@ -230,7 +201,8 @@ class ProyectoController(CrudRestController):
     new_form = proyecto_add_form
     edit_form = proyecto_edit_form
     edit_filler = proyecto_edit_filler
-    tabla_fases_filler = None#tabla_fases_filler
+    
+    
     #para el form de busqueda
     opciones = dict(nombre=u"Nombre de Proyecto",
                    codigo=u"Código",
@@ -239,6 +211,7 @@ class ProyectoController(CrudRestController):
                    numero_fases=u"Número de Fases",
                    fecha_creacion=u"Fecha de Creación"
                    )
+    
     #el diccionario opciones de tiene lo que se muestra en 
     #el combobox de selección de filtros,
     #tiene que tener la misma clave que los valores de columnas
@@ -291,15 +264,14 @@ class ProyectoController(CrudRestController):
     def iniciar(self, id_proyecto):
         """Inicia un proyecto"""
         
-#        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
         if (not PoseePermiso('iniciar proyecto', 
                         id_proyecto=id_proyecto).is_met(request.environ)):
             flash("No puedes iniciar el proyecto", "warning")
             
         proy = Proyecto.por_id(id_proyecto)
         proy.iniciar_proyecto()
-        
-        redirect('/proyectos/%s/edit' % id_proyecto)
+        flash("El proyecto se ha iniciado correctamente")
+        redirect("/proyectos/")
                 
     @without_trailing_slash
     @paginate('lista_elementos', items_per_page=5)
@@ -315,14 +287,14 @@ class ProyectoController(CrudRestController):
         pp = PoseePermiso('consultar proyecto')
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
-            redirect("/proyectos")
+            redirect("/proyectos/")
 
         tmpl_context.widget = self.table
         buscar_table_filler = ProyectoTableFiller(DBSession)
         buscar_table_filler.filtros = kw
         proyectos = buscar_table_filler.get_value()
         
-        atras = '/proyectos'
+        atras = '/proyectos/'
         
         return dict(lista_elementos=proyectos, 
                     page=self.title, 
@@ -341,10 +313,7 @@ class ProyectoController(CrudRestController):
     def new(self, *args, **kw):
         """Display a page to show a new record."""
         tmpl_context.widget = self.new_form
-        if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/":
-            atras = "../"
-        else:
-            atras = "/proyectos"
+        atras = "/proyectos/"
         return dict(value=kw, page="Nuevo Proyecto", atras=atras)    
     
     @validate(proyecto_add_form, error_handler=new)
@@ -352,93 +321,36 @@ class ProyectoController(CrudRestController):
     def post(self, *args, **kw):
         if "sprox_id" in kw:
             del kw["sprox_id"]
-        id_proy_lider = int(kw["lider"])
-        del kw["lider"]
-        #transaction.begin()
+
         proy = Proyecto(**kw)
-        lider = Usuario.por_id(id_proy_lider)
-        nombre_lider = lider.nombre_usuario
-        rol_template = Rol.obtener_rol_plantilla(nombre_rol=u"Lider de Proyecto")
         DBSession.add(proy)
         DBSession.flush()
-        rol_nuevo = Rol.nuevo_rol_desde_plantilla(plantilla=rol_template,
-                                                  id=proy.id_proyecto)
-        #Rol(id_fase=0, id_tipo_item=0)
-
         proy.codigo = Proyecto.generar_codigo(proy)
-        rol_nuevo.usuarios.append(lider)
 
-        
-        #después de crear el proyecto, si el usuario actual es el lider
-        #se redirige a la interface de administración del nuevo proyecto.
-        if (nombre_lider == request.identity['repoze.who.userid']):
-            redirect("/proyectos/%d/edit" % proy.id_proyecto)
-        else:
-            redirect("/proyectos")
+        #Creamos el rol miembro  y lider de proyecto para este proyecto.
+        plant_m = Rol.obtener_rol_plantilla(nombre_rol=u"Miembro de Proyecto")
+        plant_l = Rol.obtener_rol_plantilla(nombre_rol=u"Lider de Proyecto")
+        rol_m = Rol.nuevo_rol_desde_plantilla(plantilla=plant_m, id=proy.id_proyecto)
+        rol_l = Rol.nuevo_rol_desde_plantilla(plantilla=plant_l, id=proy.id_proyecto)
 
+        flash("Se ha creado un nuevo proyecto")
+        redirect("/proyectos/")
 
-    #@rest.dispatch_on(PUT='put')
-    @expose('lpm.templates.proyecto.administrar')
+    @expose('lpm.templates.proyecto.edit')
     def edit(self, id_proyecto,*args, **kw):
         """Despliega una pagina para admistrar un proyecto"""
-#        id_proyecto = args[0]
+
         pp = PoseePermiso('modificar proyecto', id_proyecto=id_proyecto)
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect("/proyectos")
         proyecto = Proyecto.por_id(id_proyecto)
-        iniciado = (proyecto.estado == u'Iniciado')
-        
-        puede_crear_fases = (not iniciado and
-                            PoseePermiso('crear fase', id_proyecto=id_proyecto).\
-                            is_met(request.environ))
-        
-        puede_crear_ti = (iniciado and
-                            PoseePermiso('crear tipo item', id_proyecto=id_proyecto).\
-                            is_met(request.environ))
-        
-        puede_asignar_rol = PoseePermiso('asignar-desasignar rol', 
-                                         id_proyecto = id_proyecto). \
-                                         is_met(request.environ)
-
-        puede_crear_rol = PoseePermiso('crear rol', 
-                                         id_proyecto = id_proyecto). \
-                                         is_met(request.environ)
-        
-        puede_iniciar = (not iniciado and PoseePermiso('iniciar proyecto', \
-                                                      id_proyecto=id_proyecto). \
-                                                      is_met(request.environ))
-        
         tmpl_context.widget = self.edit_form
-        
-            
-        #tmpl_context.tabla_fases = FasesProyectoTableFiller(DBSession)
-        #tmpl_context.tabla_ti = TiProyectoTableFiller(DBSession)
-        tmpl_context.tabla_fases = self.fases.table
-        tmpl_context.tabla_ti = self.tipositems.table
-        
         value = self.edit_filler.get_value(values={'id_proyecto': id_proyecto})
         value['_method'] = 'PUT'
-        #fases = self.fases.get_all()['value']#tabla_fases_filler.get_value()
-        #tipo_items = self.tipositems.get_all()['value']#self.tabla_ti_filler.get_value()
-        fases = self.fases.table_filler.get_value(id_proyecto=id_proyecto, **kw)
-        tipo_items = self.tipositems.table_filler.get_value(id_proyecto=id_proyecto, **kw)
-
-        if request.environ.get('HTTP_REFERER') == "http://" + request.environ.get('HTTP_HOST',) + "/":
-            atras = "../"
-        else:
-            atras = "/proyectos"
+        atras = "/proyectos/"
         return dict(value=value,
-                    page="Administrar Proyecto %s" % proyecto.nombre,
-                    fases=fases,
-                    tipo_items=tipo_items,
-                    puede_crear_fase=puede_crear_fases,
-                    puede_crear_ti=puede_crear_ti,
-                    iniciado=iniciado,
-                    puede_crear_rol=puede_crear_rol,
-                    puede_asignar_rol=puede_asignar_rol,
-                    puede_iniciar=puede_iniciar,
-                    id=id_proyecto,
+                    page="Modificar Proyecto %s" % proyecto.nombre,
                     atras=atras
                     )
     
@@ -451,90 +363,11 @@ class ProyectoController(CrudRestController):
         if "sprox_id" in kw:
             del kw["sprox_id"]
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        transaction.begin()
         proy = Proyecto.por_id(id_proyecto)
         proy.nombre = unicode(kw["nombre"])
         proy.descripcion = unicode(kw["descripcion"])
-        transaction.commit()
-        redirect("../")
+        redirect("/proyectos/")
     
-    
-    @with_trailing_slash
-    @paginate('lista_elementos', items_per_page=5)
-    @expose('lpm.templates.proyecto.get_all')
-    @expose('json')
-    def mis_proyectos(self, *args, **kw):
-        tmpl_context.widget = self.table
-        
-        class mp_filler(ProyectoTableFiller):
-            """
-            TableFiller temporal utilizado para recuperar los proyectos del
-            usuario actual.
-            """
-            def _do_get_provider_count_and_objs(self, **kw):
-                count, proys = super(mp_filler, 
-                                    self)._do_get_provider_count_and_objs(**kw)
-                filtrados = []
-                for p in proys:
-                    if p.obtener_lider().nombre_usuario == \
-                       request.credentials["repoze.what.userid"]:
-                        filtrados.append(p)
-                return len(filtrados), filtrados
-
-            def __actions__(self, obj):
-                """Links de acciones para un registro dado"""
-                value = '<div>'
-                clase = 'actions'
-
-                if PoseePermiso('modificar proyecto',
-                                id_proyecto=obj.id_proyecto).is_met(request.environ):
-                    value += '<div>' + \
-                                '<a href="/proyectos/'+ str(obj.id_proyecto) + '/edit" ' + \
-                                'class="' + clase + '">Modificar</a>' + \
-                             '</div><br />'
-
-                if PoseePermiso('eliminar proyecto',
-                                id_proyecto=obj.id_proyecto).is_met(request.environ):
-                    value += '<div><form method="POST" action="/proyectos/post_delete/' + str(obj.id_proyecto) + '" class="button-to">'+\
-                             '<input onclick="return confirm(\'¿Está seguro?\');" value="Delete" type="submit" '+\
-                             'style="background-color: transparent; float:left; border:0; color: #286571;'+\
-                             'display: inline; margin: 0; padding: 0;" class="' + clase + '"/>'+\
-                             '</form></div><br />'
-
-                if obj.estado == u"No Iniciado":
-                    if PoseePermiso('iniciar proyecto', 
-                                id_proyecto=obj.id_proyecto).is_met(request.environ):
-                        value += '<div>' + \
-                                    '<a href="./iniciar/' + str(obj.id_proyecto) + '" ' +\
-                                    'class="' + clase + '">Iniciar</a>' + \
-                                 '</div><br />'
-                value += '</div>'
-                return value
-
-                
-        mpf = mp_filler(DBSession)
-        if kw.keys():
-            mpf.filtros = kw
-        proyectos = mpf.get_value()
-        atras = "/"
-        titulo = u"Mis Proyectos"
-        url_action = "./"
-        if UrlParser.parse_nombre(request.url, "post_buscar"):
-            url_action = "../"
-            atras = "../"
-            
-        return dict(lista_elementos=proyectos, 
-                    page=titulo,
-                    titulo=titulo, 
-                    modelo=self.model.__name__, 
-                    columnas=self.columnas,
-                    opciones=self.opciones,
-                    url_action=url_action,
-                    puede_crear=False,
-                    comboboxes=self.comboboxes,
-                    atras=atras
-                    )
-                    
     @expose()
     def post_delete(self, id_proyecto):
         proy = Proyecto.por_id(int(id_proyecto))
