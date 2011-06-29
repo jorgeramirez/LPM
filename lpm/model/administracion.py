@@ -347,6 +347,7 @@ class Proyecto(DeclarativeBase):
             DBSession.add(fase)
             DBSession.flush()
             fase.codigo = Fase.generar_codigo(fase)
+            return fase
 
 
 

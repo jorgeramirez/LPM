@@ -14,13 +14,15 @@ from tg.decorators import (paginate, expose, with_trailing_slash,
                            without_trailing_slash)
 from tg import redirect, request, validate, flash
 
-from lpm.model import DBSession, Fase, Proyecto
+from lpm.model import DBSession, Fase, Proyecto, Rol
 from lpm.lib.sproxcustom import (CustomTableFiller,
                                  CustomPropertySingleSelectField)
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
 from lpm.lib.util import UrlParser
 from lpm.controllers.tipoitem import TipoItemController, TipoItemTableFiller
 from lpm.controllers.validaciones.fase_validator import FaseFormValidator
+from lpm.controllers.miembros_fase import MiembrosFaseController
+from lpm.controllers.no_miembros_fase import NoMiembrosFaseController
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, EditFormFiller
 from sprox.fillerbase import EditFormFiller
@@ -88,12 +90,12 @@ class FaseTableFiller(CustomTableFiller):
 
 
             value += '<div>' + \
-                        '<a href="'+ url_cont + str(obj.id_fase) + '/miembros" ' + \
+                        '<a href="'+ url_cont + str(obj.id_fase) + '/miembrosfase" ' + \
                         'class="' + clase + '">Miembros</a>' + \
                      '</div><br />'
 
             value += '<div>' + \
-                        '<a href="'+ url_cont + str(obj.id_fase) + '/nomiembros" ' + \
+                        '<a href="'+ url_cont + str(obj.id_fase) + '/nomiembrosfase" ' + \
                         'class="' + clase + '">No miembros</a>' + \
                      '</div><br />'
                      
@@ -221,6 +223,9 @@ class FaseController(CrudRestController):
     
     #Subcontrolador
     tipositems = TipoItemController(DBSession)
+    miembrosfase = MiembrosFaseController()
+    nomiembrosfase = NoMiembrosFaseController()
+    rolesfase = None
     
     #{ Modificadores
 
@@ -349,7 +354,11 @@ class FaseController(CrudRestController):
             del kw["sprox_id"]
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
         proy = Proyecto.por_id(id_proyecto)
-        proy.crear_fase(**kw)
+        fase = proy.crear_fase(**kw)
+        #Creamos el rol miembro  de fase
+        plant_m = Rol.obtener_rol_plantilla(nombre_rol=u"Miembro de Fase")
+        rol_m = Rol.nuevo_rol_desde_plantilla(plantilla=plant_m, 
+                                              id=fase.id_fase)
         flash("Fase Creada")
         redirect("./")
         

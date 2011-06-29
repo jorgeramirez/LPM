@@ -15,11 +15,13 @@ from tg.decorators import (paginate, expose, with_trailing_slash,
                            without_trailing_slash)
 from tg import redirect, request, require, flash, url, validate 
 
-from lpm.model import DBSession, Usuario, Proyecto, Rol
+from lpm.model import DBSession, Usuario, Proyecto, Rol, Fase
 from lpm.lib.sproxcustom import CustomTableFiller
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
 from lpm.lib.util import UrlParser
 from lpm.controllers.usuario import UsuarioEditForm, UsuarioEditFiller
+from lpm.controllers.miembros_proyecto import (MiembrosProyectoTable,
+                                               MiembrosProyectoRolesTable)
 
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller
@@ -37,26 +39,10 @@ import transaction
 from tg import tmpl_context, request
 
 
-class MiembrosProyectoTable(TableBase):
-    __model__ = Usuario
-    __headers__ = {'nombre_usuario' : u'Nombre de Usuario', 'email' : u"E-mail",
-                   'nombre' : u"Nombre", 'apellido' : u"Apellido",
-                   'check' : u'Check'
-                  }
-    __add_fields__ = {'check' : None}
-    __xml_fields__ = ['Check']
-    __omit_fields__ = ['id_usuario', 'password', 'telefono', 'nro_documento', 
-                       '_password', 'historial_lb', 'roles',
-                       'historial_item', 'creado']
-    __default_column_width__ = '15em'
-    __column_widths__ = {'email': "35em",
-                         '__actions__' : "50em"
-                        }
-    
-miembros_proyecto_table = MiembrosProyectoTable(DBSession)
+miembros_fase_table = MiembrosProyectoTable(DBSession)
 
 
-class MiembrosProyectoTableFiller(CustomTableFiller):
+class MiembrosFaseTableFiller(CustomTableFiller):
     __model__ = Usuario
     __omit_fields__ = ['password', 'telefono', 'nro_documento', 
                        '_password', 'historial_lb', 'roles',
@@ -71,23 +57,32 @@ class MiembrosProyectoTableFiller(CustomTableFiller):
     def __actions__(self, obj):
         """Links de acciones para un registro dado"""
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        if id_proyecto:
+            url_cont = "/proyectos/%d/" % id_proyecto
+        else:
+            id_proyecto = UrlParser.parse_id(request.url, "proyectos_fase")
+            url_cont = "/proyectos_fase/%d/" % id_proyecto
+        
+        id_fase = UrlParser.parse_id(request.url, "fases")
+        url_cont += "fases/%d/"
+        url_cont %= id_fase
+        
         clase = 'actions'
         value = "<div>"
-        url_cont = "/proyectos/%d/" % id_proyecto
         value += '<div>' + \
-                    '<a href="' + url_cont + "miembros/" + str(obj.id_usuario) + '" ' + \
+                    '<a href="' + url_cont + "miembrosfase/" + str(obj.id_usuario) + '" ' + \
                     'class="' + clase + '">Ver</a>' + \
                  '</div><br />'
         
         if PoseePermiso("asignar-desasignar rol", 
                         id_proyecto=id_proyecto).is_met(request.environ):
             value += '<div>' + \
-                        '<a href="'+ url_cont + "miembros/" + str(obj.id_usuario) + \
+                        '<a href="'+ url_cont + "miembrosfase/" + str(obj.id_usuario) + \
                         "/rolesasignados/" '" ' + \
                         'class="' + clase + '">Roles Asig.</a>' + \
                      '</div><br />'
             value += '<div>' + \
-                        '<a href="'+ url_cont + "miembros/" + str(obj.id_usuario) + \
+                        '<a href="'+ url_cont + "miembrosfase/" + str(obj.id_usuario) + \
                         "/rolesdesasignados/" '" ' + \
                         'class="' + clase + '">Roles Desasig.</a>' + \
                      '</div><br />'
@@ -95,48 +90,29 @@ class MiembrosProyectoTableFiller(CustomTableFiller):
         
         return value
         
-    def _do_get_provider_count_and_objs(self, id_proyecto=None, **kw):
+    def _do_get_provider_count_and_objs(self, id_fase=None, **kw):
         """
         Se muestra la lista de usuario si se tiene un permiso 
         necesario. Caso contrario se muestra solo su usuario
         """
-        count, lista = super(MiembrosProyectoTableFiller,
+        count, lista = super(MiembrosFaseTableFiller,
                          self)._do_get_provider_count_and_objs(**kw)
         
         filtrados = []
         for u in lista:
-            if AlgunPermiso(tipo="Proyecto", id_proyecto=id_proyecto,
+            if AlgunPermiso(tipo="Fase", id_fase=id_fase,
                             id_usuario=u.id_usuario):
                 filtrados.append(u)
         return len(filtrados), filtrados
 
-miembros_proyecto_table_filler = MiembrosProyectoTableFiller(DBSession)
-
+miembros_fase_table_filler = MiembrosFaseTableFiller(DBSession)
 
 
 #tabla de roles asignados/desasignados al usuario.
-class MiembrosProyectoRolesTable(TableBase):
-    __model__ = Rol
-    __headers__ = {'nombre_rol' : u'Nombre',
-                   'codigo' : u"Código", 'check' : u'Check'
-                  }
-    __omit_fields__ = ['id_rol', 'permisos', 'usuarios',
-                       'id_proyecto', 'id_fase', 'id_tipo_item',
-                       'descripcion', 'creado', "tipo"]
-    __default_column_width__ = '15em'
-    
-    __add_fields__ = {'check' : None}
-    __xml_fields__ = ['Check']
-    __column_widths__ = {'nombre_rol': "35em",
-                         'codigo': "35em",
-                         '__actions__' : "50em"
-                        }
-    __field_order__ = ["nombre_rol", "codigo", "check"]
-
-miembros_proyecto_roles_table = MiembrosProyectoRolesTable(DBSession)
+miembros_fase_roles_table = MiembrosProyectoRolesTable(DBSession)
 
 
-class MiembrosProyectoRolesTableFiller(CustomTableFiller):
+class MiembrosFaseRolesTableFiller(CustomTableFiller):
     __model__ = Rol
     __add_fields__ = {'check' : None}
 
@@ -157,40 +133,38 @@ class MiembrosProyectoRolesTableFiller(CustomTableFiller):
         return value
 
     def _do_get_provider_count_and_objs(self, usuario=None, asignados=True, 
-                                        id_proyecto=None, **kw):
-        count, lista = super(MiembrosProyectoRolesTableFiller,
+                                        id_fase=None, **kw):
+        count, lista = super(MiembrosFaseRolesTableFiller,
                          self)._do_get_provider_count_and_objs(**kw)
         
         roles = []
         
         if not asignados:
-            roles_proy = DBSession.query(Rol) \
-                                  .filter(or_(and_(Rol.tipo == ("Proyecto"),
-                                          Rol.id_proyecto == id_proyecto),
-                                          and_(Rol.tipo == "Plantilla proyecto",
-                                               Rol.nombre_rol != u"Miembro de Proyecto",
-                                               Rol.nombre_rol != u"Lider de Proyecto")
+            roles_fase = DBSession.query(Rol) \
+                                  .filter(or_(and_(Rol.tipo == u"Fase",
+                                          Rol.id_fase == id_fase),
+                                          and_(Rol.tipo == u"Plantilla fase")
                                                )).all()
-            for r in roles_proy:
+            for r in roles_fase:
                 if r not in usuario.roles:
                     roles.append(r)
         else:
-            if id_proyecto:
+            if id_fase:
                 for r in usuario.roles:
-                    if r.tipo == "Proyecto" and r.id_proyecto == id_proyecto:
+                    if r.tipo == "Fase" and r.id_fase == id_fase:
                         roles.append(r)
 
         return len(roles), roles
     
     
 
-miembros_proyecto_roles_table_filler = MiembrosProyectoRolesTableFiller(DBSession)
+miembros_fase_roles_table_filler = MiembrosFaseRolesTableFiller(DBSession)
 
 
 #controlador de roles asignados al usuario.
 class RolesAsignadosController(RestController):
-    table = miembros_proyecto_roles_table
-    table_filler = miembros_proyecto_roles_table_filler
+    table = miembros_fase_roles_table
+    table_filler = miembros_fase_roles_table_filler
     action = "./"
 
   
@@ -214,26 +188,26 @@ class RolesAsignadosController(RestController):
         Retorna todos los registros
         Retorna una página HTML si no se especifica JSON
         """
-        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        id_usuario = UrlParser.parse_id(request.url, "miembros")
+        id_fase = UrlParser.parse_id(request.url, "fases")
+        id_usuario = UrlParser.parse_id(request.url, "miembrosfase")
         usuario = Usuario.por_id(id_usuario)
-        proy = Proyecto.por_id(id_proyecto)
+        fase = Fase.por_id(id_fase)
         puede_desasignar = PoseePermiso("asignar-desasignar rol", 
-                                        id_proyecto=id_proyecto).is_met(request.environ)
+                                        id_fase=id_fase).is_met(request.environ)
         
         titulo = "Roles de: %s" % usuario.nombre_usuario
 
         if request.response_type == 'application/json':
             return self.table_filler.get_value(usuario=usuario, 
-                                               id_proyecto=id_proyecto, **kw)
+                                               id_fase=id_fase, **kw)
         if not getattr(self.table.__class__, '__retrieves_own_value__', False):
             roles = self.table_filler.get_value(usuario=usuario, 
-                                               id_proyecto=id_proyecto, **kw)
+                                               id_fase=id_fase, **kw)
         else:
             roles = []
             
         tmpl_context.widget = self.table
-        atras = "/proyectos/%d/miembros/" % id_proyecto
+        atras = "../../"
         return dict(lista_elementos=roles, 
                     page=titulo, 
                     titulo=titulo, 
@@ -249,22 +223,22 @@ class RolesAsignadosController(RestController):
     @expose('lpm.templates.miembros.roles_asignados_get_all')
     @expose('json')
     def post_buscar(self, *args, **kw):
-        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        
-        id_usuario = UrlParser.parse_id(request.url, "miembros")
+        id_fase = UrlParser.parse_id(request.url, "fases")
+        id_usuario = UrlParser.parse_id(request.url, "miembrosfase")
         usuario = Usuario.por_id(id_usuario)
         
-        proy = Proyecto.por_id(id_proyecto)
+        fase = Fase.por_id(id_fase)
         puede_desasignar = PoseePermiso("asignar-desasignar rol", 
-                                        id_proyecto=id_proyecto).is_met(request.environ)
+                                        id_fase=id_fase).is_met(request.environ)
         
         titulo = "Roles de: %s" % usuario.nombre_usuario
         tmpl_context.widget = self.table
-        buscar_table_filler = MiembrosProyectoRolesTableFiller(DBSession)
+        buscar_table_filler = MiembrosFaseRolesTableFiller(DBSession)
         buscar_table_filler.filtros = kw
         usuarios = buscar_table_filler.get_value(usuario=usuario, 
-                                                 id_proyecto=id_proyecto, **kw)
-        atras = "/proyectos/%d/miembros/" % id_proyecto
+                                                 id_fase=id_fase, **kw)
+
+        atras = "../../"
         return dict(lista_elementos=usuarios, 
                     page=titulo, 
                     titulo=titulo, 
@@ -286,7 +260,7 @@ class RolesAsignadosController(RestController):
                     continue
                 pks.append(int(pk))
             transaction.begin()
-            id_user = UrlParser.parse_id(request.url, "miembros")
+            id_user = UrlParser.parse_id(request.url, "miembrosfase")
             user = Usuario.por_id(id_user)
             c = 0
             while c < len(user.roles):
@@ -304,8 +278,8 @@ class RolesAsignadosController(RestController):
 
 #controlador de roles desasignados al usuario.
 class RolesDesasignadosController(RestController):
-    table = miembros_proyecto_roles_table
-    table_filler = miembros_proyecto_roles_table_filler
+    table = miembros_fase_roles_table
+    table_filler = miembros_fase_roles_table_filler
     action = "./"
 
   
@@ -329,25 +303,26 @@ class RolesDesasignadosController(RestController):
         Retorna todos los registros
         Retorna una página HTML si no se especifica JSON
         """
-        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        id_usuario = UrlParser.parse_id(request.url, "miembros")
+        id_fase = UrlParser.parse_id(request.url, "fases")
+        id_usuario = UrlParser.parse_id(request.url, "miembrosfase")
         usuario = Usuario.por_id(id_usuario)
-        proy = Proyecto.por_id(id_proyecto)
+        fase = Fase.por_id(id_fase)
+                                        
         titulo = u"Roles Desasignados para: %s" % usuario.nombre_usuario
         puede_asignar = PoseePermiso("asignar-desasignar rol", 
-                                        id_proyecto=id_proyecto).is_met(request.environ)
+                                     id_fase=id_fase).is_met(request.environ)
                                         
         if request.response_type == 'application/json':
             return self.table_filler.get_value(usuario=usuario, asignados=False,
-                                               id_proyecto=id_proyecto, **kw)
+                                               id_fase=id_fase, **kw)
         if not getattr(self.table.__class__, '__retrieves_own_value__', False):
             roles = self.table_filler.get_value(usuario=usuario, asignados=False,
-                                               id_proyecto=id_proyecto, **kw)
+                                               id_fase=id_fase, **kw)
         else:
             roles = []
             
         tmpl_context.widget = self.table
-        atras = "/proyectos/%d/miembros/" % id_proyecto
+        atras = "../../"
         return dict(lista_elementos=roles, 
                     page=titulo, 
                     titulo=titulo, 
@@ -363,19 +338,21 @@ class RolesDesasignadosController(RestController):
     @expose('lpm.templates.miembros.roles_desasignados_get_all')
     @expose('json')
     def post_buscar(self, *args, **kw):
-        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        id_usuario = UrlParser.parse_id(request.url, "miembros")
+        id_fase = UrlParser.parse_id(request.url, "fases")
+        id_usuario = UrlParser.parse_id(request.url, "miembrosfase")
         usuario = Usuario.por_id(id_usuario)
-        proy = Proyecto.por_id(id_proyecto)
+        fase = Fase.por_id(id_fase)
+        
         puede_asignar = PoseePermiso("asignar-desasignar rol", 
-                                        id_proyecto=id_proyecto).is_met(request.environ)
+                                        id_fase=id_fase).is_met(request.environ)
         titulo = u"Roles Desasignados para: %s" % usuario.nombre_usuario
         tmpl_context.widget = self.table
-        buscar_table_filler = MiembrosProyectoRolesTableFiller(DBSession)
+        buscar_table_filler = MiembrosFaseRolesTableFiller(DBSession)
         buscar_table_filler.filtros = kw
         roles = buscar_table_filler.get_value(usuario=usuario, asignados=False,
-                                               id_proyecto=id_proyecto, **kw)
-        atras = "/proyectos/%d/miembros/" % id_proyecto
+                                               id_fase=id_fase, **kw)
+        
+        atras = "../../"
         return dict(lista_elementos=roles, 
                     page=titulo, 
                     titulo=titulo, 
@@ -397,14 +374,14 @@ class RolesDesasignadosController(RestController):
                     continue
                 pks.append(int(pk))
             transaction.begin()
-            id_user = UrlParser.parse_id(request.url, "miembros")
-            id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+            id_user = UrlParser.parse_id(request.url, "miembrosfase")
+            id_fase = UrlParser.parse_id(request.url, "fases")
             user = Usuario.por_id(id_user)
             roles = DBSession.query(Rol).filter(Rol.id_rol.in_(pks)).all()
             for r in roles:
                 if r.tipo.find(u"Plantilla") >= 0: #crear rol a partir de plantilla
                     rol_new = Rol.nuevo_rol_desde_plantilla(plantilla=r, 
-                                                            id=id_proyecto)
+                                                            id=id_fase)
                     rol_new.usuarios.append(user)
                 else:
                     r.usuarios.append(user)
@@ -413,9 +390,9 @@ class RolesDesasignadosController(RestController):
         return "./"
 
 
-class MiembrosProyectoController(RestController):
-    table = miembros_proyecto_table
-    table_filler = miembros_proyecto_table_filler
+class MiembrosFaseController(RestController):
+    table = miembros_fase_table
+    table_filler = miembros_fase_table_filler
     action = "./"
     
     #{Sub Controladores
@@ -444,23 +421,25 @@ class MiembrosProyectoController(RestController):
         Retorna todos los registros
         Retorna una página HTML si no se especifica JSON
         """
+        id_fase = UrlParser.parse_id(request.url, "fases")
+        fase = Fase.por_id(id_fase)
 
-        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        proy = Proyecto.por_id(id_proyecto)
-        titulo = "Miembros del Proyecto: %s" % proy.nombre
+        titulo = "Miembros de la Fase: %s" % fase.nombre
 
         puede_remover = PoseePermiso("asignar-desasignar rol", 
-                                        id_proyecto=id_proyecto).is_met(request.environ)
+                                        id_fase=id_fase).is_met(request.environ)
 
         if request.response_type == 'application/json':
-            return self.table_filler.get_value(id_proyecto=id_proyecto,**kw)
+            return self.table_filler.get_value(id_fase=id_fase,**kw)
         if not getattr(self.table.__class__, '__retrieves_own_value__', False):
-            miembros = self.table_filler.get_value(id_proyecto=id_proyecto,**kw)
+            miembros = self.table_filler.get_value(id_fase=id_fase,**kw)
         else:
             miembros = []
             
         tmpl_context.widget = self.table
-        atras = "/proyectos/%d/" % id_proyecto
+        
+        #atras = "/proyectos/%d/" % id_proyecto
+        atras = "../"
         return dict(lista_elementos=miembros, 
                     page=titulo, 
                     titulo=titulo, 
@@ -475,16 +454,19 @@ class MiembrosProyectoController(RestController):
     @expose('lpm.templates.miembros.get_all')
     @expose('json')
     def post_buscar(self, *args, **kw):
-        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        proy = Proyecto.por_id(id_proyecto)
-        titulo = "Miembros del Proyecto: %s" % proy.nombre
+        id_fase = UrlParser.parse_id(request.url, "fases")
+        fase = Fase.por_id(id_fase)
+
+        titulo = "Miembros de la Fase: %s" % fase.nombre
         puede_remover = PoseePermiso("asignar-desasignar rol", 
-                                        id_proyecto=id_proyecto).is_met(request.environ)
-        tmpl_context.widget = miembros_proyecto_table
-        buscar_table_filler = MiembrosProyectoTableFiller(DBSession)
+                                     id_fase=id_fase).is_met(request.environ)
+        tmpl_context.widget = miembros_fase_table
+        buscar_table_filler = MiembrosFaseTableFiller(DBSession)
         buscar_table_filler.filtros = kw
-        usuarios = buscar_table_filler.get_value(id_proyecto=id_proyecto,**kw)
-        atras = "/proyectos/%d/" % id_proyecto
+        usuarios = buscar_table_filler.get_value(id_fase=id_fase,**kw)
+        
+        #atras = "/proyectos/%d/" % id_proyecto
+        atras = "../"
         return dict(lista_elementos=usuarios, 
                     page=titulo, titulo=titulo, 
                     columnas=self.columnas,
@@ -496,27 +478,23 @@ class MiembrosProyectoController(RestController):
     @expose("lpm.templates.miembros.get_one")
     def get_one(self, *args, **kw):
         """
-        Muestras los datos de un usuario miembro del proyecto.
+        Muestras los datos de un usuario miembro de la fase.
         """
-        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        id_fase = UrlParser.parse_id(request.url, "fases")
         tmpl_context.widget = UsuarioEditForm(DBSession)
         filler = UsuarioEditFiller(DBSession)
         value = filler.get_value(values={'id_usuario': int(args[0])})
         page = u"Usuario %s" % value["nombre_usuario"]
-        atras = "/proyectos/%d/" % id_proyecto
+        atras = "../"
         return dict(value=value, page=page, atras=atras)
         
     @expose()
     def remover_seleccionados(self, *args, **kw):
         """ 
-        Desasigna miembros del proyecto.
+        Desasigna miembros de la fase.
         """
-        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        
-        #recuperamos el rol miembro de proyecto
-        #rol = DBSession.query(Rol) \
-        #               .filter(and_(Rol.id_proyecto == id_proyecto,
-        #                       Rol.nombre_rol == u"Miembro de Proyecto")).first()
+        id_fase = UrlParser.parse_id(request.url, "fases")
+
         if kw:
             pks = []
             for k, pk in kw.items():
@@ -530,8 +508,8 @@ class MiembrosProyectoController(RestController):
             for u in usuarios:
                 c = 0
                 while c < len(u.roles):
-                    if u.roles[c].id_proyecto == id_proyecto and \
-                       u.roles[c].tipo == "Proyecto":
+                    if u.roles[c].id_fase == id_fase and \
+                       u.roles[c].tipo == u"Fase":
                         del u.roles[c]
                     else:
                         c += 1
@@ -539,7 +517,7 @@ class MiembrosProyectoController(RestController):
             transaction.commit()
 
         flash("Usuarios removidos correctamente")
-        return "/proyectos/%d/miembros/" % id_proyecto
+        return "../"
     
     #}
 

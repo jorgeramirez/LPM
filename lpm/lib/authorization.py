@@ -32,7 +32,7 @@ Permisos = [
     dict(nombre= u"asignar-desasignar rol", descripcion= u"Permite realizar la operación de asignar un rol", tipo= u"Proyecto, Fase, Tipo Ítem, Rol"),
     dict(nombre= u"consultar rol", descripcion= u"Permite consultar atributos de un rol", tipo= u"Proyecto, Fase, Tipo Ítem, Rol"),
 
-    dict(nombre= u"miembro proyecto", descripcion= u"Indica si es miembro del proyecto", tipo= u"Proyecto"),
+    dict(nombre= u"miembro", descripcion= u"Indica si es miembro", tipo= u"Proyecto, Fase, Tipo Ítem"),
 
 #proyecto
     dict(nombre= u"consultar proyecto", descripcion= (u"Permite consultar valores de atributos de " +
