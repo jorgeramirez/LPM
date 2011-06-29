@@ -24,6 +24,7 @@ from lpm.controllers.fase import FaseController, FaseTableFiller, FaseTable
 from lpm.controllers.tipoitem import TipoItemController, TipoItemTableFiller
 from lpm.controllers.miembros_proyecto import MiembrosProyectoController
 from lpm.controllers.no_miembros_proyecto import NoMiembrosProyectoController
+from lpm.controllers.roles_proyecto import RolesProyectoController
 
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, EditFormFiller, RecordFiller
@@ -98,7 +99,7 @@ class ProyectoTableFiller(CustomTableFiller):
                      '</div><br />'
                      
             value += '<div>' + \
-                        '<a href="/proyectos/'+ str(obj.id_proyecto) + '/roles" ' + \
+                        '<a href="/proyectos/'+ str(obj.id_proyecto) + '/rolesproyecto" ' + \
                         'class="' + clase + '">Roles de Proyecto</a>' + \
                      '</div><br />'
 
@@ -194,6 +195,7 @@ class ProyectoController(CrudRestController):
     tipositems = TipoItemController(DBSession)
     miembros = MiembrosProyectoController()
     nomiembros = NoMiembrosProyectoController()
+    rolesproyecto = RolesProyectoController(DBSession)
     #{ Modificadores
     model = Proyecto
     table = proyecto_table
