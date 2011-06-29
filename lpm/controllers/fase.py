@@ -20,8 +20,6 @@ from lpm.lib.sproxcustom import (CustomTableFiller,
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
 from lpm.lib.util import UrlParser
 from lpm.controllers.tipoitem import TipoItemController, TipoItemTableFiller
-from lpm.controllers.item import ItemController
-from lpm.controllers.lineabase import LineaBaseController
 from lpm.controllers.validaciones.fase_validator import FaseFormValidator
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, EditFormFiller
@@ -60,61 +58,82 @@ class FaseTableFiller(CustomTableFiller):
         """Links de acciones para un registro dado"""
         value = '<div>'
         clase = 'actions_fase'
-        #poco elegante pero ...
-        controller = "./fases/" + str(obj.id_fase)
-        
-        #si está en la tabla que está en edit proyecto necesita esta parte del url
-        if (UrlParser.parse_nombre(request.url, "fases")):
-            controller =  str(obj.id_fase)
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        url_proy = "/proyectos/"
+        if not id_proyecto:
+            #desde el submenu fase.
+            id_proyecto = UrlParser.parse_id(request.url, "proyectos_fase")
+            url_proy = "/proyectos_fase/"
+            
+        url_cont = url_proy + "%d/fases/"
+        url_cont %= id_proyecto
 
-        if PoseePermiso('modificar fase', 
+        if PoseePermiso('modificar fase',
                         id_fase=obj.id_fase).is_met(request.environ):
             value += '<div>' + \
-                        '<a href="./'+ controller +'/edit" ' + \
+                        '<a href="'+ url_cont + str(obj.id_fase) + '/edit" ' + \
                         'class="' + clase + '">Modificar</a>' + \
                      '</div><br />'
-        
+
+            value += '<div>' + \
+                        '<a href="'+ url_cont + str(obj.id_fase) + '/rolesfase" ' + \
+                        'class="' + clase + '">Roles de Fase</a>' + \
+                     '</div><br />'
+
+
+            value += '<div>' + \
+                        '<a href="'+ url_cont + str(obj.id_fase) + '/tipositems" ' + \
+                        'class="' + clase + '">Tipos de Ítem</a>' + \
+                     '</div><br />'
+
+
+            value += '<div>' + \
+                        '<a href="'+ url_cont + str(obj.id_fase) + '/miembros" ' + \
+                        'class="' + clase + '">Miembros</a>' + \
+                     '</div><br />'
+
+            value += '<div>' + \
+                        '<a href="'+ url_cont + str(obj.id_fase) + '/nomiembros" ' + \
+                        'class="' + clase + '">No miembros</a>' + \
+                     '</div><br />'
+                     
+
         proy = Proyecto.por_id(obj.id_proyecto)
-        if (proy.estado != "Iniciado" and
+        if proy.estado != "Iniciado" and \
             PoseePermiso('eliminar fase',
-                        id_fase=obj.id_fase).is_met(request.environ)):
+                         id_fase=obj.id_fase).is_met(request.environ):
             
-                
-            value += '<div><form method="POST" action="' + controller + '" class="button-to">'+\
+            value += '<div><form method="POST" action="' + str(obj.id_fase) + '" class="button-to">'+\
                      '<input type="hidden" name="_method" value="DELETE" />' +\
                      '<input onclick="return confirm(\'¿Está seguro?\');" value="Eliminar" type="submit" '+\
                      'style="background-color: transparent; float:left; border:0; color: #286571; display: inline;'+\
-                     'margin: 0; padding: 0;' + clase + '"/>'+\
+                     'margin: 0; padding: 0; margin-left: -3px; margin-top: -3px;' + clase + '"/>'+\
                      '</form></div><br />'
                      
-        if not_anonymous().is_met(request.environ):
-            value += '<div>' + \
-                        '<a href="./'+ controller +'/edit" ' + \
-                        'class="' + clase + '">Ver</a>' + \
-                     '</div><br />'
         value += '</div>'
         return value
     
-    def _do_get_provider_count_and_objs(self, id_proyecto=None, **kw):
+    def _do_get_provider_count_and_objs(self, id_proyecto=None, id_fase=None, **kw):
+        """
+        Retorna las fases del proyecto en cuestión
+        """
+        if id_fase:
+            fase  = Fase.por_id(id_fase)
+            return 1, [fase]
+
         count, lista = super(FaseTableFiller, self).\
                             _do_get_provider_count_and_objs(**kw)
         filtrados = []                    
-        if (id_proyecto):
+        if id_proyecto:
             id_proyecto = int(id_proyecto)
-            ap = AlgunPermiso(tipo='Fase', id_proyecto=id_proyecto).is_met(request.environ)
+            #ap = AlgunPermiso(tipo='Fase', id_proyecto=id_proyecto).is_met(request.environ)
 
-            if (ap):
-                for f in lista:
-                    if (f.id_proyecto == id_proyecto):
-                        if (AlgunPermiso(tipo='Fase', id_fase=f.id_fase).is_met(request.environ)):
-                            filtrados.append(f)
+            for f in lista:
+                if f.id_proyecto == id_proyecto:
+                    if AlgunPermiso(tipo='Fase', 
+                                    id_fase=f.id_fase).is_met(request.environ):
+                        filtrados.append(f)
                 
-            return len(filtrados), filtrados        
-        
-        for f in lista:
-            if (AlgunPermiso(tipo='Fase', id_fase=f.id_fase).is_met(request.environ)):
-                filtrados.append(f)
-        
         return len(filtrados), filtrados
                    
 
@@ -126,8 +145,13 @@ class PosicionField(CustomPropertySingleSelectField):
     Dropdown field para las posiciones disponibles
     """
     def _my_update_params(self, d, nullable=False):
+        
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        if (id_proyecto):
+        
+        if not id_proyecto:
+            id_proyecto = UrlParser.parse_id(request.url, "proyectos_fase")
+        
+        if id_proyecto:
             proy = Proyecto.por_id(id_proyecto)
             
         options = []
@@ -188,18 +212,16 @@ class FaseController(CrudRestController):
 
         
     #{ Variables
-    title = u"Administración de Fases"
+    title = u"Fases de proyecto: %s"
     allow_only = not_anonymous(u"El usuario debe haber iniciado sesión")
     
     #{plantillas
-    tmp_from_proyecto_action = "/proyectos/%d/fases/buscar"
-    tmp_from_proyecto_titulo = "Fases de proyecto: %s"
-    tmp_action = "./"
+    tmp_action = "/proyectos/%d/fases/"
+    tmp_action_fase = "/proyectos_fase/%d/fases/" #desde submenu fase
     
     #Subcontrolador
     tipositems = TipoItemController(DBSession)
-    items = ItemController(DBSession)
-    lbs = LineaBaseController(DBSession)
+    
     #{ Modificadores
 
                      
@@ -234,26 +256,25 @@ class FaseController(CrudRestController):
         Retorna todos los registros
         Retorna una página HTML si no se especifica JSON
         """
-        puede_crear = False
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        titulo = self.title
-        atras = "../"
+        action = self.tmp_action % id_proyecto
+        if not id_proyecto:
+            id_proyecto = UrlParser.parse_id(request.url, "proyectos_fase")
+            action = self.tmp_action_fase % id_proyecto
         
-        if(id_proyecto):#significa que se está en el controlador que está en proyectos
-            puede_crear = PoseePermiso("crear fase").is_met(request.environ)
-            proy = Proyecto.por_id(id_proyecto)
-            titulo = self.tmp_from_proyecto_titulo % proy.nombre
-            atras = "../edit"
+        puede_crear = PoseePermiso("crear fase", 
+                                   id_proyecto=id_proyecto).is_met(request.environ)
+        proy = Proyecto.por_id(id_proyecto)
+        titulo = self.title % proy.nombre
+        atras = "../"
         fases = self.table_filler.get_value(id_proyecto=id_proyecto, **kw)
-
-            
         tmpl_context.widget = self.table
   
         
         
         return dict(lista_elementos=fases, 
                     page=titulo,
-                    titulo=self.title, 
+                    titulo=titulo, 
                     modelo=self.model.__name__, 
                     columnas=self.columnas,
                     opciones=self.opciones,
@@ -272,53 +293,43 @@ class FaseController(CrudRestController):
         Controlador que recibe los parámetros de búsqueda para 
         devolver el resultado esperado.
         """
-        puede_crear = False
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        titulo = self.title
-        '''
-        pp = PoseePermiso('consultar fases')
-        if not pp.is_met(request.environ):
-            flash(pp.message % pp.nombre_permiso, 'warning')
-        '''        
-        if(id_proyecto):#significa que se está en el controlador que está en proyectos
-            puede_crear = PoseePermiso("crear fase").is_met(request.environ)
-            proy = Proyecto.por_id(id_proyecto)
-            titulo = self.tmp_from_proyecto_titulo % proy.nombre
-            
-        
+        action = self.tmp_action % id_proyecto
+        if not id_proyecto:
+            id_proyecto = UrlParser.parse_id(request.url, "proyectos_fase")
+            action = self.tmp_action_fase % id_proyecto     
 
-
+        puede_crear = PoseePermiso("crear fase", 
+                                   id_proyecto=id_proyecto).is_met(request.environ)
+        proy = Proyecto.por_id(id_proyecto)
+        titulo = self.title % proy.nombre
         tmpl_context.widget = self.table
         buscar_table_filler = FaseTableFiller(DBSession)
         buscar_table_filler.filtros = kw
         fases = buscar_table_filler.get_value(id_proyecto=id_proyecto)
-        atras = '/fases'
+        atras = '../'
         
         return dict(lista_elementos=fases, 
-                    page=self.title, 
-                    titulo=self.title, 
+                    page=titulo, 
+                    titulo=titulo, 
                     modelo=self.model.__name__,
                     columnas=self.columnas,
-                    #url_action=self.tmp_action,
-                    url_action="../", #por /post_buscar/
+                    url_action=action,
                     puede_crear=puede_crear,
                     comboboxes=self.comboboxes,
                     opciones=self.opciones,
                     atras=atras
                     )
     
-    def get_one(self, *args, **kw):
-        pass
-
     @without_trailing_slash
     @expose('lpm.templates.fases.new')
     def new(self, *args, **kw):
         """Display a page to show a new record."""
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        if(not id_proyecto):
+        atras = "./"
+        if not id_proyecto:
             redirect("./")
         tmpl_context.widget = self.new_form
-        atras = '/proyectos/'+ str(id_proyecto) +'/edit'
         return dict(value=kw, page="Nueva Fase", atras=atras)
     
     @expose()
@@ -327,13 +338,9 @@ class FaseController(CrudRestController):
         fase = Fase.por_id(id)
         proy = Proyecto.por_id(fase.id_proyecto)
         proy.eliminar_fase(id)
-        #TODO arreglar que se direccione a /fases si se estaba en /fases
-        #o a /proyecto/id/fases si se estaba ahí
-        if (UrlParser.parse_id(request.url, "proyectos")):
-            #redirect("/proyectos/%d/fases" % proy.id_proyecto)
-            redirect("/proyectos/%d/edit" % proy.id_proyecto)
-        else:
-            redirect("/fases")
+        flash("Fase eliminada")
+        redirect("../")
+
         
     @validate(fase_add_form, error_handler=new)
     @expose()
@@ -341,83 +348,29 @@ class FaseController(CrudRestController):
         if "sprox_id" in kw:
             del kw["sprox_id"]
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        if (id_proyecto):
-            proy = Proyecto.por_id(id_proyecto)
-            proy.crear_fase(**kw)
-        
-        if (UrlParser.parse_id(request.url, "proyectos")):
-            redirect("/proyectos/%d/edit" % proy.id_proyecto)
-        else:
-            redirect("./")
+        proy = Proyecto.por_id(id_proyecto)
+        proy.crear_fase(**kw)
+        flash("Fase Creada")
+        redirect("./")
         
     
     @expose('lpm.templates.fases.edit')
     def edit(self, *args, **kw):
         """Despliega una pagina para realizar modificaciones"""
-        
         id_fase = UrlParser.parse_id(request.url, "fases")
-
         fase = Fase.por_id(int(id_fase))
-        
-        atras = "../fases"
-        if (UrlParser.parse_id(request.url, "proyectos")):
-            atras = "../../fases"
-            
-        puede_crear_item = PoseePermiso("crear item", 
-                                       id_fase=id_fase).is_met(request.environ)
-        if puede_crear_item:
-            puede_crear_item = fase.puede_crear_item()
-            
-            
-       
-        puede_asignar_rol = PoseePermiso('asignar-desasignar rol', 
-                                         id_fase = id_fase). \
-                                         is_met(request.environ)
 
-        puede_crear_rol = PoseePermiso('crear rol', 
-                                         id_fase = id_fase). \
-                                         is_met(request.environ)
-        
-     
-        puede_crear_lb = PoseePermiso('crear lb', 
-                                      id_fase=id_fase).is_met(request.environ)
-
-        if puede_crear_lb:
-            puede_crear_lb = fase.puede_crear_lb()
-
-        
-        #pp = PoseePermiso('modificar fase', id_fase=id_fase)
-        #if not pp.is_met(request.environ):
-        #    flash(pp.message % pp.nombre_permiso, 'warning')
-        #    redirect("./")
+        pp = PoseePermiso('modificar fase', id_fase=id_fase)
+        if not pp.is_met(request.environ):
+            flash(pp.message % pp.nombre_permiso, 'warning')
+            redirect("./")
             
         tmpl_context.widget = FaseEditForm(DBSession)
-        
         value = self.edit_filler.get_value(values={'id_fase': id_fase})
-        
-        #value['_method'] = 'PUT'
-        
-        tmpl_context.tabla_items = self.items.table
-        items = self.items.table_filler.get_value(id_fase=id_fase)
-        tmpl_context.tabla_lb = self.lbs.table
-        lbs = self.lbs.table_filler.get_value(id_fase=id_fase)
-        
-        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        
-        if (id_proyecto):
-            atras = "/proyectos/%d/edit" % id_proyecto
-        else:
-            atras = "/fases"
-        
+        page = u"Modificar Fase: %s" % value["nombre"]
+        atras = "./"
         return dict(value=value,
-                    page="Modificar Fase",
-                    puede_asignar_rol=puede_asignar_rol,
-                    puede_crear_rol=puede_crear_rol,
-                    puede_crear_item=puede_crear_item,
-                    puede_crear_lb=puede_crear_lb,
-                    id=str(id_fase),
-                    items=items,
-                    lbs=lbs,
+                    page=page,
                     atras=atras)
  
         
@@ -437,9 +390,43 @@ class FaseController(CrudRestController):
 
         proy = Proyecto.por_id(id_proyecto)
         proy.modificar_fase(id_fase, **kw)
-        
-        if (UrlParser.parse_id(request.url, "proyectos")):
-            redirect("/proyectos/%d/edit" % proy.id_proyecto)
+        flash("Fase modificada")
+        redirect("./")
+
+    @with_trailing_slash
+    @paginate('lista_elementos', items_per_page=5)
+    @expose('lpm.templates.fases.get_all')
+    @expose('json')
+    def get_one(self, *args, **kw):
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        action = self.tmp_action % id_proyecto
+        if not id_proyecto:
+            id_proyecto = UrlParser.parse_id(request.url, "proyectos_fase")
+            action = self.tmp_action_fase % id_proyecto
+            
+        id_fase = int(args[0])
+        puede_crear = PoseePermiso("crear fase", 
+                                   id_proyecto=id_proyecto).is_met(request.environ)
+        if pylons.request.response_type == 'application/json':
+            return dict(lista=self.table_filler.get_value(id_fase=id_fase, **kw))
+        if not getattr(self.table.__class__, ' ', False):
+            fase = self.table_filler.get_value(id_fase=id_fase, **kw)
         else:
-            redirect("../")        
+            fase = []
+            
+        tmpl_context.widget = self.table
+        proy = Proyecto.por_id(id_proyecto)
+        titulo = self.title % proy.nombre
+        atras = '../'
+        return dict(lista_elementos=fase, 
+                    page=titulo,
+                    titulo=titulo, 
+                    modelo=self.model.__name__, 
+                    columnas=self.columnas,
+                    opciones=self.opciones,
+                    url_action=action,
+                    puede_crear=puede_crear,
+                    comboboxes=self.comboboxes,
+                    atras=atras
+                    )
     #}

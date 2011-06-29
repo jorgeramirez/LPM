@@ -135,10 +135,14 @@ class ProyectoTableFiller(CustomTableFiller):
         value += '</div>'
         return value
     
-    def _do_get_provider_count_and_objs(self, **kw):
+    def _do_get_provider_count_and_objs(self, id_proyecto=None, **kw):
         """
         Retorna la Lista los proyectos del sistema sobre
         """
+        if id_proyecto:
+            proy  = Proyecto.por_id(id_proyecto)
+            return 1, [proy]
+            
         count, lista = super(ProyectoTableFiller, self).\
                             _do_get_provider_count_and_objs(**kw)
         filtrados = []                    
@@ -196,6 +200,7 @@ class ProyectoController(CrudRestController):
     miembros = MiembrosProyectoController()
     nomiembros = NoMiembrosProyectoController()
     rolesproyecto = RolesProyectoController(DBSession)
+    
     #{ Modificadores
     model = Proyecto
     table = proyecto_table
@@ -390,15 +395,17 @@ class ProyectoController(CrudRestController):
         id_proyecto = int(args[0])
         puede_crear = PoseePermiso("crear proyecto").is_met(request.environ)
         if pylons.request.response_type == 'application/json':
-            return dict(lista=self.table_filler.get_value(**kw))
+            return dict(lista=self.table_filler.get_value(id_proyecto=id_proyecto,
+                                                          **kw))
         if not getattr(self.table.__class__, ' ', False):
-            proyectos = self.table_filler.get_value(**kw)
+            proyecto = self.table_filler.get_value(id_proyecto=id_proyecto,
+                                                    **kw)
         else:
-            proyectos = []
+            proyecto = []
             
         tmpl_context.widget = self.table
         atras = '/'
-        return dict(lista_elementos=proyectos, 
+        return dict(lista_elementos=proyecto,
                     page=self.title,
                     titulo=self.title, 
                     modelo=self.model.__name__, 
