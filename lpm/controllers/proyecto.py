@@ -83,32 +83,32 @@ class ProyectoTableFiller(CustomTableFiller):
         if PoseePermiso('modificar proyecto',
                         id_proyecto=obj.id_proyecto).is_met(request.environ):
             value += '<div>' + \
-                        '<a href="./'+ str(obj.id_proyecto) + '/edit" ' + \
+                        '<a href="/proyectos/'+ str(obj.id_proyecto) + '/edit" ' + \
                         'class="' + clase + '">Modificar</a>' + \
                      '</div><br />'
 
             value += '<div>' + \
-                        '<a href="./'+ str(obj.id_proyecto) + '/fases" ' + \
+                        '<a href="/proyectos/'+ str(obj.id_proyecto) + '/fases" ' + \
                         'class="' + clase + '">Fases</a>' + \
                      '</div><br />'
 
             value += '<div>' + \
-                        '<a href="./'+ str(obj.id_proyecto) + '/tipositems" ' + \
+                        '<a href="/proyectos/'+ str(obj.id_proyecto) + '/tipositems" ' + \
                         'class="' + clase + '">Tipos de Ítem</a>' + \
                      '</div><br />'
                      
             value += '<div>' + \
-                        '<a href="./'+ str(obj.id_proyecto) + '/roles" ' + \
+                        '<a href="/proyectos/'+ str(obj.id_proyecto) + '/roles" ' + \
                         'class="' + clase + '">Roles de Proyecto</a>' + \
                      '</div><br />'
 
             value += '<div>' + \
-                        '<a href="./'+ str(obj.id_proyecto) + '/miembros" ' + \
+                        '<a href="/proyectos/'+ str(obj.id_proyecto) + '/miembros" ' + \
                         'class="' + clase + '">Miembros</a>' + \
                      '</div><br />'
 
             value += '<div>' + \
-                        '<a href="./'+ str(obj.id_proyecto) + '/nomiembros" ' + \
+                        '<a href="/proyectos/'+ str(obj.id_proyecto) + '/nomiembros" ' + \
                         'class="' + clase + '">No miembros</a>' + \
                      '</div><br />'
 
@@ -117,7 +117,7 @@ class ProyectoTableFiller(CustomTableFiller):
             if PoseePermiso('iniciar proyecto', 
                         id_proyecto=obj.id_proyecto).is_met(request.environ):
                 value += '<div>' + \
-                            '<a href="./iniciar/' + str(obj.id_proyecto) + '" ' +\
+                            '<a href="/proyectos/iniciar/' + str(obj.id_proyecto) + '" ' +\
                             'class="' + clase + '">Iniciar</a>' + \
                          '</div><br />'
 
@@ -257,9 +257,6 @@ class ProyectoController(CrudRestController):
                     atras=atras
                     )
 
-    def get_one(self, *args, **kw):
-        pass
-     
     @expose()
     def iniciar(self, id_proyecto):
         """Inicia un proyecto"""
@@ -381,4 +378,34 @@ class ProyectoController(CrudRestController):
         flash(_('Recurso no encontrado'), 'warning')
         redirect('/')
         return dict(page='index')
+
+
+    @with_trailing_slash
+    @paginate('lista_elementos', items_per_page=5)
+    @expose('lpm.templates.proyecto.get_all')
+    @expose('json')
+    def get_one(self, *args, **kw):
+        id_proyecto = int(args[0])
+        puede_crear = PoseePermiso("crear proyecto").is_met(request.environ)
+        if pylons.request.response_type == 'application/json':
+            return dict(lista=self.table_filler.get_value(**kw))
+        if not getattr(self.table.__class__, ' ', False):
+            proyectos = self.table_filler.get_value(**kw)
+        else:
+            proyectos = []
+            
+        tmpl_context.widget = self.table
+        atras = '/'
+        return dict(lista_elementos=proyectos, 
+                    page=self.title,
+                    titulo=self.title, 
+                    modelo=self.model.__name__, 
+                    columnas=self.columnas,
+                    opciones=self.opciones,
+                    url_action="/proyectos/",
+                    puede_crear=puede_crear,
+                    comboboxes=self.comboboxes,
+                    atras=atras
+                    )
+
     #}

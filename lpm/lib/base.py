@@ -29,22 +29,23 @@ class BaseController(TGController):
         request.identity = request.environ.get('repoze.who.identity')
         # para acceder mas rapido a este componente
         request.credentials = request.environ.get('repoze.what.credentials')
-
-        username = request.credentials["repoze.what.userid"]
-        usuario = model.Usuario.by_user_name(username)
-        request.puede_proyecto = False
-        request.puede_fase = False
-        request.puede_ti = False
-            
-        if u"crear proyecto" in request.credentials["permissions"] or \
-           u"modificar proyecto" in  request.credentials["permissions"]:
-            request.puede_proyecto = True
-        elif u"modificar fase" in request.credentials["permissions"]:
-            request.puede_fase = True
-        else:
-            if u"crear tipo item" in request.credentials["permissions"] or \
-               u"redefinir tipo item" in request.credentials["permissions"]:
-                request.puede_ti = True
+        
+        if request.credentials:
+            username = request.credentials["repoze.what.userid"]
+            usuario = model.Usuario.by_user_name(username)
+            request.puede_proyecto = False
+            request.puede_fase = False
+            request.puede_ti = False
+                
+            if u"crear proyecto" in request.credentials["permissions"] or \
+               u"modificar proyecto" in  request.credentials["permissions"]:
+                request.puede_proyecto = True
+            elif u"modificar fase" in request.credentials["permissions"]:
+                request.puede_fase = True
+            else:
+                if u"crear tipo item" in request.credentials["permissions"] or \
+                   u"redefinir tipo item" in request.credentials["permissions"]:
+                    request.puede_ti = True
         
         tmpl_context.identity = request.identity
 #        session['atras'] = session['actual']

@@ -175,7 +175,6 @@ class MiembrosProyectoRolesTableFiller(CustomTableFiller):
                 if r not in usuario.roles:
                     roles.append(r)
         else:
-            roles = usuario.roles
             if id_proyecto:
                 for r in usuario.roles:
                     if r.tipo == "Proyecto" and r.id_proyecto == id_proyecto:
@@ -216,7 +215,8 @@ class RolesAsignadosController(RestController):
         Retorna una página HTML si no se especifica JSON
         """
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        usuario = Usuario.by_user_name(request.credentials["repoze.what.userid"])
+        id_usuario = UrlParser.parse_id(request.url, "miembros")
+        usuario = Usuario.por_id(id_usuario)
         proy = Proyecto.por_id(id_proyecto)
         puede_desasignar = PoseePermiso("asignar-desasignar rol", 
                                         id_proyecto=id_proyecto).is_met(request.environ)
@@ -233,7 +233,7 @@ class RolesAsignadosController(RestController):
             roles = []
             
         tmpl_context.widget = self.table
-        atras = "/proyectos/"
+        atras = "/proyectos/%d/miembros/" % id_proyecto
         return dict(lista_elementos=roles, 
                     page=titulo, 
                     titulo=titulo, 
@@ -250,7 +250,10 @@ class RolesAsignadosController(RestController):
     @expose('json')
     def post_buscar(self, *args, **kw):
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        usuario = Usuario.by_user_name(request.credentials["repoze.what.userid"])
+        
+        id_usuario = UrlParser.parse_id(request.url, "miembros")
+        usuario = Usuario.por_id(id_usuario)
+        
         proy = Proyecto.por_id(id_proyecto)
         puede_desasignar = PoseePermiso("asignar-desasignar rol", 
                                         id_proyecto=id_proyecto).is_met(request.environ)
@@ -261,7 +264,7 @@ class RolesAsignadosController(RestController):
         buscar_table_filler.filtros = kw
         usuarios = buscar_table_filler.get_value(usuario=usuario, 
                                                  id_proyecto=id_proyecto, **kw)
-        atras = "/proyectos/"
+        atras = "/proyectos/%d/miembros/" % id_proyecto
         return dict(lista_elementos=usuarios, 
                     page=titulo, 
                     titulo=titulo, 
@@ -272,7 +275,8 @@ class RolesAsignadosController(RestController):
                     atras=atras,
                     puede_desasignar=puede_desasignar)
 
-    @expose('lpm.templates.miembros.roles_asignados_get_all')
+    #@expose('lpm.templates.miembros.roles_asignados_get_all')
+    @expose()
     def desasignar_roles(self, *args, **kw):
         """ Desasigna los roles seleccionados a un usuario """
         if kw:
@@ -282,7 +286,8 @@ class RolesAsignadosController(RestController):
                     continue
                 pks.append(int(pk))
             transaction.begin()
-            user = Usuario.por_id(int(args[0]))
+            id_user = UrlParser.parse_id(request.url, "miembros")
+            user = Usuario.por_id(id_user)
             c = 0
             while c < len(user.roles):
                 if user.roles[c].id_rol in pks:
@@ -290,14 +295,29 @@ class RolesAsignadosController(RestController):
                 else:
                     c += 1
             transaction.commit()
-
-        return self.get_all(*args, **kw)   
+        
+        flash("Roles Desasignados correctamente")
+        return "./"
     
 
 
 
 #controlador de roles desasignados al usuario.
-class RolesDesasignadosController(RolesAsignadosController):
+class RolesDesasignadosController(RestController):
+    table = miembros_proyecto_roles_table
+    table_filler = miembros_proyecto_roles_table_filler
+    action = "./"
+
+  
+    opciones = dict(codigo= u'Código',
+                    nombre_rol= u'Nombre',
+                    tipo=u'Tipo'
+                    )
+    columnas = dict(codigo='texto',
+                    nombre_rol='texto',
+                    tipo='combobox'
+                    )
+    comboboxes = dict(tipo=Rol.tipos_posibles)
     
     #{ Métodos
     @with_trailing_slash
@@ -310,7 +330,8 @@ class RolesDesasignadosController(RolesAsignadosController):
         Retorna una página HTML si no se especifica JSON
         """
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        usuario = Usuario.by_user_name(request.credentials["repoze.what.userid"])
+        id_usuario = UrlParser.parse_id(request.url, "miembros")
+        usuario = Usuario.por_id(id_usuario)
         proy = Proyecto.por_id(id_proyecto)
         titulo = u"Roles Desasignados para: %s" % usuario.nombre_usuario
         puede_asignar = PoseePermiso("asignar-desasignar rol", 
@@ -326,7 +347,7 @@ class RolesDesasignadosController(RolesAsignadosController):
             roles = []
             
         tmpl_context.widget = self.table
-        atras = "/proyectos/"
+        atras = "/proyectos/%d/miembros/" % id_proyecto
         return dict(lista_elementos=roles, 
                     page=titulo, 
                     titulo=titulo, 
@@ -343,7 +364,8 @@ class RolesDesasignadosController(RolesAsignadosController):
     @expose('json')
     def post_buscar(self, *args, **kw):
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        usuario = Usuario.by_user_name(request.credentials["repoze.what.userid"])
+        id_usuario = UrlParser.parse_id(request.url, "miembros")
+        usuario = Usuario.por_id(id_usuario)
         proy = Proyecto.por_id(id_proyecto)
         puede_asignar = PoseePermiso("asignar-desasignar rol", 
                                         id_proyecto=id_proyecto).is_met(request.environ)
@@ -353,7 +375,7 @@ class RolesDesasignadosController(RolesAsignadosController):
         buscar_table_filler.filtros = kw
         roles = buscar_table_filler.get_value(usuario=usuario, asignados=False,
                                                id_proyecto=id_proyecto, **kw)
-        atras = "/proyectos/"
+        atras = "/proyectos/%d/miembros/" % id_proyecto
         return dict(lista_elementos=roles, 
                     page=titulo, 
                     titulo=titulo, 
@@ -364,7 +386,7 @@ class RolesDesasignadosController(RolesAsignadosController):
                     atras=atras,
                     puede_asignar=puede_asignar)
 
-    @expose('lpm.templates.miembros.roles_desasignados_get_all')
+    @expose()
     def asignar_roles(self, *args, **kw):
         """ Asigna los roles seleccionados a un usuario """
 
@@ -375,21 +397,20 @@ class RolesDesasignadosController(RolesAsignadosController):
                     continue
                 pks.append(int(pk))
             transaction.begin()
-            user = Usuario.por_id(int(args[0]))
+            id_user = UrlParser.parse_id(request.url, "miembros")
+            id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+            user = Usuario.por_id(id_user)
             roles = DBSession.query(Rol).filter(Rol.id_rol.in_(pks)).all()
             for r in roles:
-                if r.tipo.find("Plantilla") >= 0: #crear rol a partir de plantilla
-                    id = None
-                    for k in ["id_proyecto", "id_fase", "id_tipo_item"]:
-                        if kw.has_key(k):
-                            id = kw[k]
-                            break
-                    rol_new = Rol.nuevo_rol_desde_plantilla(plantilla=r, id=id)
+                if r.tipo.find(u"Plantilla") >= 0: #crear rol a partir de plantilla
+                    rol_new = Rol.nuevo_rol_desde_plantilla(plantilla=r, 
+                                                            id=id_proyecto)
                     rol_new.usuarios.append(user)
                 else:
                     r.usuarios.append(user)
             transaction.commit()
-        return self.get_all(*args, **kw)
+        flash("Roles Asignados correctamente")
+        return "./"
 
 
 class MiembrosProyectoController(RestController):
@@ -439,7 +460,7 @@ class MiembrosProyectoController(RestController):
             miembros = []
             
         tmpl_context.widget = self.table
-        atras = "/proyectos/"
+        atras = "/proyectos/%d/" % id_proyecto
         return dict(lista_elementos=miembros, 
                     page=titulo, 
                     titulo=titulo, 
@@ -463,7 +484,7 @@ class MiembrosProyectoController(RestController):
         buscar_table_filler = MiembrosProyectoTableFiller(DBSession)
         buscar_table_filler.filtros = kw
         usuarios = buscar_table_filler.get_value(id_proyecto=id_proyecto,**kw)
-        atras = "/proyectos/"
+        atras = "/proyectos/%d/" % id_proyecto
         return dict(lista_elementos=usuarios, 
                     page=titulo, titulo=titulo, 
                     columnas=self.columnas,
@@ -477,11 +498,13 @@ class MiembrosProyectoController(RestController):
         """
         Muestras los datos de un usuario miembro del proyecto.
         """
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
         tmpl_context.widget = UsuarioEditForm(DBSession)
         filler = UsuarioEditFiller(DBSession)
         value = filler.get_value(values={'id_usuario': int(args[0])})
         page = u"Usuario %s" % value["nombre_usuario"]
-        return dict(value=value, page=page)
+        atras = "/proyectos/%d/" % id_proyecto
+        return dict(value=value, page=page, atras=atras)
         
     @expose()
     def remover_seleccionados(self, *args, **kw):

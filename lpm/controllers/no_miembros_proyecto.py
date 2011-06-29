@@ -135,7 +135,7 @@ class NoMiembrosProyectoController(RestController):
             nomiembros = []
             
         tmpl_context.widget = self.table
-        atras = "/proyectos/"
+        atras = "/proyectos/%d/" % id_proyecto
         return dict(lista_elementos=nomiembros, 
                     page=titulo, 
                     titulo=titulo, 
@@ -159,7 +159,7 @@ class NoMiembrosProyectoController(RestController):
         buscar_table_filler = NoMiembrosProyectoTableFiller(DBSession)
         buscar_table_filler.filtros = kw
         usuarios = buscar_table_filler.get_value(id_proyecto=id_proyecto,**kw)
-        atras = "/proyectos/"
+        atras = "/proyectos/%d/" % id_proyecto
         return dict(lista_elementos=usuarios, 
                     page=titulo, titulo=titulo, 
                     columnas=self.columnas,
@@ -173,11 +173,13 @@ class NoMiembrosProyectoController(RestController):
         """
         Muestras los datos de un usuario miembro del proyecto.
         """
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
         tmpl_context.widget = UsuarioEditForm(DBSession)
         filler = UsuarioEditFiller(DBSession)
         value = filler.get_value(values={'id_usuario': int(args[0])})
         page = u"Usuario %s" % value["nombre_usuario"]
-        return dict(value=value, page=page)
+        atras = "/proyectos/%d/" % id_proyecto
+        return dict(value=value, page=page, atras=atras)
         
     @expose()
     def incorporar_seleccionados(self, *args, **kw):

@@ -28,14 +28,15 @@ $(function(){
             data: desa_kw,
             complete: function(jqXHR, textStatus){
                 var responseText = jqXHR.responseText;
-                var tbl_html = jQuery("<div>")
+                window.location = responseText;
+                /*var tbl_html = jQuery("<div>")
                                .append(responseText.replace(rscript, ""))
                                .find("#tabla_asignados");
                 $("#tabla_asignados").html(tbl_html);
                 var tbl_html = jQuery("<div>")
                                .append(responseText.replace(rscript, ""))
                                .find("#tabla_desasignados");
-                $("#tabla_desasignados").html(tbl_html);
+                $("#tabla_desasignados").html(tbl_html);*/
             }
         });
         return false;
@@ -61,14 +62,15 @@ $(function(){
             data: asig_kw,
             complete: function(jqXHR, textStatus){
                 var responseText = jqXHR.responseText;
-                var tbl_html = jQuery("<div>")
+                window.location = responseText;
+                /*var tbl_html = jQuery("<div>")
                                .append(responseText.replace(rscript, ""))
                                .find("#tabla_desasignados");
                 $("#tabla_desasignados").html(tbl_html);
                 var tbl_html = jQuery("<div>")
                                .append(responseText.replace(rscript, ""))
                                .find("#tabla_asignados");
-                $("#tabla_asignados").html(tbl_html);
+                $("#tabla_asignados").html(tbl_html);*/
             }
         });
         return false;
