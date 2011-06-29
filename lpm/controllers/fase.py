@@ -23,6 +23,7 @@ from lpm.controllers.tipoitem import TipoItemController, TipoItemTableFiller
 from lpm.controllers.validaciones.fase_validator import FaseFormValidator
 from lpm.controllers.miembros_fase import MiembrosFaseController
 from lpm.controllers.no_miembros_fase import NoMiembrosFaseController
+from lpm.controllers.roles_fase import RolesFaseController
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, EditFormFiller
 from sprox.fillerbase import EditFormFiller
@@ -218,14 +219,14 @@ class FaseController(CrudRestController):
     allow_only = not_anonymous(u"El usuario debe haber iniciado sesión")
     
     #{plantillas
-    tmp_action = "/proyectos/%d/fases/"
-    tmp_action_fase = "/proyectos_fase/%d/fases/" #desde submenu fase
-    
+    #tmp_action = "/proyectos/%d/fases/"
+    #tmp_action_fase = "/proyectos_fase/%d/fases/" #desde submenu fase
+    tmp_action = "./"
     #Subcontrolador
     tipositems = TipoItemController(DBSession)
     miembrosfase = MiembrosFaseController()
     nomiembrosfase = NoMiembrosFaseController()
-    rolesfase = None
+    rolesfase = RolesFaseController(DBSession)
     
     #{ Modificadores
 
@@ -262,10 +263,10 @@ class FaseController(CrudRestController):
         Retorna una página HTML si no se especifica JSON
         """
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        action = self.tmp_action % id_proyecto
+        #action = self.tmp_action % id_proyecto
         if not id_proyecto:
             id_proyecto = UrlParser.parse_id(request.url, "proyectos_fase")
-            action = self.tmp_action_fase % id_proyecto
+            #action = self.tmp_action_fase % id_proyecto
         
         puede_crear = PoseePermiso("crear fase", 
                                    id_proyecto=id_proyecto).is_met(request.environ)
@@ -299,10 +300,10 @@ class FaseController(CrudRestController):
         devolver el resultado esperado.
         """
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        action = self.tmp_action % id_proyecto
+        #action = self.tmp_action % id_proyecto
         if not id_proyecto:
             id_proyecto = UrlParser.parse_id(request.url, "proyectos_fase")
-            action = self.tmp_action_fase % id_proyecto     
+            #action = self.tmp_action_fase % id_proyecto     
 
         puede_crear = PoseePermiso("crear fase", 
                                    id_proyecto=id_proyecto).is_met(request.environ)
@@ -319,7 +320,7 @@ class FaseController(CrudRestController):
                     titulo=titulo, 
                     modelo=self.model.__name__,
                     columnas=self.columnas,
-                    url_action=action,
+                    url_action=self.tmp_action,
                     puede_crear=puede_crear,
                     comboboxes=self.comboboxes,
                     opciones=self.opciones,
@@ -408,7 +409,7 @@ class FaseController(CrudRestController):
     @expose('json')
     def get_one(self, *args, **kw):
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        action = self.tmp_action % id_proyecto
+        #action = self.tmp_action % id_proyecto
         if not id_proyecto:
             id_proyecto = UrlParser.parse_id(request.url, "proyectos_fase")
             action = self.tmp_action_fase % id_proyecto
@@ -433,7 +434,7 @@ class FaseController(CrudRestController):
                     modelo=self.model.__name__, 
                     columnas=self.columnas,
                     opciones=self.opciones,
-                    url_action=action,
+                    url_action=self.tmp_action,
                     puede_crear=puede_crear,
                     comboboxes=self.comboboxes,
                     atras=atras
