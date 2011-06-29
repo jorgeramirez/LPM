@@ -63,36 +63,34 @@ class AtributosPorTipoItemTableFiller(CustomTableFiller):
         value = '<div>'
         clase = 'actions'
         id = str(obj.id_atributos_por_tipo_item)
-        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
         id_tipo = UrlParser.parse_id(request.url, "tipositems")
-        url_cont = "/tipositems/%d/atributostipoitem/" % id_tipo
-        if id_proyecto:
-            url_cont = "/proyectos/%d/tipositems/%d/atributostipoitem/" % \
-                                                   (id_proyecto, id_tipo)
-        #if PoseePermiso('redefinir tipo item').is_met(request.environ):
+        
+       
         if PoseePermiso('redefinir tipo item',
                         id_tipo_item=obj.id_tipo_item).is_met(request.environ):
             value += '<div>' + \
-                        '<a href="' + url_cont + id + '/edit" ' + \
+                        '<a href="./' + id + '/edit" ' + \
                         'class="' + clase + '">Modificar</a>' + \
                      '</div><br />'
+
         if obj.puede_eliminarse():
             if PoseePermiso('redefinir tipo item',
                             id_tipo_item=obj.id_tipo_item).is_met(request.environ):
-                value += '<div><form method="POST" action="' + url_cont + 'post_delete/' + id + '" class="button-to">'+\
+                value += '<div><form method="POST" action="' + id + '" class="button-to">'+\
+                         '<input type="hidden" name="_method" value="DELETE" />' +\
                          '<input onclick="return confirm(\'Está seguro?\');" value="Eliminar" type="submit" '+\
                          'style="background-color: transparent; float:left; border:0; color: #286571;'+\
-                         'display: inline; margin: 0; padding: 0;" class="' + clase + '"/>'+\
+                         'display: inline; margin: 0; padding: 0; margin-left:-3px;" class="' + clase + '"/>'+\
                          '</form></div><br />'
         value += '</div>'
         return value
     
-    def _do_get_provider_count_and_objs(self, **kw):
+    def _do_get_provider_count_and_objs(self, id_tipo_item=None,**kw):
         """
         Se muestra la lista de atributos del tipo de ítem 
         si se tiene un permiso necesario.
         """
-        if AlgunPermiso(tipo="Tipo").is_met(request.environ):
+        if AlgunPermiso(tipo="Tipo", id_tipo_item=id_tipo_item).is_met(request.environ):
             id_tipo = UrlParser.parse_id(request.url, "tipositems")
             ti = TipoItem.por_id(id_tipo)
             pks = []
@@ -105,14 +103,7 @@ class AtributosPorTipoItemTableFiller(CustomTableFiller):
                              .filter(AtributosPorTipoItem \
                                      .id_atributos_por_tipo_item.in_(pks))
             return query.count(), query.all()
-            #lista = ti.atributos
-            #actual = ti.id_padre
-            #while (actual):
-            #    papa = TipoItem.por_id(actual)
-            #    lista.extend(papa.atributos)
-            #    actual = papa.id_padre
 
-            #return len(lista), lista
         return 0, []
 
 atributos_por_tipo_item_table_filler = AtributosPorTipoItemTableFiller(DBSession)
@@ -122,7 +113,6 @@ class AtributoTipoField(PropertySingleSelectField):
     """Dropdown list para el tipo del atributo"""
     def _my_update_params(self, d, nullable=False):
         options = []
-        #options.append((0, "----------"))
         options.extend(AtributosPorTipoItem._tipos_permitidos)
         d['options'] = options
         return d
@@ -148,7 +138,6 @@ class AtributosPorTipoItemEditForm(EditableForm):
     __hide_fields__ = ['id_atributos_por_tipo_item']
     __omit_fields__ = ['id_tipo_item', 'id_atributos_por_tipo_item']
     __require_fields__ = ['nombre', 'tipo', 'valor_por_defecto'] 
-    #__require_fields__ = ['valor_por_defecto']
     __check_if_unique__ = True
     __field_order__ = ['nombre', 'tipo', 'valor_por_defecto']
     __field_attrs__ = {'nombre': { 'maxlength' : '32'},
@@ -171,9 +160,8 @@ atributos_por_tipo_item_edit_filler = AtributosPorTipoItemEditFiller(DBSession)
 class AtributosPorTipoItemController(CrudRestController):
     """Controlador de roles"""
     #{ Variables
-    title = u"Administrar Atributos de Tipo de Item"
-    action = "/atributostipoitem/"
-    parent_action = "/tipositems/"
+    title = u"Atributos de: %s"
+    action = "./"
     #{ Plantillas
 
     # No permitir rols anonimos (?)
@@ -187,25 +175,61 @@ class AtributosPorTipoItemController(CrudRestController):
     edit_form = atributos_por_tipo_item_edit_form
     edit_filler = atributos_por_tipo_item_edit_filler
 
+    opciones = dict(nombre= u'Nombre',
+                    tipo=u"Tipo")
+                    
+    columnas = dict(nombre= u'texto',
+                    tipo=u"combobox")
+                    
+    comboboxes = dict(tipo=AtributosPorTipoItem._tipos_permitidos)
+
     #{ Métodos
+    @with_trailing_slash
+    @paginate('lista_elementos', items_per_page=5)
+    @expose('lpm.templates.tipoitem.get_all')
+    @expose('json')
+    def get_all(self, *args, **kw):
+        """ 
+        Retorna todos los registros
+        Retorna una página HTML si no se especifica JSON
+        """
+        
+        id_tipo_item = UrlParser.parse_id(request.url, "tipositems")
+        puede_crear = PoseePermiso('redefinir tipo item',
+                                   id_tipo_item=id_tipo_item).is_met(request.environ)
+        tipo = TipoItem.por_id(id_tipo_item)
+        titulo = self.title % tipo.nombre
+        atributos = self.table_filler.get_value(id_tipo_item=id_tipo_item, **kw)
+        tmpl_context.widget = self.table
+        url_action = self.action
+        atras = "../"
+        
+        return dict(lista_elementos=atributos,
+                    page=titulo, 
+                    titulo=titulo, 
+                    modelo=self.model.__name__, 
+                    columnas=self.columnas,
+                    opciones=self.opciones,
+                    comboboxes=self.comboboxes,
+                    url_action=url_action,
+                    puede_crear=puede_crear,
+                    atras=atras
+                    )
+
+
+
     @without_trailing_slash
     @expose('lpm.templates.atributotipoitem.edit')
     def edit(self, *args, **kw):
         """Despliega una pagina para modificar el atributo"""
-        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        id_tipo = UrlParser.parse_id(request.url, "tipositems")
-        atras = self.parent_action + str(id_tipo) + '/edit'
-        url_action = self.parent_action + str(id_tipo) + self.action 
-        if id_proyecto:
-            atras = "/proyectos/" + str(id_proyecto) + atras
-            url_action = "/proyectos/" + str(id_proyecto) + url_action
-        
-        #pp = PoseePermiso('redefinir tipo item')
+        id_tipo_item = UrlParser.parse_id(request.url, "tipositems")
+        url_action = "../"
+       
         pp = PoseePermiso('redefinir tipo item',
-                          id_tipo_item=id_tipo)
+                          id_tipo_item=id_tipo_item)
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
-            redirect(atras)
+            redirect(url_action)
         tmpl_context.widget = self.edit_form
         value = self.edit_filler.get_value( \
                      values={'id_atributos_por_tipo_item': int(args[0])})
@@ -213,22 +237,16 @@ class AtributosPorTipoItemController(CrudRestController):
         page = "Atributo {nombre}".format(nombre=value["nombre"])
         return dict(value=value, 
                     page=page, 
-                    atras=atras)
+                    atras=url_action)
 
     @without_trailing_slash
     @expose('lpm.templates.atributotipoitem.new')
     def new(self, *args, **kw):
         """Despliega una pagina para crear un tipo_item"""
-        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        id_tipo = UrlParser.parse_id(request.url, "tipositems")
-        atras = self.parent_action + str(id_tipo) + '/edit'
-        url_action = self.parent_action + str(id_tipo) + self.action 
-        if id_proyecto:
-            atras = "/proyectos/" + str(id_proyecto) + atras
-            url_action = "/proyectos/" + str(id_proyecto) + url_action
-        #pp = PoseePermiso('redefinir tipo item')
-        pp = PoseePermiso('redefinir tipo item',
-                          id_tipo_item=id_tipo)
+        id_tipo_item = UrlParser.parse_id(request.url, "tipositems")
+        url_action = "./"
+
+        pp = PoseePermiso('redefinir tipo item', id_tipo_item=id_tipo_item)
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect(atras)
@@ -236,75 +254,101 @@ class AtributosPorTipoItemController(CrudRestController):
         return dict(value=kw, 
                     page=u"Nuevo Atributo", 
                     action=url_action, 
-                    atras=atras)
+                    atras=url_action)
     
     @validate(atributos_por_tipo_item_add_form, error_handler=new)
     @expose()
     def post(self, *args, **kw):
         """create a new record"""
-        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        id_tipo = UrlParser.parse_id(request.url, "tipositems")
-        atras = self.parent_action + str(id_tipo) + '/edit'
-        if id_proyecto:
-            atras = "/proyectos/" + str(id_proyecto) + atras
-            
-        #pp = PoseePermiso('redefinir tipo item')
-        pp = PoseePermiso('redefinir tipo item',
-                          id_tipo_item=id_tipo)
+        id_tipo_item = UrlParser.parse_id(request.url, "tipositems")
+        url_action = "./"
+
+        pp = PoseePermiso('redefinir tipo item',id_tipo_item=id_tipo_item)
+                          
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
-            redirect(atras)
+            redirect(url_action)
+            
         if kw.has_key("sprox_id"):
             del kw["sprox_id"]
 
-        tipo = TipoItem.por_id(id_tipo)
+        tipo = TipoItem.por_id(id_tipo_item)
         try:
             tipo.agregar_atributo(**kw)
         except NombreDeAtributoError, err:
             flash(unicode(err), "warning")
 
-        redirect(atras)
+        redirect(url_action)
         
     @validate(atributos_por_tipo_item_edit_form, error_handler=edit)
     @expose()
     def put(self, *args, **kw):
         """update a record"""
-        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        id_tipo = UrlParser.parse_id(request.url, "tipositems")
-        id_atributo = int(args[0])
-        atras = self.parent_action + str(id_tipo) + '/edit'
-        if id_proyecto:
-            atras = "/proyectos/" + str(id_proyecto) + atras
-        #pp = PoseePermiso('redefinir tipo item')
-        pp = PoseePermiso('redefinir tipo item',
-                          id_tipo_item=id_tipo)
-        
+        id_tipo_item = UrlParser.parse_id(request.url, "tipositems")
+        id_atributo = UrlParser.parse_id(request.url, "atributostipoitem")
+        url_action = "../"
+
+        pp = PoseePermiso('redefinir tipo item',id_tipo_item=id_tipo_item)
+                          
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
-            redirect(atras)
+            redirect(url_action)
+            
         if kw.has_key("sprox_id"):
             del kw["sprox_id"]
         transaction.begin()
-        tipo = TipoItem.por_id(id_tipo)
+        tipo = TipoItem.por_id(id_tipo_item)
         try:
             tipo.modificar_atributo(id_atributo, **kw)
         except NombreDeAtributoError, err:
             flash(unicode(err), "warning")
         transaction.commit()
-        redirect(atras)
+        redirect(url_action)
 
     @expose()
     def post_delete(self, *args, **kw):
         """This is the code that actually deletes the record"""
-        id = int(args[0])
+        id_atributo = int(args[0])
         transaction.begin()
-        attr = AtributosPorTipoItem.por_id(id)
+        attr = AtributosPorTipoItem.por_id(id_atributo)
         DBSession.delete(attr)
         transaction.commit()
-        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        id_tipo = UrlParser.parse_id(request.url, "tipositems")
-        atras = self.parent_action + str(id_tipo) + '/edit'
-        if id_proyecto:
-            atras = "/proyectos/" + str(id_proyecto) + atras
-        redirect(atras)
+        flash("Atributo Eliminado")
+        redirect("./")
+
+    @with_trailing_slash
+    @paginate('lista_elementos', items_per_page=5)
+    @expose('lpm.templates.tipoitem.get_all')
+    @expose('json')
+    def post_buscar(self, *args, **kw):
+        """ 
+        Retorna todos los registros
+        Retorna una página HTML si no se especifica JSON
+        """
+        
+        id_tipo_item = UrlParser.parse_id(request.url, "tipositems")
+        puede_crear = PoseePermiso('redefinir tipo item',
+                                   id_tipo_item=id_tipo_item).is_met(request.environ)
+        tipo = TipoItem.por_id(id_tipo_item)
+        titulo = self.title % tipo.nombre
+        filler = AtributosPorTipoItemTableFiller(DBSession)
+        filler.filtros = kw
+        atributos = filler.get_value(id_tipo_item=id_tipo_item, **kw)
+        tmpl_context.widget = self.table
+        url_action = self.action
+        atras = "../"
+        
+        return dict(lista_elementos=atributos,
+                    page=titulo, 
+                    titulo=titulo, 
+                    modelo=self.model.__name__, 
+                    columnas=self.columnas,
+                    opciones=self.opciones,
+                    comboboxes=self.comboboxes,
+                    url_action="../",
+                    puede_crear=puede_crear,
+                    atras=atras
+                    )
+
+
     #}
