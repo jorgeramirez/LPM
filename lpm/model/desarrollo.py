@@ -42,6 +42,7 @@ __all__ = ['Item', 'PropiedadItem', 'RelacionPorItem',
            'Relacion', 'AtributosDeItems', 'ArchivosExternos',
             'ArchivosPorItem', 'HistorialItems', 'AtributosPorItem']
 
+"""
 class HiloContador(threading.Thread):
     def __init__(self, p_item, lock_v, lock_h, lock_s, v, suma):
         self.p_item = p_item
@@ -92,8 +93,111 @@ class HiloContador(threading.Thread):
         
         for h in self.lh:
             h.join()
-                          
-                            
+"""
+                         
+class HiloAdelante(threading.Thread):
+    def __init__(self, p_item, lock_v, lock_s, v, suma):
+        self.p_item = p_item
+        self.lock_v = lock_v
+        self.lock_s = lock_s
+        self.visitados = v
+        self.suma = suma
+        self.lh = []
+                
+        threading.Thread.__init__(self)
+        
+    def run(self):
+        aristas = []
+        
+        for ri in self.p_item.relaciones:
+            relacion = Relacion.por_id(ri.id_relacion)
+            if (relacion.id_anterior == p_item.id_item_actual):
+                otro = relacion.obtener_otro_item(self.p_item.id_item_actual)
+                p_otro = PropiedadItem.por_id(otro.id_propiedad_item)
+                
+                self.lock_v.acquire()
+                if (not self.visitados.has_key(p_otro.id_item_actual)):
+                    self.visitados.setdefault(p_otro.id_item_actual, {'nodo': [], 'aristas': []})
+                    self.lock_v.release()
+                    
+                    self.lock_s.acquire()
+                    self.suma[0] += p_otro.complejidad
+                    self.lock_s.release()
+                    
+                    fase = lpm.model.Fase.por_id(otro.id_fase)                
+                    arista = p_otro.id_item_actual + " : { directed: true }"
+                    #TODO color diferente para fase diferente
+                    nodo = p_otro.id_item_actual + " : {'color': '#b2b', 'shape': 'dot', 'label': '" +\
+                            otro.codigo + "-" + str(p_otro.complejidad) + "'}"
+                    
+                    self.lock_v.acquire()
+                    self.visitados[p_item.id_item_actual]['aristas'].append(arista)
+                    self.visitados[p_otro.id_item_actual]['nodo'].append(nodo)
+                    self.lock_v.release()
+                    
+                    hilo = HiloAdelante(p_otro, self.lock_v, self.lock_s, self.visitados, self.suma)
+
+                    self.lh.append(hilo)
+                    hilo.start()
+    
+                else:
+                    self.lock_v.release()
+        
+        for h in self.lh:
+            h.join()
+            
+class HiloAtras(threading.Thread):
+    def __init__(self, p_item, lock_v, lock_s, v, suma):
+        self.p_item = p_item
+        self.lock_v = lock_v
+        self.lock_s = lock_s
+        self.visitados = v
+        self.suma = suma
+        self.lh = []
+                
+        threading.Thread.__init__(self)
+        
+    def run(self):
+        aristas = []
+        
+        for ri in self.p_item.relaciones:
+            relacion = Relacion.por_id(ri.id_relacion)
+            if (relacion.id_posterior == p_item.id_item_actual):
+                otro = relacion.obtener_otro_item(self.p_item.id_item_actual)
+                p_otro = PropiedadItem.por_id(otro.id_propiedad_item)
+                
+                self.lock_v.acquire()
+                if (not self.visitados.has_key(p_otro.id_item_actual)):
+                    self.visitados.setdefault(p_otro.id_item_actual, {'nodo': [], 'aristas': []})
+                    self.lock_v.release()
+                    
+                    self.lock_s.acquire()
+                    self.suma[0] += p_otro.complejidad
+                    self.lock_s.release()
+                    
+                    fase = lpm.model.Fase.por_id(otro.id_fase)                
+                    arista = p_item.id_item_actual + " : { directed: true }"
+                    #TODO color diferente para fase diferente
+                    nodo = p_otro.id_item_actual + " : {'color': '#b2b', 'shape': 'dot', 'label': '" +\
+                            otro.codigo + "-" + str(p_otro.complejidad) + "'}"
+                    
+                    self.lock_v.acquire()
+                    self.visitados[p_otro.id_item_actual]['aristas'].append(arista)
+                    self.visitados[p_otro.id_item_actual]['nodo'].append(nodo)
+                    self.lock_v.release()
+                    
+                    hilo = HiloAtras(p_otro, self.lock_v, self.lock_s, self.visitados, self.suma)
+
+                    self.lh.append(hilo)
+                    hilo.start()
+    
+                else:
+                    self.lock_v.release()
+        
+        for h in self.lh:
+            h.join()
+            
+                                        
 class Item(DeclarativeBase):
     """
     Clase que representa al Item en su versión
@@ -505,46 +609,57 @@ class Item(DeclarativeBase):
 
     def calcular_impacto(self):
         """ Calcula el impacto de cambiar un item
-        @return: lista de strings con las lineas representando un grafo
+        @return: sumatoria de complejidades y un diccionario conteniendo los nodos
+        y las aristas en json para ser usado por arbor.js
         """
         p_item = PropiedadItem.por_id(self.id_propiedad_item)
-        lock_visitados = threading.Lock()
-        lock_sumatoria = threading.Lock()
-        lock_hilos = threading.Lock()
-        visitados = {}
-        lista_hilos = []
-        sumatoria = [0]
+        lock_visitados1 = threading.Lock()
+        lock_sumatoria1 = threading.Lock()
+        visitados1 = {}
+        visitados1.setdefault(p_item.id_item_actual, {'nodo': [], 'aristas': []})
+        sumatoria1 = [0]
         
-        hilo = HiloContador(p_item, lock_visitados, lock_hilos, lock_sumatoria, visitados, sumatoria)
+        lock_visitados2 = threading.Lock()
+        lock_sumatoria2 = threading.Lock()
+        visitados2 = {}
+        visitados2.setdefault(p_item.id_item_actual, {'nodo': [], 'aristas': []})
+        sumatoria2 = [0]
+         
+        hilo1 = HiloAdelante(p_item, lock_visitados1, lock_sumatoria1, visitados1, sumatoria1)
+        hilo2 = HiloAtras(p_item, lock_visitados2, lock_sumatoria2, visitados2, sumatoria2)
         
-        hilo.start()
-        hilo.join()
+        hilo1.start()
+        hilo2.start()
         
-        """
-        i = 0
-        while (True):
-            lock_hilos.acquire()
-            if (len(lista_hilos) > i):
+        hilo1.join()
+        hilo2.join()
+        
+        sumatoria_total = p_item.complejidad + sumatoria1[0] + sumatoria2[0]
+        
+        grafo = {}
+        
+        #a ver si le gusta el \n
+        nodo = p_item.id_item_actual + " : {'color': '#333', 'shape': 'box', 'label': '" +\
+                           self.codigo + "-" + str(p_item.complejidad) + "'},\n"
+                           
+        aristas = visitados1[p_item.id_item_actual]['aristas']\
+                .extend(visitados2[p_item.id_item_actual]['aristas'])
+        
+        
+        grafo.setdefault('nodos', nodo)
+        grafo.setdefault('aristas', p_item.id_item_actual + " : {" + ",".join(aristas) + "},\n")
+        for id, partes in visitados1.item():
+            if (id != self.id_item):
+                grafo['nodos'] += partes['nodo'][0]
+                grafo['aristas'] += (id + ": { " + ",\n".join(partes['aristas']) + "},\n")   
                 
-                if (not lista_hilos[i].is_alive()):
-                    lista_hilos.pop(i)
-                    lock_hilos.release()
-                else:   
-                    lock_hilos.release()
-                    lista_hilos[i].join()
-            else:
-                lock_hilos.release()
-            
-            i += 1
-            lock_hilos.acquire()
-            if (len(lista_hilos) < i):
-                lock_hilos.release()
-                i = 0
-            elif (len(lista_hilos) == 0):
-                lock_hilos.release()
-                break  
-        """
-        return sumatoria, visitados
+        for id, partes in visitados2.item():
+            if (id != self.id_item):
+                grafo['nodos'] += partes['nodo'][0]
+                grafo['aristas'] += (id + ": { " + ",\n".join(partes['aristas']) + "},\n")    
+       
+        
+        return sumatoria_total, grafo
 
 
         

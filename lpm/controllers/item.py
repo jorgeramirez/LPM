@@ -815,26 +815,20 @@ class ItemController(CrudRestController):
             atras = "../%s/edit" % id
             
         item = Item.por_id(id_item)
-        sumatoria, f = item.calcular_impacto()
+        sumatoria, grafo = item.calcular_impacto()
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
         
         fase = Fase.por_id(item.id_fase)
         proy = Proyecto.por_id(fase.id_proyecto)
-        impacto = (float(sumatoria[0])/float(proy.complejidad_total)) * 100
-
-        filas = []
-        
-        for v in f.values():
-            #if (not dl.has_key(v['padre'])):
-            #  dl.setdefault(v['padre'], [])
-            filas.append(v[0])
+        impacto = (float(sumatoria)/float(proy.complejidad_total)) * 100
 
         return dict(atras=atras,
                     impacto=str(impacto),
                     page=page,
                     filas=filas,
                     ct=str(proy.complejidad_total),
-                    suma=str(sumatoria[0])
+                    suma=str(sumatoria),
+                    grafo=grafo
                     )
     
     @expose()
