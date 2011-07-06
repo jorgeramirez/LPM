@@ -115,48 +115,41 @@ class ItemTableFiller(CustomTableFiller):
         """Links de acciones para un registro dado"""
 
         value = '<div>'
-        clase = 'actions_fase'
-        controller = "./items/" + str(obj.id_item)
+        clase = 'actions_items'
+        controller = "./" + str(obj.id_item)
 
-        #si no está en la tabla que se encuentra en edit fase necesita 
-        #solamente esta parte de la url
-        if UrlParser.parse_nombre(request.url, "items"):
-            controller =  str(obj.id_item)
-        
-        
         p_item = PropiedadItem.por_id(obj.id_propiedad_item) #version actual.    
         
         if PoseePermiso('modificar item', 
                         id_tipo_item=obj.id_tipo_item).is_met(request.environ):
             if p_item.estado not in [u"Bloqueado", u"Revisión-Bloq", "Eliminado"]:
                 value += '<div>' + \
-                            '<a href="./'+ controller +'/edit" ' + \
+                            '<a href="'+ controller +'/edit" ' + \
                             'class="' + clase + '">Modificar</a>' + \
                          '</div><br />'
             #adjuntos es el controlador de archivos adjuntos al item.
             value += '<div>' + \
-                        '<a href="./'+ controller +'/adjuntos" ' + \
+                        '<a href="'+ controller +'/adjuntos" ' + \
                         'class="' + clase + '">Adjuntos</a>' + \
                      '</div><br />'
             #versiones es el controlador de versiones del item.
             value += '<div>' + \
-                        '<a href="./'+ controller +'/versiones" ' + \
+                        '<a href="'+ controller +'/versiones" ' + \
                         'class="' + clase + '">Versiones</a>' + \
                      '</div><br />'
-        
         
         eliminar = False
         revivir = False
         aprobar = False
         desaprobar = False
         st = p_item.estado
-        if st == "Desaprobado" or st == u"Revisión-Desbloq":
+        if st == u"Desaprobado" or st == u"Revisión-Desbloq":
             eliminar = True
             aprobar = True
-        elif st == "Aprobado":
+        elif st == u"Aprobado":
             eliminar = True
             desaprobar = True
-        elif st == "Eliminado":
+        elif st == u"Eliminado":
             revivir = True
 
         #if PoseePermiso('eliminar-revivir item',
@@ -164,17 +157,14 @@ class ItemTableFiller(CustomTableFiller):
         if PoseePermiso('eliminar-revivir item',
                         id_tipo_item=obj.id_tipo_item).is_met(request.environ):
             if eliminar:
-                value += '<div><form method="POST" action="' + controller + '" class="button-to">'+\
+                value += '<div><form method="POST" action="' + str(obj.id_item) + '" class="button-to">'+\
                          '<input type="hidden" name="_method" value="DELETE" />' +\
                          '<input onclick="return confirm(\'¿Está seguro?\');" value="Eliminar" type="submit" '+\
                          'style="background-color: transparent; float:left; border:0; color: #286571; display: inline;'+\
                          'margin: 0; padding: 0;' + clase + '"/>'+\
                          '</form></div><br />'
-        
-        if controller.isalnum():
-            controller = './'
-        else:
-            controller = './items/'
+
+        controller = './'
             
         #if PoseePermiso('aprobar-desaprobar item', 
         #                id_fase=obj.id_fase).is_met(request.environ):
