@@ -263,10 +263,10 @@ class FaseController(CrudRestController):
         Retorna una página HTML si no se especifica JSON
         """
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        #action = self.tmp_action % id_proyecto
+        atras = "../"
         if not id_proyecto:
             id_proyecto = UrlParser.parse_id(request.url, "proyectos_fase")
-            #action = self.tmp_action_fase % id_proyecto
+            atras = "../../"
         
         puede_crear = PoseePermiso("crear fase", 
                                    id_proyecto=id_proyecto).is_met(request.environ)
@@ -275,7 +275,6 @@ class FaseController(CrudRestController):
             puede_crear = False
 
         titulo = self.title % proy.nombre
-        atras = "../"
         fases = self.table_filler.get_value(id_proyecto=id_proyecto, **kw)
         tmpl_context.widget = self.table
   
@@ -341,7 +340,12 @@ class FaseController(CrudRestController):
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
         atras = "./"
         if not id_proyecto:
-            redirect("./")
+            id_proyecto = UrlParser.parse_id(request.url, "proyectos_fase")
+            atras = "../../"
+        
+        
+        if not id_proyecto:
+            redirect(atras)
         tmpl_context.widget = self.new_form
         return dict(value=kw, page="Nueva Fase", atras=atras)
     
@@ -361,6 +365,12 @@ class FaseController(CrudRestController):
         if "sprox_id" in kw:
             del kw["sprox_id"]
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        atras = "./"
+        
+        if not id_proyecto:
+            id_proyecto = UrlParser.parse_id(request.url, "proyectos_fase")
+            atras = "../../"
+        
         proy = Proyecto.por_id(id_proyecto)
         fase = proy.crear_fase(**kw)
         #Creamos el rol miembro  de fase
@@ -368,7 +378,7 @@ class FaseController(CrudRestController):
         rol_m = Rol.nuevo_rol_desde_plantilla(plantilla=plant_m, 
                                               id=fase.id_fase)
         flash("Fase Creada")
-        redirect("./")
+        redirect(atras)
         
     
     @expose('lpm.templates.fases.edit')
@@ -376,7 +386,12 @@ class FaseController(CrudRestController):
         """Despliega una pagina para realizar modificaciones"""
         id_fase = UrlParser.parse_id(request.url, "fases")
         fase = Fase.por_id(int(id_fase))
-
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        atras = "./"
+        if not id_proyecto:
+            id_proyecto = UrlParser.parse_id(request.url, "proyectos_fase")
+            atras = "../../"
+            
         pp = PoseePermiso('modificar fase', id_fase=id_fase)
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
@@ -385,7 +400,6 @@ class FaseController(CrudRestController):
         tmpl_context.widget = FaseEditForm(DBSession)
         value = self.edit_filler.get_value(values={'id_fase': id_fase})
         page = u"Modificar Fase: %s" % value["nombre"]
-        atras = "./"
         return dict(value=value,
                     page=page,
                     atras=atras)
@@ -416,15 +430,17 @@ class FaseController(CrudRestController):
     @expose('json')
     def get_one(self, *args, **kw):
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        #action = self.tmp_action % id_proyecto
+        action = "./"
+        atras = '../'
         if not id_proyecto:
             id_proyecto = UrlParser.parse_id(request.url, "proyectos_fase")
-            action = self.tmp_action_fase % id_proyecto
+            atras = "/proyectos_fase/"
             
         id_fase = int(args[0])
         puede_crear = PoseePermiso("crear fase", 
                                    id_proyecto=id_proyecto).is_met(request.environ)
         proy = Proyecto.por_id(id_proyecto)
+        
         if proy.estado == "Iniciado":
             puede_crear = False
             
@@ -437,14 +453,14 @@ class FaseController(CrudRestController):
             
         tmpl_context.widget = self.table
         titulo = self.title % proy.nombre
-        atras = '../'
+        
         return dict(lista_elementos=fase, 
                     page=titulo,
                     titulo=titulo, 
                     modelo=self.model.__name__, 
                     columnas=self.columnas,
                     opciones=self.opciones,
-                    url_action=self.tmp_action,
+                    url_action=action,
                     puede_crear=puede_crear,
                     comboboxes=self.comboboxes,
                     atras=atras
