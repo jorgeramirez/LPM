@@ -4,7 +4,6 @@
 from tg import expose, flash, require, url, request, redirect, session
 from pylons.i18n import ugettext as _, lazy_ugettext as l_
 from tgext.admin.tgadminconfig import TGAdminConfig
-#from tgext.admin.controller import AdminController
 from tgext.admin import AdminController
 from repoze.what import predicates
 
@@ -12,16 +11,14 @@ from lpm.lib.base import BaseController
 from lpm.lib.mail import Gmail
 from lpm.model import DBSession, metadata, Usuario
 from lpm import model
-#from lpm.controllers.secure import SecureController
-#from lpm.controllers.error import ErrorController
 from lpm.controllers.proyecto import ProyectoController
 from lpm.controllers.fase import FaseController
 from lpm.controllers.usuario import UsuarioController
 from lpm.controllers.rol import (RolController, RolPlantillaController)
-#                                 RolContextoController)
 from lpm.controllers.lineabase import LineaBaseController
 from lpm.controllers.item import ItemController
 from lpm.controllers.tipoitem import TipoItemController
+from lpm.controllers.proyectos_fase import ProyectosFaseController
 
 import hashlib , random
 
@@ -46,7 +43,7 @@ class RootController(BaseController):
     roles = RolController(DBSession)
     rolesplantilla = RolPlantillaController(DBSession)
     proyectos = ProyectoController(DBSession)
-    proyectos_fase = None
+    proyectos_fase = ProyectosFaseController(DBSession)
     proyectos_fase_ti = None
     items = ItemController(DBSession)
     lbs = LineaBaseController(DBSession)

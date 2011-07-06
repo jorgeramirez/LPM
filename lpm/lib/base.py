@@ -40,10 +40,9 @@ class BaseController(TGController):
             if u"crear proyecto" in request.credentials["permissions"] or \
                u"modificar proyecto" in  request.credentials["permissions"]:
                 request.puede_proyecto = True
-            elif u"modificar fase" in request.credentials["permissions"]:
+            if u"modificar fase" in request.credentials["permissions"]:
                 request.puede_fase = True
-            else:
-                if u"crear tipo item" in request.credentials["permissions"] or \
+            if u"crear tipo item" in request.credentials["permissions"] or \
                    u"redefinir tipo item" in request.credentials["permissions"]:
                     request.puede_ti = True
         
