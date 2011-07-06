@@ -127,11 +127,31 @@ class ItemTableFiller(CustomTableFiller):
                             '<a href="'+ controller +'/edit" ' + \
                             'class="' + clase + '">Modificar</a>' + \
                          '</div><br />'
+                         
+            #atributos es el controlador de atributos (por el tipo) del item.
+            value += '<div>' + \
+                        '<a href="'+ controller +'/atributos" ' + \
+                        'class="' + clase + '">Atributos</a>' + \
+                     '</div><br />'
+            
+            #relaciones a-s del item.
+            value += '<div>' + \
+                        '<a href="'+ controller +'/relaciones_as" ' + \
+                        'class="' + clase + '">Relaciones A-S</a>' + \
+                     '</div><br />'
+                    
+            #relaciones p-h del item.
+            value += '<div>' + \
+                        '<a href="'+ controller +'/relaciones_ph" ' + \
+                        'class="' + clase + '">Relaciones P-H</a>' + \
+                     '</div><br />'
+                     
             #adjuntos es el controlador de archivos adjuntos al item.
             value += '<div>' + \
                         '<a href="'+ controller +'/adjuntos" ' + \
                         'class="' + clase + '">Adjuntos</a>' + \
-                     '</div><br />'
+                     '</div><br />'         
+            
             #versiones es el controlador de versiones del item.
             value += '<div>' + \
                         '<a href="'+ controller +'/versiones" ' + \
@@ -151,7 +171,18 @@ class ItemTableFiller(CustomTableFiller):
             desaprobar = True
         elif st == u"Eliminado":
             revivir = True
-
+        
+        #if PoseePermiso('eliminar-revivir item', 
+        #                id_fase=obj.id_fase).is_met(request.environ):
+        if PoseePermiso('eliminar-revivir item', 
+                        id_tipo_item=obj.id_tipo_item).is_met(request.environ):
+            if revivir:
+                value += '<div>' + \
+                            '<a href="' + controller + 'revivir/' +str(obj.id_item) +'" ' + \
+                            'class="' + clase + '">Revivir</a>' + \
+                         '</div><br />'
+        value += '</div>'
+        
         #if PoseePermiso('eliminar-revivir item',
         #                id_fase=obj.id_fase).is_met(request.environ):
         if PoseePermiso('eliminar-revivir item',
@@ -180,6 +211,7 @@ class ItemTableFiller(CustomTableFiller):
                             '<a href="' + controller + 'desaprobar/' +str(obj.id_item) +'" ' + \
                             'class="' + clase + '">Desaprobar</a>' + \
                          '</div><br />'
+                         
         #if PoseePermiso('calcular impacto', 
         #                id_fase=obj.id_fase).is_met(request.environ):
         if PoseePermiso('calcular impacto', 
@@ -189,16 +221,6 @@ class ItemTableFiller(CustomTableFiller):
                             'class="' + clase + '">Calcular Impacto</a>' + \
                          '</div><br />'
 
-        #if PoseePermiso('eliminar-revivir item', 
-        #                id_fase=obj.id_fase).is_met(request.environ):
-        if PoseePermiso('eliminar-revivir item', 
-                        id_tipo_item=obj.id_tipo_item).is_met(request.environ):
-            if revivir:
-                value += '<div>' + \
-                            '<a href="' + controller + 'revivir/' +str(obj.id_item) +'" ' + \
-                            'class="' + clase + '">Revivir</a>' + \
-                         '</div><br />'
-        value += '</div>'
         return value
 
     def _do_get_provider_count_and_objs(self, id_fase=None, **kw):
