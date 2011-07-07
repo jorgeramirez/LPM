@@ -2,7 +2,7 @@
 """
 Módulo que define un controlador basico de proyectos
 utilizados por aquellos usuarios que pueden
-realizar configuraciones a nivel de fases
+realizar configuraciones a nivel de tipos de ítem
 
 @authors:
     - U{Carlos Bellino<mailto:carlosbellino@gmail.com>}
@@ -22,7 +22,7 @@ from lpm.lib.sproxcustom import (CustomTableFiller,
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso, Miembro
 from lpm.lib.util import UrlParser
 from lpm.controllers.proyecto import ProyectoTable
-from lpm.controllers.fase import FaseController
+from lpm.controllers.fases_ti import FasesTipoController
 
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, EditFormFiller, RecordFiller
@@ -41,10 +41,10 @@ import transaction
 from tw.forms import TextField
 
 
-proyectos_fase_table = ProyectoTable(DBSession)
+proyectos_fase_tipo_table = ProyectoTable(DBSession)
 
 
-class ProyectosFaseTableFiller(CustomTableFiller):
+class ProyectosFaseTipoTableFiller(CustomTableFiller):
     __model__ = Proyecto
     __add_fields__ = {'project_leader': None}
     
@@ -59,7 +59,7 @@ class ProyectosFaseTableFiller(CustomTableFiller):
         value = '<div>'
         clase = 'actions'
         value += '<div>' + \
-                    '<a href="./'+ str(obj.id_proyecto) + '/fases/" ' + \
+                    '<a href="./'+ str(obj.id_proyecto) + '/fases_ti/" ' + \
                     'class="' + clase + '">Seleccionar</a>' + \
                  '</div><br />'
 
@@ -75,7 +75,7 @@ class ProyectosFaseTableFiller(CustomTableFiller):
             proy  = Proyecto.por_id(id_proyecto)
             return 1, [proy]
             
-        count, lista = super(ProyectosFaseTableFiller, self).\
+        count, lista = super(ProyectosFaseTipoTableFiller, self).\
                             _do_get_provider_count_and_objs(**kw)
         filtrados = []                    
         for p in lista:
@@ -85,10 +85,10 @@ class ProyectosFaseTableFiller(CustomTableFiller):
         return len(filtrados), filtrados         
 
 
-proyectos_fase_table_filler = ProyectosFaseTableFiller(DBSession)
+proyectos_fase_tipo_table_filler = ProyectosFaseTipoTableFiller(DBSession)
     
     
-class ProyectosFaseController(CrudRestController):
+class ProyectosFaseTipoController(CrudRestController):
     """Controlador de Proyectos"""
     #{ Variables
     title = u"Proyectos"
@@ -98,12 +98,12 @@ class ProyectosFaseController(CrudRestController):
     allow_only = not_anonymous(u"El usuario debe haber iniciado sesión")
     
     #{ Sub Controlador
-    fases = FaseController(DBSession)
+    fases_ti = FasesTipoController(DBSession)
     
     #{ Modificadores
     model = Proyecto
-    table = proyectos_fase_table
-    table_filler = proyectos_fase_table_filler
+    table = proyectos_fase_tipo_table
+    table_filler = proyectos_fase_tipo_table_filler
     
     
     #para el form de busqueda
@@ -173,7 +173,7 @@ class ProyectosFaseController(CrudRestController):
         
         puede_crear = False
         tmpl_context.widget = self.table
-        buscar_table_filler = ProyectosFaseTableFiller(DBSession)
+        buscar_table_filler = ProyectosFaseTipoTableFiller(DBSession)
         buscar_table_filler.filtros = kw
         proyectos = buscar_table_filler.get_value()
         
