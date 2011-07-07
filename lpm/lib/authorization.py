@@ -292,8 +292,9 @@ class Miembro(Predicate):
                            r.id_fase == self.id_fase:
                             return
                     else:
-                        if r.tipo.find("Tipo") >= 0 and \
-                           r.id_tipo_item == self.id_tipo_item:
+                        if (r.tipo.find("Tipo") >= 0 and \
+                            self.id_tipo_item.es_o_es_hijo(r.id_tipo_item)):
+                            #r.id_tipo_item == self.id_tipo_item:
                             return
         self.unmet(self.message)
 

@@ -19,6 +19,7 @@ from lpm.controllers.lineabase import LineaBaseController
 from lpm.controllers.item import ItemController
 from lpm.controllers.tipoitem import TipoItemController
 from lpm.controllers.proyectos_fase import ProyectosFaseController
+from lpm.controllers.proyectos_desarrollo import ProyectosDesarrolloController
 
 import hashlib , random
 
@@ -45,7 +46,8 @@ class RootController(BaseController):
     proyectos = ProyectoController(DBSession)
     proyectos_fase = ProyectosFaseController(DBSession)
     proyectos_fase_ti = None
-    items = ItemController(DBSession)
+    #items = ItemController(DBSession)
+    proyectos_desarrollo = ProyectoDesarrolloController(DBSession)
     lbs = LineaBaseController(DBSession)
 
     '''

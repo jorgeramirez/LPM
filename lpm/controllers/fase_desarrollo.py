@@ -26,6 +26,8 @@ from lpm.controllers.miembros_fase import MiembrosFaseController
 from lpm.controllers.no_miembros_fase import NoMiembrosFaseController
 from lpm.controllers.roles_fase import RolesFaseController
 from lpm.controllers.fase import FaseTable
+from lpm.controllers.item import ItemController
+
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, EditFormFiller
 from sprox.fillerbase import EditFormFiller
@@ -182,6 +184,13 @@ class FaseDesarrolloController(CrudRestController):
                     atras=atras
                     )
 
+    @expose('lpm.templates.index')
+    def _default(self, *args, **kw):
+        """Maneja las urls no encontradas"""
+        flash(_('Recurso no encontrado'), 'warning')
+        redirect('/')
+        return dict(page='index')
+    
     @expose()
     def new(self, *args, **kw):
         pass

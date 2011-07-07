@@ -231,17 +231,18 @@ class ItemTableFiller(CustomTableFiller):
         """
         count, lista = super(ItemTableFiller, self).\
                             _do_get_provider_count_and_objs(**kw)
-        filtrados = []                    
+        filtrados = []
+        '''                   
         if id_fase:
             id_fase = int(id_fase)
-            ap = AlgunPermiso(tipo='Fase', id_fase=id_fase).is_met(request.environ)
-            if ap:
-                for it in lista:
-                    if it.id_fase == id_fase:
-                        filtrados.append(it)
-                
-            return len(filtrados), filtrados        
-        
+        '''
+        for it in lista:
+            if (it.id_fase == id_fase and \
+                Miembro(id_tipo_item=it.id_tipo_item).is_met(request.environ)):
+                filtrados.append(it)
+            
+        return len(filtrados), filtrados        
+        '''
         for it in lista:
             #if AlgunPermiso(tipo='Fase', id_fase=it.id_fase).is_met(request.environ):
             if AlgunPermiso(tipo=u'Tipo Ítem', 
@@ -249,7 +250,8 @@ class ItemTableFiller(CustomTableFiller):
                 filtrados.append(it)
         
         return len(filtrados), filtrados
-
+        '''
+        
 item_table_filler = ItemTableFiller(DBSession)
 
 class ItemRelacionTable(TableBase):
@@ -313,7 +315,7 @@ class ItemRelacionTableFiller(CustomTableFiller):
     def _do_get_provider_count_and_objs(self, id_item=None, tipo=None, **kw):
         """
         Recupera los ítems para los cuales tenemos algún permiso. y está o no
-        relacionado al campo realcionado.
+        relacionado al campo relacionado.
         Si el usuario se encuentra en una fase, retorna solo
         los ítems que pertenecen a dicha fase.
         """
