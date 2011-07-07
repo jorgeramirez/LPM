@@ -328,11 +328,13 @@ class TipoItemController(CrudRestController):
         
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
         id_fase = UrlParser.parse_id(request.url, "fases")
+        atras = "../"        
         if not id_proyecto:
             id_proyecto = UrlParser.parse_id(request.url, "proyectos_fase")
             if not id_proyecto:
                 id_proyecto = UrlParser.parse_id(request.url, "proyectos_fase_ti")
                 id_fase = UrlParser.parse_id(request.url, "fases_ti")
+            atras = "../../"
         
         proy = Proyecto.por_id(id_proyecto)
         puede_crear = puede_crear = PoseePermiso("crear tipo item",
@@ -345,7 +347,7 @@ class TipoItemController(CrudRestController):
         tipo_items = self.table_filler.get_value(id_fase=id_fase, **kw)
         tmpl_context.widget = self.table
         url_action = self.action
-        atras = "../"
+
         
         return dict(lista_elementos=tipo_items,
                     page=titulo, 
@@ -471,11 +473,13 @@ class TipoItemController(CrudRestController):
     def post_buscar(self, *args, **kw):
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
         id_fase = UrlParser.parse_id(request.url, "fases")
+        atras = "../"
         if not id_proyecto:
             id_proyecto = UrlParser.parse_id(request.url, "proyectos_fase")
             if not id_proyecto:
                 id_proyecto = UrlParser.parse_id(request.url, "proyectos_fase_ti")
                 id_fase = UrlParser.parse_id(request.url, "fases_ti")
+            atras = "../../../"
         
         proy = Proyecto.por_id(id_proyecto)
         puede_crear = puede_crear = PoseePermiso("crear tipo item",
@@ -488,8 +492,6 @@ class TipoItemController(CrudRestController):
         buscar_table_filler = self.table_filler.__class__(DBSession)
         buscar_table_filler.filtros = kw
         tipos_items = buscar_table_filler.get_value(id_fase=id_fase)
-        
-        atras = "../"
         
         return  dict(lista_elementos=tipos_items, 
                      page=titulo, 

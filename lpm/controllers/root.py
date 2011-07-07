@@ -19,6 +19,7 @@ from lpm.controllers.lineabase import LineaBaseController
 from lpm.controllers.item import ItemController
 from lpm.controllers.tipoitem import TipoItemController
 from lpm.controllers.proyectos_fase import ProyectosFaseController
+from lpm.controllers.proyectos_fase_ti import ProyectosFaseTipoController
 
 import hashlib , random
 
@@ -44,52 +45,9 @@ class RootController(BaseController):
     rolesplantilla = RolPlantillaController(DBSession)
     proyectos = ProyectoController(DBSession)
     proyectos_fase = ProyectosFaseController(DBSession)
-    proyectos_fase_ti = None
+    proyectos_fase_ti = ProyectosFaseTipoController(DBSession)
     items = ItemController(DBSession)
     lbs = LineaBaseController(DBSession)
-
-    '''
-    credentials = request.environ.get('repoze.what.credentials')
-    if credentials:
-        puede_proyecto = False
-        puede_fase = False
-        puede_ti = False
-            
-        if u"crear proyecto" in credentials["permissions"] or \
-           u"modificar proyecto" in  credentials["permissions"]:
-            puede_proyecto = True
-        elif u"modificar fase" in credentials["permissions"]:
-            puede_fase = True
-        else:
-            if u"crear tipo item" in credentials["permissions"] or \
-               u"redefinir tipo item" in credentials["permissions"]:
-                puede_ti = True
-
-    usuarios = UsuarioController(DBSession)
-    roles = RolController(DBSession)
-    rolesplantilla = RolPlantillaController(DBSession)
-    
-    if puede_proyecto:
-        proyectos = ProyectoController(DBSession)
-        self.fases = FaseController(DBSession)
-        self.tipositems = TipoItemController(DBSession)
-    elif puede_fase:
-        #TODO
-        self.proyectos = None #ProyectosFaseController()
-        self.fases = FaseController(DBSession)
-    elif puede_ti:
-        #TODO
-        self.proyectos = None #ProyectosFaseController()
-        self.fases = None #FaseTiController()
-        self.tipositems = TipoItemController(DBSession)
-    else:
-        #TODO
-        self.proyectos = None  #para lb y items
-        self.fases = None
-
-    self.items = ItemController(DBSession)
-    self.lbs = LineaBaseController(DBSession)
-    '''
 
     @expose('lpm.templates.index')
     def index(self):
