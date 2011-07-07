@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Módulo que define el controlador de fases para acceder a los items 
-con los que se puede trabajar.
+Módulo que define el controlador de fases para acceder a las 
+líneas base con las que se puede trabajar.
 
 @authors:
     - U{Carlos Bellino<mailto:carlosbellino@gmail.com>}
@@ -18,7 +18,7 @@ from tg import redirect, request, validate, flash
 from lpm.model import DBSession, Fase, Proyecto, Rol
 from lpm.lib.sproxcustom import (CustomTableFiller,
                                  CustomPropertySingleSelectField)
-from lpm.lib.authorization import PoseePermiso, AlgunPermiso
+from lpm.lib.authorization import PoseePermiso, AlgunPermiso, Miembro
 from lpm.lib.util import UrlParser
 from lpm.controllers.tipoitem import TipoItemController, TipoItemTableFiller
 from lpm.controllers.validaciones.fase_validator import FaseFormValidator
@@ -26,7 +26,7 @@ from lpm.controllers.miembros_fase import MiembrosFaseController
 from lpm.controllers.no_miembros_fase import NoMiembrosFaseController
 from lpm.controllers.roles_fase import RolesFaseController
 from lpm.controllers.fase import FaseTable
-from lpm.controllers.item import ItemController
+from lpm.controllers.lineabase import LineaBaseController
 
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, EditFormFiller
@@ -41,28 +41,28 @@ from pylons import tmpl_context
 import transaction
 
     
-fase_desarrollo_table = FaseTable(DBSession)
+fases_gestconf_table = FaseTable(DBSession)
 
 
-class FaseDesarrolloTableFiller(CustomTableFiller):
+class FasesGestConfTableFiller(CustomTableFiller):
     __model__ = Fase
     
     def __actions__(self, obj):
         """Links de acciones para un registro dado"""
         value = '<div>'
         clase = 'actions_fase'
-        id_proyecto = UrlParser.parse_id(request.url, "proyectos_desarrollo")
-        url_proy = "/proyectos_desarrollo/"
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos_gestconf")
+        url_proy = "/proyectos_gestconf/"
 
-        url_cont = url_proy + "%d/fases_desarrollo/"
+        url_cont = url_proy + "%d/fases/"
         url_cont %= id_proyecto
 
 
         value += '<div>' + \
-                    '<a href="'+ url_cont + str(obj.id_fase) + '/items/" ' + \
+                    '<a href="'+ url_cont + str(obj.id_fase) + '/lbs/" ' + \
                     'class="' + clase + '">Seleccionar</a>' + \
                  '</div>'
-
+        value += '</div>'
         return value
     
     def _do_get_provider_count_and_objs(self, id_proyecto=None, **kw):
@@ -70,26 +70,28 @@ class FaseDesarrolloTableFiller(CustomTableFiller):
         Retorna las fases del proyecto en cuestión
         """
 
-        count, lista = super(FaseTableFiller, self).\
+        count, lista = super(FasesGestConfTableFiller, self).\
                             _do_get_provider_count_and_objs(**kw)
         filtrados = []                    
         if id_proyecto:
             id_proyecto = int(id_proyecto)
             ap = AlgunPermiso(tipo='Fase', id_proyecto=id_proyecto).is_met(request.environ)
             
-            #se listan las fases en la que se es miembro
+            #se listan las fases del proyecto
             for f in lista:
-                if (f.id_proyecto == id_proyecto and \
-                    Miembro(id_fase=f.id_fase).is_met(request.environ)):
-                    filtrados.append(u)
+                if f.id_proyecto == id_proyecto and \
+                    Miembro(id_proyecto=f.id_proyecto).is_met(request.environ):
+                    #(Miembro(id_fase=f.id_fase).is_met(request.environ) or \
+                    #Miembro(id_proyecto=f.id_proyecto).is_met(request.environ)):
+                    filtrados.append(f)
                     
         return len(filtrados), filtrados
                    
 
-fase_desarrollo_table_filler = FaseDesarrolloTableFiller(DBSession)
+fases_gestconf_table_filler = FasesGestConfTableFiller(DBSession)
 
 
-class FaseDesarrolloController(CrudRestController):
+class FasesGestConfController(CrudRestController):
     """Controlador de Fases en Desarrollo"""
         
     #{ Variables
@@ -97,13 +99,13 @@ class FaseDesarrolloController(CrudRestController):
     allow_only = not_anonymous(u"El usuario debe haber iniciado sesión")
     
     #Subcontrolador
-    items = ItemController(DBSession)
+    lbs = LineaBaseController(DBSession)
     
     #{ Modificadores
 
     model = Fase
-    table = fase_desarrollo_table
-    table_filler = fase_desarrollo_table_filler
+    table = fases_gestconf_table
+    table_filler = fases_gestconf_table_filler
     
     opciones = dict(nombre= u'Nombre',
                     posicion= u'Posición',
@@ -131,7 +133,7 @@ class FaseDesarrolloController(CrudRestController):
         Retorna todos los registros
         Retorna una página HTML si no se especifica JSON
         """
-        id_proyecto = UrlParser.parse_id(request.url, "proyectos_desarrollo")
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos_gestconf")
         
         proy = Proyecto.por_id(id_proyecto)
 
@@ -161,13 +163,13 @@ class FaseDesarrolloController(CrudRestController):
         Controlador que recibe los parámetros de búsqueda para 
         devolver el resultado esperado.
         """
-        id_proyecto = UrlParser.parse_id(request.url, "proyectos_desarrollo")
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos_gestconf")
         
         proy = Proyecto.por_id(id_proyecto)
 
         titulo = self.title % proy.nombre
         atras = "../"
-        buscar_table_filler = FaseDesarrolloTableFiller(DBSession)
+        buscar_table_filler = FasesGestConfTableFiller(DBSession)
         buscar_table_filler.filtros = kw
         fases = buscar_table_filler.get_value(id_proyecto=id_proyecto, **kw)
         tmpl_context.widget = self.table

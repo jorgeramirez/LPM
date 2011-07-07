@@ -21,7 +21,7 @@ from lpm.lib.sproxcustom import (CustomTableFiller,
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso, Miembro
 from lpm.lib.util import UrlParser
 from lpm.controllers.proyecto import ProyectoTable
-from lpm.controllers.fase_desarrollo import FaseDesarrolloController
+from lpm.controllers.fases_gestconf import FasesGestConfController
 
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, EditFormFiller, RecordFiller
@@ -40,10 +40,10 @@ import transaction
 from tw.forms import TextField
 
 
-proyectos_desarrollo_table = ProyectoTable(DBSession)
+proyectos_gestconf_table = ProyectoTable(DBSession)
 
 
-class ProyectosDesarrolloTableFiller(CustomTableFiller):
+class ProyectosGestConfTableFiller(CustomTableFiller):
     __model__ = Proyecto
     __add_fields__ = {'project_leader': None}
     
@@ -71,7 +71,7 @@ class ProyectosDesarrolloTableFiller(CustomTableFiller):
         es miembro
         """
             
-        count, lista = super(ProyectosFaseTableFiller, self).\
+        count, lista = super(ProyectosGestConfTableFiller, self).\
                             _do_get_provider_count_and_objs(**kw)
         filtrados = []                    
         for p in lista:
@@ -81,10 +81,10 @@ class ProyectosDesarrolloTableFiller(CustomTableFiller):
         return len(filtrados), filtrados         
 
 
-proyectos_desarrollo_table_filler = ProyectosDesarrolloTableFiller(DBSession)
+proyectos_gestconf_table_filler = ProyectosGestConfTableFiller(DBSession)
     
     
-class ProyectosDesarrolloController(CrudRestController):
+class ProyectosGestConfController(CrudRestController):
     """Controlador de Proyectos"""
     #{ Variables
     title = u"Proyectos"
@@ -94,12 +94,12 @@ class ProyectosDesarrolloController(CrudRestController):
     allow_only = not_anonymous(u"El usuario debe haber iniciado sesión")
     
     #{ Sub Controlador
-    fases_desarrollo = FaseDesarrolloController(DBSession)
+    fases = FasesGestConfController(DBSession)
     
     #{ Modificadores
     model = Proyecto
-    table = proyectos_desarrollo_table
-    table_filler = proyectos_desarrollo_table_filler
+    table = proyectos_gestconf_table
+    table_filler = proyectos_gestconf_table_filler
     
     
     #para el form de busqueda
@@ -166,7 +166,7 @@ class ProyectosDesarrolloController(CrudRestController):
         devolver el resultado esperado.
         """
         tmpl_context.widget = self.table
-        buscar_table_filler = ProyectosFaseTableFiller(DBSession)
+        buscar_table_filler = ProyectosGestConfTableFiller(DBSession)
         buscar_table_filler.filtros = kw
         proyectos = buscar_table_filler.get_value()
         

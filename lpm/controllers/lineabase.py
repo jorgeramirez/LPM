@@ -74,9 +74,11 @@ class LineaBaseTableFiller(CustomTableFiller):
         if UrlParser.parse_nombre(request.url, "lbs"):
             #controller =  str(obj.id_lb)
             controller = u""
-            if not obj.items:  #lb rota
+            
+            if not obj.items:  #lb rota FIXME
                 obj.estado = u'Rota'
                 return '<div></div>'
+            
             id_item = obj.items[0].propiedad_item.id_item_actual
             id_fase = Item.por_id(id_item).id_fase
         else:

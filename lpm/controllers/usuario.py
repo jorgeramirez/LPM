@@ -372,11 +372,14 @@ class UsuarioController(CrudRestController):
     @expose('lpm.templates.usuario.edit')
     def edit(self, *args, **kw):
         """Despliega una pagina para modificar usuario"""
+        username = request.identity['repoze.who.userid']
+        usuario = Usuario.by_user_name(username)
         
-        pp = PoseePermiso('modificar usuario')
-        if not pp.is_met(request.environ):
-            flash(pp.message % pp.nombre_permiso, 'warning')
-            redirect("/usuarios")
+        if usuario.id_usuario != int(args[0]):
+            pp = PoseePermiso('modificar usuario')
+            if not pp.is_met(request.environ):
+                flash(pp.message % pp.nombre_permiso, 'warning')
+                redirect("/usuarios")
         
         tmpl_context.widget = self.edit_form
         usuarios = self.table_filler.get_value(**kw)
@@ -422,11 +425,15 @@ class UsuarioController(CrudRestController):
             del kw["repita_nuevo_password"]
         if kw["nro_documento"]:
             kw["nro_documento"] = int(kw["nro_documento"])
+
+        username = request.identity['repoze.who.userid']
+        usuario = Usuario.by_user_name(username)
         
-        pp = PoseePermiso('modificar usuario')
-        if not pp.is_met(request.environ):
-            flash(pp.message % pp.nombre_permiso, 'warning')
-            redirect(self.action)
+        if usuario.id_usuario != int(kw["id_usuario"]):        
+            pp = PoseePermiso('modificar usuario')
+            if not pp.is_met(request.environ):
+                flash(pp.message % pp.nombre_permiso, 'warning')
+                redirect(self.action)
 
         usuario = Usuario.por_id(args[0])
         usuario.nombre = kw["nombre"]
