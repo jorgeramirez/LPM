@@ -8,11 +8,7 @@ from tg import request, session
 from repoze.what.predicates import has_any_permission
 from pylons.i18n import _, ungettext, N_
 import lpm.model as model
-<<<<<<< HEAD
-from lpm.lib.authorization import PoseePermiso
-=======
-from lpm.lib.authorization import AlgunPermiso
->>>>>>> kaname
+from lpm.lib.authorization import PoseePermiso, AlgunPermiso
 
 __all__ = ['BaseController']
 
@@ -47,17 +43,8 @@ class BaseController(TGController):
             request.puede_ti = False
             request.puede_busqueda = False
             
-            if u"crear proyecto" in request.credentials["permissions"] or \
-               u"modificar proyecto" in  request.credentials["permissions"]:
-                request.puede_proyecto = True
             if AlgunPermiso(tipo="Rol").is_met(request.environ):
                 request.puede_rol = True
-            if u"modificar fase" in request.credentials["permissions"]:
-                request.puede_fase = True
-            if u"crear tipo item" in request.credentials["permissions"] or \
-                   u"redefinir tipo item" in request.credentials["permissions"]:
-                    request.puede_ti = True
-
 
             perms = request.credentials["permissions"]
             if perms.count("crear proyecto") or \
@@ -73,10 +60,12 @@ class BaseController(TGController):
             
             if AlgunPermiso(tipo="Usuario").is_met(request.environ):
                 request.puede_busqueda = True
+                
             if AlgunPermiso(tipo="Tipo").is_met(request.environ):
                 request.puede_desarrollo = True
-            if has_any_permission(u"crear lb",u"abrir-cerrar lb",u"consultar lb").\
-                is_met(request.environ):
+                
+            if has_any_permission(u"crear lb", u"abrir-cerrar lb", 
+                                  u"consultar lb").is_met(request.environ):
                 request.puede_gestion_conf = True
 			
         tmpl_context.identity = request.identity
