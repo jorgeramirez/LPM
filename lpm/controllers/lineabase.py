@@ -21,11 +21,7 @@ from lpm.lib.sproxcustom import (CustomTableFiller,
                                  CustomPropertySingleSelectField)
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
 from lpm.lib.util import UrlParser
-from lpm.controllers.version import VersionController
-from lpm.controllers.adjunto import AdjuntoController
-from lpm.controllers.atributoitem import AtributoItemController
-from lpm.controllers.relacion import (RelacionController, RelacionTable,
-                                      RelacionTableFiller)
+from lpm.controllers.historial_lb import HistorialLBController
 
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, EditFormFiller
@@ -304,21 +300,17 @@ class ItemLBTableFiller(CustomTableFiller):
         """Links de acciones para un registro dado"""
         return "<div></div>"
     
-    def _do_get_provider_count_and_objs(self, id_lb=None, **kw):
+    def _do_get_provider_count_and_objs(self, lb=None, **kw):
         """
-        Recupera las versiones del ítem en cuestión.
+        Recupera los ítems que forman parte de la lb en cuestión.
         """
         count, lista = super(ItemLBTableFiller, self).\
                             _do_get_provider_count_and_objs(**kw)
         filtrados = []                    
-        if id_lb:
-            id_lb = int(id_lb)
-            lb = LB.por_id(id_lb)
-            for iplb in lb.items:
-                if iplb in lista:
-                    filtrados.append(iplb)
+        for iplb in lb.items:
+            if iplb in lista:
+                filtrados.append(iplb)
         return len(filtrados), filtrados
-
 
 item_lb_table_filler = ItemLBTableFiller(DBSession)
 
@@ -335,7 +327,7 @@ class LineaBaseController(CrudRestController):
     
     
     #{ Sub-controlador
-    historiallbs = None
+    historiallbs = HistorialLBController(DBSession)
     
     #{ Modificadores
     model = LB
@@ -369,6 +361,7 @@ class LineaBaseController(CrudRestController):
         titulo = u"Líneas Base de Fase: %s" % fase.nombre
         lbs = self.table_filler.get_value(id_fase=id_fase, **kw)
         tmpl_context.widget = self.table
+        atras = "../../"
         return dict(lista_elementos=lbs, 
                     page=titulo,
                     titulo=titulo, 
@@ -377,7 +370,8 @@ class LineaBaseController(CrudRestController):
                     opciones=self.opciones,
                     url_action=self.tmp_action,
                     puede_crear=puede_crear,
-                    comboboxes=self.comboboxes
+                    comboboxes=self.comboboxes,
+                    atras=atras
                     )
     
     @without_trailing_slash
@@ -623,17 +617,12 @@ class LineaBaseController(CrudRestController):
         """ 
         Muestra los elementos que forman parte de la LB
         """
-        
-        #TODO Modificar
-                
         id_lb = int(args[0])
         lb = LB.por_id(id_lb)
         titulo = u"Ítems de Línea Base: %s" % lb.codigo
-        iplbs = item_lb_table_filler.get_value(id_lb=id_lb, **kw)
+        iplbs = item_lb_table_filler.get_value(lb=lb, **kw)
         tmpl_context.widget = item_lb_table
         atras = "../../"
-        if UrlParser.parse_nombre(request.url, "fases"):
-            atras = "../../../edit" 
         return dict(lista_elementos=iplbs, 
                     page=titulo,
                     titulo=titulo, 
