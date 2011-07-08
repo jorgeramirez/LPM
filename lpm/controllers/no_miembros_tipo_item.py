@@ -189,7 +189,7 @@ class NoMiembrosTipoController(RestController):
         Incorporar al proyecto a los usuarios que fueron seleccionados.
         """
         id_tipo_item = UrlParser.parse_id(request.url, "tipositems")
-        
+
         #recuperamos el rol miembro de tipo de item
         rol = DBSession.query(Rol) \
                        .filter(and_(Rol.id_tipo_item == id_tipo_item,

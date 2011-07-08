@@ -7,6 +7,7 @@ from tg.render import render
 from tg import request, session
 from pylons.i18n import _, ungettext, N_
 import lpm.model as model
+from lpm.lib.authorization import PoseePermiso
 
 __all__ = ['BaseController']
 
@@ -36,7 +37,8 @@ class BaseController(TGController):
             request.puede_proyecto = False
             request.puede_fase = False
             request.puede_ti = False
-                
+            
+            '''    
             if u"crear proyecto" in request.credentials["permissions"] or \
                u"modificar proyecto" in  request.credentials["permissions"]:
                 request.puede_proyecto = True
@@ -45,7 +47,22 @@ class BaseController(TGController):
             if u"crear tipo item" in request.credentials["permissions"] or \
                    u"redefinir tipo item" in request.credentials["permissions"]:
                     request.puede_ti = True
-        
+            '''
+            
+            perms = request.credentials["permissions"]
+            if perms.count("crear proyecto") or \
+               perms.count("modificar proyecto"):
+                request.puede_proyecto = True
+            
+            if perms.count("modificar fase"):
+                request.puede_fase = True
+            
+            if perms.count("crear tipo item") or \
+               perms.count("redefinir tipo item"):
+                request.puede_ti = True
+            
+            
+            
         tmpl_context.identity = request.identity
 #        session['atras'] = session['actual']
 #        session['actual'] = session['adelante']
