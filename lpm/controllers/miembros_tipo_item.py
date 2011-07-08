@@ -252,7 +252,16 @@ class RolesAsignadosController(RestController):
             user = Usuario.por_id(id_user)
             c = 0
             while c < len(user.roles):
-                if user.roles[c].id_rol in pks:
+                r = user.roles[c]
+                if r.id_rol in pks:
+                    if r.nombre_rol == "Miembro de Tipo Item":
+                        msg = "No puedes eliminar el rol {nr}. Si deseas "
+                        msg += "que el usuario deje de ser miembro, debes "
+                        msg += "hacerlo en la pagina de Miembros para este "
+                        msg += "tipo de item."
+                        flash(msg.format(nr=r.nombre_rol), "warning")
+                        DBSession.rollback()
+                        return "./"
                     del user.roles[c]
                 else:
                     c += 1

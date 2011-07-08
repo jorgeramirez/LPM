@@ -303,8 +303,8 @@ class RolesAsignadosController(RestController):
                     
                     if r.nombre_rol == "Miembro de Proyecto":
                         msg = "No puedes eliminar el rol {nr}. Si deseas "
-                        msg += "eliminar al usuario, debes hacerlo en la "
-                        msg += "pagina de Miembros del Proyecto."
+                        msg += "que el usuario deje de ser miembro, debes "
+                        msg += "hacerlo en la pagina de Miembros del Proyecto."
                         flash(msg.format(nr=r.nombre_rol), "warning")
                         DBSession.rollback()
                         return "./"
