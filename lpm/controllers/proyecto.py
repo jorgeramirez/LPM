@@ -25,6 +25,7 @@ from lpm.controllers.tipoitem import TipoItemController, TipoItemTableFiller
 from lpm.controllers.miembros_proyecto import MiembrosProyectoController
 from lpm.controllers.no_miembros_proyecto import NoMiembrosProyectoController
 from lpm.controllers.roles_proyecto import RolesProyectoController
+from lpm.controllers.proyecto_tipoitem import ProyectoTipoItemController
 
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, EditFormFiller, RecordFiller
@@ -196,7 +197,7 @@ class ProyectoController(CrudRestController):
     
     #{ Sub Controlador
     fases = FaseController(DBSession)
-    tipositems = None #TipoItemController(DBSession)
+    tipositems = ProyectoTipoItemController(DBSession)
     miembros = MiembrosProyectoController()
     nomiembros = NoMiembrosProyectoController()
     rolesproyecto = RolesProyectoController(DBSession)

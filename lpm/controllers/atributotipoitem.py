@@ -91,6 +91,9 @@ class AtributosPorTipoItemTableFiller(CustomTableFiller):
         si se tiene un permiso necesario.
         """
         if AlgunPermiso(tipo="Tipo", id_tipo_item=id_tipo_item).is_met(request.environ):
+            count, lista = super(AtributosPorTipoItemTableFiller, 
+                            self)._do_get_provider_count_and_objs(**kw)
+                                 
             id_tipo = UrlParser.parse_id(request.url, "tipositems")
             ti = TipoItem.por_id(id_tipo)
             pks = []
@@ -99,10 +102,17 @@ class AtributosPorTipoItemTableFiller(CustomTableFiller):
                 for attr in actual.atributos:
                     pks.append(attr.id_atributos_por_tipo_item)
                 actual = TipoItem.por_id(actual.id_padre)
-            query = DBSession.query(AtributosPorTipoItem) \
-                             .filter(AtributosPorTipoItem \
-                                     .id_atributos_por_tipo_item.in_(pks))
-            return query.count(), query.all()
+            
+            filtrados = []
+            for attr in lista:
+                if attr.id_atributos_por_tipo_item in pks:
+                    filtrados.append(attr)
+            return len(filtrados), filtrados
+            
+            #query = DBSession.query(AtributosPorTipoItem) \
+            #                 .filter(AtributosPorTipoItem \
+            #                         .id_atributos_por_tipo_item.in_(pks))
+            #return query.count(), query.all()
 
         return 0, []
 
