@@ -5,60 +5,12 @@
 <xi:include href="esquema.html" />
 <head>
 <title>$page</title>
-<link href="${tg.url('/css/jquery-ui.css')}" rel="stylesheet" type="text/css"/>
-<script src="${tg.url('/javascript/jquery-1.5.1.min.js')}"></script>
-<script src="${tg.url('/javascript/jquery-ui-1.8.13.custom.min.js')}"></script>
-<script src="${tg.url('/javascript/relaciones.js')}"></script>
 </head>
 <body>
   <div style="height:0px;"> &nbsp; </div>
   <h2 style="margin-top:1px; padding-left: 60px;">$page</h2>
   <div style="float:left; padding-left: 95px;" class="crud_edit">
-    <table cellspacing="0" cellpadding="2" border="0">
-    <tbody>
-        <tr>
-            <td colspan="2">
-                ${XML(tmpl_context.widget(value=value, action='./'))}
-                
-            </td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                <h2 class="color-sobra" style="font-size: 1.5em; margin-top: 5px;">Atributos Específicos</h2>
-                <div id="tabla_atributos" class="crud_table" style="height:65%; width:700px; margin-top: 10px;">
-                    ${XML(tmpl_context.tabla_atributos(value=atributos))}
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                <h2 class="color-sobra" style="font-size: 1.5em; margin-top: 5px;">Relaciones</h2>
-            </td>
-        </tr>
-        <py:if test="puede_relacionar">
-        <tr>
-            <td>
-                
-                <a class="link_boton" href="${tg.url('../relacionar_item/' + id)}">
-                    <input id="relacionar_item" style="margin-top:0; " class="boton" type="button" value="Relacionar"/>
-                </a>
-             </td>
-             <td>             
-                <form id="form_eliminar_relaciones" method="POST" action="${tg.url('../eliminar_relaciones/' + id)}">
-                <input id="eliminar_relacion" class="boton" type="submit" value="Eliminar Seleccionados" style="margin-top: 0px; width: 160px; margin-left:-600px;"/>
-                </form>            
-            </td>
-        </tr>
-        </py:if>
-        <tr>
-            <td colspan="2">
-                <div id="tabla_relaciones" class="crud_table" style="height:65%; width:700px; margin-top: 10px;">
-                    ${XML(tmpl_context.tabla_relaciones(value=relaciones))} 
-                </div>
-            </td>
-        </tr>
-  </tbody>
-  </table>
+    ${XML(tmpl_context.widget(value=value, action='./'))}
   </div>
   <div style="height:0px; clear:both;"> &nbsp; </div>
 </body>

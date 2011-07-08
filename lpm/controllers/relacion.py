@@ -51,8 +51,8 @@ class RelacionTable(TableBase):
     __column_widths__ = { '__actions__': "50em"}
     __field_order__ = ['codigo', 'tipo', 'item_relacionado']
     __xml_fields__ = ['Estado']
+    
 relacion_table = RelacionTable(DBSession)
-
 
 class RelacionTableFiller(CustomTableFiller):
     __model__ = Relacion
@@ -106,7 +106,7 @@ class RelacionTableFiller(CustomTableFiller):
         value = '<div>'
         clase = 'actions_fase'
         id = str(obj.id_relacion)
-        controller = "./relaciones/" + id
+        controller = "./" + id
         id_item = UrlParser.parse_id(request.url, "items")
         item = Item.por_id(id_item)
 
@@ -128,6 +128,11 @@ class RelacionTableFiller(CustomTableFiller):
         """
         count, lista = super(RelacionTableFiller, self).\
                             _do_get_provider_count_and_objs(**kw)
+        
+        tipo = "a-s"
+        if (UrlParser.parse_nombre(request.url, "relaciones_ph")):
+            tipo = "p-h"
+        
         filtrados = []                    
         if id_version:
             p_item = PropiedadItem.por_id(id_version)
@@ -136,9 +141,10 @@ class RelacionTableFiller(CustomTableFiller):
             ap = AlgunPermiso(tipo='Fase',
                               id_fase=item.id_fase).is_met(request.environ)
             if ap:
-                for rel_por_item in p_item.relaciones:
-                    if rel_por_item.relacion in lista:
-                        filtrados.append(rel_por_item.relacion)
+                for rpi in p_item.relaciones:
+                    if (rpi.relacion in lista) and \
+                        rpi.relacion.tipo == Relacion.tipo_relaciones[tipo]:
+                        filtrados.append(rpi.relacion)
 
         return len(filtrados), filtrados
 
@@ -146,7 +152,32 @@ class RelacionTableFiller(CustomTableFiller):
 relacion_table_filler = RelacionTableFiller(DBSession)
 
 
+#tabla para eliminar relacion de ítem
+class RelacionItemTable(RelacionTable):
+    __add_fields__ = {'item_relacionado': None,
+                       'check': None, 'estado': None}
+    __omit_fields__ = ['id_relacion', 'id_anterior', 'id_posterior',
+                       '__actions__']
+    __headers__ = {'tipo': u'Tipo', 'codigo': u'Código',
+                   'item_relacionado': u"Ítem Relacionado",
+                   'estado': u'Estado', 'check': u"Check"}
+    
+    __field_order__ = ["codigo", 'item_relacionado', 'tipo', "estado", "check"]
+    __xml_fields__ = ['Check', 'Estado']
+    
+relacion_item_table = RelacionItemTable(DBSession)
 
+#filler para relacionar/eliminar relacion de ítem
+class RelacionItemTableFiller(RelacionTableFiller):
+    __add_fields__ = {'item_relacionado': None, 'check': None,
+                      'estado': None}
+    
+    def check(self, obj, **kw):
+        checkbox = '<input type="checkbox" class="checkbox_tabla" id="' + str(obj.id_relacion) + '"/>'
+        return checkbox
+        
+relacion_item_table_filler = RelacionItemTableFiller(DBSession)
+        
 class RelacionController(CrudRestController):
     """Controlador de atributos de ítem"""
 
@@ -157,16 +188,19 @@ class RelacionController(CrudRestController):
     #{plantillas
     tmp_action = "./"
     
+    #{subcontrolador
+    relacionar_items = ItemRelacionController(DBSession)
+    
     #{ Modificadores
     model = Relacion
     table = relacion_table
     table_filler = relacion_table_filler     
 
     
-    opciones = dict(tipo= u'Tipo', codigo=u'Código')
-    columnas = dict(tipo='combobox', codigo='texto')
+    opciones = dict(codigo=u'Código')
+    columnas = dict(codigo='texto')
     
-    comboboxes = dict(tipo=Relacion.tipo_relaciones.values())
+    #comboboxes = dict(tipo=Relacion.tipo_relaciones.values())
     
     #{ Métodos
     @with_trailing_slash
@@ -181,7 +215,10 @@ class RelacionController(CrudRestController):
         id_item = UrlParser.parse_id(request.url, "items")
         id_version = UrlParser.parse_id(request.url, "versiones")
         titulo = self.title
-        relaciones = {}
+        relaciones = []
+        tabla = self.table
+        puede_relacionar = False
+        
         if id_version:
             #desde controller de versiones
             p_item = PropiedadItem.por_id(id_version)
@@ -192,18 +229,22 @@ class RelacionController(CrudRestController):
             #desde controller de items.
             item = Item.por_id(id_item)
             titulo = u"Relaciones de Ítem: %s" % item.codigo
-            relaciones = self.table_filler. \
+            relaciones = relacion_item_table_filler. \
                         get_value(id_version=item.id_propiedad_item, **kw)
-        
-        tmpl_context.widget = self.table
+            tabla = relacion_item_table
+            puede_relacionar = PoseePermiso('modificar item', \
+                                id_tipo_item=item.id_tipo_item).is_met(request.environ)
+            
+        tmpl_context.widget = tabla
         return dict(lista_elementos=relaciones, 
                     page=titulo,
                     titulo=titulo, 
                     modelo=self.model.__name__, 
                     columnas=self.columnas,
                     opciones=self.opciones,
-                    comboboxes=self.comboboxes,
-                    url_action=self.tmp_action
+                    #comboboxes=self.comboboxes,
+                    url_action=self.tmp_action,
+                    puede_relacionar=puede_relacionar
                     )
     
     @without_trailing_slash
@@ -218,23 +259,33 @@ class RelacionController(CrudRestController):
         id_item = UrlParser.parse_id(request.url, "items")
         id_version = UrlParser.parse_id(request.url, "versiones")
         titulo = self.title
-        relaciones = {}
-        buscar_table_filler = RelacionTableFiller(DBSession)
-        buscar_table_filler.filtros = kw
+        relaciones = []
+        tabla = self.table
+        puede_relacionar = False
+        
         if id_version:
             #desde controller de versiones
+            buscar_table_filler = RelacionTableFiller(DBSession)
+            buscar_table_filler.filtros = kw
             p_item = PropiedadItem.por_id(id_version)
             titulo = u"Relaciones de Version: %d" % p_item.version
             relaciones = buscar_table_filler. \
                         get_value(id_version=p_item.id_propiedad_item)
         elif id_item:
             #desde controller de items.
+            buscar_table_filler = RelacionItemTableFiller(DBSession)
+            buscar_table_filler.filtros = kw
+            tabla = relacion_item_table
+            
             item = Item.por_id(id_item)
             titulo = u"Relaciones de Ítem: %s" % item.codigo
-            relaciones = buscar_table_filler. \
-                        get_value(id_version=item.id_propiedad_item)
+            relaciones = relacion_item_table_filler. \
+                        get_value(id_version=item.id_propiedad_item, **kw)
+            tabla = relacion_item_table
+            puede_relacionar = PoseePermiso('modificar item', \
+                                id_tipo_item=item.id_tipo_item).is_met(request.environ)
 
-        tmpl_context.widget = self.table
+        tmpl_context.widget = tabla
         return dict(lista_elementos=relaciones,
                     page=titulo,
                     titulo=titulo,
@@ -242,10 +293,48 @@ class RelacionController(CrudRestController):
                     columnas=self.columnas,
                     url_action='../',
                     opciones=self.opciones,
-                    comboboxes=self.comboboxes,                    
-                    atras='../'
+                    #comboboxes=self.comboboxes,                    
+                    atras='../',
+                    puede_relacionar=puede_relacionar
                     )
     
+    @expose()
+    def eliminar_relaciones(self, *args, **kw):
+        #se lo llama desde la pagina de edit, al marcar las relaciones
+        #y luego seleccionar Eliminar. Ajax.
+        id_item = UrlParser.parse_id(request.url, "items")
+        item = Item.por_id(id_item)
+        
+        p_item = PropiedadItem.por_id(item.id_propiedad_item)
+        
+        ids = []
+        if kw:
+            for k, pk in kw.items():
+                if not k.isalnum():
+                    continue
+                ids.append(int(pk))
+
+            p_item.eliminar_relaciones(ids)
+        
+        try:
+            id = int(args[0])
+            if (id > 0):
+                ids.append(id)
+        except:
+            id = 0
+            flash(u"Argumento invalido", "warning")
+            
+                
+        usuario = Usuario.by_user_name(request.identity['repoze.who.userid'])
+        item.guardar_historial(u"eliminar-relaciones", usuario)
+        
+        if (id):
+            redirect("../")
+        else:
+            transaction.commit()   
+            #return "/items/%d/edit" % id_item
+            return './'
+        
     @expose()
     def get_one(self, *args, **kw):
         pass
@@ -256,8 +345,6 @@ class RelacionController(CrudRestController):
     
     @expose()
     def post_delete(self, id):
-        #TODO llamado desde la pagina de edit Item, al seleccionar
-        #el action de eliminar de un elemento de la tabla.
         pass
         
     @expose()
@@ -271,16 +358,5 @@ class RelacionController(CrudRestController):
     @expose()
     def put(self, *args, **kw):
         pass
-    
-    @expose()
-    def relacionar(self, *args, **kw):
-        """
-        Relaciona dos ítems.
-        """
-        # Este metodo es invocado desde la pagina de relacionar_item
-        # al seleccionar el link del action Relacionar de un elemento 
-        # de alguna de las dos tablas.
-        # ./items/1/relacionar/2
-        # se debera crear la relacion 1 con 2
-        pass
+
     #}

@@ -217,18 +217,22 @@ class ItemTableFiller(CustomTableFiller):
         if PoseePermiso('calcular impacto', 
                         id_tipo_item=obj.id_tipo_item).is_met(request.environ):
                 value += '<div>' + \
-                            '<a href="' + controller + 'calcular_impacto/' +str(obj.id_item) +'" ' + \
+                            '<a href="' + controller + 'calcular_impacto/' + str(obj.id_item) +'" ' + \
                             'class="' + clase + '">Calcular Impacto</a>' + \
                          '</div><br />'
 
         return value
 
-    def _do_get_provider_count_and_objs(self, id_fase=None, **kw):
+    def _do_get_provider_count_and_objs(self, id_fase=None, id_item=None, **kw):
         """
         Recupera los ítems para los cuales tenemos algún permiso.
         Si el usuario se encuentra en una fase, retorna solo
         los ítems que pertenecen a dicha fase.
         """
+        if id_item:
+            item  = Item.por_id(id_item)
+            return 1, [item]
+            
         count, lista = super(ItemTableFiller, self).\
                             _do_get_provider_count_and_objs(**kw)
         filtrados = []
@@ -253,107 +257,6 @@ class ItemTableFiller(CustomTableFiller):
         '''
         
 item_table_filler = ItemTableFiller(DBSession)
-
-class ItemRelacionTable(TableBase):
-    __model__ = Item
-    __headers__ = { 'codigo': u'Código',
-                    'complejidad': 'Complejidad',
-                    'codigo_tipo': u'Tipo de Ítem',
-                    'version_actual': u'Versión Actual',
-                    'estado': u'Estado',
-                    'check': u'Check'
-                  }
-    __omit_fields__ = ['__actions__', 'id_item', 'numero', 'numero_por_tipo',
-                       'id_tipo_item',
-                       'id_propiedad_item', 'propiedad_item_versiones',
-                       'id_fase', 'descripcion', 'observaciones']
-    __add_fields__ = {'codigo_tipo': None,
-                      'version_actual': None, 'estado': None,
-                      'complejidad': None,
-                      'check': None}
-    __xml_fields__ = ['Check']
-    
-    __default_column_width__ = '15em'
-    __column_widths__ = { '__actions__': "50em"}
-    __field_order__ = ["codigo", "version_actual", "complejidad", 
-                       "codigo_tipo", "estado", "check"]
-    
-item_relacion_table = ItemRelacionTable(DBSession)
-
-    
-class ItemRelacionTableFiller(CustomTableFiller):
-    __model__ = Item
-    __add_fields__ = {'codigo_tipo': None,
-                      'version_actual': None, 'estado': None,
-                      'complejidad': None,
-                      'check': None}
-    
-    def version_actual(self, obj, **kw):
-        p_item = PropiedadItem.por_id(obj.id_propiedad_item)
-        return p_item.version
-    
-    def estado(self, obj, **kw):
-        p_item = PropiedadItem.por_id(obj.id_propiedad_item)
-        return p_item.estado
-    
-    def codigo_tipo(self, obj, **kw):
-        ti = TipoItem.por_id(obj.id_tipo_item)
-        return ti.codigo
-    
-    def complejidad(self, obj, **kw):
-        p_item = PropiedadItem.por_id(obj.id_propiedad_item)
-        return p_item.complejidad
-    
-    def check(self, obj, **kw):
-        #id
-        checkbox = '<input type="checkbox" class="checkbox_tabla" id="' + str(obj.id_item) + '"/>'
-        return checkbox
-        
-#    def __actions__(self, obj):
-        
-       
-    def _do_get_provider_count_and_objs(self, id_item=None, tipo=None, **kw):
-        """
-        Recupera los ítems para los cuales tenemos algún permiso. y está o no
-        relacionado al campo relacionado.
-        Si el usuario se encuentra en una fase, retorna solo
-        los ítems que pertenecen a dicha fase.
-        """
-#        count, lista = super(ItemTableFiller, self).\
-#                            _do_get_provider_count_and_objs(**kw)
-        filtrados = []                    
-        if id_item:
-            item = Item.por_id(int(id_item))
-            
-            if (tipo == 'p-h'):
-                
-                items_fase_actual = DBSession.query(Item)\
-                .filter(and_(Item.id_propiedad_item == PropiedadItem.id_propiedad_item,\
-                Item.id_item != item.id_item, Item.id_fase == item.id_fase,
-                PropiedadItem.estado != u"Eliminado"))\
-                .all()
-                
-                for it in items_fase_actual:
-                    if (not it.esta_relacionado(id_item)):
-                        filtrados.append(it)           
-               
-            if (tipo == 'a-s'):
-                fase = Fase.por_id(item.id_fase)
-                items_fase_anterior = DBSession.query(Item)\
-                .filter(and_(Item.id_propiedad_item == PropiedadItem.id_propiedad_item,\
-                Item.id_fase == Fase.id_fase, Fase.id_proyecto == fase.id_proyecto, PropiedadItem.estado == u"Bloqueado", \
-                    Fase.posicion == fase.posicion - 1, fase.posicion != 1))\
-                .all()
-                
-                
-                for it in items_fase_anterior:
-                    if (not it.esta_relacionado(id_item)):
-                        filtrados.append(it)
-                        
-                
-        return len(filtrados), filtrados
-
-item_relacion_table_filler = ItemRelacionTableFiller(DBSession)
 
 
 class TipoItemField(CustomPropertySingleSelectField):
@@ -425,7 +328,6 @@ class ItemEditForm(EditableForm):
 
 item_edit_form = ItemEditForm(DBSession)
 
-
 class ItemEditFiller(EditFormFiller):
     __model__ = Item
     __add_fields__ = {"complejidad": None, "prioridad": None,
@@ -450,31 +352,6 @@ class ItemEditFiller(EditFormFiller):
 item_edit_filler = ItemEditFiller(DBSession)
 
 
-#tabla para eliminar relacion de ítem
-class RelacionItemTable(RelacionTable):
-    __add_fields__ = {'item_relacionado': None,
-                       'check': None, 'estado': None}
-    __omit_fields__ = ['id_relacion', 'id_anterior', 'id_posterior',
-                       '__actions__']
-    __headers__ = {'tipo': u'Tipo', 'codigo': u'Código',
-                   'item_relacionado': u"Ítem Relacionado",
-                   'estado': u'Estado', 'check': u"Check"}
-    
-    __field_order__ = ["codigo", 'item_relacionado', 'tipo', "estado", "check"]
-    __xml_fields__ = ['Check', 'Estado']
-    
-    
-#filler para relacionar/eliminar relacion de ítem
-class RelacionItemTableFiller(RelacionTableFiller):
-    __add_fields__ = {'item_relacionado': None, 'check': None,
-                      'estado': None}
-    
-    def check(self, obj, **kw):
-        checkbox = '<input type="checkbox" class="checkbox_tabla" id="' + str(obj.id_relacion) + '"/>'
-        return checkbox
-
-
-
 class ItemController(CrudRestController):
     """Controlador de Items"""
 
@@ -486,10 +363,12 @@ class ItemController(CrudRestController):
     tmp_action = "./"
     
     #{Subcontroladores
+    
     adjuntos = AdjuntoController(DBSession)
     versiones = VersionController(DBSession)
     atributos = AtributoItemController(DBSession)
-    relaciones = RelacionController(DBSession)
+    relaciones_ph = RelacionController(DBSession)
+    relaciones_as = RelacionController(DBSession)
     
     #{ Modificadores
     model = Item
@@ -518,17 +397,18 @@ class ItemController(CrudRestController):
         Retorna una página HTML si no se especifica JSON
         """
         puede_crear = False
-        id_fase = UrlParser.parse_id(request.url, "fases")
+        id_fase = UrlParser.parse_id(request.url, "fases_desarrollo")
         titulo = self.title
-        atras = "/items/"
+        atras = "../"
         if id_fase: 
             # desde el controlador de fases
             puede_crear = PoseePermiso("crear item", id_fase=id_fase).is_met(request.environ)
-            atras = "/fases/%d/edit/" % id_fase
+            #atras = "/fases/%d/edit/" % id_fase
             fase = Fase.por_id(id_fase)
             if puede_crear:
                 puede_crear = fase.puede_crear_item()
             titulo = u"Ítems de Fase: %s" % fase.nombre
+            
         items = self.table_filler.get_value(id_fase=id_fase, **kw)
         tmpl_context.widget = self.table
         return dict(lista_elementos=items, 
@@ -553,7 +433,7 @@ class ItemController(CrudRestController):
         devolver el resultado esperado.
         """
         puede_crear = False
-        id_fase = UrlParser.parse_id(request.url, "fases")
+        id_fase = UrlParser.parse_id(request.url, "fases_desarrollo")
         titulo = self.title
         if id_fase: 
             # desde el controlador de fases
@@ -577,18 +457,48 @@ class ItemController(CrudRestController):
                     puede_crear=puede_crear,
                     comboboxes=self.comboboxes,
                     opciones=self.opciones,
-                    atras='../'
+                    atras='../../'
                     )
-    
-    @expose("lpm.templates.item.get_one")
+                    
+    @with_trailing_slash
+    @expose("lpm.templates.item.get_all")
     def get_one(self, *args, **kw):
         #id_fase = UrlParser.parse_id(request.url, "fases")
         id_item = UrlParser.parse_id(request.url, "items")
-        atras = "./"
+        atras = "../"
         #if UrlParser.parse_nombre(request.url, "fases"):
         #    atras = "../../edit"
         item = Item.por_id(id_item)
         
+        puede_crear = False
+        id_fase = UrlParser.parse_id(request.url, "fases_desarrollo")
+
+        atras = "../"
+        if id_fase: 
+            # desde el controlador de fases
+            puede_crear = PoseePermiso("crear item", id_fase=id_fase).is_met(request.environ)
+            #atras = "/fases/%d/edit/" % id_fase
+            fase = Fase.por_id(id_fase)
+            if puede_crear:
+                puede_crear = fase.puede_crear_item()
+            
+        titulo = u"Ítem: %s" % item.codigo
+            
+        items = self.table_filler.get_value(id_item=item.id_item, **kw)
+        tmpl_context.widget = self.table
+        return dict(lista_elementos=items, 
+                    page=titulo,
+                    atras=atras,
+                    titulo=titulo, 
+                    modelo=self.model.__name__, 
+                    columnas=self.columnas,
+                    opciones=self.opciones,
+                    url_action="../",
+                    puede_crear=puede_crear,
+                    comboboxes=self.comboboxes
+                    )
+        
+        '''
         class get_one_edit_form(ItemEditForm):
             prioridad = TextField("prioridad")
             complejidad = TextField("complejidad")
@@ -612,17 +522,19 @@ class ItemController(CrudRestController):
                     relaciones=relaciones,
                     atras=atras
                     )
-
+        '''
+        
     @without_trailing_slash
     @expose('lpm.templates.item.new')
     def new(self, *args, **kw):
         """Display a page to show a new record."""
-        if not UrlParser.parse_nombre(request.url, "fases"):
-            redirect("./")
+        #if not UrlParser.parse_nombre(request.url, "fases"):
+        #    redirect("./")
+        
         tmpl_context.widget = self.new_form
         return dict(value=kw,
                     page=u"Nuevo Ítem", 
-                    atras='./')
+                    atras='../')
     
     @expose()
     def post_delete(self, id_item):
@@ -641,7 +553,7 @@ class ItemController(CrudRestController):
     def post(self, *args, **kw):
         if "sprox_id" in kw:
             del kw["sprox_id"]
-        id_fase = UrlParser.parse_id(request.url, "fases")
+        id_fase = UrlParser.parse_id(request.url, "fases_desarrollo")
         id_tipo = int(kw["id_tipo_item"])
         user = Usuario.by_user_name(request.credentials["repoze.what.userid"])
         del kw["id_tipo_item"]
@@ -656,9 +568,9 @@ class ItemController(CrudRestController):
         
         #id_fase = UrlParser.parse_id(request.url, "fases")
         id_item = UrlParser.parse_id(request.url, "items")
-        atras = "../"
-        if UrlParser.parse_nombre(request.url, "fases"):
-            atras = "../../edit"
+        atras = "./"
+        #if UrlParser.parse_nombre(request.url, "fases"):
+        #   atras = "../../edit"
         item = Item.por_id(id_item)
         puede_modificar = PoseePermiso('modificar item', 
                                        id_fase=item.id_fase).is_met(request.environ)
@@ -666,22 +578,22 @@ class ItemController(CrudRestController):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect("./")
         tmpl_context.widget = self.edit_form
-        tmpl_context.tabla_atributos = self.atributos.table
-        atributos = self.atributos.table_filler \
-                        .get_value(id_version=item.id_propiedad_item)
+        #tmpl_context.tabla_atributos = self.atributos.table
+        #atributos = self.atributos.table_filler \
+        #                .get_value(id_version=item.id_propiedad_item)
         
-        tmpl_context.tabla_relaciones = RelacionItemTable(DBSession)
-        rel_table_filler = RelacionItemTableFiller(DBSession)
-        relaciones = rel_table_filler.get_value(id_version=item.id_propiedad_item)
+        #tmpl_context.tabla_relaciones = RelacionItemTable(DBSession)
+        #rel_table_filler = RelacionItemTableFiller(DBSession)
+        #relaciones = rel_table_filler.get_value(id_version=item.id_propiedad_item)
         value = self.edit_filler.get_value(values={'id_item': id_item})
         page = u"Modificar Ítem: %s" % value["codigo"]
 
         return dict(value=value,
                     page=page,
-                    id=str(id_item),
-                    puede_relacionar=puede_modificar,
-                    atributos=atributos,
-                    relaciones=relaciones,
+                    #id=str(id_item),
+                    #puede_relacionar=puede_modificar,
+                    #atributos=atributos,
+                    #relaciones=relaciones,
                     atras=atras
                     )
         
@@ -696,10 +608,10 @@ class ItemController(CrudRestController):
             del kw["sprox_id"]
         kw["complejidad"] = int(kw["complejidad"])
         kw["prioridad"] = int(kw["prioridad"])
-        atras = "../"
+        atras = "./"
         id_item = UrlParser.parse_id(request.url, "items")
-        if UrlParser.parse_nombre(request.url, "fases"):
-            atras = "../../edit"
+        #if UrlParser.parse_nombre(request.url, "fases"):
+        #    atras = "../../edit"
         item = Item.por_id(id_item)
         user_name = request.credentials["repoze.what.userid"]
         user = Usuario.by_user_name(user_name)
@@ -709,114 +621,7 @@ class ItemController(CrudRestController):
             flash(unicode(err), "warning")
 
         redirect(atras)
-        
-    
-    @expose('lpm.templates.item.relaciones')
-    def relacionar_item(self, *args, **kw):
-        #se lo llama desde la pagina edit del item, al hacer click en el
-        #boton Relacionar
-        id = args[0]
-        id_item = int(id)
-        item = Item.por_id(id_item)
-        page = u"Relacionar con ítem: {codigo}".format(codigo=item.codigo)
-        tmpl_context.tabla_item_fase_actual = item_relacion_table
-        tmpl_context.tabla_item_fase_anterior = item_relacion_table
-        anteriores = item_relacion_table_filler.get_value(id_item=id_item,\
-                                                          tipo='a-s', **kw)
-                                                        
-        actuales = item_relacion_table_filler.get_value(id_item=id_item,\
-                                                          tipo='p-h', **kw)
-        atras = "../%d/edit" % id_item
             
-        return dict(anteriores=anteriores, 
-                    actuales=actuales,
-                    page=page, 
-                    id=id, 
-                    atras=atras,
-                    )
-    
-    @expose()
-    def relacionar_as(self, *args, **kw):
-        #recibe los elementos seleccionados en relacionar_item
-        #relaciona, y retorna. Ajax
-        id = args[0]
-        id_item = int(id)
-        item = Item.por_id(id_item)
-        p_item = PropiedadItem.por_id(item.id_propiedad_item)
-        
-        if kw:
-            ids = []
-            for k, pk in kw.items():
-                if not k.isalnum():
-                    continue
-                ids.append(int(pk))
-        
-        p_item.agregar_relaciones(ids, 'a-s')
-        
-        usuario = Usuario.by_user_name(request.identity['repoze.who.userid'])
-        item.guardar_historial(u"relacionar-AS", usuario)
-        transaction.commit()    
-        #return "/items/%d/edit" % id_item
-        return '../'
-        
-    @expose()
-    def relacionar_ph(self, *args, **kw):
-        #recibe los elementos seleccionados en relacionar_item
-        #relaciona, y retorna. Ajax
-        id = args[0]
-        id_item = int(id)
-        item = Item.por_id(id_item)
-        p_item = PropiedadItem.por_id(item.id_propiedad_item)
-        
-        if kw:
-            ids = []
-            for k, pk in kw.items():
-                if not k.isalnum():
-                    continue
-                ids.append(int(pk))
-        
-            retorno, creado = p_item.agregar_relaciones(ids, 'p-h')
-        
-            if (creado):#si por lo menos se pudo crear una relacion se guarda en el 
-                        #historial
-                usuario = Usuario.by_user_name(request.identity['repoze.who.userid'])
-                item.guardar_historial(u"relacionar-PH", usuario)
-        
-            
-            if (retorno == u"" and creado):
-                flash("Relacionado exiosamente") 
-            elif (retorno != u""):
-                mensaje = u"No se pudo crear la relación con %s" % retorno
-                flash(retorno, "warning")
-
-            transaction.commit()    
-            #return "/items/%d/edit" % id_item
-        return '../'
-    
-    @expose()
-    def eliminar_relaciones(self, *args, **kw):
-        #se lo llama desde la pagina de edit, al marcar las relaciones
-        #y luego seleccionar Eliminar. Ajax.
-        id = args[0]
-        id_item = int(id)
-        item = Item.por_id(id_item)
-        p_item = PropiedadItem.por_id(item.id_propiedad_item)
-        print kw
-        if kw:
-            ids = []
-            for k, pk in kw.items():
-                if not k.isalnum():
-                    continue
-                ids.append(int(pk))
-
-            p_item.eliminar_relaciones(ids)
-            
-            usuario = Usuario.by_user_name(request.identity['repoze.who.userid'])
-            item.guardar_historial(u"eliminar-relaciones", usuario)
-        transaction.commit()
-        return '../%s/edit' % id
-
-    
     @expose('lpm.templates.item.impacto')
     def calcular_impacto(self, *args, **kw):
         """Calcula el impacto"""
@@ -824,16 +629,16 @@ class ItemController(CrudRestController):
         id_item = int(id)
         item = Item.por_id(id_item)
         page = "Calculo de impacto de item: %s" % item.codigo
-        atras = "../"
-        if UrlParser.parse_nombre(request.url, "fases"):
-            atras = "../%s/edit" % id
+        atras = "./%d" % id
+        #if UrlParser.parse_nombre(request.url, "fases"):
+        #    atras = "../%s/edit" % id
             
         item = Item.por_id(id_item)
         sumatoria, grafo = item.calcular_impacto()
-        id_proyecto = UrlParser.parse_id(request.url, "proyectos")
+        id_proyecto = UrlParser.parse_id(request.url, "proyectos_desarrollo")
         
-        fase = Fase.por_id(item.id_fase)
-        proy = Proyecto.por_id(fase.id_proyecto)
+        #fase = Fase.por_id(item.id_fase)
+        proy = Proyecto.por_id(id_proyecto)
         impacto = (float(sumatoria)/float(proy.complejidad_total)) * 100
 
         return dict(atras=atras,
@@ -857,7 +662,7 @@ class ItemController(CrudRestController):
             flash(u"Ítem Revivido")
         except RevivirItemError, err:
             flash(unicode(err), 'warning')
-        redirect("../")
+        redirect("./%d" % item.id_item)
         
     @expose()
     def aprobar(self, *args, **kw):
@@ -871,7 +676,7 @@ class ItemController(CrudRestController):
             flash(u"Ítem Aprobado")
         except CondicionAprobarError, err:
             flash(unicode(err), 'warning')
-        redirect("../")
+        redirect("./%d" % item.id_item)
         
     @expose()
     def desaprobar(self, *args, **kw):
@@ -885,5 +690,5 @@ class ItemController(CrudRestController):
             flash(u"Ítem Desaprobado")
         except DesAprobarItemError, err:
             flash(unicode(err), 'warning')
-        redirect("../")
+        redirect("./%d" % item.id_item)
     #}

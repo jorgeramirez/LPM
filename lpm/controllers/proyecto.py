@@ -404,7 +404,7 @@ class ProyectoController(CrudRestController):
             proyecto = []
             
         tmpl_context.widget = self.table
-        atras = '/'
+        atras = '../'
         return dict(lista_elementos=proyecto,
                     page=self.title,
                     titulo=self.title, 

@@ -11,9 +11,27 @@
     <div style="padding-left: 95px;">
     <table cellspacing="0" cellpadding="2" border="0">
     <tbody>
-        <tr>${buscar()}</tr>
+        <py:if test="puede_relacionar">
         <tr>
             <td>
+                <a class="link_boton" href="${tg.url('./relacionar_items/')}">
+                    <input id="nueva_relacion" style="margin-bottom:10px;" class="boton" type="button" value="Nueva Relacion"/>
+                </a>
+            </td>
+            <td>             
+                <form id="form_eliminar_relaciones" method="POST" action="${tg.url('./eliminar_relaciones/')}">
+                <input id="eliminar_relacion" class="boton" type="submit" value="Eliminar Seleccionadas" style="margin-top: 0px; width: 160px; margin-left:-600px;"/>
+                </form>            
+            </td>
+        </tr>
+        </py:if>
+        <tr>
+            <td colspan="2">
+                ${buscar()}
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
                 <span style="font-size: 12;" py:if="lista_elementos" py:content="tmpl_context.paginators.lista_elementos.pager(link='./')"/>
                 <div class="crud_table" style="height:65%; width:700px; margin-top: 5px;">
                     ${tmpl_context.widget(value=lista_elementos)}
@@ -21,7 +39,9 @@
             </td>
         </tr>
         <tr>
-            <div style="clear:both;"></div>
+            <td colspan="2">
+                <div style="clear:both;"></div>
+            </td>
         </tr>
     </tbody>
     </table>  
