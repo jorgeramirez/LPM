@@ -461,7 +461,7 @@ class Proyecto(DeclarativeBase):
         self.tipos_de_item.append(tipo)
         DBSession.add(tipo)
         DBSession.flush()
-        tipo.codigo = TipoItem.generar_codigo(tipo)
+        tipo.codigo = TipoItem.generar_codigo(tipo, kw.get("siglas", None))
         return tipo
     
     def eliminar_tipo_item(self, id):
@@ -539,17 +539,23 @@ class TipoItem(DeclarativeBase):
     #}
     
     @classmethod
-    def generar_codigo(cls, tipo):
+    def generar_codigo(cls, tipo, siglas_u):
         """
         Genera el codigo para el elemento pasado como parametro
-        """
-        words = tipo.nombre.lower().split()
-        while words.count("de"):
-            words.remove("de")
-        siglas = u""
-        for w in words:
-            siglas += w[0]
         
+        @param tipo: el tipo de item
+        @param siglas_u: las siglas ingresadas por el usuario.
+        """
+        if not siglas_u:
+            words = tipo.nombre.lower().split()
+            while words.count("de"):
+                words.remove("de")
+            siglas = u""
+            for w in words:
+                siglas += w[0]
+        else:
+            siglas = siglas_u.replace(" ", "").lower()
+
         #comprobar que las siglas sean únicas.
         query = DBSession.query(TipoItem).filter(TipoItem.codigo.like(siglas + "%"))
         if query.count():

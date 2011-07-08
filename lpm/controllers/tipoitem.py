@@ -239,13 +239,15 @@ class TipoItemAddForm(AddRecordForm):
     __omit_fields__ = ['id_tipo_item', 'id_proyecto', 'codigo',
                        'hijos', 'atributos', 'items', 'roles', 'id_fase']
     __check_if_unique__ = True
-    __field_order__ = ['nombre', 'descripcion', 'id_padre', 'id_importado',
-                       'mezclar']
+    __field_order__ = ['nombre', 'siglas', 'descripcion', 'id_padre', 
+                       'id_importado', 'mezclar']
     __field_attrs__ = {'descripcion' : {'row': '1'},
                        'nombre': { 'maxlength' : '50'}
                        
                       }
+    __add_fields__ = {"siglas": None}
     __require_fields__ = ['nombre', 'id_padre']
+    siglas = TextField("siglas", label_text="Siglas")
     id_padre = TipoPadreField("id_padre", accion="new", label_text="Tipo Padre")
     id_importado = TipoImportadoField("id_importado", accion="new", label_text="Importar De")
     descripcion = TextArea
@@ -378,7 +380,7 @@ class TipoItemController(CrudRestController):
 
         tmpl_context.widget = self.edit_form
         value['_method'] = 'PUT'
-        page = "Tipo Item {nombre}".format(nombre=value["nombre"])
+        page = "Tipo Item: {nombre}".format(nombre=value["nombre"])
         return dict(value=value, 
                     page=page, 
                     atras=url_action, 
