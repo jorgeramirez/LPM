@@ -22,8 +22,10 @@ from lpm.lib.authorization import PoseePermiso, AlgunPermiso
 from lpm.lib.util import UrlParser
 from lpm.controllers.rol import (RolTable as RolRolTable,
                                      RolTableFiller as RolRolTableFiller)
-
-from lpm.controllers.historialitem import HistorialItemController
+from lpm.controllers.usuario_roles_sys import \
+                                    (UsuarioRolesAsignadosController,
+                                     UsuarioRolesDesasignadosController)
+#from lpm.controllers.historialitem import HistorialItemController
 
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller
@@ -69,7 +71,7 @@ class UsuarioTableFiller(CustomTableFiller):
     def __actions__(self, obj):
         """Links de acciones para un registro dado"""
 
-        clase = 'actions'
+        clase = 'actions_fase'
         value = "<div>"
 
         if PoseePermiso('modificar usuario').is_met(request.environ):
@@ -77,14 +79,29 @@ class UsuarioTableFiller(CustomTableFiller):
                         '<a href="/usuarios/'+ str(obj.id_usuario) +'/edit" ' + \
                         'class="' + clase + '">Modificar</a>' + \
                      '</div><br />'
+                     
+        if PoseePermiso('asignar-desasignar rol').is_met(request.environ):
+            value += '<div>' + \
+                        '<a href="./' + str(obj.id_usuario) + \
+                                '/roles_sis_asignados" ' + \
+                        'class="' + clase + '">Roles Asig.</a>' + \
+                     '</div><br />'
+                     
+            value += '<div>' + \
+                        '<a href="./' + str(obj.id_usuario) + \
+                                '/roles_sis_desasignados" ' + \
+                        'class="' + clase + '">Roles Desa.</a>' + \
+                     '</div><br />'  
+
         if PoseePermiso('eliminar usuario').is_met(request.environ):
             value += '<div><form method="POST" action="' + str(obj.id_usuario) + '" class="button-to">'+\
                      '<input type="hidden" name="_method" value="DELETE" />' +\
-                     '<input onclick="return confirm(\'Está seguro?\');" value="Delete" type="submit" '+\
+                     '<input onclick="return confirm(\'Está seguro?\');" value="Eliminar" type="submit" '+\
                      'style="background-color: transparent; float:left; border:0; color: #286571;'+\
-                     'display: inline; margin: 0; padding: 0;" class="' + clase + '"/>'+\
+                     'display: inline; margin: 0; padding: 0; margin-left:-3px;" class="' + clase + '"/>'+\
                      '</form></div><br />'
-
+     
+    
         value += '</div>'
         return value
         
@@ -147,167 +164,6 @@ class UsuarioEditFiller(EditFormFiller):
 usuario_edit_filler = UsuarioEditFiller(DBSession)
 
 
-#tablas para la asignación/desasignación de roles
-'''
-class RolTable(TableBase):
-    __model__ = Rol
-    __headers__ = {'nombre_rol' : u'Nombre de Rol',
-                   'codigo' : u"Código", 'tipo' : u'Tipo',
-                   'proyecto': u'Proyecto', 'fase': u"Fase", 
-                   'tipo_item': u"Tipo de Ítem", 'check' : u'Check'
-                  }
-    __omit_fields__ = ['id_rol', 'permisos', 'usuarios',
-                       'id_proyecto', 'id_fase', 'id_tipo_item',
-                       'descripcion', 'creado']
-    __default_column_width__ = '15em'
-    
-    __add_fields__ = {'proyecto':None, 'fase': None,
-                      'tipo_item': None, 'check' : None}
-    __xml_fields__ = ['Check']
-    __column_widths__ = {'nombre_rol': "35em",
-                         'codigo': "35em",
-                         '__actions__' : "50em"
-                        }
-    __field_order__ = ["nombre_rol", "codigo", "tipo", "proyecto", "fase",
-                       "tipo_item", "check"]
-
-    
-rol_user_table = RolTable(DBSession)
-
-class RolTableFiller(TableFiller):
-    __model__ = Rol
-    __add_fields__ = {'proyecto':None, 'fase': None,
-                      'tipo_item': None, 'check' : None}
-
-    def check(self, obj, **kw):
-        #id
-        checkbox = '<input type="checkbox" class="checkbox_tabla" id="' + str(obj.id_rol) + '"/>'
-        return checkbox
-    
-    def proyecto(self, obj, **kw):
-        if obj.id_proyecto:
-            proy = Proyecto.por_id(obj.id_proyecto)
-            return proy.nombre
-        else:
-            return u"---------"
-
-    def fase(self, obj, **kw):
-        if obj.id_fase:
-            fase = Fase.por_id(obj.id_fase)
-            return fase.nombre
-        else:
-            return u"---------"
-            
-    def tipo_item(self, obj, **kw):
-        if obj.id_tipo_item:
-            tipo_item = TipoItem.por_id(obj.id_tipo_item)
-            return tipo_item.codigo
-        else:
-            return u"---------"
-    
-    def _do_get_provider_count_and_objs(self, usuario=None, asignados=True, 
-                                        id_proyecto=None, id_fase=None,
-                                        id_tipo_item=None, **kw):
-
-        if (not asignados):
-            roles = Rol.roles_desasignados(usuario.id_usuario, id_proyecto,
-                                           id_fase, id_tipo_item)
-        elif (asignados):
-            roles = usuario.roles
-            if id_proyecto or id_fase or id_tipo_item:
-                roles = []
-                for r in usuario.roles:
-                    if id_proyecto and r.id_proyecto != id_proyecto:
-                        continue
-                    elif id_fase and r.id_fase != id_fase:
-                        continue
-                    elif id_tipo_item and r.id_tipo_item != id_tipo_item:
-                        continue
-                    roles.append(r)
-
-        return len(roles), roles
-
-    def __actions__(self, obj):
-        """Links de acciones para un registro dado"""
-
-        value = '<div>'
-        clase = 'actions'
-        contexto = ""
-        url_cont = ""
-        
-        #if (obj.tipo == "Sistema"):
-        #    url_cont = "/roles/"
-        #else:
-        #    url_cont = "/rolesplantilla/"
-        #    tipo = obj.tipo.lower()
-        #    if (tipo.find(u"proyecto") >= 0):
-        #        contexto = "proyecto"
-        #    elif (tipo.find(u"fase") >= 0):
-        #        contexto = "fase"
-        #    else:
-        #        contexto = "ti"
-
-        perm_mod = None
-        perm_del = None
-        if (obj.tipo == "Sistema"):
-            url_cont = "/roles/"
-            perm_mod = PoseePermiso('modificar rol')
-            perm_del = PoseePermiso('eliminar rol')
-        else:
-            url_cont = "/rolesplantilla/"
-            tipo = obj.tipo.lower()
-            if (tipo.find(u"proyecto") >= 0):
-                contexto = "proyecto"
-                if tipo == "proyecto":
-                    perm_mod = PoseePermiso('modificar rol', 
-                                            id_proyecto=obj.id_proyecto)
-                    perm_del = PoseePermiso('eliminar rol',
-                                            id_proyecto=obj.id_proyecto)
-                else:
-                    perm_mod = PoseePermiso('modificar rol')
-                    perm_del = PoseePermiso('eliminar rol')
-            elif (tipo.find(u"fase") >= 0):
-                contexto = "fase"
-                if tipo == "fase":
-                    perm_mod = PoseePermiso('modificar rol', 
-                                            id_fase=obj.id_fase)
-                    perm_del = PoseePermiso('eliminar rol',
-                                            id_fase=obj.id_fase)
-                else:
-                    perm_mod = PoseePermiso('modificar rol')
-                    perm_del = PoseePermiso('eliminar rol')
-            else:
-                contexto = "ti"
-                if tipo.find("plantilla") >= 0:
-                    perm_mod = PoseePermiso('modificar rol')
-                    perm_del = PoseePermiso('eliminar rol')
-                else:
-                    perm_mod = PoseePermiso('modificar rol', 
-                                            id_tipo_item=obj.id_tipo_item)
-                    perm_del = PoseePermiso('eliminar rol',
-                                            id_tipo_item=obj.id_tipo_item)
-
-
-        #if PoseePermiso('modificar rol').is_met(request.environ):
-        if perm_mod.is_met(request.environ):
-            value += '<div>' + \
-                        '<a href="' +  url_cont + str(obj.id_rol) + "/edit?contexto="+  \
-                        contexto + '" class="' + clase + '">Modificar</a>' + \
-                     '</div><br />'
-        #if PoseePermiso('eliminar rol').is_met(request.environ):
-        if perm_del.is_met(request.environ):
-            value += '<div><form method="POST" action="/roles/' + str(obj.id_rol) + '" class="button-to">'+\
-                     '<input type="hidden" name="_method" value="DELETE" />' +\
-                     '<input onclick="return confirm(\'Está seguro?\');" value="Delete" type="submit" '+\
-                     'style="background-color: transparent; float:left; border:0; color: #286571;'+\
-                     'display: inline; margin: 0; padding: 0;" class="' + clase + '"/>'+\
-                     '</form></div><br />'
-        value += '</div>'
-        return value
-        
-roles_usuario_filler = RolTableFiller(DBSession)
-'''
-
 class UsuarioController(CrudRestController):
     """Controlador de usuarios"""
     #{ Variables
@@ -317,6 +173,8 @@ class UsuarioController(CrudRestController):
 
     # No permitir usuarios anonimos (?)
     allow_only = not_anonymous(u"El usuario debe haber iniciado sesión")
+    roles_sis_asignados = UsuarioRolesAsignadosController()
+    roles_sis_desasignados = UsuarioRolesDesasignadosController()
 
     #{ Modificadores
     model = Usuario
