@@ -145,9 +145,9 @@ class RolTableFiller(CustomTableFiller):
         if perm_del.is_met(request.environ):
             value += '<div><form method="POST" action="./' + str(obj.id_rol) + '" class="button-to">'+\
                      '<input type="hidden" name="_method" value="DELETE" />' +\
-                     '<input onclick="return confirm(\'Está seguro?\');" value="Delete" type="submit" '+\
+                     '<input onclick="return confirm(\'Está seguro?\');" value="Eliminar" type="submit" '+\
                      'style="background-color: transparent; float:left; border:0; color: #286571;'+\
-                     'display: inline; margin: 0; padding: 0;" class="' + clase + '"/>'+\
+                     'display: inline; margin: 0; padding: 0; margin-left:-3px;" class="' + clase + '"/>'+\
                      '</form></div><br />'
         value += '</div>'
         return value
@@ -199,9 +199,9 @@ class RolPlantillaTableFiller(TableFiller):
         if perm_del.is_met(request.environ):
             value += '<div><form method="POST" action="./' + str(obj.id_rol) + '" class="button-to">'+\
                      '<input type="hidden" name="_method" value="DELETE" />' +\
-                     '<input onclick="return confirm(\'Está seguro?\');" value="Delete" type="submit" '+\
+                     '<input onclick="return confirm(\'Está seguro?\');" value="Eliminar" type="submit" '+\
                      'style="background-color: transparent; float:left; border:0; color: #286571;'+\
-                     'display: inline; margin: 0; padding: 0;" class="' + clase + '"/>'+\
+                     'display: inline; margin: 0; padding: 0; margin-left:-3px;" class="' + clase + '"/>'+\
                      '</form></div><br />'
         value += '</div>'
         return value
@@ -539,11 +539,8 @@ class RolController(CrudRestController):
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')
             redirect(self.action)
-        id_rol = int(args[0][0])
-        if kw.has_key("id_rol"):
-            del kw["id_rol"]
 
-        Rol.actualizar_rol(id_rol, **kw)
+        Rol.actualizar_rol(**kw)
 
         redirect(self.action)
 
