@@ -1,3 +1,43 @@
+# -*- coding: utf-8 -*-
+"""
+Módulo que define el controlador de ítems
+a relacionar
+
+@authors:
+    - U{Carlos Bellino<mailto:carlosbellino@gmail.com>}
+    - U{Nahuel Hernández<mailto:nahuel.11990@gmail.com>}
+    - U{Jorge Ramírez<mailto:jorgeramirez1990@gmail.com>}
+
+@since: 1.0
+"""
+from tgext.crud import CrudRestController
+from tg.decorators import (paginate, expose, with_trailing_slash,
+                           without_trailing_slash)
+from tg import redirect, request, validate, flash
+
+from lpm.model import DBSession, Item, TipoItem, Fase, PropiedadItem, Usuario, Relacion, Proyecto
+from lpm.model.excepciones import *
+from lpm.lib.sproxcustom import (CustomTableFiller,
+                                 CustomPropertySingleSelectField)
+from lpm.lib.authorization import PoseePermiso, AlgunPermiso
+from lpm.lib.util import UrlParser
+
+from sprox.tablebase import TableBase
+from sprox.fillerbase import TableFiller, EditFormFiller
+from sprox.fillerbase import EditFormFiller
+from sprox.formbase import AddRecordForm, EditableForm
+
+from tw.forms.fields import TextField, TextArea
+
+from repoze.what.predicates import not_anonymous
+
+from sqlalchemy import and_, or_
+import pylons
+from pylons import tmpl_context
+
+import transaction
+
+
 class ItemRelacionTable(TableBase):
     __model__ = Item
     __headers__ = { 'codigo': u'Código',

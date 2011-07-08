@@ -19,6 +19,7 @@ from lpm.model import (DBSession, Relacion, RelacionPorItem, Item,
                        PropiedadItem)
 from lpm.lib.sproxcustom import (CustomTableFiller,
                                  CustomPropertySingleSelectField)
+from lpm.controllers.items_relacion import ItemRelacionController
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
 from lpm.lib.util import UrlParser
 
