@@ -205,7 +205,7 @@ class NoMiembrosProyectoController(RestController):
             
             for u in usuarios:
                 u.roles.append(rol)
-                rol.usuarios.append(u)
+                #rol.usuarios.append(u)
    
         transaction.commit()
 

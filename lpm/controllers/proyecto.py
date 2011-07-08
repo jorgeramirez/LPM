@@ -126,8 +126,8 @@ class ProyectoTableFiller(CustomTableFiller):
 
         if PoseePermiso('eliminar proyecto',
                         id_proyecto=obj.id_proyecto).is_met(request.environ):
-            value += '<div><form method="POST" action="' + str(obj.id_proyecto) + '" class="button-to">'+\
-                     '<input type="hidden" name="_method" value="DELETE" />' +\
+            url = "/proyectos/post_delete/%d" % obj.id_proyecto
+            value += '<div><form method="POST" action="' + url + '" class="button-to">'+\
                      '<input onclick="return confirm(\'¿Está seguro?\');" value="Eliminar" type="submit" '+\
                      'style="background-color: transparent; float:left; border:0; color: #286571;'+\
                      'display: inline; margin: 0; padding: 0; margin-left: -3px;" class="' + clase + '"/>'+\
@@ -274,6 +274,11 @@ class ProyectoController(CrudRestController):
             flash("No puedes iniciar el proyecto", "warning")
             
         proy = Proyecto.por_id(id_proyecto)
+        if not proy.obtener_lider():
+            msg = "No puedes iniciar el proyecto. Debes primero asignarle "
+            msg += "un lider"
+            flash(msg, "warning")
+            redirect("/proyectos/")
         proy.iniciar_proyecto()
         flash("El proyecto se ha iniciado correctamente")
         redirect("/proyectos/")

@@ -289,11 +289,30 @@ class RolesAsignadosController(RestController):
             id_user = UrlParser.parse_id(request.url, "miembros")
             user = Usuario.por_id(id_user)
             c = 0
+            pos_l = 0
+            pos_m = 0
             while c < len(user.roles):
-                if user.roles[c].id_rol in pks:
+                r = user.roles[c]
+                if r.id_rol in pks:
+                    if r.nombre_rol == "Lider de Proyecto" and \
+                       len(r.usuarios) == 1:
+                        msg = "No puedes eliminar el rol {nr} porque "
+                        msg += "existe un solo {nr}."
+                        flash(msg.format(nr=r.nombre_rol), "warning")
+                        return "./"
+                    
+                    if r.nombre_rol == "Miembro de Proyecto":
+                        msg = "No puedes eliminar el rol {nr}. Si deseas "
+                        msg += "eliminar al usuario, debes hacerlo en la "
+                        msg += "pagina de Miembros del Proyecto."
+                        flash(msg.format(nr=r.nombre_rol), "warning")
+                        DBSession.rollback()
+                        return "./"
+
                     del user.roles[c]
                 else:
                     c += 1
+
             transaction.commit()
         
         flash("Roles Desasignados correctamente")
@@ -512,11 +531,7 @@ class MiembrosProyectoController(RestController):
         Desasigna miembros del proyecto.
         """
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
-        
-        #recuperamos el rol miembro de proyecto
-        #rol = DBSession.query(Rol) \
-        #               .filter(and_(Rol.id_proyecto == id_proyecto,
-        #                       Rol.nombre_rol == u"Miembro de Proyecto")).first()
+        url = "/proyectos/%d/miembros/" % id_proyecto
 
         transaction.begin()
         if kw:
@@ -532,8 +547,17 @@ class MiembrosProyectoController(RestController):
             for u in usuarios:
                 c = 0
                 while c < len(u.roles):
-                    if u.roles[c].id_proyecto == id_proyecto and \
-                       u.roles[c].tipo == "Proyecto":
+                    r = u.roles[c]
+                    if r.id_proyecto == id_proyecto and \
+                       r.tipo == "Proyecto":
+                        if r.nombre_rol == "Lider de Proyecto" and \
+                           len(r.usuarios) == 1:
+                            msg = "No puedes eliminar al usuario {nu} porque "
+                            msg += "es el {nr}"
+                            flash(msg.format(nu=u.nombre_usuario, 
+                                             nr=r.nombre_rol), "warning")
+                            transaction.commit()
+                            return url
                         del u.roles[c]
                     else:
                         c += 1
@@ -541,7 +565,7 @@ class MiembrosProyectoController(RestController):
         transaction.commit()
 
         flash("Usuarios removidos correctamente")
-        return "/proyectos/%d/miembros/" % id_proyecto
+        return url
     
     #}
 

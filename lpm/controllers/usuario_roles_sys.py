@@ -15,7 +15,7 @@ from tg.decorators import (paginate, expose, with_trailing_slash,
                            without_trailing_slash)
 from tg import redirect, request, require, flash, url, validate 
 
-from lpm.model import DBSession, Usuario, Proyecto, Rol
+from lpm.model import DBSession, Usuario, Rol
 from lpm.lib.sproxcustom import CustomTableFiller
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso, Miembro
 from lpm.lib.util import UrlParser
@@ -193,6 +193,15 @@ class UsuarioRolesAsignadosController(RestController):
             c = 0
             while c < len(user.roles):
                 if user.roles[c].id_rol in pks:
+                    r = user.roles[c]
+                    if r.nombre_rol == u"Administrador del Sistema" and \
+                       len(r.usuarios) == 1:
+                        #verificamos que haya mas de un administrador 
+                        #del sistema
+                        msg = "No puedes eliminar el rol {nr}. Solo existe "
+                        msg += "un {nr}, y es usted."
+                        flash(msg.format(nr=r.nombre_rol), "warning")
+                        return "./"
                     del user.roles[c]
                 else:
                     c += 1

@@ -497,7 +497,10 @@ class Proyecto(DeclarativeBase):
     
     def obtener_lider(self):
         """
-        Retorna el lider de este proyecto.
+        Retorna el líder de este proyecto. Debido a que el rol de líder
+        puede ser asignados a varios usuarios, el líder se considera al
+        primer usuario en recibir el rol de Líder de Proyecto para el proyecto
+        en cuestión.
         """
         rol = DBSession.query(Rol).filter(and_( \
                                    Rol.nombre_rol == "Lider de Proyecto", 
