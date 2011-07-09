@@ -87,11 +87,13 @@ class MiembrosTipoTableFiller(CustomTableFiller):
         count, lista = super(MiembrosTipoTableFiller,
                          self)._do_get_provider_count_and_objs(**kw)
         
-        filtrados = []
-        for u in lista:
-            if Miembro(id_tipo_item=id_tipo_item,
-                       id_usuario=u.id_usuario).is_met(request.environ):
-                filtrados.append(u)
+        #filtrados = []
+        filtrados = lista
+        #apti = AlgunPermiso(tipo="Tipo", id_tipo_item=id_tipo_item)
+        #for u in lista:
+        #    apti.id_usuario = u.id_usuario
+        #    if apti:
+        #        filtrados.append(u)
         return len(filtrados), filtrados
 
 miembros_tipo_table_filler = MiembrosTipoTableFiller(DBSession)
@@ -423,7 +425,8 @@ class MiembrosTipoController(RestController):
         id_tipo_item = UrlParser.parse_id(request.url, "tipositems")
         tipo = TipoItem.por_id(id_tipo_item)
 
-        titulo = u"Miembros del Tipo de Item: %s" % tipo.nombre
+        #titulo = u"Miembros del Tipo de Item: %s" % tipo.nombre
+        titulo = "Lista de Usuarios"
         puede_remover = PoseePermiso("asignar-desasignar rol", 
                                       id_tipo_item=id_tipo_item).is_met(request.environ)
         
@@ -455,8 +458,8 @@ class MiembrosTipoController(RestController):
         id_tipo_item = UrlParser.parse_id(request.url, "tipositems")
         tipo = TipoItem.por_id(id_tipo_item)
 
-        titulo = u"Miembros del Tipo de Ítem: %s" % tipo.nombre
-
+        #titulo = u"Miembros del Tipo de Ítem: %s" % tipo.nombre
+        titulo = "Lista de Usuarios"
         puede_remover = PoseePermiso("asignar-desasignar rol", 
                                         id_tipo_item=id_tipo_item).is_met(request.environ)
         tmpl_context.widget = miembros_tipo_table

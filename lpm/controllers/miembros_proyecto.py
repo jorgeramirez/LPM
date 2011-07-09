@@ -17,7 +17,7 @@ from tg import redirect, request, require, flash, url, validate
 
 from lpm.model import DBSession, Usuario, Proyecto, Rol
 from lpm.lib.sproxcustom import CustomTableFiller
-from lpm.lib.authorization import PoseePermiso, AlgunPermiso, Miembro
+from lpm.lib.authorization import PoseePermiso, AlgunPermiso
 from lpm.lib.util import UrlParser
 from lpm.controllers.usuario import UsuarioEditForm, UsuarioEditFiller
 
@@ -103,11 +103,13 @@ class MiembrosProyectoTableFiller(CustomTableFiller):
         count, lista = super(MiembrosProyectoTableFiller,
                          self)._do_get_provider_count_and_objs(**kw)
         
-        filtrados = []
-        for u in lista:
-            if Miembro(id_proyecto=id_proyecto, 
-                           id_usuario=u.id_usuario).is_met(request.environ):
-                filtrados.append(u)
+        #filtrados = []
+        filtrados = lista
+        #app = AlgunPermiso(tipo="Proyecto", id_proyecto=id_proyecto)
+        #for u in lista:
+        #    app.id_usuario = u.id_usuario
+        #    if app:
+        #        filtrados.append(u)
         return len(filtrados), filtrados
 
 miembros_proyecto_table_filler = MiembrosProyectoTableFiller(DBSession)
@@ -469,8 +471,8 @@ class MiembrosProyectoController(RestController):
 
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
         proy = Proyecto.por_id(id_proyecto)
-        titulo = "Miembros del Proyecto: %s" % proy.nombre
-
+        #titulo = "Miembros del Proyecto: %s" % proy.nombre
+        titulo = "Lista de Usuarios"
         puede_remover = PoseePermiso("asignar-desasignar rol", 
                                         id_proyecto=id_proyecto).is_met(request.environ)
 
@@ -499,7 +501,8 @@ class MiembrosProyectoController(RestController):
     def post_buscar(self, *args, **kw):
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
         proy = Proyecto.por_id(id_proyecto)
-        titulo = "Miembros del Proyecto: %s" % proy.nombre
+        #titulo = "Miembros del Proyecto: %s" % proy.nombre
+        titulo = "Lista de Usuarios"
         puede_remover = PoseePermiso("asignar-desasignar rol", 
                                         id_proyecto=id_proyecto).is_met(request.environ)
         tmpl_context.widget = miembros_proyecto_table

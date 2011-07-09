@@ -93,14 +93,16 @@ class TipoItemTableFiller(CustomTableFiller):
 
             value += '<div>' + \
                         '<a href="'+ url_cont + '/miembrostipo" ' + \
-                        'class="' + clase + '">Miembros</a>' + \
+                        'class="' + clase + '">Usuarios</a>' + \
                      '</div><br />'
 
+            '''
             value += '<div>' + \
                         '<a href="'+ url_cont + '/nomiembrostipo" ' + \
                         'class="' + clase + '">No miembros</a>' + \
                      '</div><br />'
-
+            '''
+            
             value += '<div>' + \
                         '<a href="'+ url_cont + '/rolestipo" ' + \
                         'class="' + clase + '">Roles de Tipo</a>' + \

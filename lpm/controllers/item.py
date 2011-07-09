@@ -181,7 +181,7 @@ class ItemTableFiller(CustomTableFiller):
                             '<a href="' + controller + 'revivir/' +str(obj.id_item) +'" ' + \
                             'class="' + clase + '">Revivir</a>' + \
                          '</div><br />'
-        value += '</div>'
+        
         
         #if PoseePermiso('eliminar-revivir item',
         #                id_fase=obj.id_fase).is_met(request.environ):
@@ -192,7 +192,7 @@ class ItemTableFiller(CustomTableFiller):
                          '<input type="hidden" name="_method" value="DELETE" />' +\
                          '<input onclick="return confirm(\'¿Está seguro?\');" value="Eliminar" type="submit" '+\
                          'style="background-color: transparent; float:left; border:0; color: #286571; display: inline;'+\
-                         'margin: 0; padding: 0;' + clase + '"/>'+\
+                         'margin: 0; padding: 0; margin-left:-3px;margin-top:-3px;' + clase + '"/>'+\
                          '</form></div><br />'
 
         controller = './'
@@ -220,7 +220,8 @@ class ItemTableFiller(CustomTableFiller):
                             '<a href="' + controller + 'calcular_impacto/' + str(obj.id_item) +'" ' + \
                             'class="' + clase + '">Calcular Impacto</a>' + \
                          '</div><br />'
-
+        
+        value += '</div>'
         return value
 
     def _do_get_provider_count_and_objs(self, id_fase=None, id_item=None, **kw):
@@ -266,6 +267,8 @@ class TipoItemField(CustomPropertySingleSelectField):
     def _my_update_params(self, d, nullable=False):
         options = []
         id_fase = UrlParser.parse_id(request.url, "fases")
+        if not id_fase:
+            id_fase = UrlParser.parse_id(request.url, "fases_desarrollo")
         if id_fase:
             fase = Fase.por_id(id_fase)
             for ti in fase.tipos_de_item:

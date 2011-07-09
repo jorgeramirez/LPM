@@ -92,14 +92,15 @@ class FaseTableFiller(CustomTableFiller):
 
             value += '<div>' + \
                         '<a href="'+ url_cont + str(obj.id_fase) + '/miembrosfase" ' + \
-                        'class="' + clase + '">Miembros</a>' + \
+                        'class="' + clase + '">Usuarios</a>' + \
                      '</div><br />'
-
+            
+            '''
             value += '<div>' + \
                         '<a href="'+ url_cont + str(obj.id_fase) + '/nomiembrosfase" ' + \
                         'class="' + clase + '">No miembros</a>' + \
                      '</div><br />'
-                     
+            '''
 
         proy = Proyecto.por_id(obj.id_proyecto)
         if proy.estado != "Iniciado" and \

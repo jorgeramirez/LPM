@@ -62,7 +62,8 @@ class FaseDesarrolloTableFiller(CustomTableFiller):
                     '<a href="'+ url_cont + str(obj.id_fase) + '/items/" ' + \
                     'class="' + clase + '">Seleccionar</a>' + \
                  '</div>'
-
+                 
+        value += '</div>'
         return value
     
     def _do_get_provider_count_and_objs(self, id_proyecto=None, **kw):
@@ -80,7 +81,7 @@ class FaseDesarrolloTableFiller(CustomTableFiller):
             for f in lista:
                 if (f.id_proyecto == id_proyecto and \
                     AlgunPermiso(tipo= "Tipo", id_fase=f.id_fase).is_met(request.environ)):
-                    filtrados.append(u)
+                    filtrados.append(f)
                     
         return len(filtrados), filtrados
                    

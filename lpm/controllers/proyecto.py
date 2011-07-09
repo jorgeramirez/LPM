@@ -106,14 +106,15 @@ class ProyectoTableFiller(CustomTableFiller):
 
             value += '<div>' + \
                         '<a href="/proyectos/'+ str(obj.id_proyecto) + '/miembros" ' + \
-                        'class="' + clase + '">Miembros</a>' + \
+                        'class="' + clase + '">Usuarios</a>' + \
                      '</div><br />'
 
+            '''
             value += '<div>' + \
                         '<a href="/proyectos/'+ str(obj.id_proyecto) + '/nomiembros" ' + \
                         'class="' + clase + '">No miembros</a>' + \
                      '</div><br />'
-
+            '''
 
         if obj.estado == u"No Iniciado":
             if PoseePermiso('iniciar proyecto', 
