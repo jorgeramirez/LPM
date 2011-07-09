@@ -75,7 +75,8 @@ class ProyectosDesarrolloTableFiller(CustomTableFiller):
                             _do_get_provider_count_and_objs(**kw)
         filtrados = []                    
         for p in lista:
-            if AlgunPermiso(tipo= "Tipo", id_proyecto=p.id_proyecto).is_met(request.environ):
+            if (AlgunPermiso(tipo= "Tipo", id_proyecto=p.id_proyecto).is_met(request.environ) and\
+                p.estado == u"Iniciado"):
                 filtrados.append(p)
             
         return len(filtrados), filtrados         

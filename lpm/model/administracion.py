@@ -309,7 +309,7 @@ class Proyecto(DeclarativeBase):
     def iniciar_proyecto(self):
         """ inicia un proyecto, cambia su estado a iniciado """
         print self.estado
-        if (self.estado == u"No Iniciado"):
+        if (self.estado == u"No Iniciado" and self.numero_fases > 0):
             print "iniciando proyecto"
             self.estado = u"Iniciado"
             for f in self.fases:

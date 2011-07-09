@@ -249,6 +249,10 @@ class AlgunPermiso(Predicate):
                         
                     if (algun and self.id_proyecto == r.id_proyecto):
                         return
+                    
+                    elif (algun and (self.id_fase + self.id_proyecto +\
+                                      self.id_tipo_item == 0)):
+                        return
                      
             elif (r.tipo.find(u"Fase") == 0):
                 if (self.tipo == "Fase"):
@@ -268,6 +272,10 @@ class AlgunPermiso(Predicate):
                             break
                         
                     if (algun and self.id_fase == r.id_fase):
+                        return
+                    
+                    elif (algun and (self.id_fase + self.id_proyecto +\
+                                      self.id_tipo_item == 0)):
                         return
                       
             elif (r.tipo.find(u"Tipo") == 0):

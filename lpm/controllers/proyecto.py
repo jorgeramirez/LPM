@@ -117,8 +117,9 @@ class ProyectoTableFiller(CustomTableFiller):
             '''
 
         if obj.estado == u"No Iniciado":
-            if PoseePermiso('iniciar proyecto', 
-                        id_proyecto=obj.id_proyecto).is_met(request.environ):
+            if (PoseePermiso('iniciar proyecto', 
+                        id_proyecto=obj.id_proyecto).is_met(request.environ) and\
+                        obj.numero_fases > 0):
                 value += '<div>' + \
                             '<a href="/proyectos/iniciar/' + str(obj.id_proyecto) + '" ' +\
                             'class="' + clase + '">Iniciar</a>' + \
