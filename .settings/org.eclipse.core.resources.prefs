@@ -1,4 +1,4 @@
-#Wed Jul 06 23:44:47 PYT 2011
+#Sat Jul 09 05:06:46 PYT 2011
 eclipse.preferences.version=1
 encoding//lpm/__init__.py=utf-8
 encoding//lpm/config/__init__.py=utf-8
@@ -11,10 +11,12 @@ encoding//lpm/controllers/atributotipoitem.py=utf-8
 encoding//lpm/controllers/fase.py=utf-8
 encoding//lpm/controllers/fase_desarrollo.py=utf-8
 encoding//lpm/controllers/item.py=utf-8
+encoding//lpm/controllers/miembros_fase.py=utf-8
 encoding//lpm/controllers/proyecto.py=utf-8
 encoding//lpm/controllers/proyectos_fase.py=utf-8
 encoding//lpm/controllers/relacion.py=utf-8
 encoding//lpm/controllers/rol.py=utf-8
+encoding//lpm/controllers/roles_fase.py=utf-8
 encoding//lpm/controllers/root.py=utf-8
 encoding//lpm/controllers/template.py=utf-8
 encoding//lpm/controllers/tipoitem.py=utf-8

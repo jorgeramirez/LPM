@@ -121,31 +121,46 @@ class PoseePermiso(Predicate):
 
         if self.id_usuario:
             usuario = Usuario.por_id(self.id_usuario)
+        
+            
+        if (self.id_tipo_item):
+            #recuperar id  de fase y proyecto
+            ti = TipoItem.por_id(self.id_tipo_item)
+            if (not self.id_fase):
+                self.id_fase = ti.id_fase
+            if (not self.id_proyecto):
+                self.id_proyecto = ti.id_proyecto
+        
+        elif (self.id_fase):
+            fase = Fase.por_id(self.id_fase)
+            if (not self.id_proyecto):
+                self.id_proyecto = fase.id_proyecto
                     
+                             
         for r in usuario.roles:
-                tiene = False
-                for p in r.permisos:
-                    if p.nombre_permiso == self.nombre_permiso:
-                        tiene = True
-                        
-                if not tiene: 
-                    continue
-                
-                if r.es_rol_sistema():
-                    return
-                
-                if self.id_proyecto == r.id_proyecto:
-                    if r.tipo == u"Proyecto":
-                        return
-                
-                if self.id_fase == r.id_fase:
-                    if r.tipo == u"Fase":
-                        return
-
-                ti = TipoItem.por_id(self.id_tipo_item)
-                if ti and ti.es_o_es_hijo(r.id_tipo_item):
-                    return
+            tiene = False
+            for p in r.permisos:
+                if p.nombre_permiso == self.nombre_permiso:
+                    tiene = True
                     
+            if not tiene: 
+                continue
+            
+            if r.es_rol_sistema():
+                return
+            
+            if self.id_proyecto == r.id_proyecto:
+                if r.tipo == u"Proyecto":
+                    return
+            
+            if self.id_fase == r.id_fase:
+                if r.tipo == u"Fase":
+                    return
+                
+            ti = TipoItem.por_id(self.id_tipo_item)
+            if ti and ti.es_o_es_hijo(r.id_tipo_item):
+                return
+        
         self.unmet(self.message % self.nombre_permiso)
         
 class AlgunPermiso(Predicate):
@@ -200,7 +215,70 @@ class AlgunPermiso(Predicate):
         if self.id_usuario:
             usuario = Usuario.por_id(self.id_usuario)
         
+        if (self.id_tipo_item):
+            #recuperar id  de fase y proyecto
+            ti = TipoItem.por_id(self.id_tipo_item)
+            if (not self.id_fase):
+                self.id_fase = ti.id_fase
+            if (not self.id_proyecto):
+                self.id_proyecto = ti.id_proyecto
+        
+        elif (self.id_fase):
+            fase = Fase.por_id(self.id_fase)
+            if (not self.id_proyecto):
+                self.id_proyecto = fase.id_proyecto
+                    
         for r in usuario.roles:
+            
+            if (r.tipo.find(u"Sistema") == 0):
+                
+                for p in r.permisos:
+                    if (p.tipo.find(self.tipo) >= 0):
+                        return
+                    
+            if (r.tipo.find(u"Proyecto") == 0):
+                if (self.tipo == "Proyecto" and self.id_proyecto == r.id_proyecto):
+                    return
+                
+                if (self.tipo == "Fase" or self.tipo == "Tipo"):
+                    algun = False
+                    for p in r.permisos:
+                        if (p.tipo.find(self.tipo) >= 0):
+                            algun = True
+                            break
+                        
+                    if (algun and self.id_proyecto == r.id_proyecto):
+                        return
+                     
+            elif (r.tipo.find(u"Fase") == 0):
+                if (self.tipo == "Fase"):
+                    if (self.id_fase == r.id_fase):
+                        return
+                    
+                    fase = Fase.por_id(r.id_fase)
+                    if (self.id_proyecto == fase.id_proyecto):
+                        return
+                    
+                if (self.tipo == "Tipo"):
+                    algun = False
+                    for p in r.permisos:
+                        if (p.tipo.find(self.tipo) >= 0):
+                            algun = True
+                            break
+                        
+                    if (algun and self.id_fase == r.id_fase):
+                        return
+                      
+            elif (r.tipo.find(u"Tipo") == 0):
+                if (self.tipo == "Tipo"):
+                    if (self.id_tipo_item and ti.es_o_es_hijo(r.id_tipo_item)):
+                        return
+                    
+                    ti = TipoItem.por_id(r.id_tipo_item)
+                            
+                    if (ti.id_fase == self.id_fase or ti.id_proyecto == self.id_proyecto):
+                        return
+            '''
             algun = False
             for p in r.permisos:
                 if p.nombre_permiso.find(u"consultar") < 0 and \
@@ -228,7 +306,7 @@ class AlgunPermiso(Predicate):
             ti = TipoItem.por_id(self.id_tipo_item)
             if (ti and ti.es_o_es_hijo(r.id_tipo_item)):
                 return
-            
+            '''
         self.unmet(self.message)
 
 
@@ -257,9 +335,11 @@ class Miembro(Predicate):
         if kw.has_key('id_proyecto'):
             self.id_proyecto = int(kw['id_proyecto'])
             del kw['id_proyecto']
+            
         elif kw.has_key('id_fase'):
             self.id_fase = int(kw['id_fase'])
             del kw['id_fase']
+            
         elif kw.has_key('id_tipo_item'):
             self.id_tipo_item = int(kw['id_tipo_item'])
             del kw['id_tipo_item']

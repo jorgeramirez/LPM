@@ -58,7 +58,7 @@ class ProyectosDesarrolloTableFiller(CustomTableFiller):
         value = '<div>'
         clase = 'actions'
         value += '<div>' + \
-                    '<a href="./'+ str(obj.id_proyecto) + '/fases/" ' + \
+                    '<a href="./'+ str(obj.id_proyecto) + '/fases_desarrollo/" ' + \
                     'class="' + clase + '">Seleccionar</a>' + \
                  '</div><br />'
 
@@ -71,7 +71,7 @@ class ProyectosDesarrolloTableFiller(CustomTableFiller):
         es miembro
         """
             
-        count, lista = super(ProyectosFaseTableFiller, self).\
+        count, lista = super(ProyectosDesarrolloTableFiller, self).\
                             _do_get_provider_count_and_objs(**kw)
         filtrados = []                    
         for p in lista:
@@ -166,7 +166,7 @@ class ProyectosDesarrolloController(CrudRestController):
         devolver el resultado esperado.
         """
         tmpl_context.widget = self.table
-        buscar_table_filler = ProyectosFaseTableFiller(DBSession)
+        buscar_table_filler = ProyectosDesarrolloTableFiller(DBSession)
         buscar_table_filler.filtros = kw
         proyectos = buscar_table_filler.get_value()
         

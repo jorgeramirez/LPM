@@ -263,6 +263,7 @@ class UsuarioController(CrudRestController):
     @expose('lpm.templates.usuario.new')
     def new(self, *args, **kw):
         """Despliega una pagina para crear un usuario"""
+        
         pp = PoseePermiso('crear usuario')
         if not pp.is_met(request.environ):
             flash(pp.message % pp.nombre_permiso, 'warning')

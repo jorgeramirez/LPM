@@ -86,7 +86,7 @@ class Rol(DeclarativeBase):
 
     #{ variables
     #template para el codigo (usar metodo format)
-    tmpl_codigo = "rol-{id_rol}-{tipo}"
+    tmpl_codigo = u"rol-{id_rol}-{tipo}"
     tipos_posibles = {u'Plantilla proyecto' : 'plant-proy',
                       u'Plantilla fase' : 'plant-fase',
                       u'Plantilla tipo ítem' : 'plant-ti', 

@@ -18,7 +18,7 @@ from tg import redirect, request, validate, flash
 from lpm.model import DBSession, Fase, Proyecto, Rol
 from lpm.lib.sproxcustom import (CustomTableFiller,
                                  CustomPropertySingleSelectField)
-from lpm.lib.authorization import PoseePermiso, AlgunPermiso
+from lpm.lib.authorization import PoseePermiso, AlgunPermiso, Miembro
 from lpm.lib.util import UrlParser
 from lpm.controllers.tipoitem import TipoItemController, TipoItemTableFiller
 from lpm.controllers.validaciones.fase_validator import FaseFormValidator
@@ -70,7 +70,7 @@ class FaseDesarrolloTableFiller(CustomTableFiller):
         Retorna las fases del proyecto en cuestión
         """
 
-        count, lista = super(FaseTableFiller, self).\
+        count, lista = super(FaseDesarrolloTableFiller, self).\
                             _do_get_provider_count_and_objs(**kw)
         filtrados = []                    
         if id_proyecto:
