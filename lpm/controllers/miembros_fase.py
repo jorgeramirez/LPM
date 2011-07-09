@@ -509,7 +509,7 @@ class MiembrosFaseController(RestController):
         Desasigna miembros de la fase.
         """
         id_fase = UrlParser.parse_id(request.url, "fases")
-
+        
         if kw:
             pks = []
             for k, pk in kw.items():
@@ -520,7 +520,26 @@ class MiembrosFaseController(RestController):
             transaction.begin()
             usuarios = DBSession.query(Usuario) \
                                 .filter(Usuario.id_usuario.in_(pks)).all()
+
+            fase = Fase.por_id(id_fase)
+            nr = u"Lider de Proyecto"
+            rlp = DBSession.query(Rol) \
+                          .filter(and_(Rol.tipo == u"Proyecto",
+                                       Rol.id_proyecto == fase.id_proyecto,
+                                       Rol.nombre_rol == nr)).first()
+
+            warning = False
+
             for u in usuarios:
+            
+                if rlp in u.roles and len(rlp.usuarios) == 1:
+                    msg = "No puedes eliminar al usuario {nu} porque "
+                    msg += "es el {nr}"
+                    flash(msg.format(nu=u.nombre_usuario, 
+                                     nr=nr), "warning")
+                    warning = True
+                    continue
+                    
                 c = 0
                 while c < len(u.roles):
                     if u.roles[c].id_fase == id_fase and \
@@ -530,7 +549,8 @@ class MiembrosFaseController(RestController):
                         c += 1
 
             transaction.commit()
-            flash("Usuarios removidos correctamente")
+            if not warning:
+                flash("Usuarios removidos correctamente")
         else:
             flash("Seleccione por lo menos un usuario", "warning")
         return "../"

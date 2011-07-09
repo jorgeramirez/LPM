@@ -496,7 +496,7 @@ class MiembrosTipoController(RestController):
         Desasigna miembros de la fase.
         """
         id_tipo_item = UrlParser.parse_id(request.url, "tipositems")
-
+        
         if kw:
             pks = []
             for k, pk in kw.items():
@@ -507,7 +507,25 @@ class MiembrosTipoController(RestController):
             transaction.begin()
             usuarios = DBSession.query(Usuario) \
                                 .filter(Usuario.id_usuario.in_(pks)).all()
+            
+            ti = TipoItem.por_id(id_tipo_item)
+
+            nr = u"Lider de Proyecto"
+            rlp = DBSession.query(Rol) \
+                          .filter(and_(Rol.tipo == u"Proyecto",
+                                       Rol.id_proyecto == ti.id_proyecto,
+                                       Rol.nombre_rol == nr)).first()
+
+            warning = False
             for u in usuarios:
+                if rlp in u.roles and len(rlp.usuarios) == 1:
+                    msg = "No puedes eliminar al usuario {nu} porque "
+                    msg += "es el {nr}"
+                    flash(msg.format(nu=u.nombre_usuario, 
+                                     nr=nr), "warning")
+                    warning = True
+                    continue
+
                 c = 0
                 while c < len(u.roles):
                     if u.roles[c].id_tipo_item == id_tipo_item and \
@@ -517,7 +535,8 @@ class MiembrosTipoController(RestController):
                         c += 1
 
             transaction.commit()
-            flash("Usuarios removidos correctamente")
+            if not warning:
+                flash("Usuarios removidos correctamente")
         else:
             flash("Seleccione por lo menos un usuario", "warning")
         return "../"
