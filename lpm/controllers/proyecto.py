@@ -338,9 +338,7 @@ class ProyectoController(CrudRestController):
         proy.codigo = Proyecto.generar_codigo(proy)
 
         #Creamos el rol miembro  y lider de proyecto para este proyecto.
-        plant_m = Rol.obtener_rol_plantilla(nombre_rol=u"Miembro de Proyecto")
         plant_l = Rol.obtener_rol_plantilla(nombre_rol=u"Lider de Proyecto")
-        rol_m = Rol.nuevo_rol_desde_plantilla(plantilla=plant_m, id=proy.id_proyecto)
         rol_l = Rol.nuevo_rol_desde_plantilla(plantilla=plant_l, id=proy.id_proyecto)
 
         flash("Se ha creado un nuevo proyecto")

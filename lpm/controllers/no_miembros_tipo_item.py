@@ -20,7 +20,10 @@ from lpm.lib.sproxcustom import CustomTableFiller
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso, Miembro
 from lpm.lib.util import UrlParser
 from lpm.controllers.usuario import UsuarioEditForm, UsuarioEditFiller
-from lpm.controllers.miembros_tipo_item import (miembros_tipo_table)
+from lpm.controllers.miembros_tipo_item import (MiembrosProyectoTable,
+                                                MiembrosProyectoRolesTable,
+                                                MiembrosTipoRolesTableFiller,
+                                                miembros_tipo_roles_table)
 
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller
@@ -37,6 +40,11 @@ import transaction
 
 from tg import tmpl_context, request
 
+
+class NoMiembrosTipoTable(MiembrosProyectoTable):
+    __add_fields__ = None
+
+no_miembros_tipo_table = NoMiembrosTipoTable(DBSession)
 
 
 class NoMiembrosTipoTableFiller(CustomTableFiller):
@@ -64,9 +72,9 @@ class NoMiembrosTipoTableFiller(CustomTableFiller):
         if PoseePermiso("asignar-desasignar rol", 
                         id_tipo_item=id_tipo_item).is_met(request.environ):
             value += '<div>' + \
-                        '<a href="./incorporar/' + \
-                        str(obj.id_usuario) + '" ' + \
-                        'class="' + clase + '">Incorporar</a>' + \
+                        '<a href="./' + str(obj.id_usuario) + \
+                        '/rolesdesasignados" ' + \
+                        'class="' + clase + '">Asignar Rol</a>' + \
                      '</div><br />'
 
         value += '</div>'
@@ -75,27 +83,146 @@ class NoMiembrosTipoTableFiller(CustomTableFiller):
         
     def _do_get_provider_count_and_objs(self, id_tipo_item=None, **kw):
         """
-        Se muestra la lista de usuario si se tiene un permiso 
-        necesario. Caso contrario se muestra solo su usuario
+        Se muestran los usuarios que no tienen por lo menos un rol de tipo
+        Tipo Item para el tipo de item en cuestión.
         """
         count, lista = super(NoMiembrosTipoTableFiller,
                          self)._do_get_provider_count_and_objs(**kw)
         
         filtrados = []
         tipo = TipoItem.por_id(id_tipo_item)
+        app = AlgunPermiso(tipo="Proyecto", id_proyecto=tipo.id_proyecto)
+        apf = AlgunPermiso(tipo="Fase", id_proyecto=tipo.id_proyecto)
+        apti = AlgunPermiso(tipo="Tipo", id_proyecto=tipo.id_proyecto)
         for u in lista:
-            if Miembro(id_proyecto=tipo.id_proyecto,
-                       id_usuario=u.id_usuario).is_met(request.environ) and \
-                       not Miembro(id_tipo_item=id_tipo_item,
-                                   id_usuario=u.id_usuario).is_met(request.environ):
+            if not (app.is_met(request.environ) or \
+                    apf.is_met(request.environ) or \
+                    aptiis_met(request.environ)):
                 filtrados.append(u)
         return len(filtrados), filtrados
 
 no_miembros_tipo_table_filler = NoMiembrosTipoTableFiller(DBSession)
 
+no_miembros_tipo_roles_table_filler = MiembrosTipoRolesTableFiller(DBSession)
+
+
+#controlador de roles desasignados al usuario.
+class RolesDesasignadosController(RestController):
+    table = miembros_tipo_roles_table
+    table_filler = no_miembros_tipo_roles_table_filler
+    action = "./"
+
+  
+    opciones = dict(codigo= u'Código',
+                    nombre_rol= u'Nombre',
+                    tipo=u'Tipo'
+                    )
+    columnas = dict(codigo='texto',
+                    nombre_rol='texto',
+                    tipo='combobox'
+                    )
+    comboboxes = dict(tipo=Rol.tipos_posibles)
+    
+    #{ Métodos
+    @with_trailing_slash
+    @paginate('lista_elementos', items_per_page=5)
+    @expose('lpm.templates.miembros.roles_desasignados_get_all')
+    @expose('json')
+    def get_all(self, *args, **kw):
+        """ 
+        Retorna todos los registros
+        Retorna una página HTML si no se especifica JSON
+        """
+        id_tipo_item = UrlParser.parse_id(request.url, "tipositems")
+        id_usuario = UrlParser.parse_id(request.url, "nomiembrostipo")
+        usuario = Usuario.por_id(id_usuario)
+        tipo = TipoItem.por_id(id_tipo_item)
+        puede_asignar = PoseePermiso("asignar-desasignar rol", 
+                                        id_tipo_item=id_tipo_item).is_met(request.environ)
+                                        
+        titulo = u"Roles Desasignados para: %s" % usuario.nombre_usuario
+                                        
+        if request.response_type == 'application/json':
+            return self.table_filler.get_value(usuario=usuario, asignados=False,
+                                               id_tipo_item=id_tipo_item, **kw)
+        if not getattr(self.table.__class__, '__retrieves_own_value__', False):
+            roles = self.table_filler.get_value(usuario=usuario, asignados=False,
+                                               id_tipo_item=id_tipo_item, **kw)
+        else:
+            roles = []
+            
+        tmpl_context.widget = self.table
+        atras = "../../"
+        return dict(lista_elementos=roles, 
+                    page=titulo, 
+                    titulo=titulo, 
+                    columnas=self.columnas,
+                    opciones=self.opciones,
+                    comboboxes=self.comboboxes,
+                    url_action=self.action, 
+                    atras=atras,
+                    puede_asignar=puede_asignar)
+
+    @with_trailing_slash
+    @paginate('lista_elementos', items_per_page=5)
+    @expose('lpm.templates.miembros.roles_desasignados_get_all')
+    @expose('json')
+    def post_buscar(self, *args, **kw):
+        id_tipo_item = UrlParser.parse_id(request.url, "tipositems")
+        id_usuario = UrlParser.parse_id(request.url, "nomiembrostipo")
+        usuario = Usuario.por_id(id_usuario)
+        tipo = TipoItem.por_id(id_tipo_item)
+        puede_desasignar = PoseePermiso("asignar-desasignar rol", 
+                                        id_tipo_item=id_tipo_item).is_met(request.environ)
+        titulo = u"Roles Desasignados para: %s" % usuario.nombre_usuario
+        tmpl_context.widget = self.table
+        buscar_table_filler = MiembrosTipoRolesTableFiller(DBSession)
+        buscar_table_filler.filtros = kw
+        roles = buscar_table_filler.get_value(usuario=usuario, asignados=False,
+                                               id_tipo_item=id_tipo_item, **kw)
+        
+        atras = "../../"
+        return dict(lista_elementos=roles, 
+                    page=titulo, 
+                    titulo=titulo, 
+                    columnas=self.columnas,
+                    opciones=self.opciones,
+                    comboboxes=self.comboboxes,
+                    url_action="../", 
+                    atras=atras,
+                    puede_asignar=puede_asignar)
+
+    @expose()
+    def asignar_roles(self, *args, **kw):
+        """ Asigna los roles seleccionados a un usuario """
+
+        if kw:
+            pks = []
+            for k, pk in kw.items():
+                if not k.isalnum():
+                    continue
+                pks.append(int(pk))
+            transaction.begin()
+            id_user = UrlParser.parse_id(request.url, "nomiembrostipo")
+            id_tipo_item = UrlParser.parse_id(request.url, "tipositems")
+            user = Usuario.por_id(id_user)
+            roles = DBSession.query(Rol).filter(Rol.id_rol.in_(pks)).all()
+            for r in roles:
+                if r.tipo.find(u"Plantilla") >= 0: #crear rol a partir de plantilla
+                    rol_new = Rol.nuevo_rol_desde_plantilla(plantilla=r, 
+                                                            id=id_tipo_item)
+                    rol_new.usuarios.append(user)
+                else:
+                    r.usuarios.append(user)
+            transaction.commit()
+            flash("Roles Asignados correctamente")
+        else:
+            flash("Seleccione por lo menos un rol", "warning")
+        return "./"
+
 
 class NoMiembrosTipoController(RestController):
-    table = miembros_tipo_table
+    table = no_miembros_tipo_table
     table_filler = no_miembros_tipo_table_filler
     action = "./"
     
@@ -158,7 +285,7 @@ class NoMiembrosTipoController(RestController):
 
         puede_incorporar = PoseePermiso("asignar-desasignar rol", 
                                         id_tipo_item=id_tipo_item).is_met(request.environ)
-        tmpl_context.widget = miembros_tipo_table
+        tmpl_context.widget = no_miembros_tipo_table
         buscar_table_filler = NoMiembrosTipoTableFiller(DBSession)
         buscar_table_filler.filtros = kw
         usuarios = buscar_table_filler.get_value(id_tipo_item=id_tipo_item,**kw)
@@ -183,6 +310,7 @@ class NoMiembrosTipoController(RestController):
         atras = "../"
         return dict(value=value, page=page, atras=atras)
         
+    '''
     @expose()
     def incorporar_seleccionados(self, *args, **kw):
         """ 
@@ -231,4 +359,4 @@ class NoMiembrosTipoController(RestController):
 
         flash("Usuario incorporado correctamente")
         redirect("../")
-
+    '''

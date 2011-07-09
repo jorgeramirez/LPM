@@ -373,10 +373,12 @@ class FaseController(CrudRestController):
         
         proy = Proyecto.por_id(id_proyecto)
         fase = proy.crear_fase(**kw)
+        
         #Creamos el rol miembro  de fase
-        plant_m = Rol.obtener_rol_plantilla(nombre_rol=u"Miembro de Fase")
-        rol_m = Rol.nuevo_rol_desde_plantilla(plantilla=plant_m, 
-                                              id=fase.id_fase)
+        #plant_m = Rol.obtener_rol_plantilla(nombre_rol=u"Miembro de Fase")
+        #rol_m = Rol.nuevo_rol_desde_plantilla(plantilla=plant_m, 
+        #                                      id=fase.id_fase)
+        
         flash("Fase Creada")
         redirect(atras)
         

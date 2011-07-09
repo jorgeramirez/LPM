@@ -445,9 +445,10 @@ class TipoItemController(CrudRestController):
         tipo = proy.definir_tipo_item(id_padre, id_importado, mezclar, **kw)
         
         #Creamos el rol miembro  de tipo de ítem
-        plant_m = Rol.obtener_rol_plantilla(nombre_rol=u"Miembro de Tipo Item")
-        rol_m = Rol.nuevo_rol_desde_plantilla(plantilla=plant_m, 
-                                              id=tipo.id_tipo_item)
+        #plant_m = Rol.obtener_rol_plantilla(nombre_rol=u"Miembro de Tipo Item")
+        #rol_m = Rol.nuevo_rol_desde_plantilla(plantilla=plant_m, 
+        #                                      id=tipo.id_tipo_item)
+        
         flash(u"Creacion exitosa")
         redirect(url_action)
         

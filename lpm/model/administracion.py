@@ -312,7 +312,6 @@ class Proyecto(DeclarativeBase):
         if (self.estado == u"No Iniciado"):
             print "iniciando proyecto"
             self.estado = u"Iniciado"
-            plant_m = Rol.obtener_rol_plantilla(nombre_rol=u"Miembro de Tipo Item")
             for f in self.fases:
                 tipo = TipoItem()
                 tipo.codigo = u"ti-base/f-{pos}/p-{id}".format(pos=f.posicion,
@@ -323,10 +322,6 @@ class Proyecto(DeclarativeBase):
                 self.tipos_de_item.append(tipo)
                 DBSession.add(tipo)
                 DBSession.flush()
-                #Creamos el rol miembro  de tipo de ítem
-                rol_m = Rol.nuevo_rol_desde_plantilla(plantilla=plant_m, 
-                                                      id=tipo.id_tipo_item)
-                DBSession.add(rol_m)
         
     def crear_fase(self, **kw):
         """ Para agregar fases a un proyecto no iniciado
@@ -337,7 +332,9 @@ class Proyecto(DeclarativeBase):
             #se inserta en la posicion indicada
             i = int(kw['posicion'])
 
-            ordenado = DBSession.query(Fase).filter_by(id_proyecto=self.id_proyecto).order_by(Fase.posicion.desc())   
+            ordenado = DBSession.query(Fase) \
+                                .filter_by(id_proyecto=self.id_proyecto) \
+                                .order_by(Fase.posicion.desc())
             
             for f in ordenado:
                 print f.posicion
