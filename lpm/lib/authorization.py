@@ -240,7 +240,7 @@ class AlgunPermiso(Predicate):
                 if (self.tipo == "Proyecto" and self.id_proyecto == r.id_proyecto):
                     return
                 
-                if (self.tipo == "Fase" or self.tipo == "Tipo"):
+                elif (self.tipo == "Fase" or self.tipo == "Tipo"):
                     algun = False
                     for p in r.permisos:
                         if (p.tipo.find(self.tipo) >= 0):
@@ -255,11 +255,12 @@ class AlgunPermiso(Predicate):
                     if (self.id_fase == r.id_fase):
                         return
                     
-                    fase = Fase.por_id(r.id_fase)
-                    if (self.id_proyecto == fase.id_proyecto):
-                        return
+                    elif (not self.id_fase):
+                        fase = Fase.por_id(r.id_fase)
+                        if (self.id_proyecto == fase.id_proyecto):
+                            return
                     
-                if (self.tipo == "Tipo"):
+                elif (self.tipo == "Tipo"):
                     algun = False
                     for p in r.permisos:
                         if (p.tipo.find(self.tipo) >= 0):
