@@ -266,8 +266,9 @@ class RolesAsignadosController(RestController):
                 else:
                     c += 1
             transaction.commit()
-        
-        flash("Roles Desasignados correctamente")
+            flash("Roles Desasignados correctamente")
+        else:
+            flash("Seleccione por lo menos un rol", "warning")
         return "./"
     
 
@@ -382,7 +383,9 @@ class RolesDesasignadosController(RestController):
                 else:
                     r.usuarios.append(user)
             transaction.commit()
-        flash("Roles Asignados correctamente")
+            flash("Roles Asignados correctamente")
+        else:
+            flash("Seleccione por lo menos un rol", "warning")
         return "./"
 
 
@@ -511,8 +514,9 @@ class MiembrosTipoController(RestController):
                         c += 1
 
             transaction.commit()
-
-        flash("Usuarios removidos correctamente")
+            flash("Usuarios removidos correctamente")
+        else:
+            flash("Seleccione por lo menos un usuario", "warning")
         return "../"
     
     #}

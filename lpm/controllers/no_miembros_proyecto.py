@@ -189,11 +189,12 @@ class NoMiembrosProyectoController(RestController):
         id_proyecto = UrlParser.parse_id(request.url, "proyectos")
         
         #recuperamos el rol miembro de proyecto
-        transaction.begin()
+        
         rol = DBSession.query(Rol) \
                        .filter(and_(Rol.id_proyecto == id_proyecto,
                                Rol.nombre_rol == u"Miembro de Proyecto")).one()
         if kw:
+            transaction.begin()
             pks = []
             for k, pk in kw.items():
                 if not k.isalnum():
@@ -206,10 +207,12 @@ class NoMiembrosProyectoController(RestController):
             for u in usuarios:
                 u.roles.append(rol)
                 #rol.usuarios.append(u)
-   
-        transaction.commit()
-
-        flash("Usuarios incorporados correctamente")
+            
+            flash("Usuarios incorporados correctamente")
+            transaction.commit()
+        else:
+            flash("Seleccione por lo menos un usuario", "warning")
+        
         return "/proyectos/%d/nomiembros/" % id_proyecto
     
     
