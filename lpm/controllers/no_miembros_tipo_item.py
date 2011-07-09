@@ -91,13 +91,10 @@ class NoMiembrosTipoTableFiller(CustomTableFiller):
         
         filtrados = []
         tipo = TipoItem.por_id(id_tipo_item)
-        app = AlgunPermiso(tipo="Proyecto", id_proyecto=tipo.id_proyecto)
-        apf = AlgunPermiso(tipo="Fase", id_proyecto=tipo.id_proyecto)
-        apti = AlgunPermiso(tipo="Tipo", id_proyecto=tipo.id_proyecto)
+        apti = AlgunPermiso(tipo="Tipo", id_tipo_item=tipo.id_tipo_item)
         for u in lista:
-            if not (app.is_met(request.environ) or \
-                    apf.is_met(request.environ) or \
-                    aptiis_met(request.environ)):
+            apti.id_usuario = u.id_usuario
+            if not apti.is_met(request.environ):
                 filtrados.append(u)
         return len(filtrados), filtrados
 
@@ -225,6 +222,9 @@ class NoMiembrosTipoController(RestController):
     table = no_miembros_tipo_table
     table_filler = no_miembros_tipo_table_filler
     action = "./"
+    
+    #{ Sub controlador
+    rolesdesasignados = RolesDesasignadosController()
     
     #para el form de busqueda
     opciones = dict(nombre_usuario="Nombre de Usuario", 

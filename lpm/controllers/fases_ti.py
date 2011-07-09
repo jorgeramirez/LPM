@@ -70,7 +70,8 @@ class FasesTipoTableFiller(CustomTableFiller):
             #se listan las fases en la que se es miembro
             for f in lista:
                 if (f.id_proyecto == id_proyecto and \
-                    Miembro(id_fase=f.id_fase).is_met(request.environ)):
+                    AlgunPermiso(tipo="Tipo",
+                                 id_fase=f.id_fase).is_met(request.environ)):
                     filtrados.append(f)
                     
         return len(filtrados), filtrados

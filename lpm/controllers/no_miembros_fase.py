@@ -94,13 +94,10 @@ class NoMiembrosFaseTableFiller(CustomTableFiller):
         
         filtrados = []
         fase = Fase.por_id(id_fase)
-        app = AlgunPermiso(tipo="Proyecto", id_proyecto=fase.id_proyecto)
-        apf = AlgunPermiso(tipo="Fase", id_proyecto=fase.id_proyecto)
+        apf = AlgunPermiso(tipo="Fase", id_fase=fase.id_fase)
         for u in lista:
-            app.id_usuario = u.id_usuario
             apf.id_usuario = u.id_usuario
-            if not (app.is_met(request.environ) or \
-                    apf.is_met(request.environ)):
+            if not apf.is_met(request.environ):
                 filtrados.append(u)
         return len(filtrados), filtrados
 

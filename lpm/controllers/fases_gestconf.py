@@ -75,14 +75,13 @@ class FasesGestConfTableFiller(CustomTableFiller):
         filtrados = []                    
         if id_proyecto:
             id_proyecto = int(id_proyecto)
-            ap = AlgunPermiso(tipo='Fase', id_proyecto=id_proyecto).is_met(request.environ)
+            #ap = AlgunPermiso(tipo='Fase', id_proyecto=id_proyecto).is_met(request.environ)
             
             #se listan las fases del proyecto
             for f in lista:
                 if f.id_proyecto == id_proyecto and \
-                    Miembro(id_proyecto=f.id_proyecto).is_met(request.environ):
-                    #(Miembro(id_fase=f.id_fase).is_met(request.environ) or \
-                    #Miembro(id_proyecto=f.id_proyecto).is_met(request.environ)):
+                   AlgunPermiso(tipo="Tipo", 
+                                id_fase=f.id_fase).is_met(request.environ):
                     filtrados.append(f)
                     
         return len(filtrados), filtrados

@@ -19,7 +19,7 @@ from tg import redirect, request, require, flash, validate, session
 from lpm.model import DBSession, Proyecto, Usuario, Rol
 from lpm.lib.sproxcustom import (CustomTableFiller, 
                                  CustomPropertySingleSelectField)
-from lpm.lib.authorization import PoseePermiso, AlgunPermiso, Miembro
+from lpm.lib.authorization import PoseePermiso, AlgunPermiso
 from lpm.lib.util import UrlParser
 from lpm.controllers.proyecto import ProyectoTable
 from lpm.controllers.fase import FaseController
@@ -79,7 +79,8 @@ class ProyectosFaseTableFiller(CustomTableFiller):
                             _do_get_provider_count_and_objs(**kw)
         filtrados = []                    
         for p in lista:
-            if Miembro(id_proyecto=p.id_proyecto).is_met(request.environ):
+            if AlgunPermiso(tipo="Fase", 
+                            id_proyecto=p.id_proyecto).is_met(request.environ):
                 filtrados.append(p)
             
         return len(filtrados), filtrados         
