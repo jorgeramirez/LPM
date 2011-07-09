@@ -220,9 +220,10 @@ class NoMiembrosFaseController(RestController):
                 u.roles.append(rol)
 
             transaction.commit()
-
-        flash("Usuarios incorporados correctamente")
-        return "../"
+            flash("Usuarios incorporados correctamente")
+        else:
+            flash("Seleccione por lo menos un usuario", "warning")
+        return "./"
     
     
     @expose()
