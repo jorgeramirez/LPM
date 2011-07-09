@@ -18,7 +18,7 @@ from tg import redirect, request, validate, flash
 from lpm.model import DBSession, Fase, Proyecto, Rol
 from lpm.lib.sproxcustom import (CustomTableFiller,
                                  CustomPropertySingleSelectField)
-from lpm.lib.authorization import PoseePermiso, AlgunPermiso, Miembro
+from lpm.lib.authorization import PoseePermiso, AlgunPermiso
 from lpm.lib.util import UrlParser
 from lpm.controllers.tipoitem import TipoItemController, TipoItemTableFiller
 from lpm.controllers.validaciones.fase_validator import FaseFormValidator
@@ -75,12 +75,11 @@ class FaseDesarrolloTableFiller(CustomTableFiller):
         filtrados = []                    
         if id_proyecto:
             id_proyecto = int(id_proyecto)
-            ap = AlgunPermiso(tipo='Fase', id_proyecto=id_proyecto).is_met(request.environ)
             
             #se listan las fases en la que se es miembro
             for f in lista:
                 if (f.id_proyecto == id_proyecto and \
-                    Miembro(id_fase=f.id_fase).is_met(request.environ)):
+                    AlgunPermiso(tipo= "Tipo", id_fase=f.id_fase).is_met(request.environ)):
                     filtrados.append(u)
                     
         return len(filtrados), filtrados

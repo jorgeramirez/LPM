@@ -242,7 +242,7 @@ class ItemTableFiller(CustomTableFiller):
         '''
         for it in lista:
             if (it.id_fase == id_fase and \
-                Miembro(id_tipo_item=it.id_tipo_item).is_met(request.environ)):
+                AlgunPermiso(tipo= "Tipo", id_tipo_item=it.id_tipo_item).is_met(request.environ)):
                 filtrados.append(it)
             
         return len(filtrados), filtrados        
