@@ -229,26 +229,36 @@ class Item(DeclarativeBase):
         #anteriores = Relacion.relaciones_como_posterior(self.id_item)
         if fase.posicion > 1 and anteriores_count== 0:
             raise CondicionAprobarError(u"El ítem debe tener al menos un antecesor o padre")
-        '''
+        
         for rpi in p_item.relaciones:
             if rpi.relacion.id_anterior == self.id_item: 
                 continue
             item_ant = Item.por_id(rpi.relacion.id_anterior)
             p_item_ant = PropiedadItem.por_id(item_ant.id_propiedad_item)
             iplb = lpm.model.ItemsPorLB.filter_by_id_item(p_item_ant.id_propiedad_item)
+            '''
             lb = lpm.model.LB.por_id(iplb.id_lb)
             if lb.estado != u"Cerrada":
                 raise CondicionAprobarError(u"Todos los antecesores y padres " + \
                                             "deben estar en una LB cerrada")
-        '''
+            '''
+            if p_item_ant.estado != u"Bloqueado":
+                raise CondicionAprobarError(u"Todos los antecesores y padres " + \
+                                            "deben estar en una LB cerrada")
+                
         if p_item.estado == u"Desaprobado":
-            self.marcar_para_revisar()
+            self.marcar_para_revisar(usuario)
             #for rpi in p_item.relaciones:
               #  item_rel = rpi.relacion.obtener_otro_item(self.id_item)
                # item_rel.marcar_para_revisar(self.id_item)
         
+        if p_item.estado == u"Revisión-Desbloq":
+            for rpi in p_item.relaciones:
+                rpi.relacion.revisar = False
+            
         p_item.estado = u"Aprobado"
         op = u"Aprobación"
+        DBSession.flush()
         HistorialItems.registrar(usuario, p_item, op)
         DBSession.add(p_item)
 
@@ -266,6 +276,16 @@ class Item(DeclarativeBase):
         if p_item.estado == u"Aprobado" :
             p_item.estado = u"Desaprobado"
         elif p_item.estado == u"Revision-Desbloq":
+            for rpi in p_item.relaciones:
+                if (rpi.relacion.revisar):
+                    rpi.relacion.revisar = False
+                    #cambiamos el estado del item que provoco
+                    #esta revision
+                    otro = rpi.relacion.obtener_otro_item(self.id_item)
+                    p_otro = PropiedadItem.por_id(otro.id_propiedad_item)
+                    if (p_otro.estado == u"Aprobado"):
+                        p_otro.estado = u"Revisión-Desbloq"
+                        
             p_item.estado = u"Desaprobado"
 
             iplb = lpm.model.ItemsPorLB.filter_by_id_item(p_item.id_propiedad_item)
@@ -274,6 +294,7 @@ class Item(DeclarativeBase):
         else:
             raise DesAprobarItemError()
         op = u"Desaprobación"
+        DBSession.flush()
         HistorialItems.registrar(usuario, p_item, op)
         DBSession.add(p_item)
     
@@ -292,6 +313,8 @@ class Item(DeclarativeBase):
             raise BloquearItemError()
         p_item.estado = u"Bloqueado"
         op = u"Bloqueo"
+        
+        DBSession.flush()
         HistorialItems.registrar(usuario, p_item, op)
         DBSession.add(p_item)
             
@@ -316,14 +339,17 @@ class Item(DeclarativeBase):
         HistorialItems.registrar(usuario, p_item, op)        
         DBSession.add(p_item)
     
-    def marcar_para_revisar(self):#nahuelop
+    def marcar_para_revisar(self, usuario):#nahuelop
         """id_origen es el id de un Item desde el que se produjo el cambio """
         p_item = PropiedadItem.por_id(self.id_propiedad_item)
         
+        '''
         relaciones_por_item = DBSession.query(RelacionPorItem).\
                                         filter(RelacionPorItem.id_propiedad_item\
                                         == self.id_propiedad_item).all()
-        for r in relaciones_por_item:
+        '''
+        
+        for rpi in p_item.relaciones:
 #            relacion = Relacion.por_id(r.id_relacion)
 #            
 #            if (relacion.id_anterior == self.id_item):
@@ -331,18 +357,19 @@ class Item(DeclarativeBase):
 #            else:
 #                otro = Item.por_id(relacion.id_posterior)
             
-            otro = r.relacion.obtener_otro_item(self.id_item)
+            otro = rpi.relacion.obtener_otro_item(self.id_item)
             p_otro = PropiedadItem.por_id(otro.id_item)
                
-            if (otro.revisar()):#solo si se cambio el estado de revisar se pone como para revisar la relacion
+            if (otro.revisar(usuario)):#solo si se cambio el estado de revisar se pone como para revisar la relacion
                 rpi_otro = DBSession.query(RelacionPorItem).\
                                             filter(and_(RelacionPorItem.id_propiedad_item\
                                             == otro.id_propiedad_item,\
                                             RelacionPorItem.id_relacion == r.id_relacion))\
+                                            .order_by(RelacionPorItem.id_relacion_por_item.desc())\
                                             .first()
                 rpi_otro.revisar = True
 
-    def revisar(self):
+    def revisar(self, usuario):
         """ Cambia el estado de bloqueado a Rev-bloqueado y de aprobado a 
         rev-desbloqueado
         @return: True si se marcó para revisión"""
@@ -350,12 +377,22 @@ class Item(DeclarativeBase):
         p_item = PropiedadItem.por_id(self.id_propiedad_item)
         if (p_item.estado == u"Bloqueado"):
             p_item.estado = u"Revisión-Bloq"
-            lb = DBSession.query(lpm.model.LB).filter(and_(lpm.model.LB.id_lb == lpm.model.ItemsPorLB.id_lb,
-                    lpm.model.ItemsPorLB.id_item==p_item.id_propiedad_item)).first()
+            lb = DBSession.query(lpm.model.LB).filter(and_(lpm.model.LB.id_lb ==\
+                                                            lpm.model.ItemsPorLB.id_lb,\
+                                                            lpm.model.ItemsPorLB.id_item==\
+                                                            p_item.id_propiedad_item))\
+                                                            .order_by(lpm.LB.id_lb.desc())\
+                                                            .first()
             lb.estado = u"Para-Revisión"
+            DBSession.flush()
+            HistorialItems.registrar(usuario, p_item, u"Revisión")
+            HistorialLB.registrar(usuario, lb, u"Para-Revisión")
             return True
+        
         elif (p_item.estado == u"Aprobado"):
             p_item.estado = u"Revisión-Desbloq"
+            DBSession.flush()
+            HistorialItems.registrar(usuario, p_item, u"Revisión")
             return True
         
         return False
@@ -373,11 +410,13 @@ class Item(DeclarativeBase):
         if p_item.estado in [u"Bloqueado", u"Eliminado", u"Revisión-Bloq"]:
             raise EliminarItemError()
         p_item.estado = u"Eliminado"
+        if (p_item.estado )
         op = u"Eliminación"
         proy = DBSession.query(lpm.model.Proyecto) \
                         .join(lpm.model.Fase) \
                         .filter(lpm.model.Fase.id_fase == self.id_fase).one()
         proy.complejidad_total -= p_item.complejidad
+        DBSession.flush()
         HistorialItems.registrar(usuario, p_item, op)
     
     def esta_relacionado(self, id_item):
@@ -424,7 +463,8 @@ class Item(DeclarativeBase):
         p_item_revivido.estado = u"Desaprobado"
         self.propiedad_item_versiones.append(p_item_revivido)
         DBSession.add(p_item_revivido)
-        op = u"Revivir"
+        op = u"Resurrección"
+        DBSession.flush()
         HistorialItems.registrar(usuario, p_item_revivido, op)
         DBSession.flush()
         self.id_propiedad_item = p_item_revivido.id_propiedad_item
@@ -456,18 +496,21 @@ class Item(DeclarativeBase):
             if val and kw[k] != val:
                 ch = True
                 break
+            
         if not ch:
             raise ModificarItemError(u"No se realizaron cambios")
 
         p_item_mod = PropiedadItem()
         p_item_mod.version = p_item.version + 1
         p_item_mod.estado = u"Desaprobado"
+        op = u"Modificado: "
+        
         for attr in ["prioridad", "complejidad", "descripcion", "observaciones"]:
             valor = getattr(p_item, attr)
             setattr(p_item_mod, attr, kw[attr])
             if valor != kw[attr]:
-                op = u"Modificación Atributo General"
-                HistorialItems.registrar(usuario, p_item_mod, op)
+                op += (attr + " ")                
+                
         p_item_mod.incorporar_relaciones(p_item.relaciones)
         p_item_mod.incorporar_atributos(p_item.atributos)
         p_item_mod.incorporar_archivos(p_item.archivos)
@@ -475,6 +518,9 @@ class Item(DeclarativeBase):
         DBSession.add(p_item_mod)
         DBSession.flush()
         self.id_propiedad_item = p_item_mod.id_propiedad_item
+        
+        DBSession.flush()
+        HistorialItems.registrar(usuario, p_item_mod, op)
         
         if p_item.complejidad != p_item_mod.complejidad:
             proy = DBSession.query(lpm.model.Proyecto) \
@@ -544,6 +590,7 @@ class Item(DeclarativeBase):
 
         op = u"Reversión De: %d A: %d" % (p_item_actual.version, 
                                           p_item_version.version)
+        DBSession.flush()
         HistorialItems.registrar(usuario, p_item_nuevo, op)
         self.propiedad_item_versiones.append(p_item_nuevo)
         DBSession.add(p_item_nuevo)
@@ -726,6 +773,7 @@ class Item(DeclarativeBase):
         p_item_mod.archivos.append(api)
         self.propiedad_item_versiones.append(p_item_mod)
         op = u"Nuevo Adjunto"
+        DBSession.flush()
         HistorialItems.registrar(usuario, p_item_mod, op)
         DBSession.add_all([new_file, api, p_item_mod])
         DBSession.flush()
@@ -755,6 +803,7 @@ class Item(DeclarativeBase):
         p_item_mod.incorporar_archivos(p_item.archivos, id_ignorado=id_archivo)
         self.propiedad_item_versiones.append(p_item_mod)
         op = u"Eliminación de Archivo Adjunto"
+        DBSession.flush()
         HistorialItems.registrar(usuario, p_item_mod, op)        
         DBSession.add(p_item_mod)
         DBSession.flush()
@@ -821,6 +870,7 @@ class PropiedadItem(DeclarativeBase):
         attr_por_ti = lpm.model.AtributosPorTipoItem. \
                         por_id(api.atributo.id_atributos_por_tipo_item)
         op = u"Mod. Atributo Específico: %s" % attr_por_ti.nombre
+        DBSession.flush()
         HistorialItems.registrar(usuario, p_item_mod, op)
         item = Item.por_id(self.id_item_actual)
         item.propiedad_item_versiones.append(p_item_mod)
