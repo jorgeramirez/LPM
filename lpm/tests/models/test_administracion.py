@@ -53,8 +53,9 @@ class TestProyecto(ModelTest):
     
     def test_iniciar_proyecto(self):
         """ 
-        ``iniciar_proyecto`` debe setear correctamente el estado del proyecto
+        iniciar_proyecto funciona correctamente proyecto
         """
+        self.obj.estado = u"Iniciado"
         self.obj.iniciar_proyecto()
         eq_(self.obj.estado, u"Iniciado")
     
@@ -74,10 +75,13 @@ class TestFase(ModelTest):
         return dep
     
     def test_crear_item(self):
-        """``crear_item`` funciona"""
+        """crear_item funciona correctamente"""
         fase = DBSession.query(Fase).one()
         id_tipo = fase.tipos_de_item[0].id_tipo_item
-        fase.crear_item(id_tipo, prioridad=5, complejidad=5)
+        usuario = Usuario(nombre_usuario = u'usertest' , email=u"test@x.org")
+        DBSession.add(usuario)
+        DBSession.flush()
+        fase.crear_item(id_tipo, prioridad=5, usuario=usuario ,descripcion = 'test', observaciones='test' , complejidad=5)
         item = DBSession.query(Item).one()
         assert item.propiedad_item_versiones[0].prioridad == 5
     

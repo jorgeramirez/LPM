@@ -61,19 +61,28 @@ class TestItem(ModelTest):
     
     def test_bloquear_item(self):
         """Bloquear Item funciona correctamente"""
-        self.obj.bloquear()
+        usuario = Usuario(nombre_usuario = u'usertest' , email=u"test@x.org")
+        DBSession.add(usuario)
+        DBSession.flush()
+        self.obj.bloquear(usuario=usuario)
         eq_(self.obj.propiedad_item_versiones[0].estado, u"Bloqueado")
     
     def test_desbloquear_item(self):
         """Desbloquear Item funciona correctamente"""
+        usuario = Usuario(nombre_usuario = u'usertest' , email=u"test@x.org")
+        DBSession.add(usuario)
+        DBSession.flush()
         self.obj.propiedad_item_versiones[0].estado = u"Bloqueado"
-        self.obj.desbloquear()
+        self.obj.desbloquear(usuario=usuario)
         assert self.obj.propiedad_item_versiones[0].estado == u"Aprobado" or \
             self.obj.propiedad_item_versiones[0].estado == u"Revision-Desbloq"
     
     def test_eliminar_item(self):
         """Eliminar ítem funciona correctamente"""
-        self.obj.eliminar()
+        usuario = Usuario(nombre_usuario = u'usertest' , email=u"test@x.org")
+        DBSession.add(usuario)
+        DBSession.flush()
+        self.obj.eliminar(usuario=usuario)
         eq_(self.obj.propiedad_item_versiones[0].estado, u"Eliminado")
     
     def test_modificar_item(self):
@@ -86,7 +95,8 @@ class TestItem(ModelTest):
         u.password = u'administrador'
         DBSession.add(u)
         DBSession.flush()
-        self.obj.modificar(u, complejidad=8, prioridad=10)
+        self.obj.modificar(u, complejidad=8, prioridad=10, descripcion=u'test',
+                            observaciones=u'test')
         p_item = PropiedadItem.por_id(self.obj.id_propiedad_item)
         eq_(p_item.complejidad, 8)
 
@@ -95,7 +105,10 @@ class TestItem(ModelTest):
         p_item = self.obj.propiedad_item_versiones[0]
         DBSession.add(p_item)
         DBSession.flush()
-        self.obj.eliminar()
+        usuario = Usuario(nombre_usuario = u'usertest' , email=u"test@x.org")
+        DBSession.add(usuario)
+        DBSession.flush()
+        self.obj.eliminar(usuario=usuario)
         eq_(self.obj.propiedad_item_versiones[0].estado, u"Eliminado")
     
     def test_revertir_item(self):
