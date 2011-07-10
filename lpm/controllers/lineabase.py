@@ -61,24 +61,10 @@ class LineaBaseTableFiller(CustomTableFiller):
 
         value = '<div>'
         clase = 'actions_fase'
-        controller = "./lbs/" #+ str(obj.id_lb)
-        
-        
-
-        #si no está en la tabla que se encuentra en edit fase necesita 
-        #solamente esta parte de la url
-        if UrlParser.parse_nombre(request.url, "lbs"):
-            #controller =  str(obj.id_lb)
-            controller = u""
-            
-            if not obj.items:  #lb rota FIXME
-                obj.estado = u'Rota'
-                return '<div></div>'
-            
-            id_item = obj.items[0].propiedad_item.id_item_actual
-            id_fase = Item.por_id(id_item).id_fase
-        else:
-            id_fase = UrlParser.parse_id(request.url, "fases")
+        controller = "./" #+ str(obj.id_lb)
+        if UrlParser.parse_nombre(request.url, "post_buscar"):
+            controller = "../"
+        id_fase = UrlParser.parse_id(request.url, "fases")
         
         id = str(obj.id_lb)
         if PoseePermiso('abrir-cerrar lb', 
@@ -158,10 +144,10 @@ class ItemGenerarTable(TableBase):
     __add_fields__ = {'version': None, 'tipo': None, 'check':None}
     __omit_fields__ = ['id_item', 'numero', 'numero_por_tipo', 'id_tipo_item',
                        'id_propiedad_item', 'propiedad_item_versiones',
-                       'id_fase']
+                       'id_fase', '__actions__']
     __xml_fields__ = ['Check']
     __default_column_width__ = '15em'
-    __column_widths__ = { '__actions__': "50em"}
+    #__column_widths__ = { '__actions__': "50em"}
     __field_order__ = ["codigo", "version","tipo", "check"]
 
 item_generar_table = ItemGenerarTable(DBSession)
@@ -184,27 +170,19 @@ class ItemGenerarTableFiller(CustomTableFiller):
 
     def __actions__(self, obj):
         """Links de acciones para un registro dado"""
-
-        value = '<div>'
+        
+        value = '<div>' #por el momento.
+        '''
         clase = 'actions_fase'
         controller = "../items/%d/" % obj.id_item
         
-        #id_fase = UrlParser.parse_id(request.url, "fases")
-        
-        #si está en la tabla que se encuentra en edit fase necesita 
-        #if UrlParser.parse_nombre(request.url, "fases"):
-        #    controller = u""
-            #id_item = obj.items[0].propiedad_item.id_item_actual
-        #    id_fase = Item.por_id(id_item).id_fase
-        #else:
-        #    id_fase = UrlParser.parse_id(request.url, "fases")
-            
         value += '<div>' + \
                  '<a href="'+ controller +'" ' + \
                  'class="' + clase + '">Examinar</a>' + \
                  '</div><br />'
 
         value += '</div>'
+        '''
         return value
 
     def _do_get_provider_count_and_objs(self, id_fase=None, items=None, **kw):
@@ -557,11 +535,11 @@ class LineaBaseController(CrudRestController):
             else:
                 inhabilitados.append(p_item)
                 
+        user = Usuario.by_user_name(request.credentials["repoze.what.userid"])
         if (inhabilitados == []):
             lb.estado = u"Cerrada"
 
             #registrar en el historial
-            user = Usuario.by_user_name(request.credentials["repoze.what.userid"])
             for p_item in habilitados:
                 p_item.estado = u"Bloqueado"
                 HistorialItems.registrar(user, p_item, u"Bloqueo")
@@ -572,7 +550,11 @@ class LineaBaseController(CrudRestController):
 
             flash("Linea base cerrada correctamente")
             redirect('../')
-
+        
+        #Romper la LB.
+        lb.estado = u"Rota"
+        HistorialLB.registrar(user, lb, u"Ruptura")
+        
         page = u"Generar LB parcial a partir de : {codigo}".format(codigo=lb.codigo)
         tmpl_context.tabla_items_habilitados = ItemGenerarTable(DBSession)
         tmpl_context.tabla_items = ItemInhabilitadosTable(DBSession)
