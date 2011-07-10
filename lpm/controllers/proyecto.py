@@ -15,7 +15,7 @@ from tg.decorators import (paginate, expose, with_trailing_slash,
 from tg import redirect, request, require, flash, validate, session
 
 from lpm.controllers.validaciones.proyecto_validator import ProyectoAddFormValidator, ProyectoEditFormValidator
-from lpm.model import DBSession, Proyecto, Usuario, Rol
+from lpm.model import DBSession, Proyecto, Usuario, Rol, PropiedadItem, Item, Fase
 from lpm.lib.sproxcustom import (CustomTableFiller, 
                                  CustomPropertySingleSelectField)
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
@@ -33,6 +33,8 @@ from sprox.fillerbase import EditFormFiller
 from sprox.formbase import AddRecordForm, EditableForm
 from sprox.recordviewbase import RecordViewBase
 from repoze.what.predicates import not_anonymous, is_anonymous, All
+
+from sqlalchemy import and_
 
 import pylons
 from pylons import tmpl_context
@@ -381,6 +383,13 @@ class ProyectoController(CrudRestController):
     @expose()
     def post_delete(self, id_proyecto):
         proy = Proyecto.por_id(int(id_proyecto))
+        p_items = DBSession.query(PropiedadItem).filter(and_(PropiedadItem.id_item_actual ==\
+                                                   Item.id_item, Item.id_fase == \
+                                                   Fase.id_fase, Fase.id_proyecto ==
+                                                   id_proyecto)).all()
+        for pi in p_items:
+            DBSession.delete(pi)
+                                                   
         DBSession.delete(proy)
         flash("Proyecto Eliminado")
         redirect("/proyectos/")

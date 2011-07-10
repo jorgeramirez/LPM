@@ -44,58 +44,7 @@ __all__ = ['Item', 'PropiedadItem', 'RelacionPorItem',
            'Relacion', 'AtributosDeItems', 'ArchivosExternos',
             'ArchivosPorItem', 'HistorialItems', 'AtributosPorItem']
 
-"""
-class HiloContador(threading.Thread):
-    def __init__(self, p_item, lock_v, lock_h, lock_s, v, suma):
-        self.p_item = p_item
-        self.lock_v = lock_v
-        self.lock_s = lock_s
-        self.lock_h = lock_h
-        self.visitados = v
-        self.suma = sumaa
-        self.lh = []
-                
-        threading.Thread.__init__(self)
-        
-    def run(self):
-        
-        for ri in self.p_item.relaciones:
-            relacion = Relacion.por_id(ri.id_relacion)
-            otro = relacion.obtener_otro_item(self.p_item.id_item_actual)
-            p_otro = PropiedadItem.por_id(otro.id_propiedad_item)
-            
-            self.lock_v.acquire()
-            if (not self.visitados.has_key(p_otro.id_item_actual)):
-                self.visitados.setdefault(p_otro.id_item_actual, [])
-                self.lock_v.release()
-                
-                self.lock_s.acquire()
-                self.suma[0] += p_otro.complejidad
-                #print 'suma: ', self.suma
-                self.lock_s.release()
-                
-                fase = lpm.model.Fase.por_id(otro.id_fase)                
-                identacion = " " * fase.posicion
-                fila = identacion + otro.codigo + " " + str(p_otro.complejidad)
-                self.lock_v.acquire()
-                self.visitados[p_otro.id_item_actual].append(fila)
-                #self.visitados[p_otro.id_item_actual].setdefault('codigo', otro.codigo)
-                #self.visitados[p_otro.id_item_actual].setdefault('compl', p_otro.complejidad)
-                #self.visitados[p_otro.id_item_actual].setdefault('papa', p_item.id_item_actual)
-                self.lock_v.release()
-                
-                hilo = HiloContador(p_otro, self.lock_v, self.lock_h, self.lock_s, self.visitados, self.suma)
-                #self.lock_h.acquire()
-                self.lh.append(hilo)
-                hilo.start()
-                #self.lock_h.release()
 
-            else:
-                self.lock_v.release()
-        
-        for h in self.lh:
-            h.join()
-"""
                          
 class HiloAdelante(threading.Thread):
     def __init__(self, p_item, lock_v, lock_s, v, suma, colores):
