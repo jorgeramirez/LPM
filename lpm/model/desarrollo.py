@@ -111,7 +111,7 @@ class HiloAdelante(threading.Thread):
         
         for ri in self.p_item.relaciones:
             relacion = Relacion.por_id(ri.id_relacion)
-            if (relacion.id_anterior == p_item.id_item_actual):
+            if (relacion.id_anterior == self.p_item.id_item_actual):
                 otro = relacion.obtener_otro_item(self.p_item.id_item_actual)
                 p_otro = PropiedadItem.por_id(otro.id_propiedad_item)
                 
@@ -127,11 +127,11 @@ class HiloAdelante(threading.Thread):
                     fase = lpm.model.Fase.por_id(otro.id_fase)                
                     arista = str(p_otro.id_item_actual) + " : { directed: true }"
                     #TODO color diferente para fase diferente
-                    nodo = p_otro.id_item_actual + " : {'color': '#b2b', 'shape': 'dot', 'label': '" +\
-                            str(otro.codigo) + "-" + str(p_otro.complejidad) + "'}"
+                    nodo = str(p_otro.id_item_actual) + " : {'color': '#b2b', 'shape': 'dot', 'label': '" +\
+                            str(otro.codigo) + "-" + str(p_otro.complejidad) + "'},\n"
                     
                     self.lock_v.acquire()
-                    self.visitados[p_item.id_item_actual]['aristas'].append(arista)
+                    self.visitados[self.p_item.id_item_actual]['aristas'].append(arista)
                     self.visitados[p_otro.id_item_actual]['nodo'].append(nodo)
                     self.lock_v.release()
                     
@@ -162,7 +162,7 @@ class HiloAtras(threading.Thread):
         
         for ri in self.p_item.relaciones:
             relacion = Relacion.por_id(ri.id_relacion)
-            if (relacion.id_posterior == p_item.id_item_actual):
+            if (relacion.id_posterior == self.p_item.id_item_actual):
                 otro = relacion.obtener_otro_item(self.p_item.id_item_actual)
                 p_otro = PropiedadItem.por_id(otro.id_propiedad_item)
                 
@@ -176,10 +176,10 @@ class HiloAtras(threading.Thread):
                     self.lock_s.release()
                     
                     fase = lpm.model.Fase.por_id(otro.id_fase)                
-                    arista = str(p_item.id_item_actual) + " : { directed: true }"
+                    arista = str(self.p_item.id_item_actual) + " : { directed: true }"
                     #TODO color diferente para fase diferente
-                    nodo = p_otro.id_item_actual + " : {'color': '#b2b', 'shape': 'dot', 'label': '" +\
-                            str(otro.codigo) + "-" + str(p_otro.complejidad) + "'}"
+                    nodo = str(p_otro.id_item_actual) + " : {'color': '#b2b', 'shape': 'dot', 'label': '" +\
+                            str(otro.codigo) + "-" + str(p_otro.complejidad) + "'},\n"
                     
                     self.lock_v.acquire()
                     self.visitados[p_otro.id_item_actual]['aristas'].append(arista)
@@ -652,12 +652,13 @@ class Item(DeclarativeBase):
             if (id != self.id_item):
                 grafo['nodos'] += partes['nodo'][0]
                 grafo['aristas'] += (str(id) + ": { " + (",\n".join(partes['aristas'])) + "},\n")   
-                
+                      
         for id, partes in visitados2.items():
             if (id != self.id_item):
                 grafo['nodos'] += partes['nodo'][0]
                 grafo['aristas'] += (str(id) + ": { " + (",\n".join(partes['aristas'])) + "},\n")    
        
+        
         
         return sumatoria_total, grafo
 
@@ -1240,9 +1241,9 @@ class Relacion(DeclarativeBase):
         """
         item = Item.por_id(id_item)
         
-        return DBSession.query(cls).filter(cls.id_posterior == id_item)\
-                                           .filter(item.id_propiedad_item == RelacionPorItem.id_propiedad_item)\
-                                           .filter(cls.id_relacion == RelacionPorItem.id_relacion).all()
+        return DBSession.query(cls).filter(and_(cls.id_posterior == id_item,\
+                                                cls.id_relacion == RelacionPorItem.id_relacion,\
+                                                item.id_propiedad_item == RelacionPorItem.id_propiedad_item)).all()
 
     @classmethod
     def relaciones_como_anterior(cls, id_item):
@@ -1258,9 +1259,9 @@ class Relacion(DeclarativeBase):
         """
         item = Item.por_id(id_item)
         
-        return DBSession.query(cls).filter(cls.id_anterior == id_item)\
-                                           .filter(item.id_propiedad_item == RelacionPorItem.id_propiedad_item)\
-                                           .filter(cls.id_relacion == RelacionPorItem.id_relacion).all()
+        return DBSession.query(cls).filter(and_(cls.id_anterior == id_item,\
+                                                cls.id_relacion == RelacionPorItem.id_relacion,\
+                                                item.id_propiedad_item == RelacionPorItem.id_propiedad_item)).all()
     
     #{ Métodos de Objeto
     def obtener_otro_item(self, id_item):
