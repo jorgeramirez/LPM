@@ -69,9 +69,13 @@ class HistorialLBTableFiller(CustomTableFiller):
         clase = 'actions_fase'
         id = str(obj.id_lb)
         id_fase = UrlParser.parse_id(request.url, "fases")
+        url_cont = "./"
+        if UrlParser.parse_nombre(request.url, "post_buscar"):
+            url_cont = "../"
         if PoseePermiso('consultar lb',
                         id_fase=id_fase).is_met(request.environ):
-            value += '<div>' + '<a href="./' + 'examinar/'  + id + \
+            
+            value += '<div>' + '<a href="' + url_cont + 'examinar/'  + id + \
                         '" class="' + clase + '">Examinar</a>' + \
                      '</div><br />'                
         value += '</div>'
@@ -84,7 +88,7 @@ class HistorialLBTableFiller(CustomTableFiller):
         count, lista = super(HistorialLBTableFiller, self).\
                             _do_get_provider_count_and_objs(**kw)
         filtrados = []
-        for hlb in lb.historial_lb:
+        for hlb in reversed(lb.historial_lb):
             if hlb in lista:
                 filtrados.append(hlb)
         return len(filtrados), filtrados
@@ -211,7 +215,7 @@ class HistorialLBController(CrudRestController):
         tmpl_context.widget = self.table
         buscar_table_filler = HistorialLBTableFiller(DBSession)
         buscar_table_filler.filtros = kw
-        historial = self.table_filler.get_value(lb=lb, **kw)
+        historial = buscar_table_filler.get_value(lb=lb, **kw)
         return dict(lista_elementos=historial, 
                     page=titulo,
                     titulo=titulo, 
