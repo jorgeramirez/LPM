@@ -100,16 +100,20 @@ class UniqueEditNroDocumento(FancyValidator):
                                         value, state)
         return value
 
+class PasswordChanged(FancyValidator):
+    def _to_python(self, value, state):
+        if value != None:
+            if len(value) < 6:
+                raise Invalid('Password incorrecto, minimo 6 caracteres',
+                                        value, state)
+        return value
+
 class UsuarioEditFormValidator(UsuarioAddFormValidator):
     nombre_usuario = None
     password = None
     repita_password = None
-    nuevo_password = All(String(min=6,messages={'tooShort':
-            'Password incorrecto, minimo 6 caracteres'}), 
-            NotEmpty(messages={'empty':'Ingrese password'}))
-    repita_nuevo_password = All(String(min=6,messages={'tooShort':
-            'Password incorrecto, minimo 6 caracteres'}), 
-            NotEmpty(messages={'empty':'Ingrese password'}))
+    nuevo_password = PasswordChanged()
+    repita_nuevo_password = PasswordChanged()
     email = All(UniqueEditEmail(),Email(not_empty=True,messages = {
         'empty': 'Ingrese una direccion de email',
         'noAt': 'Un email debe contener un @',
