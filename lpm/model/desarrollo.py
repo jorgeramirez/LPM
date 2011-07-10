@@ -35,6 +35,8 @@ from lpm.model.excepciones import *
 
 import transaction
 
+import random
+
 import thread
 import threading
 
@@ -96,12 +98,13 @@ class HiloContador(threading.Thread):
 """
                          
 class HiloAdelante(threading.Thread):
-    def __init__(self, p_item, lock_v, lock_s, v, suma):
+    def __init__(self, p_item, lock_v, lock_s, v, suma, colores):
         self.p_item = p_item
         self.lock_v = lock_v
         self.lock_s = lock_s
         self.visitados = v
         self.suma = suma
+        self.colores = colores
         self.lh = []
                 
         threading.Thread.__init__(self)
@@ -126,8 +129,9 @@ class HiloAdelante(threading.Thread):
                     
                     fase = lpm.model.Fase.por_id(otro.id_fase)                
                     arista = str(p_otro.id_item_actual) + " : { directed: true }"
-                    #TODO color diferente para fase diferente
-                    nodo = str(p_otro.id_item_actual) + " : {'color': '#b2b', 'shape': 'dot', 'label': '" +\
+                    
+                    nodo = str(p_otro.id_item_actual) + " : {'color': '#"+ self.colores[fase.posicion - 1] +\
+                            "', 'shape': 'dot', 'label': '" +\
                             str(otro.codigo) + "-" + str(p_otro.complejidad) + "'},\n"
                     
                     self.lock_v.acquire()
@@ -147,12 +151,13 @@ class HiloAdelante(threading.Thread):
             h.join()
             
 class HiloAtras(threading.Thread):
-    def __init__(self, p_item, lock_v, lock_s, v, suma):
+    def __init__(self, p_item, lock_v, lock_s, v, suma, colores):
         self.p_item = p_item
         self.lock_v = lock_v
         self.lock_s = lock_s
         self.visitados = v
         self.suma = suma
+        self.colores = colores
         self.lh = []
                 
         threading.Thread.__init__(self)
@@ -178,7 +183,8 @@ class HiloAtras(threading.Thread):
                     fase = lpm.model.Fase.por_id(otro.id_fase)                
                     arista = str(self.p_item.id_item_actual) + " : { directed: true }"
                     #TODO color diferente para fase diferente
-                    nodo = str(p_otro.id_item_actual) + " : {'color': '#b2b', 'shape': 'dot', 'label': '" +\
+                    nodo = str(p_otro.id_item_actual) + " : {'color': '#"+ self.colores[fase.posicion - 1] +\
+                            "', 'shape': 'dot', 'label': '" +\
                             str(otro.codigo) + "-" + str(p_otro.complejidad) + "'},\n"
                     
                     self.lock_v.acquire()
@@ -624,9 +630,15 @@ class Item(DeclarativeBase):
         visitados2 = {}
         visitados2.setdefault(p_item.id_item_actual, {'nodo': [], 'aristas': []})
         sumatoria2 = [0]
-         
-        hilo1 = HiloAdelante(p_item, lock_visitados1, lock_sumatoria1, visitados1, sumatoria1)
-        hilo2 = HiloAtras(p_item, lock_visitados2, lock_sumatoria2, visitados2, sumatoria2)
+        
+        proy = lpm.model.Proyecto.por_id(lpm.model.Fase.por_id(self.id_fase).id_proyecto)
+        colores = []
+        for i in range(proy.numero_fases):
+            colores.append(str(random.randint(0, 9)) + str(random.randint(0, 9)) + str(random.randint(0, 9)))
+        
+        
+        hilo1 = HiloAdelante(p_item, lock_visitados1, lock_sumatoria1, visitados1, sumatoria1, colores)
+        hilo2 = HiloAtras(p_item, lock_visitados2, lock_sumatoria2, visitados2, sumatoria2, colores)
         
         hilo1.start()
         hilo2.start()
