@@ -300,7 +300,8 @@ class UsuarioController(CrudRestController):
         usuario.email = kw["email"]
         usuario.telefono = kw["telefono"]
         usuario.nro_documento = kw["nro_documento"]
-        usuario.password = kw["nuevo_password"]
+        if kw["nuevo_password"] != None:
+            usuario.password = kw["nuevo_password"]
     
         redirect("../") 
     
