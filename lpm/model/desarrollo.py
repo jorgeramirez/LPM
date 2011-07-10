@@ -81,14 +81,14 @@ class HiloAdelante(threading.Thread):
                     
                     nodo = str(p_otro.id_item_actual) + " : {'color': '#"+ self.colores[fase.posicion - 1] +\
                             "', 'shape': 'dot', 'label': '" +\
-                            str(otro.codigo) + "-" + str(p_otro.complejidad) + "'},\n"
+                            str(otro.codigo) + "(" + str(p_otro.complejidad) + ")'},\n"
                     
                     self.lock_v.acquire()
                     self.visitados[self.p_item.id_item_actual]['aristas'].append(arista)
                     self.visitados[p_otro.id_item_actual]['nodo'].append(nodo)
                     self.lock_v.release()
                     
-                    hilo = HiloAdelante(p_otro, self.lock_v, self.lock_s, self.visitados, self.suma)
+                    hilo = HiloAdelante(p_otro, self.lock_v, self.lock_s, self.visitados, self.suma, self.colores)
 
                     self.lh.append(hilo)
                     hilo.start()
@@ -134,14 +134,14 @@ class HiloAtras(threading.Thread):
                     #TODO color diferente para fase diferente
                     nodo = str(p_otro.id_item_actual) + " : {'color': '#"+ self.colores[fase.posicion - 1] +\
                             "', 'shape': 'dot', 'label': '" +\
-                            str(otro.codigo) + "-" + str(p_otro.complejidad) + "'},\n"
+                            str(otro.codigo) + "(" + str(p_otro.complejidad) + ")'},\n"
                     
                     self.lock_v.acquire()
                     self.visitados[p_otro.id_item_actual]['aristas'].append(arista)
                     self.visitados[p_otro.id_item_actual]['nodo'].append(nodo)
                     self.lock_v.release()
                     
-                    hilo = HiloAtras(p_otro, self.lock_v, self.lock_s, self.visitados, self.suma)
+                    hilo = HiloAtras(p_otro, self.lock_v, self.lock_s, self.visitados, self.suma, self.colores)
 
                     self.lh.append(hilo)
                     hilo.start()
@@ -186,7 +186,7 @@ class Item(DeclarativeBase):
                         'r-d' : u"Revisión-Desbloq"
                         }
     #{ Relaciones
-    propiedad_item_versiones = relation('PropiedadItem')
+    propiedad_item_versiones = relation('PropiedadItem', cascade="delete")
     
     #}
 
@@ -202,6 +202,17 @@ class Item(DeclarativeBase):
                                       numero_por_tipo=item.numero_por_tipo,
                                       pos=fase.posicion,
                                       proy=tipo.id_proyecto)
+    
+    def lb_actual(self):
+        """ obtine la lb actual del item
+        @return: None si no está en un lb
+        """
+        p_item = PropiedadItem.por_id(self.id_propiedad_item)
+        lb = DBSession.query(lpm.model.LB).filter(and_(lpm.model.LB.id_lb == lpm.model.ItemsPorLB.id_lb,\
+                                             lpm.model.ItemsPorLB.id_item == PropiedadItem.id_propiedad_item,\
+                                             PropiedadItem.id_propiedad_item == p_item.id_propiedad_item))\
+                                             .order_by(lpm.model.LB.id_lb.desc()).first()
+        return lb
     
     def aprobar(self, usuario): #jorge (falta probar)
         """
@@ -275,6 +286,7 @@ class Item(DeclarativeBase):
         p_item = PropiedadItem.por_id(self.id_propiedad_item)
         if p_item.estado == u"Aprobado" :
             p_item.estado = u"Desaprobado"
+            
         elif p_item.estado == u"Revision-Desbloq":
             for rpi in p_item.relaciones:
                 if (rpi.relacion.revisar):
@@ -288,11 +300,15 @@ class Item(DeclarativeBase):
                         
             p_item.estado = u"Desaprobado"
 
-            iplb = lpm.model.ItemsPorLB.filter_by_id_item(p_item.id_propiedad_item)
-            lb = lpm.model.Lb.por_id(iplb.id_lb)
-            lb.romper()
+#            iplb = lpm.model.ItemsPorLB.filter_by_id_item(p_item.id_propiedad_item)
+#            lb = lpm.model.Lb.por_id(iplb.id_lb)
+        lb = self.lb_actual()
+        if lb:
+            lb.romper(usuario)
+                
         else:
             raise DesAprobarItemError()
+        
         op = u"Desaprobación"
         DBSession.flush()
         HistorialItems.registrar(usuario, p_item, op)
@@ -311,6 +327,7 @@ class Item(DeclarativeBase):
         p_item = PropiedadItem.por_id(self.id_propiedad_item)
         if p_item.estado != u"Aprobado":
             raise BloquearItemError()
+        
         p_item.estado = u"Bloqueado"
         op = u"Bloqueo"
         
@@ -328,6 +345,7 @@ class Item(DeclarativeBase):
         @raises DesBloquearItemError: el estado del L{Item} es distinto al 
             de "Bloqueado" o "Revision-Desbloq"
         """
+        
         p_item = PropiedadItem.por_id(self.id_propiedad_item)
         if p_item.estado == u"Bloqueado":
             p_item.estado = u"Aprobado"
@@ -336,8 +354,8 @@ class Item(DeclarativeBase):
         else:
             raise DesBloquearItemError()
         op = u"Desbloqueo"
+        DBSession.flush()
         HistorialItems.registrar(usuario, p_item, op)        
-        DBSession.add(p_item)
     
     def marcar_para_revisar(self, usuario):#nahuelop
         """id_origen es el id de un Item desde el que se produjo el cambio """
@@ -350,17 +368,13 @@ class Item(DeclarativeBase):
         '''
         
         for rpi in p_item.relaciones:
-#            relacion = Relacion.por_id(r.id_relacion)
-#            
-#            if (relacion.id_anterior == self.id_item):
-#                otro = Item.por_id(relacion.id_anterior)
-#            else:
-#                otro = Item.por_id(relacion.id_posterior)
             
             otro = rpi.relacion.obtener_otro_item(self.id_item)
             p_otro = PropiedadItem.por_id(otro.id_item)
-               
-            if (otro.revisar(usuario)):#solo si se cambio el estado de revisar se pone como para revisar la relacion
+            
+            #solo si se cambio el estado de revisar se pone como para revisar la relacion
+            '''   
+            if (otro.revisar(usuario)):
                 rpi_otro = DBSession.query(RelacionPorItem).\
                                             filter(and_(RelacionPorItem.id_propiedad_item\
                                             == otro.id_propiedad_item,\
@@ -368,6 +382,12 @@ class Item(DeclarativeBase):
                                             .order_by(RelacionPorItem.id_relacion_por_item.desc())\
                                             .first()
                 rpi_otro.revisar = True
+            '''
+            for rpi_otro in p_otro.relaciones:
+                if (rpi_otro.relacion.id_anterior == self.id_item or\
+                    rpi_otro.relacion.id_posterior == self.id_item):
+                    if (otro.revisar(usuario)):
+                        rpi_otro.revisar = True   
 
     def revisar(self, usuario):
         """ Cambia el estado de bloqueado a Rev-bloqueado y de aprobado a 
@@ -377,13 +397,10 @@ class Item(DeclarativeBase):
         p_item = PropiedadItem.por_id(self.id_propiedad_item)
         if (p_item.estado == u"Bloqueado"):
             p_item.estado = u"Revisión-Bloq"
-            lb = DBSession.query(lpm.model.LB).filter(and_(lpm.model.LB.id_lb ==\
-                                                            lpm.model.ItemsPorLB.id_lb,\
-                                                            lpm.model.ItemsPorLB.id_item==\
-                                                            p_item.id_propiedad_item))\
-                                                            .order_by(lpm.LB.id_lb.desc())\
-                                                            .first()
-            lb.estado = u"Para-Revisión"
+            lb = self.lb_actual()
+            if (lb and lb.estado == u"Cerrada"):
+                lb.estado = u"Para-Revisión"
+                
             DBSession.flush()
             HistorialItems.registrar(usuario, p_item, u"Revisión")
             HistorialLB.registrar(usuario, lb, u"Para-Revisión")
@@ -410,7 +427,27 @@ class Item(DeclarativeBase):
         if p_item.estado in [u"Bloqueado", u"Eliminado", u"Revisión-Bloq"]:
             raise EliminarItemError()
         p_item.estado = u"Eliminado"
-        if (p_item.estado )
+        
+        #se rompe la linea base en donde esta
+        lb = self.lb_actual()
+        en_lb = False
+        if (lb and lb.estado != u"Rota"):
+            lb.romper(usuario)
+            en_lb = True
+        
+        #se marcan para revisar los rpi del otro item
+        #y se marca para revision el otro
+        
+        for rpi in p_item.relaciones:
+            otro = rpi.relacion.obtener_otro_item(self.id_item)
+            p_otro = PropiedadItem.por_id(otro.id_propiedad_item)
+            
+            for rpi_otro in p_otro.relaciones:
+                if (rpi_otro.relacion.id_anterior == self.id_item or\
+                    rpi_otro.relacion.id_posterior == self.id_item):
+                    if (otro.revisar(usuario)):
+                        rpi_otro.revisar = True        
+            
         op = u"Eliminación"
         proy = DBSession.query(lpm.model.Proyecto) \
                         .join(lpm.model.Fase) \
@@ -438,8 +475,7 @@ class Item(DeclarativeBase):
             
         return False
 
-            
-        
+    
     def revivir(self, usuario):
         """
         Revive un ítem, implica que el mismo reviva con el estado desbloqueado.
@@ -648,7 +684,7 @@ class Item(DeclarativeBase):
         
         #a ver si le gusta el \n
         nodo = str(p_item.id_item_actual) + " : {'color': '#333', 'shape': 'box', 'label': '" +\
-                           str(self.codigo) + "-" + str(p_item.complejidad) + "'},\n"
+                           str(self.codigo) + "(" + str(p_item.complejidad) + ")'},\n"
                            
         visitados1[p_item.id_item_actual]['aristas']\
                 .extend(visitados2[p_item.id_item_actual]['aristas'])
@@ -668,34 +704,7 @@ class Item(DeclarativeBase):
        
         
         
-        return sumatoria_total, grafo
-
-
-        
-#    def _sumar(self, v, sum, lh):
-#        
-#        for ri in self.p_item.relaciones:
-#            relacion = Relacion.por_id(ri.id_relacion)
-#            otro = relacion.obtener_otro_item(self.p_item.id_item_actual)
-#            p_otro = PropiedadItem.por_id(otro.id_propiedad_item)
-#            
-#            self.lock_v.acquire()
-#            if (not self.visitados.has_key(p_otro.id_item_actual)):
-#                self.visitados.setdefault(p_otro.id_item_actual, True)
-#                self.lock_v.release()
-#                
-#                self.lock_s.acquire()
-#                self.sum += p_otro.complejidad
-#                self.lock_s.release()
-#                
-#                hilo = HilosContador(self.p_otro, self.lock_v, self.lock_h, self.lock_s, self.visitados, self.sum, self.lh)
-#                self.lock_hilos.adquire()
-#                self.li.append(hilo)
-#                self.lock_hilos.release()
-#                hilo.star()
-#                
-#            else:
-#                self.lock_v.release()            
+        return sumatoria_total, grafo         
             
     def crear_siguiente_propiedad_item(self):
         """Crea y asigna al item una nueva propiedad en la que se deben realizar
@@ -832,9 +841,9 @@ class PropiedadItem(DeclarativeBase):
                                                 ondelete='CASCADE'))
     
     #{ Relaciones
-    relaciones = relation('RelacionPorItem')
-    archivos = relation('ArchivosPorItem')
-    atributos = relation('AtributosPorItem')
+    relaciones = relation('RelacionPorItem', cascade="delete")
+    archivos = relation('ArchivosPorItem', cascade="delete")
+    atributos = relation('AtributosPorItem', cascade="delete")
     #}
     
     def modificar_atributo(self, usuario, id_atributo, valor):
@@ -899,7 +908,7 @@ class PropiedadItem(DeclarativeBase):
         @return: un string conteniendo los códigos de los ítems con los que no se puedo relacionar
         por formaciones de ciclos, cadena vacía en caso de que todos se relacionen.
         """
-        retorno = u""
+        retorno = []
         creado = False
         
         item = Item.por_id(self.id_item_actual)
@@ -936,26 +945,31 @@ class PropiedadItem(DeclarativeBase):
             DBSession.flush()
             relacion.set_codigo()
             
+            p_item_nuevo.relaciones.append(rel_por_item1)
+            p_item_ant.relaciones.append(rel_por_item2)
+            DBSession.add(rel_por_item1)
+            DBSession.add(rel_por_item2)
+            #no hace falta agregar p_item_ant verdad?
+            DBSession.flush()
+            
             if (tipo == 'p-h' and \
                 PropiedadItem._detectar_bucle(p_item_nuevo)):
                 #raise RelacionError(u"Se formó un bucle con la realcion nueva")
                 DBSession.delete(relacion)
                 DBSession.flush()
-                retorno += (u"  :  " + antecesor.codigo)
+                retorno.append(antecesor.codigo)
                 continue
             elif (not creado):
                 creado = True
-                          
-            p_item_nuevo.relaciones.append(rel_por_item1)
-            p_item_ant.relaciones.append(rel_por_item2)
-            DBSession.add_all([rel_por_item1, rel_por_item2])
-            #no hace falta agregar p_item_ant verdad?
-        
+                   
+           #DBSession.add(rel_por_item2)
+            
         if (not creado):
             item.id_propiedad_item = self.id_propiedad_item
-            DBSession.delete(p_item_nuevo)
-            
-        return retorno, creado  
+            #DBSession.delete(p_item_nuevo)
+        
+        no_relacionados = ", ".join(retorno)    
+        return no_relacionados, creado
     
     @classmethod        
     def _detectar_bucle(cls, item_prop):   
@@ -968,32 +982,37 @@ class PropiedadItem(DeclarativeBase):
         inicio = item_prop.id_item_actual
         visitado = {}
         
-        return cls._dfs(inicio, item_prop, visitado)
+        resultado = cls._dfs(inicio, item_prop, visitado)
+
+        return resultado
         
     @classmethod
     def _dfs(cls, inicio, nodo, visitado):
         """ Realiza la búsqueda en profundidad para encontrar bucles """
-        if (visitado.has_key(nodo.id_item_actual) and visitado[nodo.id_item_actual]):
-            if (inicio == nodo.id_item_actual):
-                return [nodo.id_item_actual]
+        if (visitado.has_key(nodo.id_item_actual)):
         
-        visitado.setdefault(nodo.id_item_actual, True)
+            if (visitado[nodo.id_item_actual]):
+                if (inicio == nodo.id_item_actual):
+                    return [nodo.id_item_actual]
+            else:
+                visitado[nodo.id_item_actual] = True
+        else:
+            visitado.setdefault(nodo.id_item_actual, True)
         
         #TODO mejorar el query de la función relaciones_como_anterior
         r_anterior = Relacion.relaciones_como_anterior(nodo.id_item_actual)
-        print r_anterior
-        if (r_anterior):
-            
-            for arco in r_anterior:
-                if (arco.tipo == Relacion.tipo_relaciones['p-h']):
-                    adyacente = PropiedadItem.por_id(Item.por_id(arco.id_anterior).id_propiedad_item)
-                    ciclo = PropiedadItem._dfs(inicio, adyacente, visitado)
-                    if (ciclo):
-                        ciclo.append(adyacente.id_item_actual)
+        
+        ciclo = None   
+        for arco in r_anterior:
+            if (arco.tipo == Relacion.tipo_relaciones['p-h']):
+                adyacente = PropiedadItem.por_id(Item.por_id(arco.id_posterior).id_propiedad_item)
+                ciclo = PropiedadItem._dfs(inicio, adyacente, visitado)
+                if (ciclo):
+                    ciclo.append(adyacente.id_item_actual)
                 
         visitado[nodo.id_item_actual] = False
         
-        return None
+        return ciclo
 
     def eliminar_relaciones(self, ids):#nahuel
         """
@@ -1159,7 +1178,7 @@ class RelacionPorItem(DeclarativeBase):
     #referencing a single instance of the child object.
     
     #relaciones = relation("Relacion")
-    relacion = relation("Relacion")
+    relacion = relation("Relacion", cascade="delete")
     
     #Métodos de clase
     @classmethod
@@ -1270,10 +1289,15 @@ class Relacion(DeclarativeBase):
         """
         item = Item.por_id(id_item)
         
-        return DBSession.query(cls).filter(and_(cls.id_anterior == id_item,\
+        retorno = DBSession.query(cls).filter(and_(cls.id_anterior == id_item,\
                                                 cls.id_relacion == RelacionPorItem.id_relacion,\
                                                 item.id_propiedad_item == RelacionPorItem.id_propiedad_item)).all()
-    
+        
+        if not retorno:
+            return []
+        else:
+            return retorno
+        
     #{ Métodos de Objeto
     def obtener_otro_item(self, id_item):
         """

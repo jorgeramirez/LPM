@@ -50,19 +50,16 @@ class FaseDesarrolloTableFiller(CustomTableFiller):
     def __actions__(self, obj):
         """Links de acciones para un registro dado"""
         value = '<div>'
-        clase = 'actions_fase'
-        id_proyecto = UrlParser.parse_id(request.url, "proyectos_desarrollo")
-        url_proy = "/proyectos_desarrollo/"
-
-        url_cont = url_proy + "%d/fases_desarrollo/"
-        url_cont %= id_proyecto
-
-
+        clase = 'actions'
+        controller = './' + str(obj.id_fase)
+        if (UrlParser.parse_nombre(request.url, "post_buscar")):
+            controller = '../' + str(obj.id_fase)
+            
         value += '<div>' + \
-                    '<a href="'+ url_cont + str(obj.id_fase) + '/items/" ' + \
+                    '<a href="' + controller + '/items/" ' + \
                     'class="' + clase + '">Seleccionar</a>' + \
-                 '</div>'
-                 
+                 '</div><br />'
+
         value += '</div>'
         return value
     

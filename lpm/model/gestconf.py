@@ -50,7 +50,7 @@ class LB(DeclarativeBase):
     # template para codificacion
     tmpl_codigo = u"lb-{id_lb}"
     #{ Relaciones
-    items = relation("ItemsPorLB", backref='lb')
+    items = relation("ItemsPorLB", backref='lb', cascade="delete")
     #}
 
     @classmethod
@@ -74,11 +74,12 @@ class LB(DeclarativeBase):
         iplb.propiedad_item = p_item
         self.items.append(iplb)
     
-    def romper(self):
+    def romper(self, usuario):
         """
         Rompe una linea base
         """
-        pass
+        self.estado = u"Rota"
+        HistorialLB.registrar(usuario, self, u"Rutura")
     
     @classmethod
     def por_id(cls, id):
@@ -148,7 +149,7 @@ class ItemsPorLB(DeclarativeBase):
                                         onupdate="CASCADE", ondelete="CASCADE"))
     
     #{ Relaciones
-    propiedad_item = relation('PropiedadItem', backref='item_lb_assocs')
+    propiedad_item = relation('PropiedadItem', backref='item_lb_assocs', cascade="delete")
     #}
     
     @classmethod
@@ -162,4 +163,4 @@ class ItemsPorLB(DeclarativeBase):
         @return: el elemento recuperado
         @rtype: L{ItemsPorLB}
         """
-        return DBSession.query(cls).filter_by(id_item=id).one()
+        return DBSession.query(cls).filter_by(id_item=id).first()

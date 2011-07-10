@@ -210,30 +210,39 @@ class ItemRelacionController(CrudRestController):
         p_item = PropiedadItem.por_id(item.id_propiedad_item)
         
         ids = []
+        id = None
         if kw:
             for k, pk in kw.items():
                 if not k.isalnum():
                     continue
                 ids.append(int(pk))
         
-        try:
-            id = int(args[0])
-            if (id > 0):
-                ids.append(id)
-        except:
-            id = 0
-            flash(u"Argumento invalido", "warning")
+        else:
+            try:
+                id = int(args[0])
+                if (id > 0):
+                    ids.append(id)
+            except:
+                id = 0
+                flash(u"Argumento inválido", "warning")
             
         p_item.agregar_relaciones(ids, 'a-s')
         
         usuario = Usuario.by_user_name(request.identity['repoze.who.userid'])
         item.guardar_historial(u"relacionar-AS", usuario)
+        
+        mensaje = ""
+
+        indice = session.get('indice_mensaje', 0)
+        session['indice_mensaje'] = indice + 1
+        session[str(indice)] = mensaje
+           
         if (id):
-            redirect("../")
+            redirect('../mensajes/%d' % indice)
         else:
             transaction.commit()   
             #return "/items/%d/edit" % id_item
-            return './'
+            return './mensajes/%d' % indice
         
     @expose()
     def relacionar_ph(self, *args, **kw):
@@ -268,12 +277,13 @@ class ItemRelacionController(CrudRestController):
             item.guardar_historial(u"relacionar-PH", usuario)
         
         mensaje = ""
-        if (retorno == u"" and creado):
-            mensaje = u"Relacionado exitósamente"
+        if (retorno == u"" and not creado):
+            mensaje = u"No se crearon relaciones"
         elif (retorno != u""):
             mensaje = u"No se pudo crear la relación con %s" % retorno
             
         #no sé como pasar strings como parámetro, fea solución
+
         indice = session.get('indice_mensaje', 0)
         session['indice_mensaje'] = indice + 1
         session[str(indice)] = mensaje
@@ -289,7 +299,7 @@ class ItemRelacionController(CrudRestController):
     def mensajes(self, id):
         """ imprime un mensaje flash"""
         mensaje = session.get(id, "")
-        if (mensaje != ""):
+        if (mensaje == ""):
             flash(u"Relacionado exitósamente")
         else:
             flash(mensaje, "warning")

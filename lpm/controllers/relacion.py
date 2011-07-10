@@ -44,21 +44,24 @@ class RelacionTable(TableBase):
     __model__ = Relacion
     __headers__ = {'tipo': u'Tipo', 'codigo': u'Código',
                    'item_relacionado': u"Ítem Relacionado",
-                   'estado': u'Estado'}
+                   'estado': u'Revisión',
+                   'item_relacionado_estado': u'Estado'}
     __add_fields__ = {'item_relacionado': None,
-                      'estado': None}
+                      'estado': None,
+                      'item_relacionado_estado': None}
     __omit_fields__ = ['id_relacion', 'id_anterior', 'id_posterior']
     __default_column_width__ = '15em'
     __column_widths__ = { '__actions__': "50em"}
-    __field_order__ = ['codigo', 'tipo', 'item_relacionado']
-    __xml_fields__ = ['Estado']
+    __field_order__ = ['codigo', 'tipo', 'item_relacionado', 'item_relacionado_estado']
+    __xml_fields__ = ['Revision']
     
 relacion_table = RelacionTable(DBSession)
 
 class RelacionTableFiller(CustomTableFiller):
     __model__ = Relacion
     __add_fields__ = {'item_relacionado': None,
-                      'estado': None}
+                      'estado': None,
+                      'item_relacionado_estado': None}
     
     def item_relacionado(self, obj, **kw):
         id_item = UrlParser.parse_id(request.url, "items")
@@ -67,6 +70,15 @@ class RelacionTableFiller(CustomTableFiller):
             id_item = id_version        
         otro = obj.obtener_otro_item(id_item)
         return otro.codigo
+    
+    def item_relacionado_estado(self, obj, **kw):
+        id_item = UrlParser.parse_id(request.url, "items")
+        id_version = UrlParser.parse_id(request.url, "versiones")
+        if not id_item:
+            id_item = id_version        
+        otro = obj.obtener_otro_item(id_item)
+        p_otro = PropiedadItem.por_id(otro.id_propiedad_item)
+        return p_otro.estado
     
     def estado(self, obj, **kw):
         id_item = UrlParser.parse_id(request.url, "items")
@@ -87,11 +99,11 @@ class RelacionTableFiller(CustomTableFiller):
                                 .first()
             
         color = u"inherit;"
-        estado = u"Normal"
+        estado = u"No"
         
         if(rti.revisar):
             color = u"#ff0000;"
-            estado = u'Con revision'
+            estado = u'Sí'
             
         value = '<div style="font-color:' + color + '">' + estado + '</div>'
         
@@ -109,18 +121,25 @@ class RelacionTableFiller(CustomTableFiller):
         id = str(obj.id_relacion)
         controller = "./" + id
         id_item = UrlParser.parse_id(request.url, "items")
-        item = Item.por_id(id_item)
-        p_item = PropiedadItem.por_id(item.id_propiedad_item)
         
-        if (PoseePermiso('modificar item', 
-                        id_fase=item.id_fase).is_met(request.environ) and\
-            p_item.estado not in [u"Bloqueado", u"Revisión-Bloq", u"Eliminado"]):
-            value += '<div><form method="POST" action="' + controller + '" class="button-to">'+\
-                     '<input type="hidden" name="_method" value="DELETE" />' +\
-                     '<input onclick="return confirm(\'¿Está seguro?\');" value="Eliminar" type="submit" '+\
-                     'style="background-color: transparent; float:left; border:0; color: #286571; display: inline;'+\
-                     'margin: 0; padding: 0;' + clase + '"/>'+\
-                     '</form></div><br />'
+        if id_item:
+            item = Item.por_id(id_item)
+            p_item = PropiedadItem.por_id(item.id_propiedad_item)
+
+            otro = obj.obtener_otro_item(id_item)
+            p_otro = PropiedadItem.por_id(otro.id_propiedad_item)
+        
+            if (p_item.estado not in [u"Bloqueado", u"Revisión-Bloq", u"Eliminado"] and\
+                    obj.id_anterior != id_item or p_otro.estado == u"Eliminado"):
+                    
+                if (PoseePermiso('modificar item', 
+                                id_fase=item.id_fase).is_met(request.environ) ):
+                    value += '<div><form method="POST" action="' + controller + '" class="button-to">'+\
+                             '<input type="hidden" name="_method" value="DELETE" />' +\
+                             '<input onclick="return confirm(\'¿Está seguro?\');" value="Eliminar" type="submit" '+\
+                             'style="background-color: transparent; float:left; border:0; color: #286571; display: inline;'+\
+                             'margin: 0; padding: 0;' + clase + '"/>'+\
+                             '</form></div><br />'
         
         value += '</div>'
         return value
@@ -159,21 +178,25 @@ relacion_table_filler = RelacionTableFiller(DBSession)
 #tabla para eliminar relacion de ítem
 class RelacionItemTable(RelacionTable):
     __add_fields__ = {'item_relacionado': None,
-                       'check': None, 'estado': None}
+                       'check': None, 'estado': None,
+                      'item_relacionado_estado': None}
     __omit_fields__ = ['id_relacion', 'id_anterior', 'id_posterior']
     __headers__ = {'tipo': u'Tipo', 'codigo': u'Código',
                    'item_relacionado': u"Ítem Relacionado",
-                   'estado': u'Estado', 'check': u"Check"}
+                   'estado': u'Revision', 'check': u"Check",
+                   'item_relacionado_estado': u'Estado'}
     
-    __field_order__ = [ 'codigo', 'item_relacionado', 'tipo', "estado", "check"]
-    __xml_fields__ = ['Check', 'Estado', '__actions__']
+    __field_order__ = [ 'codigo', 'item_relacionado', 'item_relacionado_estado', \
+                       'tipo', "estado", "check"]
+    __xml_fields__ = ['Check', 'Revision', '__actions__']
     
 relacion_item_table = RelacionItemTable(DBSession)
 
 #filler para relacionar/eliminar relacion de ítem
 class RelacionItemTableFiller(RelacionTableFiller):
     __add_fields__ = {'item_relacionado': None, 'check': None,
-                      'estado': None}
+                      'estado': None,
+                      'item_relacionado_estado': None}
     
     
     
@@ -183,10 +206,14 @@ class RelacionItemTableFiller(RelacionTableFiller):
         if id_item:
             item = Item.por_id(id_item)
             p_item = PropiedadItem.por_id(item.id_propiedad_item)
+            otro = obj.obtener_otro_item(id_item)
+            p_otro = PropiedadItem.por_id(otro.id_propiedad_item)
             
-        
-            if (p_item.estado in [u"Bloqueado", u"Revisión-Bloq", u"Eliminado"]):
+            if (p_item.estado in [u"Bloqueado", u"Revisión-Bloq", u"Eliminado"] or\
+                obj.id_anterior == id_item and p_otro.estado != u"Eliminado"):
                 bloq = ' disabled="" '
+            #se permite eliminar desde el item anterior las relaciones colgadas    
+
            
         checkbox = '<input type="checkbox" class="checkbox_tabla"' + bloq + 'id="' + str(obj.id_relacion) + '"/>'
         

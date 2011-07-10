@@ -120,7 +120,8 @@ class ItemTableFiller(CustomTableFiller):
         controller = "./" + str(obj.id_item)
         controller2 = "./"
         eliminar_cont = "./" + str(obj.id_item) 
-        if (UrlParser.parse_id(request.url, "items")):#desde get_one
+        if (UrlParser.parse_id(request.url, "items") or\
+            UrlParser.parse_nombre(request.url, "post_buscar")):#desde get_one o post_buscar
             controller = "../" + str(obj.id_item)
             controller2 = "../"
             eliminar_cont = "../" + str(obj.id_item) 
