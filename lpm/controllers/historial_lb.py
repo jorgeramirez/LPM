@@ -49,7 +49,7 @@ class HistorialLBTable(TableBase):
     __default_column_width__ = '15em'
     __column_widths__ = { '__actions__': "50em"}
     __add_fields__ = {'nombre_usuario': None}
-    __field_order__ = ["codigo", "tipo_operacion", "nombre_usuario", 
+    __field_order__ = ["tipo_operacion", "nombre_usuario", 
                        "fecha_modificacion"]
     
 historial_lb_table = HistorialLBTable(DBSession)
@@ -67,12 +67,12 @@ class HistorialLBTableFiller(CustomTableFiller):
 
         value = '<div>'
         clase = 'actions_fase'
-        id = obj.id_lb
+        id = str(obj.id_lb)
         id_fase = UrlParser.parse_id(request.url, "fases")
         if PoseePermiso('consultar lb',
                         id_fase=id_fase).is_met(request.environ):
             value += '<div>' + '<a href="./' + 'examinar/'  + id + \
-                        'class="' + clase + '">Examinar</a>' + \
+                        '" class="' + clase + '">Examinar</a>' + \
                      '</div><br />'                
         value += '</div>'
         return value
@@ -164,7 +164,7 @@ class HistorialLBController(CrudRestController):
     table = historial_lb_table
     table_filler = historial_lb_table_filler
 
-    opciones = dict(tipo_modificacion=u'Tipo de Operación',
+    opciones = dict(tipo_operacion=u'Tipo de Operación',
                     fecha_modificacion= u'Fecha de Mofificación'
                     )
     columnas = dict(tipo_operacion=u'texto',
@@ -181,7 +181,7 @@ class HistorialLBController(CrudRestController):
         Retorna todos los registros
         Retorna una página HTML si no se especifica JSON
         """
-        id_lb = UrlParser.parse_id(request.url, "usuarios")
+        id_lb = UrlParser.parse_id(request.url, "lbs")
         lb = LB.por_id(id_lb)
         titulo = self.title % lb.codigo
         tmpl_context.widget = self.table
@@ -205,7 +205,7 @@ class HistorialLBController(CrudRestController):
         Controlador que recibe los parámetros de búsqueda para 
         devolver el resultado esperado.
         """
-        id_lb = UrlParser.parse_id(request.url, "usuarios")
+        id_lb = UrlParser.parse_id(request.url, "lbs")
         lb = LB.por_id(id_lb)
         titulo = self.title % lb.codigo
         tmpl_context.widget = self.table

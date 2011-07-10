@@ -502,17 +502,6 @@ class LineaBaseController(CrudRestController):
         HistorialLB.registrar(user, lb, u"Apertura")
         id_fase = UrlParser.parse_id(request.url, "fases")
         url = '../'
-        
-        '''
-        url = "/lbs/"
-
-        if not id_fase:
-            id_item = lb.items[0].propiedad_item.id_item_actual
-            id_fase = Item.por_id(id_item).id_fase
-        else:
-            url = "../"
-        '''
-        
         fase = Fase.por_id(id_fase)
         lb.estado = u"Abierta"
         fase.cambiar_estado()
@@ -570,6 +559,17 @@ class LineaBaseController(CrudRestController):
                 
         if (inhabilitados == []):
             lb.estado = u"Cerrada"
+
+            #registrar en el historial
+            user = Usuario.by_user_name(request.credentials["repoze.what.userid"])
+            for p_item in habilitados:
+                p_item.estado = u"Bloqueado"
+                HistorialItems.registrar(user, p_item, u"Bloqueo")
+            HistorialLB.registrar(user, lb, u"Cierre")
+            id_fase = UrlParser.parse_id(request.url, "fases")
+            fase = Fase.por_id(id_fase)
+            fase.cambiar_estado()
+
             flash("Linea base cerrada correctamente")
             redirect('../')
 
