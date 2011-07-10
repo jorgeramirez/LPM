@@ -81,7 +81,7 @@ class HiloAdelante(threading.Thread):
                     
                     nodo = str(p_otro.id_item_actual) + " : {'color': '#"+ self.colores[fase.posicion - 1] +\
                             "', 'shape': 'dot', 'label': '" +\
-                            str(otro.codigo) + "(" + str(p_otro.complejidad) + ")'},\n"
+                            otro.codigo + "(" + str(p_otro.complejidad) + ")'},\n"
                     
                     self.lock_v.acquire()
                     self.visitados[self.p_item.id_item_actual]['aristas'].append(arista)
@@ -134,7 +134,7 @@ class HiloAtras(threading.Thread):
                     #TODO color diferente para fase diferente
                     nodo = str(p_otro.id_item_actual) + " : {'color': '#"+ self.colores[fase.posicion - 1] +\
                             "', 'shape': 'dot', 'label': '" +\
-                            str(otro.codigo) + "(" + str(p_otro.complejidad) + ")'},\n"
+                            otro.codigo + "(" + str(p_otro.complejidad) + ")'},\n"
                     
                     self.lock_v.acquire()
                     self.visitados[p_otro.id_item_actual]['aristas'].append(arista)
@@ -684,7 +684,7 @@ class Item(DeclarativeBase):
         
         #a ver si le gusta el \n
         nodo = str(p_item.id_item_actual) + " : {'color': '#333', 'shape': 'box', 'label': '" +\
-                           str(self.codigo) + "(" + str(p_item.complejidad) + ")'},\n"
+                           self.codigo + "(" + str(p_item.complejidad) + ")'},\n"
                            
         visitados1[p_item.id_item_actual]['aristas']\
                 .extend(visitados2[p_item.id_item_actual]['aristas'])

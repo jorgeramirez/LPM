@@ -240,11 +240,13 @@ class UsuarioController(CrudRestController):
                 redirect("/usuarios")
         
         tmpl_context.widget = self.edit_form
-        usuarios = self.table_filler.get_value(**kw)
+
         user = Usuario.por_id(args[0])
         page = "Usuario {nombre}".format(nombre=user.nombre_usuario)
         atras = "/usuarios/"
-        return dict(super(UsuarioController, self).edit(*args, **kw), 
+        value = self.edit_filler.get_value(values={'id_usuario': args[0]})
+        value['_method'] = 'PUT'
+        return dict(value=value,
                     page=page,
                     id=args[0], 
                     atras=atras
@@ -287,8 +289,9 @@ class UsuarioController(CrudRestController):
 
         username = request.identity['repoze.who.userid']
         usuario = Usuario.by_user_name(username)
+        id_usuario = UrlParser.parse_id(request.url, "usuarios")
         
-        if usuario.id_usuario != int(kw["id_usuario"]):        
+        if (usuario.id_usuario != id_usuario):        
             pp = PoseePermiso('modificar usuario')
             if not pp.is_met(request.environ):
                 flash(pp.message % pp.nombre_permiso, 'warning')
