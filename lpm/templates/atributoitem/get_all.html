@@ -2,7 +2,7 @@
       xmlns:py="http://genshi.edgewall.org/"
       xmlns:xi="http://www.w3.org/2001/XInclude">
   <xi:include href="esquema.html" />
-  <xi:include href="buscar.html" />
+  <!--<xi:include href="buscar.html" />-->
 <head>
 <title>$page</title>
 </head>
@@ -11,7 +11,7 @@
     <div style="padding-left: 95px;">
     <table cellspacing="0" cellpadding="2" border="0">
     <tbody>
-        <tr>${buscar()}</tr>
+        <!--<tr>${buscar()}</tr>-->
         <tr>
             <td>
                 <span style="font-size: 12;" py:if="lista_elementos" py:content="tmpl_context.paginators.lista_elementos.pager(link='./')"/>

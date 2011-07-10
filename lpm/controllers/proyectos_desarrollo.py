@@ -143,7 +143,7 @@ class ProyectosDesarrolloController(CrudRestController):
             proyectos = []
             
         tmpl_context.widget = self.table
-        atras = './'
+        atras = '../'
         return dict(lista_elementos=proyectos, 
                     page=self.title,
                     titulo=self.title, 
@@ -171,7 +171,7 @@ class ProyectosDesarrolloController(CrudRestController):
         buscar_table_filler.filtros = kw
         proyectos = buscar_table_filler.get_value()
         
-        atras = './'
+        atras = '../../'
         
         return dict(lista_elementos=proyectos, 
                     page=self.title, 

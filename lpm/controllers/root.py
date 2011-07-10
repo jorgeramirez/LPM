@@ -52,8 +52,8 @@ class RootController(BaseController):
     proyectos_desarrollo = ProyectosDesarrolloController(DBSession)
     proyectos_gestconf = ProyectosGestConfController(DBSession)
     proyectos_fase_ti = ProyectosFaseTipoController(DBSession)
-    items = ItemController(DBSession)
-    lbs = LineaBaseController(DBSession)
+    #items = ItemController(DBSession)
+    #lbs = LineaBaseController(DBSession)
 
     @expose('lpm.templates.index')
     def index(self):

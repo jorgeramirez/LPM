@@ -125,10 +125,10 @@ class HiloAdelante(threading.Thread):
                     self.lock_s.release()
                     
                     fase = lpm.model.Fase.por_id(otro.id_fase)                
-                    arista = p_otro.id_item_actual + " : { directed: true }"
+                    arista = str(p_otro.id_item_actual) + " : { directed: true }"
                     #TODO color diferente para fase diferente
                     nodo = p_otro.id_item_actual + " : {'color': '#b2b', 'shape': 'dot', 'label': '" +\
-                            otro.codigo + "-" + str(p_otro.complejidad) + "'}"
+                            str(otro.codigo) + "-" + str(p_otro.complejidad) + "'}"
                     
                     self.lock_v.acquire()
                     self.visitados[p_item.id_item_actual]['aristas'].append(arista)
@@ -176,10 +176,10 @@ class HiloAtras(threading.Thread):
                     self.lock_s.release()
                     
                     fase = lpm.model.Fase.por_id(otro.id_fase)                
-                    arista = p_item.id_item_actual + " : { directed: true }"
+                    arista = str(p_item.id_item_actual) + " : { directed: true }"
                     #TODO color diferente para fase diferente
                     nodo = p_otro.id_item_actual + " : {'color': '#b2b', 'shape': 'dot', 'label': '" +\
-                            otro.codigo + "-" + str(p_otro.complejidad) + "'}"
+                            str(otro.codigo) + "-" + str(p_otro.complejidad) + "'}"
                     
                     self.lock_v.acquire()
                     self.visitados[p_otro.id_item_actual]['aristas'].append(arista)
@@ -639,24 +639,24 @@ class Item(DeclarativeBase):
         grafo = {}
         
         #a ver si le gusta el \n
-        nodo = p_item.id_item_actual + " : {'color': '#333', 'shape': 'box', 'label': '" +\
-                           self.codigo + "-" + str(p_item.complejidad) + "'},\n"
+        nodo = str(p_item.id_item_actual) + " : {'color': '#333', 'shape': 'box', 'label': '" +\
+                           str(self.codigo) + "-" + str(p_item.complejidad) + "'},\n"
                            
-        aristas = visitados1[p_item.id_item_actual]['aristas']\
+        visitados1[p_item.id_item_actual]['aristas']\
                 .extend(visitados2[p_item.id_item_actual]['aristas'])
         
         
         grafo.setdefault('nodos', nodo)
-        grafo.setdefault('aristas', p_item.id_item_actual + " : {" + ",".join(aristas) + "},\n")
-        for id, partes in visitados1.item():
+        grafo.setdefault('aristas', str(p_item.id_item_actual) + " : {" + (",".join(visitados1[p_item.id_item_actual]['aristas'])) + "},\n")
+        for id, partes in visitados1.items():
             if (id != self.id_item):
                 grafo['nodos'] += partes['nodo'][0]
-                grafo['aristas'] += (id + ": { " + ",\n".join(partes['aristas']) + "},\n")   
+                grafo['aristas'] += (str(id) + ": { " + (",\n".join(partes['aristas'])) + "},\n")   
                 
-        for id, partes in visitados2.item():
+        for id, partes in visitados2.items():
             if (id != self.id_item):
                 grafo['nodos'] += partes['nodo'][0]
-                grafo['aristas'] += (id + ": { " + ",\n".join(partes['aristas']) + "},\n")    
+                grafo['aristas'] += (str(id) + ": { " + (",\n".join(partes['aristas'])) + "},\n")    
        
         
         return sumatoria_total, grafo

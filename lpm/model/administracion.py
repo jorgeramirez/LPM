@@ -527,6 +527,7 @@ class TipoItem(DeclarativeBase):
                                           ondelete="CASCADE"), nullable=True)
     
     # template para codificacion
+#    tmpl_codigo = u"{siglas}-ti-{id}/f-{pos}/p-{proy}"
     tmpl_codigo = u"{siglas}-ti-{id}/f-{pos}/p-{proy}"
     #{ Relaciones
     hijos = relation('TipoItem', cascade="delete")

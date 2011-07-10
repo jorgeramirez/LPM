@@ -177,7 +177,7 @@ class AdjuntoController(CrudRestController):
                     opciones=self.opciones,
                     url_action=self.tmp_action,
                     puede_crear=puede_crear,
-                    atras="../../"
+                    atras="../"
                     )
     
     @without_trailing_slash
@@ -228,7 +228,7 @@ class AdjuntoController(CrudRestController):
                     url_action='../',
                     puede_crear=puede_crear,
                     opciones=self.opciones,
-                    atras='../'
+                    atras='../../'
                     )
     
     @expose()

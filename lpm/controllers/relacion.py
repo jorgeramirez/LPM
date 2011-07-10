@@ -16,7 +16,7 @@ from tg.decorators import (paginate, expose, with_trailing_slash,
 from tg import redirect, request, validate, flash
 
 from lpm.model import (DBSession, Relacion, RelacionPorItem, Item, 
-                       PropiedadItem)
+                       PropiedadItem, Fase, Usuario)
 from lpm.lib.sproxcustom import (CustomTableFiller,
                                  CustomPropertySingleSelectField)
 from lpm.controllers.items_relacion import ItemRelacionController
@@ -44,7 +44,7 @@ class RelacionTable(TableBase):
     __model__ = Relacion
     __headers__ = {'tipo': u'Tipo', 'codigo': u'Código',
                    'item_relacionado': u"Ítem Relacionado",
-                   'estado': 'Estado'}
+                   'estado': u'Estado'}
     __add_fields__ = {'item_relacionado': None,
                       'estado': None}
     __omit_fields__ = ['id_relacion', 'id_anterior', 'id_posterior']
@@ -91,7 +91,7 @@ class RelacionTableFiller(CustomTableFiller):
         
         if(rti.revisar):
             color = u"#ff0000;"
-            estado = u"Con revisión"
+            estado = u'Con revision'
             
         value = '<div style="font-color:' + color + '">' + estado + '</div>'
         
@@ -110,9 +110,11 @@ class RelacionTableFiller(CustomTableFiller):
         controller = "./" + id
         id_item = UrlParser.parse_id(request.url, "items")
         item = Item.por_id(id_item)
-
-        if PoseePermiso('modificar item', 
-                        id_fase=item.id_fase).is_met(request.environ):
+        p_item = PropiedadItem.por_id(item.id_propiedad_item)
+        
+        if (PoseePermiso('modificar item', 
+                        id_fase=item.id_fase).is_met(request.environ) and\
+            p_item.estado not in [u"Bloqueado", u"Revisión-Bloq", u"Eliminado"]):
             value += '<div><form method="POST" action="' + controller + '" class="button-to">'+\
                      '<input type="hidden" name="_method" value="DELETE" />' +\
                      '<input onclick="return confirm(\'¿Está seguro?\');" value="Eliminar" type="submit" '+\
@@ -142,11 +144,12 @@ class RelacionTableFiller(CustomTableFiller):
             ap = AlgunPermiso(tipo='Fase',
                               id_fase=item.id_fase).is_met(request.environ)
             if ap:
+                
                 for rpi in p_item.relaciones:
                     if (rpi.relacion in lista) and \
                         rpi.relacion.tipo == Relacion.tipo_relaciones[tipo]:
                         filtrados.append(rpi.relacion)
-
+        
         return len(filtrados), filtrados
 
 
@@ -157,14 +160,13 @@ relacion_table_filler = RelacionTableFiller(DBSession)
 class RelacionItemTable(RelacionTable):
     __add_fields__ = {'item_relacionado': None,
                        'check': None, 'estado': None}
-    __omit_fields__ = ['id_relacion', 'id_anterior', 'id_posterior',
-                       '__actions__']
+    __omit_fields__ = ['id_relacion', 'id_anterior', 'id_posterior']
     __headers__ = {'tipo': u'Tipo', 'codigo': u'Código',
                    'item_relacionado': u"Ítem Relacionado",
                    'estado': u'Estado', 'check': u"Check"}
     
-    __field_order__ = ["codigo", 'item_relacionado', 'tipo', "estado", "check"]
-    __xml_fields__ = ['Check', 'Estado']
+    __field_order__ = [ 'codigo', 'item_relacionado', 'tipo', "estado", "check"]
+    __xml_fields__ = ['Check', 'Estado', '__actions__']
     
 relacion_item_table = RelacionItemTable(DBSession)
 
@@ -173,8 +175,21 @@ class RelacionItemTableFiller(RelacionTableFiller):
     __add_fields__ = {'item_relacionado': None, 'check': None,
                       'estado': None}
     
+    
+    
     def check(self, obj, **kw):
-        checkbox = '<input type="checkbox" class="checkbox_tabla" id="' + str(obj.id_relacion) + '"/>'
+        bloq = ' '
+        id_item = UrlParser.parse_id(request.url, "items")
+        if id_item:
+            item = Item.por_id(id_item)
+            p_item = PropiedadItem.por_id(item.id_propiedad_item)
+            
+        
+            if (p_item.estado in [u"Bloqueado", u"Revisión-Bloq", u"Eliminado"]):
+                bloq = ' disabled="" '
+           
+        checkbox = '<input type="checkbox" class="checkbox_tabla"' + bloq + 'id="' + str(obj.id_relacion) + '"/>'
+        
         return checkbox
         
 relacion_item_table_filler = RelacionItemTableFiller(DBSession)
@@ -198,8 +213,8 @@ class RelacionController(CrudRestController):
     table_filler = relacion_table_filler     
 
     
-    opciones = dict(codigo=u'Código')
-    columnas = dict(codigo='texto')
+#    opciones = dict(codigo=u'Código')
+#    columnas = dict(codigo='texto')
     
     #comboboxes = dict(tipo=Relacion.tipo_relaciones.values())
     
@@ -219,7 +234,9 @@ class RelacionController(CrudRestController):
         relaciones = []
         tabla = self.table
         puede_relacionar = False
-        
+        puede_nueva = False
+            
+          
         if id_version:
             #desde controller de versiones
             p_item = PropiedadItem.por_id(id_version)
@@ -230,33 +247,46 @@ class RelacionController(CrudRestController):
             #desde controller de items.
             item = Item.por_id(id_item)
             titulo = u"Relaciones de Ítem: %s" % item.codigo
+            
             relaciones = relacion_item_table_filler. \
                         get_value(id_version=item.id_propiedad_item, **kw)
             tabla = relacion_item_table
+            
             puede_relacionar = PoseePermiso('modificar item', \
                                 id_tipo_item=item.id_tipo_item).is_met(request.environ)
-            
+            fase = Fase.por_id(item.id_fase)
+            if (UrlParser.parse_nombre(request.url, "relaciones_as")):
+                if (fase.posicion > 1):
+                    puede_nueva = True
+            else:
+                puede_nueva = True
+                
         tmpl_context.widget = tabla
         return dict(lista_elementos=relaciones, 
                     page=titulo,
                     titulo=titulo, 
                     modelo=self.model.__name__, 
-                    columnas=self.columnas,
-                    opciones=self.opciones,
+                    #columnas=self.columnas,
+                    #opciones=self.opciones,
                     #comboboxes=self.comboboxes,
                     url_action=self.tmp_action,
-                    puede_relacionar=puede_relacionar
+                    puede_relacionar=puede_relacionar,
+                    atras= "../",
+                    puede_nueva=puede_nueva
                     )
     
-    @without_trailing_slash
-    @paginate('lista_elementos', items_per_page=5)
-    @expose('lpm.templates.relacion.get_all')
-    @expose('json')
+#    @without_trailing_slash
+#    @paginate('lista_elementos', items_per_page=5)
+#    @expose('lpm.templates.relacion.get_all')
+#    @expose('json')
+    @expose()
     def post_buscar(self, *args, **kw):
         """
         Controlador que recibe los parámetros de búsqueda para 
         devolver el resultado esperado.
         """
+        pass
+        '''
         id_item = UrlParser.parse_id(request.url, "items")
         id_version = UrlParser.parse_id(request.url, "versiones")
         titulo = self.title
@@ -298,7 +328,44 @@ class RelacionController(CrudRestController):
                     atras='../',
                     puede_relacionar=puede_relacionar
                     )
-    
+        '''
+    @expose()
+    def post_delete(self, *args, **kw):
+        #se lo llama desde la pagina de edit, al marcar las relaciones
+        #y luego seleccionar Eliminar. Ajax.
+        id_item = UrlParser.parse_id(request.url, "items")
+        item = Item.por_id(id_item)
+        
+        p_item = PropiedadItem.por_id(item.id_propiedad_item)
+        
+        ids = []
+        id = None
+        if kw:
+            for k, pk in kw.items():
+                if not k.isalnum():
+                    continue
+                ids.append(int(pk))
+        else:    
+            try:
+                id = int(args[0])
+                if (id > 0):
+                    ids.append(id)
+            except:
+                id = 0
+                flash(u"Argumento invalido", "warning")
+        
+        p_item.eliminar_relaciones(ids)    
+       
+        usuario = Usuario.by_user_name(request.identity['repoze.who.userid'])
+        item.guardar_historial(u"eliminar-relaciones", usuario)
+        
+        if (id):
+            redirect("../")
+        else:
+            transaction.commit()   
+            #return "/items/%d/edit" % id_item
+            return './'
+        
     @expose()
     def eliminar_relaciones(self, *args, **kw):
         #se lo llama desde la pagina de edit, al marcar las relaciones
@@ -314,38 +381,22 @@ class RelacionController(CrudRestController):
                 if not k.isalnum():
                     continue
                 ids.append(int(pk))
-
-            p_item.eliminar_relaciones(ids)
         
-        try:
-            id = int(args[0])
-            if (id > 0):
-                ids.append(id)
-        except:
-            id = 0
-            flash(u"Argumento invalido", "warning")
-            
-                
+        p_item.eliminar_relaciones(ids)    
+       
         usuario = Usuario.by_user_name(request.identity['repoze.who.userid'])
         item.guardar_historial(u"eliminar-relaciones", usuario)
         
-        if (id):
-            redirect("../")
-        else:
-            transaction.commit()   
-            #return "/items/%d/edit" % id_item
-            return './'
-        
+        transaction.commit()   
+        #return "/items/%d/edit" % id_item
+        return './'
+    
     @expose()
     def get_one(self, *args, **kw):
         pass
 
     @expose()
     def new(self, *args, **kw):
-        pass
-    
-    @expose()
-    def post_delete(self, id):
         pass
         
     @expose()

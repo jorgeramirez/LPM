@@ -95,17 +95,19 @@ class ItemRelacionTableFiller(CustomTableFiller):
         
     def __actions__(self, obj):
         controller = "relacionar_as"
+        clase = "action"
         if (UrlParser.parse_nombre(request.url, "relaciones_ph")):
             controller = "relacionar_ph"
             
         if PoseePermiso('modificar item', 
                         id_tipo_item=obj.id_tipo_item).is_met(request.environ):
-                value += '<div>' + \
-                            '<a href="./' + controller + '/' + str(obj.id_item) +'" ' + \
-                            'class="' + clase + '">Relacionar</a>' + \
-                         '</div>'
+            value = '<div>' + \
+                        '<a href="./' + controller + '/' + str(obj.id_item) +'" ' + \
+                        'class="' + clase + '">Relacionar</a>' + \
+                     '</div>'
         
-       
+        return value
+   
     def _do_get_provider_count_and_objs(self, id_item=None, tipo=None, **kw):
         """
         Recupera los ítems para los cuales tenemos algún permiso. y está o no
@@ -196,8 +198,8 @@ class ItemRelacionController(CrudRestController):
         return dict(items=items, 
                     page=page,
                     title=self.title, 
-                    controller=controller, 
-                    atras=atras,
+                    controlador=controller, 
+                    atras=atras
                     )
     @expose()
     def relacionar_as(self, *args, **kw):
@@ -248,14 +250,14 @@ class ItemRelacionController(CrudRestController):
                 if not k.isalnum():
                     continue
                 ids.append(int(pk))
-        
-        try:
-            id = int(args[0])
-            if (id > 0):
-                ids.append(id)
-        except:
-            id = 0
-            flash(u"Argumento invalido", "warning")
+        else:
+            try:
+                id = int(args[0])
+                if (id > 0):
+                    ids.append(id)
+            except:
+                id = 0
+                flash(u"Argumento inválido", "warning")
         
         retorno, creado = p_item.agregar_relaciones(ids, 'p-h')
     
@@ -265,14 +267,17 @@ class ItemRelacionController(CrudRestController):
             item.guardar_historial(u"relacionar-PH", usuario)
         
         if (retorno == u"" and creado):
-            flash("Relacionado exiosamente") 
+            flash(u"Relacionado exitósamente") 
         elif (retorno != u""):
             mensaje = u"No se pudo crear la relación con %s" % retorno
             flash(mensaje, "warning")
-
+        
+        redirect("../")
+        '''
         if (id):
             redirect("../")
         else:
             transaction.commit()   
             #return "/items/%d/edit" % id_item
             return './'
+        '''

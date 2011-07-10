@@ -116,13 +116,20 @@ class ItemTableFiller(CustomTableFiller):
 
         value = '<div>'
         clase = 'actions_items'
+        
         controller = "./" + str(obj.id_item)
+        controller2 = "./"
+        eliminar_cont = "./" + str(obj.id_item) 
+        if (UrlParser.parse_id(request.url, "items")):#desde get_one
+            controller = "../" + str(obj.id_item)
+            controller2 = "../"
+            eliminar_cont = "../" + str(obj.id_item) 
 
         p_item = PropiedadItem.por_id(obj.id_propiedad_item) #version actual.    
         
         if PoseePermiso('modificar item', 
                         id_tipo_item=obj.id_tipo_item).is_met(request.environ):
-            if p_item.estado not in [u"Bloqueado", u"Revisión-Bloq", "Eliminado"]:
+            if p_item.estado not in [u"Bloqueado", u"Revisión-Bloq", u"Eliminado"]:
                 value += '<div>' + \
                             '<a href="'+ controller +'/edit" ' + \
                             'class="' + clase + '">Modificar</a>' + \
@@ -178,7 +185,7 @@ class ItemTableFiller(CustomTableFiller):
                         id_tipo_item=obj.id_tipo_item).is_met(request.environ):
             if revivir:
                 value += '<div>' + \
-                            '<a href="' + controller + 'revivir/' +str(obj.id_item) +'" ' + \
+                            '<a href="' + controller2 + '/revivir/' +str(obj.id_item) +'" ' + \
                             'class="' + clase + '">Revivir</a>' + \
                          '</div><br />'
         
@@ -188,14 +195,14 @@ class ItemTableFiller(CustomTableFiller):
         if PoseePermiso('eliminar-revivir item',
                         id_tipo_item=obj.id_tipo_item).is_met(request.environ):
             if eliminar:
-                value += '<div><form method="POST" action="' + str(obj.id_item) + '" class="button-to">'+\
+                value += '<div><form method="POST" action="' + eliminar_cont + '" class="button-to">'+\
                          '<input type="hidden" name="_method" value="DELETE" />' +\
                          '<input onclick="return confirm(\'¿Está seguro?\');" value="Eliminar" type="submit" '+\
-                         'style="background-color: transparent; float:left; border:0; color: #286571; display: inline;'+\
-                         'margin: 0; padding: 0; margin-left:-3px;margin-top:-3px;' + clase + '"/>'+\
+                         'style="background-color: transparent; float:left; border:0; color: #286571;'+\
+                         'display: inline; margin: 0; padding: 0; margin-left: -3px;' + clase + '"/>'+\
                          '</form></div><br />'
 
-        controller = './'
+     
             
         #if PoseePermiso('aprobar-desaprobar item', 
         #                id_fase=obj.id_fase).is_met(request.environ):
@@ -203,12 +210,12 @@ class ItemTableFiller(CustomTableFiller):
                         id_tipo_item=obj.id_tipo_item).is_met(request.environ):
             if aprobar:
                 value += '<div>' + \
-                            '<a href="' + controller + 'aprobar/' +str(obj.id_item) +'" ' + \
+                            '<a href="' + controller2 + 'aprobar/' +str(obj.id_item) +'" ' + \
                             'style="margin-right:8px;" class="' + clase + '">Aprobar</a>' + \
                          '</div><br />'
             elif desaprobar:
                 value += '<div>' + \
-                            '<a href="' + controller + 'desaprobar/' +str(obj.id_item) +'" ' + \
+                            '<a href="' + controller2 + 'desaprobar/' +str(obj.id_item) +'" ' + \
                             'class="' + clase + '">Desaprobar</a>' + \
                          '</div><br />'
                          
@@ -217,7 +224,7 @@ class ItemTableFiller(CustomTableFiller):
         if PoseePermiso('calcular impacto', 
                         id_tipo_item=obj.id_tipo_item).is_met(request.environ):
                 value += '<div>' + \
-                            '<a href="' + controller + 'calcular_impacto/' + str(obj.id_item) +'" ' + \
+                            '<a href="' + controller2 + 'calcular_impacto/' + str(obj.id_item) +'" ' + \
                             'class="' + clase + '">Calcular Impacto</a>' + \
                          '</div><br />'
         
@@ -402,7 +409,12 @@ class ItemController(CrudRestController):
         puede_crear = False
         id_fase = UrlParser.parse_id(request.url, "fases_desarrollo")
         titulo = self.title
-        atras = "../"
+        atras = "../../"
+        nuevo = "./new"
+        
+        if (UrlParser.parse_id(request.url, "items")):
+            nuevo = "../new"
+            
         if id_fase: 
             # desde el controlador de fases
             puede_crear = PoseePermiso("crear item", id_fase=id_fase).is_met(request.environ)
@@ -423,7 +435,8 @@ class ItemController(CrudRestController):
                     opciones=self.opciones,
                     url_action=self.tmp_action,
                     puede_crear=puede_crear,
-                    comboboxes=self.comboboxes
+                    comboboxes=self.comboboxes,
+                    nuevo=nuevo
                     )
     
     @without_trailing_slash
@@ -438,6 +451,11 @@ class ItemController(CrudRestController):
         puede_crear = False
         id_fase = UrlParser.parse_id(request.url, "fases_desarrollo")
         titulo = self.title
+        nuevo = "./new"
+        
+        if (UrlParser.parse_id(request.url, "items")):
+            nuevo = "../new"
+            
         if id_fase: 
             # desde el controlador de fases
             puede_crear = PoseePermiso("crear item", 
@@ -460,10 +478,12 @@ class ItemController(CrudRestController):
                     puede_crear=puede_crear,
                     comboboxes=self.comboboxes,
                     opciones=self.opciones,
-                    atras='../../'
+                    atras='../../../',
+                    nuevo=nuevo
                     )
                     
     @with_trailing_slash
+    @paginate('lista_elementos', items_per_page=5)
     @expose("lpm.templates.item.get_all")
     def get_one(self, *args, **kw):
         #id_fase = UrlParser.parse_id(request.url, "fases")
@@ -475,8 +495,11 @@ class ItemController(CrudRestController):
         
         puede_crear = False
         id_fase = UrlParser.parse_id(request.url, "fases_desarrollo")
-
-        atras = "../"
+        nuevo = "./new"
+        
+        if (UrlParser.parse_id(request.url, "items")):
+            nuevo = "../new"
+            
         if id_fase: 
             # desde el controlador de fases
             puede_crear = PoseePermiso("crear item", id_fase=id_fase).is_met(request.environ)
@@ -498,7 +521,8 @@ class ItemController(CrudRestController):
                     opciones=self.opciones,
                     url_action="../",
                     puede_crear=puede_crear,
-                    comboboxes=self.comboboxes
+                    comboboxes=self.comboboxes,
+                    nuevo=nuevo
                     )
         
         '''
@@ -632,7 +656,10 @@ class ItemController(CrudRestController):
         id_item = int(id)
         item = Item.por_id(id_item)
         page = "Calculo de impacto de item: %s" % item.codigo
-        atras = "./%d" % id
+        
+        atras = "../%s" % id
+
+
         #if UrlParser.parse_nombre(request.url, "fases"):
         #    atras = "../%s/edit" % id
             
@@ -647,7 +674,6 @@ class ItemController(CrudRestController):
         return dict(atras=atras,
                     impacto=str(impacto),
                     page=page,
-                    filas=filas,
                     ct=str(proy.complejidad_total),
                     suma=str(sumatoria),
                     grafo=grafo
@@ -665,7 +691,7 @@ class ItemController(CrudRestController):
             flash(u"Ítem Revivido")
         except RevivirItemError, err:
             flash(unicode(err), 'warning')
-        redirect("./%d" % item.id_item)
+        redirect("../%d" % item.id_item)
         
     @expose()
     def aprobar(self, *args, **kw):
@@ -679,7 +705,7 @@ class ItemController(CrudRestController):
             flash(u"Ítem Aprobado")
         except CondicionAprobarError, err:
             flash(unicode(err), 'warning')
-        redirect("./%d" % item.id_item)
+        redirect("../%d" % item.id_item)
         
     @expose()
     def desaprobar(self, *args, **kw):
@@ -693,5 +719,5 @@ class ItemController(CrudRestController):
             flash(u"Ítem Desaprobado")
         except DesAprobarItemError, err:
             flash(unicode(err), 'warning')
-        redirect("./%d" % item.id_item)
+        redirect("../%d" % item.id_item)
     #}

@@ -207,21 +207,24 @@ class AtributoItemController(CrudRestController):
                     page=titulo,
                     titulo=titulo, 
                     modelo=self.model.__name__, 
-                    columnas=self.columnas,
-                    opciones=self.opciones,
+#                    columnas=self.columnas,
+#                    opciones=self.opciones,
                     url_action=self.tmp_action,
-                    atras="../../"
+                    atras="../"
                     )
     
-    @without_trailing_slash
-    @paginate('lista_elementos', items_per_page=5)
-    @expose('lpm.templates.atributoitem.get_all')
-    @expose('json')
+#    @without_trailing_slash
+#    @paginate('lista_elementos', items_per_page=5)
+#    @expose('lpm.templates.atributoitem.get_all')
+#    @expose('json')
+    @expose()
     def post_buscar(self, *args, **kw):
         """
         Controlador que recibe los parámetros de búsqueda para 
         devolver el resultado esperado.
         """
+        pass
+        '''
         id_item = UrlParser.parse_id(request.url, "items")
         id_version = UrlParser.parse_id(request.url, "versiones")
         titulo = self.title
@@ -249,9 +252,10 @@ class AtributoItemController(CrudRestController):
                     columnas=self.columnas,
                     url_action='../',
                     opciones=self.opciones,
-                    atras='../'
+                    atras='../../'
                     )
-    
+        '''
+        
     @expose()
     def get_one(self, *args, **kw):
         pass
@@ -289,7 +293,7 @@ class AtributoItemController(CrudRestController):
         tmpl_context.widget = self.edit_form
         return dict(value=value,
                     page=titulo,
-                    atras="../../edit"
+                    atras="../"
                     )
         
     @validate(atributo_item_edit_form, error_handler=edit)

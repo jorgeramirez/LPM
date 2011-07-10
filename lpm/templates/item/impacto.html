@@ -13,20 +13,22 @@
     <div style="float:left; padding-left: 95px;" class="crud_add">
         <table>
              <tbody>
-                <tr>
-                    <td>
-                         <div class="grafo">
-                               <canvas id="viewport" width="800" height="600"></canvas>
-                         </div>
-                    </td>
-                </tr>
-                
-                <tr>
+             	<tr>
                     <td>
                             <div class="fila">Sumatoria de complejidad: ${suma}, Complejidad Total Proyecto: ${ct}</div>
                             <div class="impacto">El impacto sobre el proyecto es del ${impacto} %</div>
                     </td>
                 </tr>
+                
+                <tr>
+                    <td>
+                         <div class="grafo">
+                               <canvas id="viewport" width="700" height="600"></canvas>
+                         </div>
+                    </td>
+                </tr>
+                
+             
              </tbody>
         </table>
     </div>
@@ -37,7 +39,6 @@
     <script src="${tg.url('/javascript/grafo/graphics.js')}"></script>  
 	<script type="text/javascript">
 
-          $(document).ready(function(){
                 var sys = arbor.ParticleSystem(100, 900, 0.1) // create the system with sensible repulsion/stiffness/friction
                 sys.parameters({gravity:true}) // use center-gravity to make the graph settle nicely (ymmv)
                 sys.renderer = Renderer("#viewport") // our newly created renderer will have its .init() method called shortly by sys...
@@ -52,16 +53,14 @@
                      ${grafo['aristas']}
                    }
 
-                })
+                });
 
                 //parar simulacion 5 segundos despues
                 setTimeout(function(){
                         sys.parameters({gravity:false, friction:1});
                         sys.stop();
                 }, 5000);
-          })
 
-        })(this.jQuery)
 
     </script>
 </body>

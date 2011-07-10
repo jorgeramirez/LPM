@@ -136,7 +136,7 @@ class FaseDesarrolloController(CrudRestController):
         proy = Proyecto.por_id(id_proyecto)
 
         titulo = self.title % proy.nombre
-        atras = "../"
+        atras = "../../"
         fases = self.table_filler.get_value(id_proyecto=id_proyecto, **kw)
         tmpl_context.widget = self.table
         
@@ -166,7 +166,7 @@ class FaseDesarrolloController(CrudRestController):
         proy = Proyecto.por_id(id_proyecto)
 
         titulo = self.title % proy.nombre
-        atras = "../"
+        atras = "../../../"
         buscar_table_filler = FaseDesarrolloTableFiller(DBSession)
         buscar_table_filler.filtros = kw
         fases = buscar_table_filler.get_value(id_proyecto=id_proyecto, **kw)
