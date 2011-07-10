@@ -48,7 +48,8 @@ class BaseController(TGController):
 
             perms = request.credentials["permissions"]
             if perms.count("crear proyecto") or \
-               perms.count("modificar proyecto"):
+               perms.count("modificar proyecto") or \
+               perms.count("eliminar proyecto"):
                 request.puede_proyecto = True
             
             if perms.count("modificar fase"):
