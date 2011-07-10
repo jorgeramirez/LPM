@@ -282,7 +282,7 @@ class AdjuntoController(CrudRestController):
         id_archivo = int(args[0])
         ae = ArchivosExternos.por_id(id_archivo)
         response.headers["Content-Type"] = "application/octet-stream"
-        disp = 'attachment; filename="' + ae.nombre_archivo + '"'
+        disp = 'attachment; filename="' + ae.nombre_archivo.encode("utf-8") + '"'
         response.headers["Content-Disposition"] = disp
         return ae.archivo
     #}
