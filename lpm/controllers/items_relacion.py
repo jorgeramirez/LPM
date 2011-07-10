@@ -13,7 +13,7 @@ a relacionar
 from tgext.crud import CrudRestController
 from tg.decorators import (paginate, expose, with_trailing_slash,
                            without_trailing_slash)
-from tg import redirect, request, validate, flash
+from tg import redirect, request, validate, flash, session, url
 
 from lpm.model import DBSession, Item, TipoItem, Fase, PropiedadItem, Usuario, Relacion, Proyecto
 from lpm.model.excepciones import *
@@ -245,6 +245,7 @@ class ItemRelacionController(CrudRestController):
         p_item = PropiedadItem.por_id(item.id_propiedad_item)
         
         ids = []
+        id = None
         if kw:
             for k, pk in kw.items():
                 if not k.isalnum():
@@ -266,18 +267,53 @@ class ItemRelacionController(CrudRestController):
             usuario = Usuario.by_user_name(request.identity['repoze.who.userid'])
             item.guardar_historial(u"relacionar-PH", usuario)
         
+        mensaje = ""
         if (retorno == u"" and creado):
-            flash(u"Relacionado exitósamente") 
+            mensaje = u"Relacionado exitósamente"
         elif (retorno != u""):
             mensaje = u"No se pudo crear la relación con %s" % retorno
-            flash(mensaje, "warning")
-        
-        redirect("../")
-        '''
+            
+        #no sé como pasar strings como parámetro, fea solución
+        indice = session.get('indice_mensaje', 0)
+        session['indice_mensaje'] = indice + 1
+        session[str(indice)] = mensaje
+           
         if (id):
-            redirect("../")
+            redirect('../mensajes/%d' % indice)
         else:
             transaction.commit()   
             #return "/items/%d/edit" % id_item
-            return './'
-        '''
+            return './mensajes/%d' % indice
+        
+    @expose()
+    def mensajes(self, id):
+        """ imprime un mensaje flash"""
+        mensaje = session.get(id, "")
+        if (mensaje != ""):
+            flash(u"Relacionado exitósamente")
+        else:
+            flash(mensaje, "warning")
+            
+        redirect("../../")
+    
+    @expose()
+    def get_one(self, *args, **kw):
+        pass
+
+    @expose()
+    def new(self, *args, **kw):
+        pass
+        
+    @expose()
+    def post(self, *args, **kw):
+        pass
+    
+    @expose()
+    def edit(self, *args, **kw):
+        pass
+        
+    @expose()
+    def put(self, *args, **kw):
+        pass
+
+    #}   
