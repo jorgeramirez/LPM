@@ -327,7 +327,7 @@ class FaseController(CrudRestController):
                     titulo=titulo, 
                     modelo=self.model.__name__,
                     columnas=self.columnas,
-                    url_action=self.tmp_action,
+                    url_action="../",
                     puede_crear=puede_crear,
                     comboboxes=self.comboboxes,
                     opciones=self.opciones,

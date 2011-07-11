@@ -82,19 +82,22 @@ class UsuarioTableFiller(CustomTableFiller):
                      
         if PoseePermiso('asignar-desasignar rol').is_met(request.environ):
             value += '<div>' + \
-                        '<a href="./' + str(obj.id_usuario) + \
+                        '<a href="/usuarios/' + str(obj.id_usuario) + \
                                 '/roles_sis_asignados" ' + \
                         'class="' + clase + '">Roles Asig.</a>' + \
                      '</div><br />'
                      
             value += '<div>' + \
-                        '<a href="./' + str(obj.id_usuario) + \
+                        '<a href="/usuarios/' + str(obj.id_usuario) + \
                                 '/roles_sis_desasignados" ' + \
                         'class="' + clase + '">Roles Desa.</a>' + \
                      '</div><br />'  
 
         if PoseePermiso('eliminar usuario').is_met(request.environ):
-            value += '<div><form method="POST" action="' + str(obj.id_usuario) + '" class="button-to">'+\
+            url = ""
+            if UrlParser.parse_nombre(request.url, "post_buscar"):
+                url = "../"
+            value += '<div><form method="POST" action="' + url + str(obj.id_usuario) + '" class="button-to">'+\
                      '<input type="hidden" name="_method" value="DELETE" />' +\
                      '<input onclick="return confirm(\'Está seguro?\');" value="Eliminar" type="submit" '+\
                      'style="background-color: transparent; float:left; border:0; color: #286571;'+\
