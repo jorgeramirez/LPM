@@ -562,7 +562,7 @@ class ItemController(CrudRestController):
         tmpl_context.widget = self.new_form
         return dict(value=kw,
                     page=u"Nuevo Ítem", 
-                    atras='../')
+                    atras='./')
     
     @expose()
     def post_delete(self, id_item):
