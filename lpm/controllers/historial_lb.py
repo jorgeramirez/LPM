@@ -201,7 +201,6 @@ class HistorialLBController(CrudRestController):
                     opciones=self.opciones,
                     comboboxes=self.comboboxes,
                     url_action=self.tmp_action,
-                    comboboxes=self.comboboxes,
                     atras="../../"
                     )
     
@@ -229,7 +228,6 @@ class HistorialLBController(CrudRestController):
                     comboboxes=self.comboboxes,
                     url_action='../',
                     opciones=self.opciones,
-                    comboboxes=self.comboboxes,
                     atras='../'
                     )
 
