@@ -74,6 +74,8 @@ class TipoItemTableFiller(CustomTableFiller):
         if id_tipo:
             url_cont = "../" + str(obj.id_tipo_item)
         
+        if UrlParser.parse_nombre(request.url, "post_buscar"):
+            url_cont = "../" + str(obj.id_tipo_item)
         
         pp = PoseePermiso('redefinir tipo item', 
                           id_tipo_item=obj.id_tipo_item)
@@ -351,6 +353,9 @@ class TipoItemController(CrudRestController):
         tipo_items = self.table_filler.get_value(id_fase=id_fase, **kw)
         tmpl_context.widget = self.table
         url_action = self.action
+        
+        if UrlParser.parse_nombre(request.url, "post_buscar"):
+            url_action = "../"
 
         
         return dict(lista_elementos=tipo_items,

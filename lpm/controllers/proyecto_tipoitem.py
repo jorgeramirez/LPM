@@ -58,9 +58,12 @@ class ProyectoTipoItemTableFiller(CustomTableFiller):
         clase = 'actions'
         url_cont = "./" + str(obj.id_tipo_item)
         id_tipo = UrlParser.parse_id(request.url, "tipositems")
+        
         if id_tipo:
             url_cont = "../" + str(obj.id_tipo_item)
         
+        if UrlParser.parse_nombre(request.url, "post_buscar"):
+            url_cont = "../" + str(obj.id_tipo_item)        
         
         value += '<div>' + \
                     '<a href="' + url_cont + '/edit" ' + \

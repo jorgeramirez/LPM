@@ -58,8 +58,13 @@ class ProyectosFaseTipoTableFiller(CustomTableFiller):
         """Links de acciones para un registro dado"""
         value = '<div>'
         clase = 'actions'
+        
+        url = "./"
+        if UrlParser.parse_nombre(request.url, "post_buscar"):
+            url = "../"
+
         value += '<div>' + \
-                    '<a href="./'+ str(obj.id_proyecto) + '/fases_ti/" ' + \
+                    '<a href="'+ url + str(obj.id_proyecto) + '/fases_ti/" ' + \
                     'class="' + clase + '">Seleccionar</a>' + \
                  '</div><br />'
 
