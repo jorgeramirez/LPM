@@ -406,7 +406,7 @@ class Item(DeclarativeBase):
             DBSession.flush()
             HistorialItems.registrar(usuario, p_item, u"Revisión")
 
-            #HistorialLB.registrar(usuario, lb, u"Para-Revisión")
+            lpm.model.HistorialLB.registrar(usuario, lb, 3)
             
             return True
         
@@ -1505,7 +1505,7 @@ class HistorialItems(DeclarativeBase):
         @type p_item_mod: L{PropiedadItem}
         """
         hist_items = HistorialItems()
-        hist_items.tipo_modificacion = op
+        hist_items.tipo_modificacion = unicode(op)
         hist_items.usuario = usuario
         hist_items.item = p_item_mod
         DBSession.add(hist_items)

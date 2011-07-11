@@ -455,7 +455,7 @@ class LineaBaseController(CrudRestController):
         if pks:
             flash(u"Se ha generado la línea base")
         else:
-            flash(u"No existen ele")
+            flash(u"No se seleccionaron elementos", "warning")
         transaction.commit()
         #redirect("/fases/%d/edit" % id_fase)
         #url = '/fases/%d/edit' % id_fase
