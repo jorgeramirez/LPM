@@ -80,6 +80,12 @@ class VersionTableFiller(CustomTableFiller):
                     'class="' + clase + '">Detalles</a>' + \
                  '</div><br />'
                  
+        value += '<div>' + \
+                    '<a href="' + controller + '/atributos" ' +  \
+                    'class="' + clase + '">Atributos</a>' + \
+                 '</div><br />'
+
+
         if PoseePermiso('modificar item',
                         id_tipo_item=item.id_tipo_item).is_met(request.environ):
                 
