@@ -298,7 +298,11 @@ class Item(DeclarativeBase):
                     otro = rpi.relacion.obtener_otro_item(self.id_item)
                     p_otro = PropiedadItem.por_id(otro.id_propiedad_item)
                     if (p_otro.estado == u"Aprobado"):
-                        p_otro.estado = u"Revisión-Desbloq"
+                        for rpi_otro in p_otro.relaciones:
+                            if (rpi_otro.relacion.id_anterior == self.id_item or\
+                                rpi_otro.relacion.id_posterior == self.id_item):
+                                if (otro.revisar(usuario)):
+                                    rpi_otro.revisar = True   
                         
             p_item.estado = u"Desaprobado"
 
@@ -969,6 +973,10 @@ class PropiedadItem(DeclarativeBase):
             
         if (not creado):
             item.id_propiedad_item = self.id_propiedad_item
+            try:
+                item.propiedad_item_versiones.remove(p_item_nuevo)
+            except e:
+                print e
             #DBSession.delete(p_item_nuevo)
         
         no_relacionados = ", ".join(retorno)    

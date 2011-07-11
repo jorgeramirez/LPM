@@ -145,12 +145,14 @@ class AdjuntoController(CrudRestController):
         id_version = UrlParser.parse_id(request.url, "versiones")
         titulo = self.title
         archivos = {}
+        atras="../../"
+        
         if id_version:
             #desde controller de versiones
             p_item = PropiedadItem.por_id(id_version)
             titulo = u"Archivos Adjuntos de Versión: %d" % p_item.version
             archivos = self.table_filler. \
-                        get_value(id_version=p_item.id_propiedad_item, **kw)
+                        get_value(id_version=id_version, **kw)
         elif id_item:
             #desde controller de items
             item = Item.por_id(id_item)
@@ -165,6 +167,7 @@ class AdjuntoController(CrudRestController):
                     puede_crear = False
             
             titulo = u"Archivos Adjuntos de Ítem: %s" % item.codigo
+            atras="../"
             archivos = self.table_filler. \
                         get_value(id_version=item.id_propiedad_item, **kw)
         
@@ -177,7 +180,7 @@ class AdjuntoController(CrudRestController):
                     opciones=self.opciones,
                     url_action=self.tmp_action,
                     puede_crear=puede_crear,
-                    atras="../"
+                    atras=atras
                     )
     
     @without_trailing_slash
@@ -196,12 +199,14 @@ class AdjuntoController(CrudRestController):
         puede_crear = False
         buscar_table_filler = AdjuntoTableFiller(DBSession)
         buscar_table_filler.filtros = kw
+        atras="../../../"
+        
         if id_version:
             #desde controller de versiones
             p_item = PropiedadItem.por_id(id_version)
             titulo = u"Archivos Adjuntos de Versión: %d" % p_item.version
             archivos = buscar_table_filler. \
-                        get_value(id_version=p_item.id_propiedad_item)
+                        get_value(id_version=id_version)
         elif id_item:
             #desde controller de items.
             item = Item.por_id(id_item)
@@ -216,6 +221,7 @@ class AdjuntoController(CrudRestController):
                     puede_crear = False
 
             titulo = u"Archivos Adjuntos de Ítem: %s" % item.codigo
+            atras="../../"
             archivos = buscar_table_filler. \
                         get_value(id_version=item.id_propiedad_item)
         
@@ -228,7 +234,7 @@ class AdjuntoController(CrudRestController):
                     url_action='../',
                     puede_crear=puede_crear,
                     opciones=self.opciones,
-                    atras='../../'
+                    atras=atras
                     )
     
     @expose()

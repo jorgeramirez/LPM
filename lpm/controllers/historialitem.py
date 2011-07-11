@@ -42,63 +42,44 @@ class HistorialItemTable(TableBase):
     __model__ = HistorialItems
     __headers__ = { 'tipo_modificacion': u'Tipo de Modificacion',
                     'fecha_modificacion': u'Fecha',
-                    'nombre_usuario': u'Usuario',
-                    'codigo': u'Código de Item'
+                    'nombre_usuario': u'Usuario'
                   }
     __omit_fields__ = ['id_historial_items', 'id_usuario', 'id_item', 'usuario',
-                       'item']
+                       'item', '__actions__']
     __default_column_width__ = '15em'
     __column_widths__ = { '__actions__': "50em"}
-    __add_fields__ = {'nombre_usuario': None, 'codigo' : None}
-    __field_order__ = ["codigo", "tipo_modificacion", "nombre_usuario", "fecha_modificacion"]
+    __add_fields__ = {'nombre_usuario': None}
+    __field_order__ = [ "tipo_modificacion", "nombre_usuario", "fecha_modificacion"]
     
 historial_item_table = HistorialItemTable(DBSession)
 
 
 class HistorialItemTableFiller(CustomTableFiller):
     __model__ = HistorialItems
-    __add_fields__ = {'nombre_usuario': None, 'codigo': u'Código de Item'}
+    __add_fields__ = {'nombre_usuario': None}
     
     def nombre_usuario(self, obj, **kw):
         return obj.usuario.nombre_usuario
     
-    def codigo(self, obj, **kw):
-        item = Item.por_id(obj.item.id_item_actual)
-        return item.codigo
-    
-    def __actions__(self, obj):
-        """Links de acciones para un registro dado"""
-
-        value = '<div>'
-        clase = 'actions_fase'
-        id = obj.id_historial_items
-        item = Item.por_id(obj.item.id_item_actual)
-        if PoseePermiso('consultar item',
-                        id_tipo_item=item.id_tipo_item).is_met(request.environ):
-            value += '<div>' + '<a href="./' + str(id) + '/edit" ' +  \
-                        'class="' + clase + '">Examinar</a>' + \
-                     '</div><br />'                
-        value += '</div>'
-        return value
-    
-    def _do_get_provider_count_and_objs(self, id_usuario=None, **kw):
+    def _do_get_provider_count_and_objs(self, id_p_item=None, **kw):
         """
-        Recupera el historioal de operaciones del usuario.
+        Recupera el historiol de operaciones de la versión de un item.
         """
         count, lista = super(HistorialItemTableFiller, self).\
                             _do_get_provider_count_and_objs(**kw)
         filtrados = []                    
-        if id_usuario:
-            id_usuario = int(id_usuario)
+        if id_p_item:
+            
             for p_lista in reversed(lista):
-                if p_lista.id_usuario == id_usuario:
+                if p_lista.id_item == id_p_item:
                     filtrados.append(p_lista)
+                    
         return len(filtrados), filtrados
 
 
 historial_item_filler = HistorialItemTableFiller(DBSession)
 
-
+'''
 class VersionEditForm(EditableForm):
     __model__ = PropiedadItem
     __hide_fields__ = ['id_propiedad_item', 'id_item_actual', 'relaciones',
@@ -112,13 +93,13 @@ class VersionEditFiller(EditFormFiller):
     __model__ = PropiedadItem
     
 version_edit_filler = VersionEditFiller(DBSession)
-
+'''
 
 class HistorialItemController(CrudRestController):
     """Controlador de Historial de un Ítem"""
 
     #{ Variables
-    title = u"Historial del Ítem"
+    title = u"Historial del Ítem %s"
     allow_only = not_anonymous(u"El usuario debe haber iniciado sesión")
 
     #{plantillas
@@ -128,8 +109,6 @@ class HistorialItemController(CrudRestController):
     model = HistorialItems
     table = historial_item_table
     table_filler = historial_item_filler
-    edit_form = version_edit_form
-    edit_filler = version_edit_filler
 
     opciones = dict(tipo_modificacion=u'Tipo de Modificacion',
                     fecha_modificacion= u'Fecha de Mofificacion',
@@ -151,12 +130,13 @@ class HistorialItemController(CrudRestController):
         Retorna una página HTML si no se especifica JSON
         """
         titulo = self.title
-        id_usuario = UrlParser.parse_id(request.url, "usuarios")
-        if id_usuario:
-           usuario = Usuario.por_id(id_usuario)
-           titulo = u"Historial de Item de: %s" % usuario.nombre_usuario 
+        id_p_item = UrlParser.parse_id(request.url, "versiones")
+        
+        if id_p_item:
+           p_item = PropiedadItem.por_id(id_p_item)
+           titulo = u"Cambios en versión: %d" % p_item.version
         tmpl_context.widget = self.table
-        items = self.table_filler.get_value(id_usuario=id_usuario, **kw)
+        items = self.table_filler.get_value(id_p_item=id_p_item, **kw)
         return dict(lista_elementos=items, 
                     page=titulo,
                     titulo=self.title, 
@@ -167,34 +147,39 @@ class HistorialItemController(CrudRestController):
                     atras="../../"
                     )
     
-    @without_trailing_slash
-    @paginate('lista_elementos', items_per_page=5)
-    @expose('lpm.templates.historialitem.get_all')
-    @expose('json')
+#    @without_trailing_slash
+#    @paginate('lista_elementos', items_per_page=5)
+#    @expose('lpm.templates.historialitem.get_all')
+#    @expose('json')
+    @expose()  
     def post_buscar(self, *args, **kw):
         """
         Controlador que recibe los parámetros de búsqueda para 
         devolver el resultado esperado.
         """
         titulo = self.title
-        id_usuario = UrlParser.parse_id(request.url, "usuarios")
-        if id_usuario:
-           usuario = Usuario.por_id(id_usuario)
-           titulo = u"Historial de Item de: %s" % usuario.nombre_usuario
+        id_p_item = UrlParser.parse_id(request.url, "versiones")
+        
+        if id_p_item:
+           p_item = PropiedadItem.por_id(id_p_item)
+           titulo = u"Cambios en versión: %d" % p_item.version
         tmpl_context.widget = self.table
+        
         buscar_table_filler = HistorialItemTableFiller(DBSession)
         buscar_table_filler.filtros = kw
-        items = self.table_filler.get_value(id_usuario=id_usuario, **kw)
+        items = buscar_table_filler.get_value(id_usuario=id_usuario, **kw)
+        
         return dict(lista_elementos=items, 
-                    page=self.title, 
+                    page=titulo,
                     titulo=self.title, 
-                    modelo=self.model.__name__,
+                    modelo=self.model.__name__, 
                     columnas=self.columnas,
-                    url_action='../',
                     opciones=self.opciones,
-                    atras='../'
+                    url_action=self.tmp_action,
+                    atras="../../../"
                     )
-    
+
+        
     @expose()
     def get_one(self, *args, **kw):
         pass
@@ -210,40 +195,10 @@ class HistorialItemController(CrudRestController):
     @expose()        
     def post(self, *args, **kw):
         pass
-    
-    @expose('lpm.templates.version.edit')
+
+    @expose()  
     def edit(self, *args, **kw):
-        """ Despliega una pagina donde se puede ver el estado del ítem
-            para la versión dada.
-        """
-        id = int(args[0])
-        historial = HistorialItems.por_id(id)
-        id_item = historial.item.id_propiedad_item
-        value = self.edit_filler.get_value(values={'id_propiedad_item': id_item})
-        item = Item.por_id(id_item)
-        page = u"Versión %d del Ítem: %s" % (value["version"], item.codigo)
-        tmpl_context.widget = self.edit_form
-        
-        atributos_table = AtributoItemTable(DBSession)
-        atributos_table_filler = AtributoItemTableFiller(DBSession)
-        
-        tmpl_context.tabla_atributos = atributos_table
-        atributos = atributos_table_filler.get_value(id_version=id_item)        
-        
-        relacion_table = RelacionTable(DBSession)
-        relacion_table_filler = RelacionTableFiller(DBSession)
-        
-        tmpl_context.tabla_relaciones = relacion_table
-        relaciones = relacion_table_filler.get_value(id_version=id_item)
-        
-        atras = "../"
-        return dict(value=value,
-                    page=page,
-                    id=str(id_item),
-                    atributos=atributos,
-                    relaciones=relaciones,
-                    atras=atras
-                    )
+        pass
     @expose()
     def put(self, *args, **kw):
         pass

@@ -189,16 +189,19 @@ class AtributoItemController(CrudRestController):
         id_version = UrlParser.parse_id(request.url, "versiones")
         titulo = self.title
         atributos = {}
+        atras="../../"
+        
         if id_version:
             #desde controller de versiones
             p_item = PropiedadItem.por_id(id_version)
             titulo = u"Atributos de Version: %d" % p_item.version
             atributos = self.table_filler. \
-                        get_value(id_version=p_item.id_propiedad_item, **kw)
+                        get_value(id_version=id_version, **kw)
         elif id_item:
             #desde controller de items.
             item = Item.por_id(id_item)
             titulo = u"Atributos de Ítem: %s" % item.codigo
+            atras="../"
             atributos = self.table_filler. \
                         get_value(id_version=item.id_propiedad_item, **kw)
         
@@ -210,7 +213,7 @@ class AtributoItemController(CrudRestController):
 #                    columnas=self.columnas,
 #                    opciones=self.opciones,
                     url_action=self.tmp_action,
-                    atras="../"
+                    atras=atras
                     )
     
 #    @without_trailing_slash
@@ -231,6 +234,7 @@ class AtributoItemController(CrudRestController):
         atributos = {}
         buscar_table_filler = AtributoItemTableFiller(DBSession)
         buscar_table_filler.filtros = kw
+        atras="../../../"
         if id_version:
             #desde controller de versiones
             p_item = PropiedadItem.por_id(id_version)
@@ -252,7 +256,7 @@ class AtributoItemController(CrudRestController):
                     columnas=self.columnas,
                     url_action='../',
                     opciones=self.opciones,
-                    atras='../../'
+                    atras=atras
                     )
         '''
         

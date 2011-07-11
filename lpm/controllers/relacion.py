@@ -44,12 +44,12 @@ class RelacionTable(TableBase):
     __model__ = Relacion
     __headers__ = {'tipo': u'Tipo', 'codigo': u'Código',
                    'item_relacionado': u"Ítem Relacionado",
-                   'estado': u'Revisión',
+                   'estado': u'Revision',
                    'item_relacionado_estado': u'Estado'}
     __add_fields__ = {'item_relacionado': None,
                       'estado': None,
                       'item_relacionado_estado': None}
-    __omit_fields__ = ['id_relacion', 'id_anterior', 'id_posterior']
+    __omit_fields__ = ['id_relacion', 'id_anterior', 'id_posterior', '__actions__']
     __default_column_width__ = '15em'
     __column_widths__ = { '__actions__': "50em"}
     __field_order__ = ['codigo', 'tipo', 'item_relacionado', 'item_relacionado_estado']
@@ -262,18 +262,19 @@ class RelacionController(CrudRestController):
         tabla = self.table
         puede_relacionar = False
         puede_nueva = False
-            
+        atras = "../../"    
           
         if id_version:
             #desde controller de versiones
             p_item = PropiedadItem.por_id(id_version)
             titulo = u"Relaciones de Version: %d" % p_item.version
             relaciones = self.table_filler. \
-                        get_value(id_version=p_item.id_propiedad_item, **kw)
+                        get_value(id_version=id_version, **kw)
         elif id_item:
             #desde controller de items.
             item = Item.por_id(id_item)
             titulo = u"Relaciones de Ítem: %s" % item.codigo
+            atras = "../"
             
             relaciones = relacion_item_table_filler. \
                         get_value(id_version=item.id_propiedad_item, **kw)
@@ -298,7 +299,7 @@ class RelacionController(CrudRestController):
                     #comboboxes=self.comboboxes,
                     url_action=self.tmp_action,
                     puede_relacionar=puede_relacionar,
-                    atras= "../",
+                    atras=atras,
                     puede_nueva=puede_nueva
                     )
     

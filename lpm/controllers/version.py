@@ -23,6 +23,7 @@ from lpm.lib.util import UrlParser
 from lpm.controllers.atributoitem import AtributoItemController
 from lpm.controllers.adjunto import AdjuntoController
 from lpm.controllers.relacion import RelacionController
+from lpm.controllers.historialitem import HistorialItemController
 
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller, EditFormFiller
@@ -63,27 +64,52 @@ class VersionTableFiller(CustomTableFiller):
         value = '<div>'
         clase = 'actions_fase'
         item = Item.por_id(obj.id_item_actual)
+        p_item = PropiedadItem.por_id(item.id_propiedad_item)
         id = obj.id_propiedad_item
 
+        controller = "./" + str(obj.id_propiedad_item)
+        controller2 = "./"
+        if (UrlParser.parse_nombre(request.url, "post_buscar")):#desde post_buscar
+            controller = "../" + str(obj.id_propiedad_item)
+            controller2 = "../"
 
+            
+        
+        value += '<div>' + \
+                    '<a href="' + controller + '/edit" ' +  \
+                    'class="' + clase + '">Detalles</a>' + \
+                 '</div><br />'
+                 
         if PoseePermiso('modificar item',
                         id_tipo_item=item.id_tipo_item).is_met(request.environ):
-            value += '<div>' + \
-                        '<a href="./' + str(id) + '/edit" ' +  \
-                        'class="' + clase + '">Examinar</a>' + \
-                     '</div><br />'
-            
-            if obj.estado not in [u"Bloqueado", u"Eliminado", u"Revisión-Bloq"]:
+                
+            if p_item.estado not in [u"Bloqueado", u"Eliminado", u"Revisión-Bloq"] and\
+                id != p_item.id_propiedad_item:
                 value += '<div>' + \
-                            '<a href="./revertir/'+ str(id) + '" ' + \
+                            '<a href="' + controller2 + 'revertir/'+ str(id) + '" ' + \
                             'class="' + clase + '">Volver a versión</a>' + \
                          '</div><br />'
                      
-            value += '<div>' + \
-                '<a href="./'+ str(id) +'/adjuntos" ' + \
-                'class="' + clase + '">Adjuntos</a>' + \
-                '</div><br />'
-                
+        value += '<div>' + \
+            '<a href="' + controller +'/adjuntos" ' + \
+            'class="' + clase + '">Adjuntos</a>' + \
+            '</div><br />'
+            
+        value += '<div>' + \
+            '<a href="' + controller +'/relaciones_ph" ' + \
+            'class="' + clase + '">Relaciones P-H</a>' + \
+            '</div><br />'
+            
+        value += '<div>' + \
+            '<a href="' + controller +'/relaciones_as" ' + \
+            'class="' + clase + '">Relaciones A-S</a>' + \
+            '</div><br />'
+        
+        value += '<div>' + \
+            '<a href="' + controller +'/historial" ' + \
+            'class="' + clase + '">Historial</a>' + \
+            '</div><br />'
+                    
         value += '</div>'
         return value
     
@@ -131,7 +157,10 @@ class VersionController(CrudRestController):
     #{Subcontroladores
     adjuntos = AdjuntoController(DBSession)
     atributos = AtributoItemController(DBSession)
-    relaciones = RelacionController(DBSession)
+    relaciones_ph = RelacionController(DBSession)
+    relaciones_as = RelacionController(DBSession)
+    historial = HistorialItemController(DBSession)
+    
     #{plantillas
     tmp_action = "./"
     
@@ -152,7 +181,7 @@ class VersionController(CrudRestController):
                     complejidad=u'combobox',
                     prioridad =u'combobox'
                     )
-    comboboxes = dict(estado=Item.estados_posibles,
+    comboboxes = dict(estado=Item.estados_posibles.values(),
                       complejidad=range(1,11),
                       prioridad=range(1,11))
     
@@ -181,7 +210,7 @@ class VersionController(CrudRestController):
                     opciones=self.opciones,
                     url_action=self.tmp_action,
                     comboboxes=self.comboboxes,
-                    atras="../../"
+                    atras="../"
                     )
     
     @without_trailing_slash
@@ -210,7 +239,7 @@ class VersionController(CrudRestController):
                     url_action='../',
                     comboboxes=self.comboboxes,
                     opciones=self.opciones,
-                    atras='../'
+                    atras='../../'
                     )
     
     @expose()
@@ -240,16 +269,16 @@ class VersionController(CrudRestController):
         item = Item.por_id(id_item)
         page = u"Versión %d del Ítem: %s" % (value["version"], item.codigo)
         tmpl_context.widget = self.edit_form
-        tmpl_context.tabla_atributos = self.atributos.table
-        atributos = self.atributos.table_filler.get_value(id_version=id)        
-        tmpl_context.tabla_relaciones = self.relaciones.table
-        relaciones = self.relaciones.table_filler.get_value(id_version=id)
+        #tmpl_context.tabla_atributos = self.atributos.table
+        #atributos = self.atributos.table_filler.get_value(id_version=id)        
+        #tmpl_context.tabla_relaciones = self.relaciones.table
+        #relaciones = self.relaciones.table_filler.get_value(id_version=id)
         atras = "../"
         return dict(value=value,
                     page=page,
                     id=str(id_item),
-                    atributos=atributos,
-                    relaciones=relaciones,
+                    #atributos=atributos,
+                    #relaciones=relaciones,
                     atras=atras
                     )
         

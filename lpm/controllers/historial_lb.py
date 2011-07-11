@@ -171,10 +171,10 @@ class HistorialLBController(CrudRestController):
     opciones = dict(tipo_operacion=u'Tipo de Operación',
                     fecha_modificacion= u'Fecha de Mofificación'
                     )
-    columnas = dict(tipo_operacion=u'texto',
-                    fecha_modificacion= u'fecha'
+    columnas = dict(tipo_operacion='combobox',
+                    fecha_modificacion= 'fecha'
                     )
-    
+    comboboxes = dict(tipo_operacion= [u"Apertura", u"Cierre", u"Ruptura", u"Revisión", u"Creación"])
     #{ Métodos
     @with_trailing_slash
     @paginate('lista_elementos', items_per_page=5)
@@ -196,6 +196,7 @@ class HistorialLBController(CrudRestController):
                     modelo=self.model.__name__, 
                     columnas=self.columnas,
                     opciones=self.opciones,
+                    comboboxes=self.comboboxes,
                     url_action=self.tmp_action,
                     atras="../../"
                     )
@@ -223,6 +224,7 @@ class HistorialLBController(CrudRestController):
                     columnas=self.columnas,
                     url_action='../',
                     opciones=self.opciones,
+                    comboboxes=self.comboboxes,
                     atras='../'
                     )
 
