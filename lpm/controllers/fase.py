@@ -393,7 +393,6 @@ class FaseController(CrudRestController):
         atras = "./"
         if not id_proyecto:
             id_proyecto = UrlParser.parse_id(request.url, "proyectos_fase")
-            atras = "../../"
             
         pp = PoseePermiso('modificar fase', id_fase=id_fase)
         if not pp.is_met(request.environ):

@@ -21,7 +21,10 @@ from lpm.lib.authorization import PoseePermiso, AlgunPermiso
 from lpm.lib.util import UrlParser
 from lpm.controllers.usuario import UsuarioEditForm, UsuarioEditFiller
 from lpm.controllers.miembros_proyecto import (MiembrosProyectoTable,
-                                               MiembrosProyectoRolesTable)
+                                               MiembrosProyectoRolesTable,
+                                               select, selector,
+                                               RolVerEditForm,
+                                               rol_ver_edit_filler)
 
 from sprox.tablebase import TableBase
 from sprox.fillerbase import TableFiller
@@ -29,6 +32,8 @@ from sprox.fillerbase import EditFormFiller
 from sprox.dojo.formbase import DojoAddRecordForm as AddRecordForm
 from sprox.dojo.formbase import DojoEditableForm as EditableForm
 from sprox.widgets import PropertySingleSelectField
+
+from tw.forms.fields import TextArea
 
 from repoze.what.predicates import not_anonymous
 
@@ -128,8 +133,11 @@ class MiembrosFaseRolesTableFiller(CustomTableFiller):
         """Links de acciones para un registro dado"""
         clase = 'actions'
         value = "<div>"
+        url = "./"
+        if UrlParser.parse_nombre(request.url, "post_buscar"):
+            url = "../"
         value += '<div>' + \
-                    '<a href="/roles/' + str(obj.id_rol) + '" ' + \
+                    '<a href="' + url + str(obj.id_rol) + '" ' + \
                     'class="' + clase + '">Ver</a>' + \
                  '</div><br />'
         value += "</div>"
@@ -284,6 +292,15 @@ class RolesAsignadosController(RestController):
         else:
             flash("Seleccione por lo menos un rol", "warning")
         return "./"
+
+    @expose('lpm.templates.rol.get_one')
+    def get_one(self, id_rol):
+        """Despliega una página para visualizar el rol"""
+        tmpl_context.widget = RolVerEditForm(DBSession)
+        value = rol_ver_edit_filler.get_value(values={'id_rol': int(id_rol)})
+        page = "Rol {nombre}".format(nombre=value["nombre_rol"])
+        atras = self.action
+        return dict(value=value, page=page, atras=atras)
     
 
 
@@ -402,6 +419,15 @@ class RolesDesasignadosController(RestController):
         else:
             flash("Seleccione por lo menos un rol", "warning")
         return "./"
+
+    @expose('lpm.templates.rol.get_one')
+    def get_one(self, id_rol):
+        """Despliega una página para visualizar el rol"""
+        tmpl_context.widget = RolVerEditForm(DBSession)
+        value = rol_ver_edit_filler.get_value(values={'id_rol': int(id_rol)})
+        page = "Rol {nombre}".format(nombre=value["nombre_rol"])
+        atras = self.action
+        return dict(value=value, page=page, atras=atras)
 
 
 class MiembrosFaseController(RestController):
