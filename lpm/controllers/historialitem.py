@@ -41,8 +41,8 @@ import transaction
 class HistorialItemTable(TableBase):
     __model__ = HistorialItems
     __headers__ = { 'tipo_modificacion': u'Tipo de Modificacion',
-                    'fecha_modificacion': u'Fecha de Mofificacion',
-                    'nombre_usuario': u'Nombre de Usuario',
+                    'fecha_modificacion': u'Fecha',
+                    'nombre_usuario': u'Usuario',
                     'codigo': u'Código de Item'
                   }
     __omit_fields__ = ['id_historial_items', 'id_usuario', 'id_item', 'usuario',

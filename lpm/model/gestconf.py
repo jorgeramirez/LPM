@@ -125,8 +125,9 @@ class HistorialLB(DeclarativeBase):
         @param usuario: el usuario que realiza los cambios.
         @type usuario: L{Usuario}
         """
+        1/0
         hist_lb = HistorialLB()
-        hist_lb.tipo_operacion = unicode(op)
+        hist_lb.tipo_operacion = op
         hist_lb.usuario = usuario
         hist_lb.lb = lb
         DBSession.add(hist_lb)

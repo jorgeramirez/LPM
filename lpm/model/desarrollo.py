@@ -233,12 +233,13 @@ class Item(DeclarativeBase):
            Relacion.id_posterior== self.id_item,
            RelacionPorItem.id_propiedad_item==self.id_propiedad_item,
            RelacionPorItem.id_relacion==Relacion.id_relacion,
-           Relacion.tipo==u'Antecesor-Sucesor', 
-           PropiedadItem.id_propiedad_item==self.id_propiedad_item,
+           Relacion.tipo==u'Antecesor-Sucesor',
+           Relacion.id_anterior == Item.id_item,
+           Item.id_propiedad_item == PropiedadItem.id_propiedad_item, 
            PropiedadItem.estado==u'Bloqueado')).count()
         
         #anteriores = Relacion.relaciones_como_posterior(self.id_item)
-        if fase.posicion > 1 and anteriores_count== 0:
+        if fase.posicion > 1 and anteriores_count == 0:
             raise CondicionAprobarError(u"El ítem debe tener al menos un antecesor o padre")
         
         for rpi in p_item.relaciones:
@@ -246,8 +247,9 @@ class Item(DeclarativeBase):
                 continue
             item_ant = Item.por_id(rpi.relacion.id_anterior)
             p_item_ant = PropiedadItem.por_id(item_ant.id_propiedad_item)
-            iplb = lpm.model.ItemsPorLB.filter_by_id_item(p_item_ant.id_propiedad_item)
+            
             '''
+            iplb = lpm.model.ItemsPorLB.filter_by_id_item(p_item_ant.id_propiedad_item)
             lb = lpm.model.LB.por_id(iplb.id_lb)
             if lb.estado != u"Cerrada":
                 raise CondicionAprobarError(u"Todos los antecesores y padres " + \
@@ -256,7 +258,7 @@ class Item(DeclarativeBase):
             if p_item_ant.estado != u"Bloqueado":
                 raise CondicionAprobarError(u"Todos los antecesores y padres " + \
                                             "deben estar en una LB cerrada")
-                
+              
         if p_item.estado == u"Desaprobado":
             self.marcar_para_revisar(usuario)
             #for rpi in p_item.relaciones:
@@ -370,7 +372,7 @@ class Item(DeclarativeBase):
         for rpi in p_item.relaciones:
             
             otro = rpi.relacion.obtener_otro_item(self.id_item)
-            p_otro = PropiedadItem.por_id(otro.id_item)
+            p_otro = PropiedadItem.por_id(otro.id_propiedad_item)
             
             #solo si se cambio el estado de revisar se pone como para revisar la relacion
             '''   
@@ -400,10 +402,12 @@ class Item(DeclarativeBase):
             lb = self.lb_actual()
             if (lb and lb.estado == u"Cerrada"):
                 lb.estado = u"Para-Revisión"
-                
+              
             DBSession.flush()
             HistorialItems.registrar(usuario, p_item, u"Revisión")
-            HistorialLB.registrar(usuario, lb, u"Para-Revisión")
+
+            #HistorialLB.registrar(usuario, lb, u"Para-Revisión")
+            
             return True
         
         elif (p_item.estado == u"Aprobado"):
@@ -467,10 +471,9 @@ class Item(DeclarativeBase):
               
         p_item = PropiedadItem.por_id(self.id_propiedad_item)
         
-        for r in p_item.relaciones:
-            relacion = Relacion.por_id(r.id_relacion)
-            if (relacion.id_anterior == id_item or\
-                relacion.id_posterior == id_item ):
+        for rpi in p_item.relaciones:
+            if (rpi.relacion.id_anterior == id_item or\
+                rpi.relacion.id_posterior == id_item ):
                 return True
             
         return False
@@ -1502,7 +1505,7 @@ class HistorialItems(DeclarativeBase):
         @type p_item_mod: L{PropiedadItem}
         """
         hist_items = HistorialItems()
-        hist_items.tipo_modificacion = unicode(op)
+        hist_items.tipo_modificacion = op
         hist_items.usuario = usuario
         hist_items.item = p_item_mod
         DBSession.add(hist_items)
