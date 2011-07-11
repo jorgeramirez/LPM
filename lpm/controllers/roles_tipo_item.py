@@ -58,15 +58,19 @@ class RolesTipoTableFiller(CustomTableFiller):
         
         perm_mod = PoseePermiso('modificar rol', id_tipo_item=obj.id_tipo_item)
         perm_del = PoseePermiso('eliminar rol', id_tipo_item=obj.id_tipo_item)
+
+        url = "./"
+        if UrlParser.parse_nombre(request.url, "post_buscar"):
+            url = "../"
             
         if perm_mod.is_met(request.environ):
             value += '<div>' + \
-                        '<a href="./' + str(obj.id_rol) + "/edit"+  \
+                        '<a href="' + url + str(obj.id_rol) + "/edit"+  \
                         '" class="' + clase + '">Modificar</a>' + \
                      '</div><br />'
 
         if perm_del.is_met(request.environ):
-            value += '<div><form method="POST" action="./' + str(obj.id_rol) + '" class="button-to">'+\
+            value += '<div><form method="POST" action="' + url + str(obj.id_rol) + '" class="button-to">'+\
                      '<input type="hidden" name="_method" value="DELETE" />' +\
                      '<input onclick="return confirm(\'Está seguro?\');" value="Eliminar" type="submit" '+\
                      'style="background-color: transparent; float:left; border:0; color: #286571;'+\

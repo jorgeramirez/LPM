@@ -15,7 +15,7 @@ from tg.decorators import (paginate, expose, with_trailing_slash,
                            without_trailing_slash)
 from tg import redirect, request, require, flash, url, validate 
 
-from lpm.model import DBSession, Usuario, Proyecto, Rol
+from lpm.model import DBSession, Usuario, Proyecto, Rol, Permiso
 from lpm.lib.sproxcustom import CustomTableFiller
 from lpm.lib.authorization import PoseePermiso, AlgunPermiso
 from lpm.lib.util import UrlParser
@@ -27,6 +27,9 @@ from sprox.fillerbase import EditFormFiller
 from sprox.dojo.formbase import DojoAddRecordForm as AddRecordForm
 from sprox.dojo.formbase import DojoEditableForm as EditableForm
 from sprox.widgets import PropertySingleSelectField
+from lpm.lib.sproxcustom import WidgetSelectorDojo, MultipleSelectDojo
+
+from tw.forms.fields import TextArea
 
 from repoze.what.predicates import not_anonymous
 
@@ -151,8 +154,11 @@ class MiembrosProyectoRolesTableFiller(CustomTableFiller):
         """Links de acciones para un registro dado"""
         clase = 'actions'
         value = "<div>"
+        url = "./"
+        if UrlParser.parse_nombre(request.url, "post_buscar"):
+            url = "../"
         value += '<div>' + \
-                    '<a href="/roles/' + str(obj.id_rol) + '" ' + \
+                    '<a href="' + url + str(obj.id_rol) + '" ' + \
                     'class="' + clase + '">Ver</a>' + \
                  '</div><br />'
         value += "</div>"
@@ -187,6 +193,42 @@ class MiembrosProyectoRolesTableFiller(CustomTableFiller):
     
 
 miembros_proyecto_roles_table_filler = MiembrosProyectoRolesTableFiller(DBSession)
+
+
+## para el get_one del rol
+class select(MultipleSelectDojo):
+    def _my_update_params(self, d, nullable=False):
+        options = []
+        pks = []
+        for i, v in enumerate(d["value"]):
+            pks.append(int(v))
+        permisos = DBSession.query(Permiso) \
+                            .filter(Permiso.id_permiso.in_(pks)).all()
+        for p in permisos:
+            options.append((p.id_permiso, '%s' % p.nombre_permiso))
+        d['options'] = options
+        return d
+
+class selector(WidgetSelectorDojo):
+    default_multiple_select_field_widget_type = select
+
+class RolVerEditForm(EditableForm):
+    __model__ = Rol
+    __hide_fields__ = ['id_rol']
+    __omit_fields__ = [ 'usuarios',
+                       'codigo', 'creado', 'id_proyecto',
+                       'id_fase', 'id_tipo_item']
+    __field_order__ = ['nombre_rol', 'tipo', 'descripcion', 'permisos']
+    __widget_selector_type__ = selector
+    descripcion = TextArea
+
+class RolVerEditFiller(EditFormFiller):
+    __model__ = Rol
+
+rol_ver_edit_filler = RolVerEditFiller(DBSession)
+
+
+
 
 
 #controlador de roles asignados al usuario.
@@ -320,6 +362,15 @@ class RolesAsignadosController(RestController):
         else:
             flash("Seleccione por lo menos un rol", "warning")
         return "./"
+
+    @expose('lpm.templates.rol.get_one')
+    def get_one(self, id_rol):
+        """Despliega una página para visualizar el rol"""
+        tmpl_context.widget = RolVerEditForm(DBSession)
+        value = rol_ver_edit_filler.get_value(values={'id_rol': int(id_rol)})
+        page = "Rol {nombre}".format(nombre=value["nombre_rol"])
+        atras = self.action
+        return dict(value=value, page=page, atras=atras)
     
 
 
@@ -435,6 +486,15 @@ class RolesDesasignadosController(RestController):
         else:
             flash("Seleccione por lo menos un rol", "warning")
         return "./"
+
+    @expose('lpm.templates.rol.get_one')
+    def get_one(self, id_rol):
+        """Despliega una página para visualizar el rol"""
+        tmpl_context.widget = RolVerEditForm(DBSession)
+        value = rol_ver_edit_filler.get_value(values={'id_rol': int(id_rol)})
+        page = "Rol {nombre}".format(nombre=value["nombre_rol"])
+        atras = self.action
+        return dict(value=value, page=page, atras=atras)
 
 
 class MiembrosProyectoController(RestController):

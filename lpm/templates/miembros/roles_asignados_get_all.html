@@ -18,7 +18,7 @@
             <tr>${buscar()}</tr>
             <tr>
                 <td>
-                <form py:if="puede_desasignar" id="form_desasignar" method="POST" action="${tg.url('./desasignar_roles/')}">
+                <form py:if="puede_desasignar" id="form_desasignar" method="POST" action="${tg.url(url_action + 'desasignar_roles/')}">
                 <input id="desasignar" class="boton" type="submit" value="Desasignar Seleccionados" style="margin-top: 10px; width: 160px;"/>
                 </form>
                 </td>
