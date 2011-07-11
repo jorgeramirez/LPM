@@ -47,6 +47,7 @@ class LB(DeclarativeBase):
     estado = Column(Unicode(20), nullable=True, default=u"Cerrada")
     codigo = Column(Unicode(50), unique=True)
     estados_posibles = [u"Abierta", u"Cerrada", u"Rota", u"Para-Revisión"]
+    
     # template para codificacion
     tmpl_codigo = u"lb-{id_lb}"
     #{ Relaciones
@@ -79,7 +80,7 @@ class LB(DeclarativeBase):
         Rompe una linea base
         """
         self.estado = u"Rota"
-        HistorialLB.registrar(usuario, self, u"Rutura")
+        HistorialLB.registrar(usuario, self, 2)
     
     @classmethod
     def por_id(cls, id):
@@ -125,9 +126,9 @@ class HistorialLB(DeclarativeBase):
         @param usuario: el usuario que realiza los cambios.
         @type usuario: L{Usuario}
         """
-
+        estados_posibles = [u"Apertura", u"Cierre", u"Rutura", u"Revisión"]
         hist_lb = HistorialLB()
-        hist_lb.tipo_operacion =  LB.estados_posibles[op]
+        hist_lb.tipo_operacion =  estados_posibles[op]
         hist_lb.usuario = usuario
         hist_lb.lb = lb
         DBSession.add(hist_lb)
