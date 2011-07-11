@@ -126,7 +126,7 @@ class HistorialLB(DeclarativeBase):
         @param usuario: el usuario que realiza los cambios.
         @type usuario: L{Usuario}
         """
-        estados_posibles = [u"Apertura", u"Cierre", u"Rutura", u"Revisión"]
+        estados_posibles = [u"Apertura", u"Cierre", u"Ruptura", u"Revisión", u"Creación"]
         hist_lb = HistorialLB()
         hist_lb.tipo_operacion =  estados_posibles[op]
         hist_lb.usuario = usuario

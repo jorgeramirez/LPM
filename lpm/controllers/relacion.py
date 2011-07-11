@@ -105,7 +105,7 @@ class RelacionTableFiller(CustomTableFiller):
             color = u"#ff0000;"
             estado = u'Sí'
             
-        value = '<div style="font-color:' + color + '">' + estado + '</div>'
+        value = '<div style="color:' + color + '">' + estado + '</div>'
         
         return value
     

@@ -477,7 +477,8 @@ class LineaBaseController(CrudRestController):
             elif p_item.estado == u"Revisión-Bloq":
                 p_item.estado = u"Revisión-Desbloq"
             HistorialItems.registrar(user, p_item, op)
-        HistorialLB.registrar(user, lb, u"Apertura")
+            
+        HistorialLB.registrar(user, lb, 0)# u"Apertura"
         id_fase = UrlParser.parse_id(request.url, "fases")
         url = '../'
         fase = Fase.por_id(id_fase)
@@ -543,7 +544,7 @@ class LineaBaseController(CrudRestController):
             for p_item in habilitados:
                 p_item.estado = u"Bloqueado"
                 HistorialItems.registrar(user, p_item, u"Bloqueo")
-            HistorialLB.registrar(user, lb, u"Cierre")
+            HistorialLB.registrar(user, lb, 1)# u"Cierre"
             id_fase = UrlParser.parse_id(request.url, "fases")
             fase = Fase.por_id(id_fase)
             fase.cambiar_estado()
@@ -553,7 +554,7 @@ class LineaBaseController(CrudRestController):
         
         #Romper la LB.
         lb.estado = u"Rota"
-        HistorialLB.registrar(user, lb, u"Ruptura")
+        HistorialLB.registrar(user, lb, 2)# u"Ruptura"
         
         page = u"Generar LB parcial a partir de : {codigo}".format(codigo=lb.codigo)
         tmpl_context.tabla_items_habilitados = ItemGenerarTable(DBSession)

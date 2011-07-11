@@ -201,9 +201,9 @@ class Fase(DeclarativeBase):
             lb_new.agregar_item(pi)
         DBSession.flush()
         lb_new.codigo = LB.generar_codigo(lb_new)
-        op = u"Creación"
+
         self.cambiar_estado()
-        HistorialLB.registrar(usuario, lb_new, op)
+        HistorialLB.registrar(usuario, lb_new, 4)#u"Creación"
 
     @classmethod
     def por_id(cls, id):
