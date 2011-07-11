@@ -34,7 +34,7 @@ from sprox.dojo.formbase import DojoAddRecordForm as AddRecordForm
 from sprox.dojo.formbase import DojoEditableForm as EditableForm
 from sprox.widgets import PropertySingleSelectField
 
-from tw.forms.fields import PasswordField, TextField, InputField, SubmitButton
+from tw.forms.fields import PasswordField, TextField, InputField, CheckBox
 
 from repoze.what.predicates import not_anonymous
 
@@ -128,12 +128,14 @@ class UsuarioAddForm(AddRecordForm):
     __require_fields__ = ['nombre_usuario', 'nombre', 'apellido', 'password',
                           'repita_password', 'email']
     __base_validator__ = UsuarioAddFormValidator
-    __field_order__ = ['nombre_usuario', 'nombre', 'apellido', 'password',
-                       'repita_password', 'email', 'nro_documento', 'telefono']
+    __field_order__ = ['nombre_usuario', 'nombre', 'apellido',
+                        'email', 'nro_documento', 'telefono',
+                         'password','repita_password'
+                        ]
     __field_attrs__ = {}
     
     repita_password = PasswordField('repita_password')
-
+    
 
 usuario_add_form = UsuarioAddForm(DBSession)
 
@@ -146,17 +148,18 @@ class UsuarioEditForm(EditableForm):
     __require_fields__ = ['nombre', 'apellido', 'nuevo_password',
                           'repita_password', 'email']
     __base_validator__ = UsuarioEditFormValidator
-    __field_order__ = ['nombre_usuario', 'nombre', 'apellido', 'nuevo_password',
-                       'repita_password', 'email', 'nro_documento', 'telefono']
+    __field_order__ = ['nombre_usuario', 'nombre', 'apellido', 'email',
+                        'nro_documento', 'telefono', 'nuevo_password',
+                        'repita_password', 'cambiar_pass']
     __field_attrs__ = {
                        'nombre_usuario': { 'maxlength' : '32'}
                        }
 
     nuevo_password = PasswordField('nuevo_password')
     repita_password = PasswordField('repita_nuevo_password')
+    cambiar_pass = CheckBox("cambiar_pass", label_text="Cambiar Password")
     
-usuario_edit_form = UsuarioEditForm(DBSession)        
-
+usuario_edit_form = UsuarioEditForm(DBSession)      
 
 class UsuarioEditFiller(EditFormFiller):
     __model__ = Usuario
@@ -303,9 +306,9 @@ class UsuarioController(CrudRestController):
         usuario.email = kw["email"]
         usuario.telefono = kw["telefono"]
         usuario.nro_documento = kw["nro_documento"]
-        if kw["nuevo_password"] != None:
+        if kw["nuevo_password"] != None and kw.has_key('cambiar_pass'):
             usuario.password = kw["nuevo_password"]
-    
+
         redirect("../") 
     
     @validate(usuario_add_form, error_handler=new)
