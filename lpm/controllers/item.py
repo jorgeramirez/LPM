@@ -212,7 +212,7 @@ class ItemTableFiller(CustomTableFiller):
             if aprobar:
                 value += '<div>' + \
                             '<a href="' + controller2 + 'aprobar/' +str(obj.id_item) +'" ' + \
-                            'style="margin-right:8px;" class="' + clase + '">Aprobar</a>' + \
+                            'style="margin-left: -46px;" class="' + clase + '">Aprobar</a>' + \
                          '</div><br />'
             elif desaprobar:
                 value += '<div>' + \

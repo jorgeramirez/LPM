@@ -90,7 +90,7 @@ class RootController(BaseController):
             mail = user.email #DEBUG:  u"carlosbellino@gmail.com"
             hash = hashlib.new('ripemd160')
             hash.update(user.email + unicode(random.random()))
-            new_pass = hash.hexdigest()
+            new_pass = hash.hexdigest()[0:15]
             user._set_password(new_pass)
             DBSession.add(user)
             text = _(u"Tu nueva contraseña es : %s") % new_pass

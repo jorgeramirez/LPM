@@ -461,7 +461,8 @@ class LineaBaseController(CrudRestController):
         #url = '/fases/%d/edit' % id_fase
         url = './'
         return url
-
+       
+        
     @expose()
     def abrir(self, *args, **kw):
         """

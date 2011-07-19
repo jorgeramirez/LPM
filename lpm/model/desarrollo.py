@@ -267,7 +267,7 @@ class Item(DeclarativeBase):
         
         if p_item.estado == u"Revisión-Desbloq":
             for rpi in p_item.relaciones:
-                rpi.relacion.revisar = False
+                rpi.revisar = False
             
         p_item.estado = u"Aprobado"
         op = u"Aprobación"
@@ -292,7 +292,7 @@ class Item(DeclarativeBase):
         elif p_item.estado == u"Revision-Desbloq":
             for rpi in p_item.relaciones:
                 if (rpi.relacion.revisar):
-                    rpi.relacion.revisar = False
+                    rpi.revisar = False
                     #cambiamos el estado del item que provoco
                     #esta revision
                     otro = rpi.relacion.obtener_otro_item(self.id_item)

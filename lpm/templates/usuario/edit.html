@@ -41,9 +41,13 @@
 			{
 				$("#nuevo_password\\.container").slideDown("slow");
 				$("#repita_nuevo_password\\.container").slideDown("slow");
+                $("#nuevo_password").val("");
+				$("#repita_nuevo_password").val("");					
 			} else {
 				$("#nuevo_password\\.container").slideUp("slow");
 				$("#repita_nuevo_password\\.container").slideUp("slow");
+                $("#nuevo_password").val("");
+				$("#repita_nuevo_password").val("");				
 				//$("div.contentToChange").find("p.firstparagraph:visible").slideUp("slow");
 			}	
 		});

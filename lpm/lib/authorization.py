@@ -26,11 +26,11 @@ Permisos = [
     dict(nombre= u"modificar usuario", descripcion= u"Permite modificar valores de atributos de usuarios", tipo= u"Sistema, Usuario"),
     dict(nombre= u"consultar usuario", descripcion= u"Permite consultar valores de atributos de usuarios", tipo= u"Sistema, Usuario"),
 #roles
-    dict(nombre= u"crear rol", descripcion= u"Permite realizar la operación de crear un rol", tipo= u"Proyecto, Fase, Tipo Ítem, Rol"),
-    dict(nombre= u"eliminar rol", descripcion= u"Permite realizar la operación de eliminar un rol", tipo= u"Proyecto, Fase, Tipo Ítem, Rol"),
-    dict(nombre= u"modificar rol", descripcion= u"Permite modificar un rol", tipo= u"Proyecto, Fase, Tipo Ítem, Rol"),
-    dict(nombre= u"asignar-desasignar rol", descripcion= u"Permite realizar la operación de asignar un rol", tipo= u"Proyecto, Fase, Tipo Ítem, Rol"),
-    dict(nombre= u"consultar rol", descripcion= u"Permite consultar atributos de un rol", tipo= u"Proyecto, Fase, Tipo Ítem, Rol"),
+    dict(nombre= u"crear rol", descripcion= u"Permite realizar la operación de crear un rol", tipo= u"Proyecto, Fase, Tipo Ítem, Rol, Sistema"),
+    dict(nombre= u"eliminar rol", descripcion= u"Permite realizar la operación de eliminar un rol", tipo= u"Proyecto, Fase, Tipo Ítem, Rol, Sistema"),
+    dict(nombre= u"modificar rol", descripcion= u"Permite modificar un rol", tipo= u"Proyecto, Fase, Tipo Ítem, Rol, Sistema"),
+    dict(nombre= u"asignar-desasignar rol", descripcion= u"Permite realizar la operación de asignar un rol", tipo= u"Proyecto, Fase, Tipo Ítem, Rol, Sistema"),
+    dict(nombre= u"consultar rol", descripcion= u"Permite consultar atributos de un rol", tipo= u"Proyecto, Fase, Tipo Ítem, Rol, Sistema"),
 
     #dict(nombre= u"miembro", descripcion= u"Indica si es miembro", tipo= u"Proyecto, Fase, Tipo Ítem"),
 

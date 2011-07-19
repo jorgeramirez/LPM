@@ -494,7 +494,7 @@ class Permiso(DeclarativeBase):
     id_permiso = Column(Integer, autoincrement=True, primary_key=True)
     nombre_permiso = Column(Unicode(32), unique=True, nullable=False)
     descripcion = Column(Unicode(100))
-    tipo = Column(Unicode(30))
+    tipo = Column(Unicode(60))
     #{ Relations
 
     roles = relation(Rol, secondary=group_permission_table,
